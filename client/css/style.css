@@ -1,0 +1,164 @@
+* {
+	font-family: "Courier New", Courier, monospace;
+  box-sizing: border-box;
+}
+
+html,body {
+	
+	height: 100%;
+}
+
+body {
+	background-image: url("../images/lab_research_chemistry_test_7_mod.jpg");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: auto;
+}
+
+/*navbar*/
+#navbarTop {
+  width: 100%;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: rgba(120,120,120,0.3);
+  text-decoration: none;
+  color: white;
+}
+
+.active {
+  background-color: rgba(114,114,114,0.63);
+  color: white;
+}
+
+
+#zusatzText {
+  background-color: blue;
+  border-radius: 5px;
+  color: yellow;
+}
+
+.entrySelect {
+  border-radius: 2px;
+  background: #73AD21;
+  padding-left: 5px;
+  padding-top: 20px;
+  width: 400px;
+  height: 60px; 
+  color: white;
+  font-size: 20px;
+  line-height: 16px;
+  -webkit-box-shadow: 3px 2px 5px 1px rgba(114,114,114,0.63); 
+  box-shadow: 3px 2px 5px 1px rgba(114,114,114,0.63);
+}
+
+#topBanner {
+	padding-top: 10px;
+	font-size: 50px;
+	letter-spacing: 2px;
+	word-spacing: 2px;
+	text-align: center;
+	font-weight: 700;
+  height: 100px;
+	background: rgba(40,167,69,0.4);
+}
+
+#labFolderLogin {
+  background-color: white;
+  border-radius: 2px;
+  border: 2px solid #606060;
+  padding: 3px;
+  transform: translate(-10px, 0px);
+}
+
+#labFolderFailedLogin {
+  display: none;
+  color: red;
+}
+
+#labFolderLoginSuccesful {
+  display: none;
+  height: 100px;
+  max-height: 100px; 
+}
+
+#labFolderLoginFormHeader {
+  text-align: center;
+  background-color: rgba(40,167,69,0.4);
+  padding-top: 12px;
+  border-radius: 2px;
+}
+
+#formDescriptor {
+  padding-top: 2px;
+  margin: 0;
+  margin-top: 3px;
+}
+
+#labFolderLogin .btn-success {
+  display: block;
+  padding: 10px;
+  width: 100%;
+}
+
+/*#submitLabFolderButtonLogin {
+  display: block;
+  padding: 10px;
+  width: 100%;
+}
+
+.submitLabFolderButtonLogout {
+  display: block;
+  padding: 10px;
+  width: 100%;
+}*/
+
+
+/* Full-width inputs */
+input[type=text], input[type=password] {
+  font-size: 14px;
+  width: 100%;
+  padding: 10px 7px;
+  margin: 2px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Extra style for the cancel button (red) */
+.cancelbtn {
+  width: auto;
+  padding: 10px 18px;
+  background-color: #f44336;
+}
+
+/* Avatar image */
+img.avatar {
+  width: 40%;
+  border-radius: 50%;
+}
+
+/* Add padding to containers */
+.container {
+  padding: 16px;
+}
