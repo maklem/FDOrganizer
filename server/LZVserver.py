@@ -231,7 +231,49 @@ def getText():
 	file.close()
 	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
 
+#------------Material Database-------------
 
+@app.route('/mdb/databases', methods=['GET'])
+def getMDBDatabases():
+	url = labFolderBaseURL + '/mdb/databases'
+	
+	#prepare header		
+	headers = {"Content-Type": "application/json",
+				"Authorization" :  "Token " + request.headers['Authorization'],
+				"User-Agent": labFolderDefaultUserAgentHeader
+			  }
+	response = requests.get(url, headers=headers)
+	return response.text
+
+@app.route('/mdb/categories', methods=['GET'])
+def getMDBCategories():
+	url = labFolderBaseURL + '/mdb/categories?'
+	elementID = request.args.get('id', default = '', type = str)
+	if elementID == '':
+		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
+	file_url = url + elementID
+	#prepare header		
+	headers = {"Content-Type": "application/json",
+				"Authorization" :  "Token " + request.headers['Authorization'],
+				"User-Agent": labFolderDefaultUserAgentHeader
+			  }
+	response = requests.get(url, headers=headers)
+	return response.text
+
+#----does only support filtering by categoryID----
+@app.route('/mdb/items', methods=['GET'])
+def getMDBItems():
+	url = labFolderBaseURL + '/mdb/items'
+	categoryID = request.args.get('category_id', default = '', type = str)
+	if categoryID != '':
+		file_url = url + '?' + categoryID		
+	#prepare header		
+	headers = {"Content-Type": "application/json",
+				"Authorization" :  "Token " + request.headers['Authorization'],
+				"User-Agent": labFolderDefaultUserAgentHeader
+			  }
+	response = requests.get(url, headers=headers)
+	return response.text
 
 if __name__ == '__main__':
 	app.run(debug=True)

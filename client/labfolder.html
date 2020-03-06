@@ -30,8 +30,8 @@
 			<div class="col-md-8" id="mainPage">
 				<div  id="labFolderEntrySelectionHeader">
 					<div >
-						<button class="btn btnEntrySelectionHeader" id="labFolderSelectProject">Projekte</button>
-						<button class="btn btnEntrySelectionHeader" id="labFolderSelectMDB" onclick="">Materialien</button>
+						<button class="btn btnEntrySelectionHeader btnEntrySelectionHeaderTop" id="labFolderSelectProject" onclick="updateSelectionProjectMDB(this);">Projekte</button>
+						<button class="btn btnEntrySelectionHeader btnEntrySelectionHeaderTop" id="labFolderSelectMDB" onclick="updateSelectionProjectMDB(this);">Materialien</button>
 					</div>
 					<div  id="labFolderProjectSelect">
 						<!--
@@ -73,6 +73,8 @@
 					<button id="getEntries" type="button" class="btn btn-success">krieg die Entries...</button>
 					<button id="getProjects" type="button" class="btn btn-success">krieg die Projecte...</button>
 					<button id="download" type="button" class="btn btn-success">download...</button>
+					<button id="getMDBdatabases" type="button" class="btn btn-success">download mdb...</button>
+					<button id="getMDBcats" type="button" class="btn btn-success">download mdb categories...</button>
 				</div> 
 			</div>
 
