@@ -1,7 +1,11 @@
 * {
 	font-family: "Courier New", Courier, monospace;
   box-sizing: border-box;
+  --main_button_color: #28a745;
+  --main_button_hover_color: #169932;
 }
+
+
 
 html,body {
 	
@@ -15,7 +19,19 @@ body {
 	background-size: auto;
 }
 
-/*navbar*/
+
+#topBanner {
+  padding-top: 10px;
+  font-size: 50px;
+  letter-spacing: 2px;
+  word-spacing: 2px;
+  text-align: center;
+  font-weight: 700;
+  height: 100px;
+  background: rgba(40,167,69,0.4);
+}
+
+/*-----navbar-----*/
 #navbarTop {
   width: 100%;
 }
@@ -46,17 +62,6 @@ li a:hover {
   color: white;
 }
 
-.active {
-  background-color: rgba(114,114,114,0.63);
-  color: white;
-}
-
-
-#zusatzText {
-  background-color: blue;
-  border-radius: 5px;
-  color: yellow;
-}
 
 .entrySelect {
   border-radius: 2px;
@@ -71,18 +76,42 @@ li a:hover {
   -webkit-box-shadow: 3px 2px 5px 1px rgba(114,114,114,0.63); 
   box-shadow: 3px 2px 5px 1px rgba(114,114,114,0.63);
 }
+/*----dynamicLabFolderContent----*/
 
-#topBanner {
-	padding-top: 10px;
-	font-size: 50px;
-	letter-spacing: 2px;
-	word-spacing: 2px;
-	text-align: center;
-	font-weight: 700;
-  height: 100px;
-	background: rgba(40,167,69,0.4);
+.btnEntrySelectionHeader {
+  margin-left: -10px;
+  margin-bottom: -1px;
+  background-color: var(--main_button_color);
+  width: 50%;
+  color: white;
+  font-weight: bold;
+  border-radius: 0;
+  border-color: var(--main_button_hover_color);
 }
 
+.btnEntrySelectionHeader.selected {
+  background-color: var(--main_button_hover_color);
+  text-decoration: underline;
+  color: white;
+  outline: 0;
+}
+
+.btnEntrySelectionHeader:focus {
+  background-color: var(--main_button_hover_color);
+  color: white;
+  box-shadow: none;
+}
+
+.btnEntrySelectionHeader:hover {
+  background-color: var(--main_button_hover_color);
+  color: white;
+}
+
+.btnEntrySelectionProject {
+  width: 25%;  
+}
+
+/*----LabFolderLoginBox-----*/
 #labFolderLogin {
   background-color: white;
   border-radius: 2px;
@@ -109,17 +138,18 @@ li a:hover {
   border-radius: 2px;
 }
 
-#formDescriptor {
-  padding-top: 2px;
-  margin: 0;
-  margin-top: 3px;
-}
-
 #labFolderLogin .btn-success {
   display: block;
   padding: 10px;
   width: 100%;
 }
+
+.formDescriptor {
+  padding-top: 2px;
+  margin: 0;
+  margin-top: 3px;
+}
+
 
 /*#submitLabFolderButtonLogin {
   display: block;

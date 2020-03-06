@@ -28,8 +28,18 @@
 				<br>
 			</div>
 			<div class="col-md-8" id="mainPage">
-				<div class="col-md-8">
-					<p id="zusatzText"></p>
+				<div  id="labFolderEntrySelectionHeader">
+					<div >
+						<button class="btn btnEntrySelectionHeader" id="labFolderSelectProject">Projekte</button>
+						<button class="btn btnEntrySelectionHeader" id="labFolderSelectMDB" onclick="">Materialien</button>
+					</div>
+					<div  id="labFolderProjectSelect">
+						<!--
+						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>
+						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>
+						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>
+						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>-->
+					</div>
 				</div>
 				<div class="col-md-8">
 					<div class="selections" id=dynamic>
@@ -44,10 +54,10 @@
 					<div id="labfolderLoginform">
 						<form onsubmit="return false" action ="#">
 							<div id="labFolderLoginFormHeader"><label><strong><h1><b>LabFolder</b></h1></strong></label><br> </div>
-							<label id="formDescriptor" for="username"><h3><b>Username</b></h3></label>
-							<input name="username" type="text" placeholder="Enter Username" required>
-							<label id="formDescriptor" for="pwd"><h3><b>Password</b></h3></label>
-							<input name="pwd" type="password" placeholder="Enter Password" required>
+							<label class="formDescriptor" for="username"><h3><b>Username</b></h3></label>
+							<input name="username" type="text" placeholder="Enter Username" required value="robert.guenther@uni-bayreuth.de">
+							<label class="formDescriptor" for="pwd"><h3><b>Password</b></h3></label>
+							<input name="pwd" type="password" placeholder="Enter Password" required value="krQ3C3LTjIXFmwcpmEaM">
 							<div id="labFolderFailedLogin">
 								<label> Wrong Username or password!</label><br>
 							</div>
@@ -61,7 +71,7 @@
 				</div>
 				<div><!--these are only here for testing purposes -->
 					<button id="getEntries" type="button" class="btn btn-success">krieg die Entries...</button>
-					<button id="test" type="button" class="btn btn-success">test...</button>
+					<button id="getProjects" type="button" class="btn btn-success">krieg die Projecte...</button>
 					<button id="download" type="button" class="btn btn-success">download...</button>
 				</div> 
 			</div>
