@@ -251,7 +251,7 @@ def getMDBCategories():
 	elementID = request.args.get('mdb_id', default = '', type = str)
 	if elementID == '':
 		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-	file_url = url + '?mdb_id=' + elementID
+	url = url + '?mdb_id=' + elementID
 	#prepare header		
 	headers = {"Content-Type": "application/json",
 				"Authorization" :  "Token " + request.headers['Authorization'],
@@ -268,7 +268,7 @@ def getMDBItems():
 	url = labFolderBaseURL + '/mdb/items'
 	categoryID = request.args.get('category_id', default = '', type = str)
 	if categoryID != '':
-		file_url = url + '?category_id=' + categoryID		
+		url = url + '?category_id=' + categoryID		
 	#prepare header		
 	headers = {"Content-Type": "application/json",
 				"Authorization" :  "Token " + request.headers['Authorization'],
