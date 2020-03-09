@@ -247,17 +247,16 @@ def getMDBDatabases():
 
 @app.route('/mdb/categories', methods=['GET'])
 def getMDBCategories():
-	url = labFolderBaseURL + '/mdb/categories?'
+	url = labFolderBaseURL + '/mdb/categories'
 	elementID = request.args.get('mdb_id', default = '', type = str)
 	if elementID == '':
 		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-	file_url = url + elementID
+	file_url = url + '?mdb_id=' + elementID
 	#prepare header		
 	headers = {"Content-Type": "application/json",
 				"Authorization" :  "Token " + request.headers['Authorization'],
 				"User-Agent": labFolderDefaultUserAgentHeader
 			  }
-	print(url)
 	response = requests.get(url, headers=headers)
 	return response.text
 
@@ -267,13 +266,12 @@ def getMDBItems():
 	url = labFolderBaseURL + '/mdb/items'
 	categoryID = request.args.get('category_id', default = '', type = str)
 	if categoryID != '':
-		file_url = url + '?' + categoryID		
+		file_url = url + '?category_id=' + categoryID		
 	#prepare header		
 	headers = {"Content-Type": "application/json",
 				"Authorization" :  "Token " + request.headers['Authorization'],
 				"User-Agent": labFolderDefaultUserAgentHeader
 			  }
-	print(url)
 	response = requests.get(url, headers=headers)
 	return response.text
 
