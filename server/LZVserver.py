@@ -257,6 +257,8 @@ def getMDBCategories():
 				"Authorization" :  "Token " + request.headers['Authorization'],
 				"User-Agent": labFolderDefaultUserAgentHeader
 			  }
+	if DEBUG:			  
+		print(url)
 	response = requests.get(url, headers=headers)
 	return response.text
 
