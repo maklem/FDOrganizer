@@ -274,7 +274,9 @@ def getMDBItems():
 				"Authorization" :  "Token " + request.headers['Authorization'],
 				"User-Agent": labFolderDefaultUserAgentHeader
 			  }
+	print(url)			  
 	response = requests.get(url, headers=headers)
+	print(response.text)
 	return response.text
 
 if __name__ == '__main__':
