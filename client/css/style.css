@@ -62,53 +62,61 @@ li a:hover {
   color: white;
 }
 
+/*basic button design*/
 
-.entrySelect {
-  border-radius: 2px;
-  background: #73AD21;
-  padding-left: 5px;
-  padding-top: 20px;
-  width: 400px;
-  height: 60px; 
+.lzvButton {
   color: white;
-  font-size: 20px;
-  line-height: 16px;
-  -webkit-box-shadow: 3px 2px 5px 1px rgba(114,114,114,0.63); 
-  box-shadow: 3px 2px 5px 1px rgba(114,114,114,0.63);
+  border-radius: 0;
+  font-weight: bold;
+  background-color: var(--main_button_color);
+  border: 1px solid var(--main_button_hover_color);
+}
+
+.lzvButton:focus {
+  box-shadow: none;
+  background-color: var(--main_button_hover_color);
+  color: white;
+}
+
+.lzvButton:hover {
+  background-color: var(--main_button_hover_color);
+  color: white;
+}
+
+.lzvSideBarRight {
+  width: 100%;
+  margin-left: -10px;
+  margin-top: 1px;
+}
+
+/*the items which can be selected to download*/
+.entrySelect {
+  white-space: nowrap;
+  width: 100%;
+  padding: 10px;
+  margin-left: -25px;
+  margin-top: 2px;
+  margin-bottom: -1px;
 }
 /*----dynamicLabFolderContent----*/
 
 .btnEntrySelectionHeader {
+  white-space: nowrap;
   margin-left: -10px;
   margin-bottom: -1px;
-  background-color: var(--main_button_color);
-  width: 50%;
-  color: white;
-  font-weight: bold;
-  border-radius: 0;
-  border-color: var(--main_button_hover_color);
+  width: 48%;
 }
 
 .btnEntrySelectionHeader.selected {
   background-color: var(--main_button_hover_color);
   text-decoration: underline;
-  color: white;
   outline: 0;
-}
-
-.btnEntrySelectionHeader:focus {
-  background-color: var(--main_button_hover_color);
-  color: white;
-  box-shadow: none;
-}
-
-.btnEntrySelectionHeader:hover {
-  background-color: var(--main_button_hover_color);
   color: white;
 }
 
 .btnEntrySelectionProject {
-  width: 25%;  
+  width: 25%;
+  margin-right: 10px;
 }
 
 /*----LabFolderLoginBox-----*/
@@ -138,7 +146,7 @@ li a:hover {
   border-radius: 2px;
 }
 
-#labFolderLogin .btn-success {
+#labFolderLogin .lzvButton {
   display: block;
   padding: 10px;
   width: 100%;
@@ -191,4 +199,45 @@ img.avatar {
 /* Add padding to containers */
 .container {
   padding: 16px;
+}
+
+/*Checkboxes styles*/
+.selections input[type="checkbox"] { display: none; }
+
+.selections input[type="checkbox"] + label {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.selections input[type="checkbox"] + label:last-child { margin-bottom: 0; }
+
+.selections input[type="checkbox"] + label:before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ffffff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: .6;
+  -webkit-transition: all .12s, border-color .08s;
+  transition: all .12s, border-color .08s;
+}
+
+.selections input[type="checkbox"]:checked + label:before {
+  width: 10px;
+  top: -5px;
+  left: 5px;
+  border-radius: 2px;
+  opacity: 1;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
 }

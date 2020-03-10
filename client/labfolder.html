@@ -30,21 +30,20 @@
 			<div class="col-md-8" id="mainPage">
 				<div  id="labFolderEntrySelectionHeader">
 					<div >
-						<button class="btn btnEntrySelectionHeader btnEntrySelectionHeaderTop" id="labFolderSelectProject" onclick="updateSelectionProjectMDB(this);">Projekte</button>
-						<button class="btn btnEntrySelectionHeader btnEntrySelectionHeaderTop" id="labFolderSelectMDB" onclick="updateSelectionProjectMDB(this);">Materialien</button>
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderProject" id="labFolderSelectProject" onclick="updateSelectionProjectMDB(this);">Projekte</button>
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderMDB" id="labFolderSelectMDB" onclick="updateSelectionProjectMDB(this);">Materialien</button>
 					</div>
 					<div  id="labFolderProjectSelect">
-						<!--
+						
+<!-- 						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>
 						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>
 						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>
-						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>
-						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button>-->
+						<button class="btn btnEntrySelectionHeader btnEntrySelectionProject" id="testproject">Testprojekt</button> -->
 					</div>
 				</div>
 				<div class="col-md-8">
 					<div class="selections" id=dynamic>
 						<form id="selectableEntries">
-
 						</form>
 					</div>
 				</div>
@@ -61,21 +60,28 @@
 							<div id="labFolderFailedLogin">
 								<label> Wrong Username or password!</label><br>
 							</div>
-							<button type="submit" class="btn btn-success" id="submitLabFolderButtonLogin" onclick="authenticate(this.form);">Login</button>
+							<button type="submit" class="btn lzvButton" id="submitLabFolderButtonLogin" onclick="authenticate(this.form);">Login</button>
 						</form>
 					</div>
 					<div  id="labFolderLoginSuccesful">
 						<label>LabFolder Login Successfull</label><br>
-						<button class="btn btn-success" id="submitLabFolderButtonLogout" onclick="logout();">Logout</button>
+						<button class="btn lzvButton" id="submitLabFolderButtonLogout" onclick="logout();">Logout</button>
 					</div>
+
 				</div>
-				<div><!--these are only here for testing purposes -->
-					<button id="getEntries" type="button" class="btn btn-success">krieg die Entries...</button>
-					<button id="getProjects" type="button" class="btn btn-success">krieg die Projecte...</button>
-					<button id="download" type="button" class="btn btn-success">download...</button>
-					<button id="getMDBdatabases" type="button" class="btn btn-success">download mdb...</button>
-					<button id="getMDBcats" type="button" class="btn btn-success">download mdb categories...</button>
-				</div> 
+				<div id="labFolderDownloadButton">
+						<button id="downloadSelectedElements" type="button" class="btn lzvButton lzvSideBarRight">Download selected Elements</button>
+				</div>	
+				<!--these are only here for testing purposes -->			
+<!-- 				<div>
+					<button id="getEntries" type="button" class="btn lzvButton">krieg die Entries...</button>
+					<button id="getProjects" type="button" class="btn lzvButton">krieg die Projecte...</button>
+					<button id="download" type="button" class="btn lzvButton">download...</button>
+					<button id="downloadMDB" type="button" class="btn lzvButton">downloadMDB...</button>
+					<button id="getMDBdatabases" type="button" class="btn lzvButton">download mdb database...</button>
+					<button id="getMDBcats" type="button" class="btn lzvButton">download mdb categories...</button>
+				</div>  -->
+
 			</div>
 
 		</div>
