@@ -7,7 +7,7 @@ from flask_cors import CORS
 import requests
 import json
 
-DEBUG=1
+DEBUG=0
 
 app = Flask(__name__)
 labFolderBaseURL = 'https://eln.labfolder.com/api/v2'
@@ -145,13 +145,13 @@ def getFile():
 	fileInfoResponseJDATA = json.loads(fileInfoResponse.text)
 	
 	filename = fileInfoResponseJDATA["file_name"]
-	filedate = fileInfoResponseJDATA["version_date"]
+	filedata = fileInfoResponseJDATA["version_date"]
 	fileversion = fileInfoResponseJDATA["version_id"]
 	filetype = fileInfoResponseJDATA["content_type"]
 	if DEBUG:
 		print('filetype: ' + filetype)
 		print('filename: ' + filename)
-		print('filedata: ' + filedate)
+		print('filedata: ' + filedata)
 	
 	file = open(filename, "wb")
 	fileData = fileResponse.content
@@ -265,19 +265,57 @@ def getMDBCategories():
 #----does only support filtering by categoryID----
 @app.route('/mdb/items', methods=['GET'])
 def getMDBItems():
-	url = labFolderBaseURL + '/mdb/items'
+	urlItems = labFolderBaseURL + '/mdb/items'
+	urlCategories = labFolderBaseURL + '/mdb/categories'
 	categoryID = request.args.get('category_id', default = '', type = str)
-	if categoryID != '':
-		url = url + '?category_id=' + categoryID		
+	if categoryID == '':
+		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
+	urlItems = urlItems + '?category_id=' + categoryID		
+	urlCategories = urlCategories + '/' + categoryID
 	#prepare header		
 	headers = {"Content-Type": "application/json",
 				"Authorization" :  "Token " + request.headers['Authorization'],
 				"User-Agent": labFolderDefaultUserAgentHeader
 			  }
-	print(url)			  
-	response = requests.get(url, headers=headers)
-	print(response.text)
-	return response.text
+	if DEBUG:			  
+		print(urlItems)
+		print(urlCategories)
+	responseCategories = requests.get(urlCategories, headers=headers)
+	responseItems = requests.get(urlItems, headers=headers)
+	if DEBUG:
+		print(responseCategories.text)
+		print(responseItems.text)
+	#now we preprocess the answer to a csv 
+	categoryResponseJDATA = json.loads(responseCategories.text)
+	itemResponseJDATA = json.loads(responseItems.text)
+	
+	attributes = categoryResponseJDATA["attributes"]
+	attributes_sorted = sorted(attributes, key=lambda x: x["display_order"])
+	title = categoryResponseJDATA["title"]
+
+	fileData = "Name, "
+	for att in attributes_sorted:
+		fileData = fileData + att["title"] + ","
+	fileData.rstrip(",")
+	fileData = fileData + "\n"
+	if DEBUG:
+		print("After headline")
+		print(fileData)
+
+	for item in itemResponseJDATA:
+		fileData = fileData + item["title"] + ","
+		for satt in attributes_sorted:
+			#write the content of the sorted attribute field. identified by the id of the attribute
+			fileData = fileData + item["custom_attributes"][satt["id"]] + ","
+		fileData.rstrip(",")
+		fileData = fileData + "\n"
+	if DEBUG:		
+		print("After Content")
+		print(fileData)		
+	file = open(title + ".csv", "w")
+	file.write(fileData)
+	file.close
+	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
 
 if __name__ == '__main__':
 	app.run(debug=True)
