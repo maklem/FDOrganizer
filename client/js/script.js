@@ -64,6 +64,32 @@ function downloadSelectedElements() {
 } 
 
 
+$("#selectAllElements").click(function(){
+	var childrenDiv = $('form[id=selectableEntries]').children();
+	for (var i = 0; i < childrenDiv.length; i++) {
+		var children = childrenDiv[i].children;
+		for (var j = 0; j < children.length; j++) {
+			if (children[j].type == 'checkbox'){
+				children[j].checked = true;
+			}
+		}
+	}
+
+})
+
+$("#deSelectAllElements").click(function(){
+	var childrenDiv = $('form[id=selectableEntries]').children();
+	for (var i = 0; i < childrenDiv.length; i++) {
+		var children = childrenDiv[i].children;
+		for (var j = 0; j < children.length; j++) {
+			if (children[j].type == 'checkbox'){
+				children[j].checked = false;
+			}
+		}
+	}
+
+})
+
 //switch between (currently) Project and MaterialDB to select. Updates Projects and Materials to display
 function updateSelectionProjectMDB(clicked) {
 	if($(clicked).hasClass("selected")) { return;}
@@ -98,6 +124,14 @@ function updateSelectedProject(clicked) {
 	}		
 }
 
+function updateProjectMaterialSelection() {
+	if (labFolderProjects.projects.length > 0 ) {
+		$("#labFolderSelectProject").removeAttr("disabled");
+	}
+	if (labFolderMDB.databases.length > 0 ) {
+		$("#labFolderSelectMDB").removeAttr("disabled");	
+	}
+}
 
 function authenticate(form) {
 	var url = baseURL + '/auth/login';
@@ -115,6 +149,7 @@ function authenticate(form) {
 				getEntries();
 				getMDBDatabases();
 				getMDBCategories();
+				updateProjectMaterialSelection();
 			}
 			else
 			{
@@ -340,7 +375,7 @@ function updateLabfolderSelectableProjects() {
 	}
 	if (displayProjectCount > 0){
 		$("#labFolderProjectSelect").html(append);
-		$(".btnEntrySelectionProject").css("width", parseInt(96/displayProjectCount) + "%")
+		$(".btnEntrySelectionProject").css("width", 100/displayProjectCount + "%")
 	}
 
 }
@@ -379,7 +414,7 @@ function updateLabfolderSelectableDatabases() {
 	}
 	if (displayProjectCount > 0){
 		$("#labFolderProjectSelect").html(append);
-		$(".btnEntrySelectionProject").css("width", parseInt(96/displayProjectCount) + "%")
+		$(".btnEntrySelectionProject").css("width", 100/displayProjectCount + "%")
 	}
 
 }

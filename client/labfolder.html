@@ -13,7 +13,7 @@
 	<div class="container-fluid">
 		<div class ="row">
 			<div class="col-md-12" id="topBanner">
-				<p>$TOOLNAME$</p>
+				<p>LZV@UNI-BAYREUTH</p>
 			</div>
 			<div data-role="navbar" id="navbarTop">
 				<ul>
@@ -30,8 +30,8 @@
 			<div class="col-md-8" id="mainPage">
 				<div  id="labFolderEntrySelectionHeader">
 					<div >
-						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderProject" id="labFolderSelectProject" onclick="updateSelectionProjectMDB(this);">Projekte</button>
-						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderMDB" id="labFolderSelectMDB" onclick="updateSelectionProjectMDB(this);">Materialien</button>
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderProject" id="labFolderSelectProject" disabled="true" onclick="updateSelectionProjectMDB(this);">Projekte</button>
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderMDB" id="labFolderSelectMDB" disabled="true" onclick="updateSelectionProjectMDB(this);">Materialien</button>
 					</div>
 					<div  id="labFolderProjectSelect">
 						
@@ -44,6 +44,13 @@
 				<div class="col-md-8">
 					<div class="selections" id=dynamic>
 						<form id="selectableEntries">
+<!-- 							<div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="1337" name="1337">
+							<label for="haha">Titel</label>
+							</div>
+							<div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="1338" name="1338">
+							<label for="haha">Titel2</label>
+							</div> -->
+
 						</form>
 					</div>
 				</div>
@@ -71,6 +78,8 @@
 				</div>
 				<div id="labFolderDownloadButton">
 						<button id="downloadSelectedElements" type="button" class="btn lzvButton lzvSideBarRight">Download selected Elements</button>
+						<button id="selectAllElements" type="button" class="btn lzvButton lzvSideBarRight">Select all</button>
+						<button id="deSelectAllElements" type="button" class="btn lzvButton lzvSideBarRight">Deselect all</button>
 				</div>	
 				<!--these are only here for testing purposes -->			
 <!-- 				<div>

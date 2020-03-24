@@ -1,10 +1,15 @@
 * {
-	font-family: "Courier New", Courier, monospace;
+	/*font-family: "Courier New", Courier, monospace;*/
   box-sizing: border-box;
   --main_button_color: #28a745;
   --main_button_hover_color: #169932;
 }
 
+
+@font-face {
+    font-family: "MyriadPro-Regular", "Courier New", Courier, monospace;
+    src: url('fonts/MyriadPro-Regular.otf'); 
+}
 
 
 html,body {
@@ -28,7 +33,7 @@ body {
   text-align: center;
   font-weight: 700;
   height: 100px;
-  background: rgba(40,167,69,0.4);
+  /*background: rgba(40,167,69,0.4);*/
 }
 
 /*-----navbar-----*/
@@ -41,7 +46,7 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
+  background-color: #555;
 }
 
 li {
@@ -103,8 +108,9 @@ li a:hover {
 .btnEntrySelectionHeader {
   white-space: nowrap;
   margin-left: -10px;
+  margin-right: 5px;
   margin-bottom: -1px;
-  width: 48%;
+  width: 50%;
 }
 
 .btnEntrySelectionHeader.selected {
