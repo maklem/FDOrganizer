@@ -1,5 +1,5 @@
 var baseURL = "http://localhost:5000";
-var token = "";
+var labFolderToken = "";
 var DEBUGlogin = "robert.guenther@uni-bayreuth.de";
 var DEBUGpassword = "krQ3C3LTjIXFmwcpmEaM";
 
@@ -11,13 +11,22 @@ if (window.XMLHttpRequest) {
     var xhttp = new ActiveXObject("Microsoft.XMLHTTP");
 } 
 
+//Initialization Function
+$( document ).ready(function() {
+	var ct = getCookie("LabFolderToken");
+    if (ct != "") {
+    	token = ct;
+    	updateContentAfterLogin();
+    }
+});
+
+
 var xhttpMutexLocked = false; 
 
 //contains the entries of the loged in user from labfolder
 var labFolderEntries = {
 	entries: Array()
 }
-
 
 var labFolderProjects = {
 	projects: Array()
@@ -140,16 +149,9 @@ function authenticate(form) {
 			if(this.status == 200) {
 				data = JSON.parse(xhttp.response) ;
 				if (!("error" in data))  {
-					token = data.token;
-					$("#labFolderFailedLogin").hide();
-					$("#labfolderLoginform").hide();
-					$("#labFolderLoginSuccesful").show();
-				// unlockXMLHTTPRequest();
-				getProjects();
-				getEntries();
-				getMDBDatabases();
-				getMDBCategories();
-				updateProjectMaterialSelection();
+					labFolderToken = data.token;
+					setCookie("labFolderToken", labFolderToken);
+					updateContentAfterLogin();
 			}
 			else
 			{
@@ -171,15 +173,15 @@ function authenticate(form) {
 }
 
 function logout() {
-	if (token != '') { 
+	if (labFolderToken != '') { 
 		var url = baseURL + '/auth/logout';
 		xhttp.onreadystatechange  = function(e) {
 			if(this.readyState == 4) {
 				if(this.status == 200) {
-					document.getElementById("zusatzText").textContent = xhttp.response;
 					$('form[id=selectableEntries]').empty();
 					$("#labfolderLoginform").show();
 					$("#labFolderLoginSuccesful").hide();
+					setCookie("labFolderToken", "");
 				}
 		// unlockXMLHTTPRequest();
 	}
@@ -187,7 +189,7 @@ function logout() {
 	// lockXMLHTTPRequest();
 	xhttp.open('POST', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", token);
+	xhttp.setRequestHeader("Authorization", labFolderToken);
 	xhttp.send();
 }
 else
@@ -196,6 +198,36 @@ else
 }
 }
 
+function updateContentAfterLogin() {
+	$("#labFolderFailedLogin").hide();
+	$("#labfolderLoginform").hide();
+	$("#labFolderLoginSuccesful").show();
+	if (getCookie("labFolderProjects") == "") {
+		getProjects();
+		setCookie("labFolderProjects", JSON.stringify(labFolderProjects));	
+	}
+	else {
+		getCookie("labFolderProjects");
+	}
+
+	if (getCookie("labFolderEntries") == "") {
+		getEntries();
+		setCookie("labFolderEntries", JSON.stringify(labFolderEntries));	
+	}
+	else {
+		getCookie("labFolderEntries");
+	}
+
+	if (getCookie("labFolderMDB") == "") {
+		getMDBDatabases();
+		getMDBCategories();
+		setCookie("labFolderMDB", JSON.stringify(labFolderMDB));	
+	}
+	else {
+		getCookie("labFolderMDB");
+	}
+	updateProjectMaterialSelection();
+}
 
 function getProjects() {
 	// console.log("in getProjects");
@@ -231,7 +263,7 @@ function getProjects() {
 	// lockXMLHTTPRequest();
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", token);
+	xhttp.setRequestHeader("Authorization", labFolderToken);
 	xhttp.send();	
 }
 
@@ -272,7 +304,7 @@ function getEntries() {
 					labFolderEntries.entries.push(entry);				
 				}
 				//updateLabfolderSelectableElements();
-				console.log(labFolderEntries);
+				// console.log(labFolderEntries);
 			}
 		// unlockXMLHTTPRequest();
 	}
@@ -280,7 +312,7 @@ function getEntries() {
 	// lockXMLHTTPRequest();
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", token);
+	xhttp.setRequestHeader("Authorization", labFolderToken);
 	xhttp.send();	
 }
 
@@ -295,7 +327,6 @@ function getMDBDatabases() {
 				// console.log("get project success");
 				var parsedData = JSON.parse(xhttp.response);
 				labFolderMDB.databases = new Array();
-				console.log(parsedData);
 				for (i=0; i < parsedData.length; i++) {
 					var obj = parsedData[i];
 					var database = {
@@ -316,7 +347,7 @@ function getMDBDatabases() {
 	console.log(url);
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", token);
+	xhttp.setRequestHeader("Authorization", labFolderToken);
 	xhttp.send();	
 }
 
@@ -331,7 +362,6 @@ function getMDBCategories() {
 		// console.log("ReadyState: " + this.readyState + " Status: " + this.status);
 		if(this.readyState == 4) {
 			if(this.status == 200) {
-				console.log(xhttp.response);
 				var parsedData = JSON.parse(xhttp.response);
 				labFolderMDB.databases[k].categories = new Array();
 				// console.log("parsedData: " + parsedData.length);
@@ -354,9 +384,10 @@ function getMDBCategories() {
 	// lockXMLHTTPRequest();
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", token);
+	xhttp.setRequestHeader("Authorization", labFolderToken);
 	xhttp.send();	
 	}
+	
 }
 
 function updateLabfolderSelectableProjects() {
@@ -507,7 +538,7 @@ function downloadElement(id, type) {
 	// lockXMLHTTPRequest();
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", token);
+	xhttp.setRequestHeader("Authorization", labFolderToken);
 	xhttp.send();	
 }
 
@@ -542,7 +573,7 @@ function downloadSelectedMDBCategories() {
 		console.log(url);
 		xhttp.open('GET', url, false);
 		xhttp.setRequestHeader("Content-type", "application/json");
-		xhttp.setRequestHeader("Authorization", token);
+		xhttp.setRequestHeader("Authorization", labFolderToken);
 		xhttp.send();	
 	}
 
