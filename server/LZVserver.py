@@ -3,6 +3,7 @@ from flask import request
 from flask import Response
 from flask import make_response
 from flask import send_file
+from pathlib import Path
 from flask_cors import CORS
 import requests
 import json
@@ -10,8 +11,13 @@ import json
 DEBUG=0
 
 app = Flask(__name__)
+#baseURL of labFolder
 labFolderBaseURL = 'https://eln.labfolder.com/api/v2'
+#Testheader - required for access on labfolder, needs to be project name and a contant e-mail to be contacted when problems occur
 labFolderDefaultUserAgentHeader = 'TestprojektFDM; robert.guenther@uni-bayreuth.de'
+#storage base url - here the downlaoded data is stored, should terminate with a '/'
+storageBaseURL = '/data/'
+storageFileName = 'storage.json'
 CORS(app)
 
 #----------------------Authentification----------------------------------------
@@ -126,110 +132,159 @@ def getNotebookEntries():
 	response = requests.get(url, headers=headers)
 	return response.text
 
-@app.route('/elements/file' , methods=['GET'])
-def getFile():
-	if DEBUG:
-		print("-----in getFile-----")
-	url = labFolderBaseURL + '/elements/file/'
-	elementID = request.args.get('id', default = '', type = str)
-	if elementID == '':
-		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-	file_info_url = url + elementID	
-	file_url = file_info_url + '/download'
+@app.route('/elements/download', methods=['POST'])
+def download():
+	#we also need to verify the loged in ldap user here
+	#data should contain a json object with structure:
+	#{
+	#	type: [IMAGE,TABLE,TEXT],
+	#	id: elementID
+	#}
+	data = request.get_data()
+    jsonData = json.loads(data)            
+    for element in jsonData:
+    	downloadFile(element['elementID'],element['elementType'])
+    if length(jsonData) > 0:
+		updateStorageFile()
+	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 		
+    
+
+
+#@app.route('/elements/file' , methods=['GET'])
+def downloadFile(elementID,elementType):
+	# if DEBUG:
+	# 	print("-----in getFile-----")
+	if elementType == 'IMAGE':
+		url = labFolderBaseURL + '/elements/file/'
+		file_info_url = url + elementID	
+		file_url = file_info_url + '/download'
+	elif elementType == 'TABLE':
+		url = labFolderBaseURL + '/elements/table/'
+		file_url = url + elementID	
+	elif elementType == 'TEXT':
+		url = labFolderBaseURL + '/elements/table/'
+		file_url = url + elementID								
+	else
+		return
+
 	headers = {"Content-Type": "application/json",
 			"Authorization" :  "Token " + request.headers['Authorization'],
 			"User-Agent": labFolderDefaultUserAgentHeader
 		  }
-	fileInfoResponse = requests.get(file_info_url, headers=headers)
-	fileResponse = requests.get(file_url, headers=headers)
-	fileInfoResponseJDATA = json.loads(fileInfoResponse.text)
-	
-	filename = fileInfoResponseJDATA["file_name"]
-	filedata = fileInfoResponseJDATA["version_date"]
-	fileversion = fileInfoResponseJDATA["version_id"]
-	filetype = fileInfoResponseJDATA["content_type"]
-	if DEBUG:
-		print('filetype: ' + filetype)
-		print('filename: ' + filename)
-		print('filedata: ' + filedata)
-	
-	file = open(filename, "wb")
-	fileData = fileResponse.content
-	file.write(fileData)
-	file.close
-	
-	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
+	#elementID = request.args.get('id', default = '', type = str)
+	# if elementID == '':
+	# 	return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
 
-@app.route('/elements/table', methods=['GET'])
-def getTable():
-	if DEBUG:
-		print("-----in getTable-----")
-	url = labFolderBaseURL + '/elements/table/'
-	elementID = request.args.get('id', default = '', type = str)
-	if elementID == '':
-		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-	file_url = url + elementID	
-	headers = {"Content-Type": "application/json",
-			"Authorization" :  "Token " + request.headers['Authorization'],
-			"User-Agent": labFolderDefaultUserAgentHeader
-		  }
 	fileResponse = requests.get(file_url, headers=headers)
-	fileInfoResponseJDATA = json.loads(fileResponse.text)
-	
-	title = fileInfoResponseJDATA["title"]
-	date = fileInfoResponseJDATA["version_date"]
-	version = fileInfoResponseJDATA["version_id"]
-	content = fileInfoResponseJDATA["content"]
-
-	#process the table data and write it to a file as csv, save this file on storage
-	sheets = content["sheets"]
-	for sheet_key in sheets:
-		if DEBUG:
-			print("key: " + sheet_key)
-		file = open(title + ".csv", "w")
-		data = sheets[sheet_key]["data"]["dataTable"]
-		if DEBUG:
-			print("data: " + str(data))
-		fileData = ""
-		for line in data:
-			for row in data[line]:
-				append = data[line][row]["value"]
-				if type(append) is int:
-					append = str(append)
-				fileData = fileData + append + ","
-			fileData = fileData.rstrip(",")
-			fileData = fileData + "\n"
-		if DEBUG:
-			print("fileData: " + fileData)
+	if elementType == 'IMAGE':
+		# fileInfoResponse = requests.get(file_info_url, headers=headers)
+		fileInfoResponseJDATA = json.loads(fileInfoResponse.text)
+		filename = fileInfoResponseJDATA["file_name"]
+		filedata = fileInfoResponseJDATA["version_date"]
+		fileversion = fileInfoResponseJDATA["version_id"]
+		fileData = fileResponse.content
+		file = open(filename, "wb")
 		file.write(fileData)
 		file.close
-	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
-
-@app.route('/elements/text', methods=['GET'])
-def getText():
-	if DEBUG:
-		print("-----in getText-----")
-	url = labFolderBaseURL + '/elements/text/'
-	elementID = request.args.get('id', default = '', type = str)
-	if elementID == '':
-		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-	file_url = url + elementID	
-	headers = {"Content-Type": "application/json",
-			"Authorization" :  "Token " + request.headers['Authorization'],
-			"User-Agent": labFolderDefaultUserAgentHeader
-		  }
-	fileResponse = requests.get(file_url, headers=headers)
-	fileInfoResponseJDATA = json.loads(fileResponse.text)
+	elif elementType == 'TABLE':
+		# fileResponse = requests.get(file_url, headers=headers)
+		fileInfoResponseJDATA = json.loads(fileResponse.text)
+		title = fileInfoResponseJDATA["title"]
+		date = fileInfoResponseJDATA["version_date"]
+		version = fileInfoResponseJDATA["version_id"]
+		content = fileInfoResponseJDATA["content"]
 	
-	date = fileInfoResponseJDATA["version_date"]
-	version = fileInfoResponseJDATA["version_id"]
-	content = fileInfoResponseJDATA["content"]
-	print(content)
-	#process the table data and write it to a file as csv, save this file on storage
-	file = open("test" + ".txt", "w")
-	file.write(content)
-	file.close()
-	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
+		sheets = content["sheets"]
+		for sheet_key in sheets:			
+			data = sheets[sheet_key]["data"]["dataTable"]
+			fileData = ""
+			for line in data:
+				for row in data[line]:
+					append = data[line][row]["value"]
+					if type(append) is int:
+						append = str(append)
+					fileData = fileData + append + ","
+				fileData = fileData.rstrip(",")
+				fileData = fileData + "\n"
+			file = open(title + ".csv", "w")
+			file.write(fileData)
+			file.close
+	elif elementType == 'TEXT':
+		# fileResponse = requests.get(file_url, headers=headers)
+		fileInfoResponseJDATA = json.loads(fileResponse.text)
+		date = fileInfoResponseJDATA["version_date"]
+		version = fileInfoResponseJDATA["version_id"]
+		fileData = fileInfoResponseJDATA["content"]
+		file = open("test" + ".txt", "w")
+		file.write(fileData)
+		file.close()
+
+# def downloadTable(elementID):
+# 	# if DEBUG:
+# 	# 	print("-----in getTable-----")
+# 	url = labFolderBaseURL + '/elements/table/'
+# 	#elementID = request.args.get('id', default = '', type = str)
+# 	# if elementID == '':
+# 	# 	return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
+
+
+# 	fileResponse = requests.get(file_url, headers=headers)
+# 	fileInfoResponseJDATA = json.loads(fileResponse.text)
+	
+# 	title = fileInfoResponseJDATA["title"]
+# 	date = fileInfoResponseJDATA["version_date"]
+# 	version = fileInfoResponseJDATA["version_id"]
+# 	content = fileInfoResponseJDATA["content"]
+
+# 	#process the table data and write it to a file as csv, save this file on storage
+# 	sheets = content["sheets"]
+# 	for sheet_key in sheets:
+# 		# if DEBUG:
+# 		# 	print("key: " + sheet_key)
+# 		file = open(title + ".csv", "w")
+# 		data = sheets[sheet_key]["data"]["dataTable"]
+# 		# if DEBUG:
+# 		# 	print("data: " + str(data))
+# 		fileData = ""
+# 		for line in data:
+# 			for row in data[line]:
+# 				append = data[line][row]["value"]
+# 				if type(append) is int:
+# 					append = str(append)
+# 				fileData = fileData + append + ","
+# 			fileData = fileData.rstrip(",")
+# 			fileData = fileData + "\n"
+# 		# if DEBUG:
+# 		# 	print("fileData: " + fileData)
+# 		file.write(fileData)
+# 		file.close
+# 	# return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
+
+# #@app.route('/elements/text', methods=['GET'])
+# def downloadText(elementID):
+# 	# if DEBUG:
+# 	# 	print("-----in getText-----")
+# 	url = labFolderBaseURL + '/elements/text/'
+# 	#elementID = request.args.get('id', default = '', type = str)
+# 	# if elementID == '':
+# 	# 	return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
+	
+# 	headers = {"Content-Type": "application/json",
+# 			"Authorization" :  "Token " + request.headers['Authorization'],
+# 			"User-Agent": labFolderDefaultUserAgentHeader
+# 		  }
+# 	fileResponse = requests.get(file_url, headers=headers)
+# 	fileInfoResponseJDATA = json.loads(fileResponse.text)
+	
+# 	date = fileInfoResponseJDATA["version_date"]
+# 	version = fileInfoResponseJDATA["version_id"]
+# 	content = fileInfoResponseJDATA["content"]
+# 	# print(content)
+# 	#process the table data and write it to a file as csv, save this file on storage
+# 	file = open("test" + ".txt", "w")
+# 	file.write(content)
+# 	file.close()
+# 	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
 
 #------------Material Database-------------
 
@@ -264,7 +319,7 @@ def getMDBCategories():
 
 #----does only support filtering by categoryID----
 @app.route('/mdb/items', methods=['GET'])
-def getMDBItems():
+def downloadMDBItems():
 	urlItems = labFolderBaseURL + '/mdb/items'
 	urlCategories = labFolderBaseURL + '/mdb/categories'
 	categoryID = request.args.get('category_id', default = '', type = str)
@@ -316,6 +371,38 @@ def getMDBItems():
 	file.write(fileData)
 	file.close
 	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
+
+@app.route('/history', methods=['GET'])
+def getHistory():
+	#TODO NEED TO BE IMPLEMENTED WHEN AUTH WITH LDAP IS DONE SO WE CAN VERIFY THE USER
+	#getDatastructure and return it as json file
+
+def getDatastructure(userID):
+	folderPath = storageBaseURL + userID
+	userDirectory = Path(folderPath)
+	if userDirectory.is_dir(): #check if folder already exists
+		storageFile = Path(folderPath + '/' + storageFileName)
+		if storageFile.is_file(): #structure object already exists
+			data = storageFile.open()
+			dataJSON = json.loads(data)
+			return dataJSON
+		else: # storage oject does not exist yet, so no data has been stored yet
+			return {} #return empty object
+	else: # directory doesnt exist yet, return empty object
+		return {}
+
+#creates the folder for the user if it does not exist yet. also creates an empty structure.json object
+def createUserFolder(userID):
+	folderPath = storageBaseURL + userID
+	userDirectory = Path(folderPath)		
+	try userDirectory.mkdir(mode=0o700, exist_ok=False): #create a file, and catch exception if already exists, return if so, structure file also is there
+		storageFile = Path(folderPath + '/' + storageFileName)
+		storageFile.touch(mode=0o700, exist_ok = True) #touch the file, catch exception (should never happen since it should never already exist)
+	except:
+		return
+
+	
+
 
 if __name__ == '__main__':
 	app.run(debug=True)
