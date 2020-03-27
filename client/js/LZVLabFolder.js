@@ -494,32 +494,12 @@ function downloadSelectedEntries() {
 		}
 	}
 	//elements contains the set of id, entryTitle, elementID. These should now be downloaded from server and saved in  a folder structure
-	console.log(elements);
-	for(var i=0; i < elements.length; i++) {
-		console.log(elements[i].elementID + " " +   elements[i].elementType);
-		downloadElement(elements[i].elementID, elements[i].elementType);
-	}
-}
-
-function downloadElement(id, type) {
-	var url = baseURL;
-	switch(type) {
-		case 'IMAGE':
-		console.log("Image");	
-		url = baseURL + '/elements/file';
-		break;
-		case 'TABLE':
-		console.log("Table");	
-		url = baseURL + '/elements/table';		
-		break;
-		case 'TEXT':
-		console.log("Text");	
-		url = baseURL + '/elements/text';
-		break;
-		default:
-		console.log("Error returning");
-		return;
-	}
+	// console.log(elements);
+	// for(var i=0; i < elements.length; i++) {
+	// 	console.log(elements[i].elementID + " " +   elements[i].elementType);
+	// 	downloadElement(elements[i].elementID, elements[i].elementType);
+	// }
+	var url = baseURL + '/elements/download';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -529,18 +509,60 @@ function downloadElement(id, type) {
 
 			}
 			if(this.status == 400) {
-				alert("Fehler: Bitte ID mitgeben!");
+				console.log("Fehler: Bitte ID mitgeben!");
 			}
 		// unlockXMLHTTPRequest();
+		}
 	}
-}
-	url = url + "?id=" + id;
 	// lockXMLHTTPRequest();
-	xhttp.open('GET', url, false);
+	xhttp.open('POST', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Authorization", labFolderToken);
-	xhttp.send();	
+	var payload = stringify(elements);
+	xhttp.send(payload);
+
 }
+
+// function downloadElement(id, type) {
+// 	var url = baseURL;
+// 	switch(type) {
+// 		case 'IMAGE':
+// 		console.log("Image");	
+// 		url = baseURL + '/elements/file';
+// 		break;
+// 		case 'TABLE':
+// 		console.log("Table");	
+// 		url = baseURL + '/elements/table';		
+// 		break;
+// 		case 'TEXT':
+// 		console.log("Text");	
+// 		url = baseURL + '/elements/text';
+// 		break;
+// 		default:
+// 		console.log("Error returning");
+// 		return;
+// 	}
+// 	xhttp.onreadystatechange  = function(e) {
+// 		if(this.readyState == 4) {
+// 			if(this.status == 200) {
+// 				var answer = xhttp.response;
+
+// 				console.log("Answer:" +  answer);
+
+// 			}
+// 			if(this.status == 400) {
+// 				alert("Fehler: Bitte ID mitgeben!");
+// 			}
+// 		// unlockXMLHTTPRequest();
+// 	}
+// }
+// 	url = url + "?id=" + id;
+// 	// lockXMLHTTPRequest();
+// 	xhttp.open('GET', url, false);
+// 	xhttp.setRequestHeader("Content-type", "application/json");
+// 	xhttp.setRequestHeader("Authorization", labFolderToken);
+// 	xhttp.send();	
+// }
 
 function downloadSelectedMDBCategories() {
 	console.log("download MDB");
