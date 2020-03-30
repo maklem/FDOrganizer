@@ -13,7 +13,7 @@ if (window.XMLHttpRequest) {
 
 //Initialization Function
 $( document ).ready(function() {
-	var ct = getCookie("LabFolderToken");
+	var ct = getCookie("labFolderToken");
     if (ct != "") {
     	token = ct;
     	updateContentAfterLogin();
@@ -486,7 +486,8 @@ function downloadSelectedEntries() {
 		for (var i=0; i < ids.length; i++) {
 			if (entry.id == ids[i]) {
 				for (var k = 0 ; k < entry.elements.length; k++ ) {
-					var element = {id: entry.id, entryTitle: entry.title, elementID: entry.elements[k].elementID, elementType: entry.elements[k].type};
+					//var element = {id: entry.id, entryTitle: entry.title, elementID: entry.elements[k].elementID, elementType: entry.elements[k].type};
+					var element = {elementID: entry.elements[k].elementID, elementType: entry.elements[k].type};
 					elements.push(element);	
 				}
 				
@@ -511,14 +512,14 @@ function downloadSelectedEntries() {
 			if(this.status == 400) {
 				console.log("Fehler: Bitte ID mitgeben!");
 			}
-		// unlockXMLHTTPRequest();
 		}
 	}
-	// lockXMLHTTPRequest();
+
+
 	xhttp.open('POST', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Authorization", labFolderToken);
-	var payload = stringify(elements);
+	var payload = JSON.stringify(elements);
 	xhttp.send(payload);
 
 }
