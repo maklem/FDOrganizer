@@ -479,48 +479,61 @@ function downloadSelectedEntries() {
 			ids.push(form.elements[i].name);
 		}
 	}
-	var elements = new Array(); //these are to single elements to be downloaded later
-	for (var j=0; j < labFolderEntries.entries.length; j++) {
-		var entry = labFolderEntries.entries[j];
-		console.log("entry:" + entry);
-		for (var i=0; i < ids.length; i++) {
-			if (entry.id == ids[i]) {
-				for (var k = 0 ; k < entry.elements.length; k++ ) {
-					//var element = {id: entry.id, entryTitle: entry.title, elementID: entry.elements[k].elementID, elementType: entry.elements[k].type};
-					var element = {elementID: entry.elements[k].elementID, elementType: entry.elements[k].type};
-					elements.push(element);	
+	if(ids.length > 0) {
+		var elements = new Array(); //these are to single elements to be downloaded later
+		for (var j=0; j < labFolderEntries.entries.length; j++) {
+			var entry = labFolderEntries.entries[j];
+			//console.log("entry:" + entry);
+			for (var i=0; i < ids.length; i++) {
+				if (entry.id == ids[i]) {
+					for (var k = 0 ; k < entry.elements.length; k++ ) {
+						let project = labFolderProjects.projects.find(proj=>proj.id == entry.projectID);	
+						var element = {
+							entryID: entry.id,
+							entryTitle: entry.title,
+							projectID: entry.projectID,
+							elementID: entry.elements[k].elementID,
+							elementType: entry.elements[k].type,
+							versionID : entry.elements[k].versionID,
+							projectTitle : project.title
+						};
+						//var element = {elementID: entry.elements[k].elementID, elementType: entry.elements[k].type};
+						elements.push(element);	
+					}
+					
 				}
-				
 			}
 		}
-	}
-	//elements contains the set of id, entryTitle, elementID. These should now be downloaded from server and saved in  a folder structure
-	// console.log(elements);
-	// for(var i=0; i < elements.length; i++) {
-	// 	console.log(elements[i].elementID + " " +   elements[i].elementType);
-	// 	downloadElement(elements[i].elementID, elements[i].elementType);
-	// }
-	var url = baseURL + '/elements/download';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				var answer = xhttp.response;
+		//elements contains the set of id, entryTitle, elementID. These should now be downloaded from server and saved in  a folder structure
+		console.log(elements);
+		// for(var i=0; i < elements.length; i++) {
+		// 	console.log(elements[i].elementID + " " +   elements[i].elementType);
+		// 	downloadElement(elements[i].elementID, elements[i].elementType);
+		// }
+		if (elements.length > 0) {
+			var url = baseURL + '/elements/download';
+			xhttp.onreadystatechange  = function(e) {
+				if(this.readyState == 4) {
+					if(this.status == 200) {
+						var answer = xhttp.response;
 
-				console.log("Answer:" +  answer);
+						console.log("Answer:" +  answer);
 
+					}
+					if(this.status == 400) {
+						console.log("Fehler: Bitte ID mitgeben!");
+					}
+				}
 			}
-			if(this.status == 400) {
-				console.log("Fehler: Bitte ID mitgeben!");
-			}
-		}
+
+
+			xhttp.open('POST', url, false);
+			xhttp.setRequestHeader("Content-type", "application/json");
+			xhttp.setRequestHeader("Authorization", labFolderToken);
+			var payload = JSON.stringify(elements);
+			xhttp.send(payload);
 	}
-
-
-	xhttp.open('POST', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", labFolderToken);
-	var payload = JSON.stringify(elements);
-	xhttp.send(payload);
+}
 
 }
 
