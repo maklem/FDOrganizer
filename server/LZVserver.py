@@ -8,7 +8,7 @@ from flask_cors import CORS
 import requests
 import json
 
-DEBUG=0
+DEBUG=1	
 
 app = Flask(__name__)
 #baseURL of labFolder
@@ -137,14 +137,14 @@ def download():
 	#we also need to verify the loged in ldap user here
 	#data should contain a json object with structure:
 	#{
-	#	type: [IMAGE,TABLE,TEXT],
-	#	id: elementID
+	#	elementType: [IMAGE,TABLE,TEXT],
+	#	elementID: elementID
 	#}
 	data = request.get_data()
-    jsonData = json.loads(data)            
-    for element in jsonData:
-    	downloadFile(element['elementID'],element['elementType'])
-    if length(jsonData) > 0:
+	jsonData = json.loads(data)            
+	for element in jsonData:
+		downloadFile(element['elementID'],element['elementType'])
+	if len(jsonData) > 0:
 		updateStorageFile()
 	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 		
     
@@ -152,8 +152,8 @@ def download():
 
 #@app.route('/elements/file' , methods=['GET'])
 def downloadFile(elementID,elementType):
-	# if DEBUG:
-	# 	print("-----in getFile-----")
+	if DEBUG:
+		print("-----in downloadFile-----")
 	if elementType == 'IMAGE':
 		url = labFolderBaseURL + '/elements/file/'
 		file_info_url = url + elementID	
@@ -162,9 +162,9 @@ def downloadFile(elementID,elementType):
 		url = labFolderBaseURL + '/elements/table/'
 		file_url = url + elementID	
 	elif elementType == 'TEXT':
-		url = labFolderBaseURL + '/elements/table/'
+		url = labFolderBaseURL + '/elements/text/'
 		file_url = url + elementID								
-	else
+	else:
 		return
 
 	headers = {"Content-Type": "application/json",
@@ -177,26 +177,41 @@ def downloadFile(elementID,elementType):
 
 	fileResponse = requests.get(file_url, headers=headers)
 	if elementType == 'IMAGE':
-		# fileInfoResponse = requests.get(file_info_url, headers=headers)
+		fileInfoResponse = requests.get(file_info_url, headers=headers)
 		fileInfoResponseJDATA = json.loads(fileInfoResponse.text)
 		filename = fileInfoResponseJDATA["file_name"]
 		filedata = fileInfoResponseJDATA["version_date"]
 		fileversion = fileInfoResponseJDATA["version_id"]
 		fileData = fileResponse.content
-		file = open(filename, "wb")
-		file.write(fileData)
-		file.close
+		try:
+			if DEBUG:
+				print("---trying to write image file")
+			file = open(filename, "wb")
+			file.write(fileData)
+			file.close
+		except:
+			print("Error Saving image file")	
 	elif elementType == 'TABLE':
 		# fileResponse = requests.get(file_url, headers=headers)
+		if DEBUG:
+				print("---trying to write table file")
 		fileInfoResponseJDATA = json.loads(fileResponse.text)
 		title = fileInfoResponseJDATA["title"]
 		date = fileInfoResponseJDATA["version_date"]
 		version = fileInfoResponseJDATA["version_id"]
 		content = fileInfoResponseJDATA["content"]
-	
+		
 		sheets = content["sheets"]
-		for sheet_key in sheets:			
-			data = sheets[sheet_key]["data"]["dataTable"]
+
+		print(sheets)
+		for sheetKey in sheets:
+			try:			
+				data = sheets[sheetKey]["data"]["dataTable"]
+			except:
+				if DEBUG:
+					print("no data in sheet " + sheetKey)
+				return
+			sheetName = sheets[sheetKey]["name"]
 			fileData = ""
 			for line in data:
 				for row in data[line]:
@@ -206,18 +221,26 @@ def downloadFile(elementID,elementType):
 					fileData = fileData + append + ","
 				fileData = fileData.rstrip(",")
 				fileData = fileData + "\n"
-			file = open(title + ".csv", "w")
-			file.write(fileData)
-			file.close
+			try:
+				file = open(title + "-" + sheetName + ".csv", "w")
+				file.write(fileData)
+				file.close
+			except:
+				print("Error Saving table file")				
 	elif elementType == 'TEXT':
+		if DEBUG:
+				print("---trying to write text file")
 		# fileResponse = requests.get(file_url, headers=headers)
 		fileInfoResponseJDATA = json.loads(fileResponse.text)
 		date = fileInfoResponseJDATA["version_date"]
 		version = fileInfoResponseJDATA["version_id"]
 		fileData = fileInfoResponseJDATA["content"]
-		file = open("test" + ".txt", "w")
-		file.write(fileData)
-		file.close()
+		try:
+			file = open("test" + ".txt", "w")
+			file.write(fileData)
+			file.close()
+		except:
+			print("Error Saving text file")			
 
 # def downloadTable(elementID):
 # 	# if DEBUG:
@@ -374,6 +397,7 @@ def downloadMDBItems():
 
 @app.route('/history', methods=['GET'])
 def getHistory():
+	i=0
 	#TODO NEED TO BE IMPLEMENTED WHEN AUTH WITH LDAP IS DONE SO WE CAN VERIFY THE USER
 	#getDatastructure and return it as json file
 
@@ -395,12 +419,16 @@ def getDatastructure(userID):
 def createUserFolder(userID):
 	folderPath = storageBaseURL + userID
 	userDirectory = Path(folderPath)		
-	try userDirectory.mkdir(mode=0o700, exist_ok=False): #create a file, and catch exception if already exists, return if so, structure file also is there
+	try:
+		userDirectory.mkdir(mode=0o700, exist_ok=False) #create a file, and catch exception if already exists, return if so, structure file also is there
 		storageFile = Path(folderPath + '/' + storageFileName)
 		storageFile.touch(mode=0o700, exist_ok = True) #touch the file, catch exception (should never happen since it should never already exist)
 	except:
 		return
 
+def updateStorageFile():
+	i=0
+	#TODO IMPL
 	
 
 
