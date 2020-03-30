@@ -145,7 +145,7 @@ def download():
 	for element in jsonData:
 		downloadFile(element['elementID'],element['elementType'])
 	if len(jsonData) > 0:
-		updateStorageFile()
+		updateStorageFile("test")
 	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 		
     
 
@@ -426,8 +426,10 @@ def createUserFolder(userID):
 	except:
 		return
 
-def updateStorageFile():
-	i=0
+def updateStorageFile(userID):
+	folderPath = storageBaseURL + userID
+	userDirectory = Path(folderPath)		
+	
 	#TODO IMPL
 	
 
