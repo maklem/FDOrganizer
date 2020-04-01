@@ -20,6 +20,26 @@ $( document ).ready(function() {
     }
 });
 
+// var storageExample = {
+// 	user = "bt303343",
+// 	projects: Array({
+// 		title = "Projekttitel",
+// 		projID = "1337",
+// 		entries: Array({
+// 			entryID = "1338",
+// 			title = "entrytitle",
+// 			elements: Array({
+// 				elementID = "1339",
+// 				elementType = "TABLE",
+// 				versions: Array({
+// 					version_id = "1340",
+// 					title = "filename"
+// 				})
+// 			})
+// 		})
+// 	})
+// }
+
 
 var xhttpMutexLocked = false; 
 
