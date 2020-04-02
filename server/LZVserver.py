@@ -184,7 +184,7 @@ def downloadFile(userID, dataArray):
 		fileResponse = requests.get(file_url, headers=headers)
 		storageURL = storageBaseURL + userID + "/" + element["projectID"] + "/" + element["entryID"] + "/" + element["elementID"] + "/" + element["versionID"] + "/"
 		folderPath = Path(storageURL)
-		folderPath.mkdir(mode=0o700, parents=True, exist_ok=True)
+		folderPath.mkdir(mode=0o777, parents=True, exist_ok=True)
 		print(storageURL)
 		if element["elementType"] == 'IMAGE':
 			fileInfoResponse = requests.get(file_info_url, headers=headers)
@@ -347,16 +347,16 @@ def getHistory():
 def getDatastructure(userID):
 	folderPath = storageBaseURL + userID
 	userDirectory = Path(folderPath)
-	if userDirectory.is_dir(): #check if folder already exists
-		storageFile = Path(folderPath + '/' + storageFileName)
-		if storageFile.is_file(): #structure object already exists
-			data = storageFile.read_text()
-			dataJSON = json.loads(data)
-			return dataJSON
-		else: # storage oject does not exist yet, this should never happen since creation of the folder always creates an initial storage file
-			return {} #return empty object
-	else: # directory doesnt exist yet, return empty object
-		createUserFolder(userID)
+	if not userDirectory.is_dir(): #check if folder already exists
+		createUserFolder(userID)	
+	storageFile = Path(folderPath + '/' + storageFileName)
+	if storageFile.is_file(): #structure object already exists
+		data = storageFile.read_text()
+		dataJSON = json.loads(data)
+		return dataJSON
+	else: # storage oject does not exist yet, this should never happen since creation of the folder always creates an initial storage file
+		return {} #return empty object
+
 
 #creates the folder for the user if it does not exist yet. also creates an empty structure.json object
 def createUserFolder(userID):
@@ -387,7 +387,13 @@ def createUserFolder(userID):
 
 #updates the storage File with the added files
 def updateStorageFile(userID, addElements):
+	# if DEBUG:
+	# 	print("---in updateStorageFile---")
+	# 	print("writing " + str(len(addElements)) + " items in file")
 	storageFile = getDatastructure(userID)
+	# if DEBUG:
+	# 	print("storage file before process")
+	# 	print(json.dumps(storageFile))
 	for item in addElements:
 		if len([x for x in storageFile["projects"] if x["projectID"] == item["projectID"]]) == 0: #if project does not exist yet, we need to create everything to the bottom
 			storageFile["projects"].append({"projectID" : item["projectID"],
@@ -432,6 +438,13 @@ def updateStorageFile(userID, addElements):
 									for element in entry["elements"]:
 										if element["elementID"] == item["elementID"]: # on last level (=version) we dont need to check again if a version already exists. this case would have been found earlier and not come to here.
 											element["versions"].append({"versionID" : item["versionID"]}) #TODO: Add title of file in the document										
+	# if DEBUG:
+		# print(json.dumps(storageFile))
+		# print("storage file after process")
+	folderPath = storageBaseURL + userID
+	file = Path(folderPath + '/' + storageFileName)
+	file.unlink()
+	file.write_text(json.dumps(storageFile))
 
 #checks if elements to download already exist in storage file. pops elements which are already existing of the checkArray 
 #checkElements is a list of dicts: (projectID: str, entryID: str, elementID: str, versionID: str)
@@ -439,23 +452,33 @@ def removeAlreadyExistingTupel(userID,checkElements):
 	storageFile = getDatastructure(userID)
 	print(json.dumps(storageFile))
 	output = []
+	print("input length: " + str(len(checkElements)))
 	for item in checkElements:
+		newItem = True
 		projectID = item["projectID"]
 		entryID   = item["entryID"]
 		elementID = item["elementID"]
 		versionID = item["versionID"]
+		if storageFile["projects"] == None:
+			return checkElements
 		if len(storageFile["projects"]) == 0:
 			return checkElements
-		for projKey,projVal in storageFile["projects"].items():
+		for projVal in storageFile["projects"]:
 			if projVal["projectID"] == projectID:
-				for entryKey, entryVal in projVal["entries"]:
+				for entryVal in projVal["entries"]:
 					if entryVal["entryID"] == entryID:
-						for elementKey, elementVal in entryVal["elements"]:
+						for elementVal in entryVal["elements"]:
 							if elementVal["elementID"] == elementID:
-								for versionKey, versionVal in elementVal["versions"]:
+								for versionVal in elementVal["versions"]:
 									if versionVal["versionID"] == versionID:
-										continue
-		output.append(item)
+										newItem = False
+										break
+								break
+						break
+				break
+		if newItem:
+			output.append(item)
+	print("output length: " + str(len(output)))
 	return output
 
 
