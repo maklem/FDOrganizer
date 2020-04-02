@@ -5,8 +5,8 @@
       "type" : "string",
       "description" : "the userID of the storage File is for btxxxxxx"
     },
-    "projects" : [
-      "project_id" : {
+    "projects" : {
+      "projectID" : {
         "type" : "string",
         "description" : "id of the project"
       },
@@ -14,8 +14,8 @@
         "type" : "string",
         "description" : "title of the project"
       },
-      "entries" : [
-        "entry_id" : {
+      "entries" : {
+        "entryID" : {
           "type" : "string",
           "description" : "id of the entry"
         },
@@ -23,8 +23,8 @@
           "type" : "string",
           "description" : "title of the entry"
         },
-        "elements" : [
-          "element_id" : {
+        "elements" : {
+          "elementID" : {
             "type" : "string",
             "description" : "id of the element"
           },
@@ -37,8 +37,8 @@
             ],
             "description" : "type of the element"
           },
-          "versions" : [
-            "version_id" : {
+          "versions" : {
+            "versionID" : {
               "type" : "string",
               "description" : "id of the version"
             },
@@ -46,9 +46,9 @@
               "type" : "string",
               "description" : "title of the file"
             }
-          ]
-        ]
-      ]
-    ] 
+          }
+        }
+      }
+    } 
   }
 }
