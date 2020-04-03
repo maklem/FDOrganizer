@@ -16,7 +16,7 @@ labFolderBaseURL = 'https://eln.labfolder.com/api/v2'
 #Testheader - required for access on labfolder, needs to be project name and a contant e-mail to be contacted when problems occur
 labFolderDefaultUserAgentHeader = 'TestprojektFDM; robert.guenther@uni-bayreuth.de'
 #storage base url - here the downlaoded data is stored, should terminate with a '/'
-storageBaseURL = './data/'
+storageBaseURL = './LabFolderData/'
 storageFileName = 'storage.json'
 
 #DELETE AFTER DEV
@@ -338,13 +338,12 @@ def downloadMDBItems():
 	file.close
 	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
 
-@app.route('/history', methods=['GET'])
-def getHistory():
-	i=0
-	#TODO NEED TO BE IMPLEMENTED WHEN AUTH WITH LDAP IS DONE SO WE CAN VERIFY THE USER
-	#getDatastructure and return it as json file
+@app.route('/storage', methods=['GET'])
+def getStorageFile():
+	userID = devUserID
+	return getDatastructure(userID,return_as_string=True)
 
-def getDatastructure(userID):
+def getDatastructure(userID,return_as_string=False):
 	folderPath = storageBaseURL + userID
 	userDirectory = Path(folderPath)
 	if not userDirectory.is_dir(): #check if folder already exists
@@ -352,10 +351,16 @@ def getDatastructure(userID):
 	storageFile = Path(folderPath + '/' + storageFileName)
 	if storageFile.is_file(): #structure object already exists
 		data = storageFile.read_text()
-		dataJSON = json.loads(data)
-		return dataJSON
+		if return_as_string:
+			return data
+		else:
+			dataJSON = json.loads(data)
+			return dataJSON
 	else: # storage oject does not exist yet, this should never happen since creation of the folder always creates an initial storage file
-		return {} #return empty object
+		if return_as_string:
+			return "{}"
+		else:
+			return {} #return empty object
 
 
 #creates the folder for the user if it does not exist yet. also creates an empty structure.json object
@@ -405,7 +410,8 @@ def updateStorageFile(userID, addElements):
 													"elementID" : item["elementID"],
 													"elementType" : item["elementType"],
 													"versions" : [{
-														"versionID" : item["versionID"]
+														"versionID" : item["versionID"],
+														"versionDate" : item["versionDate"]
 													}]
 												}]
 											}]})
@@ -419,7 +425,8 @@ def updateStorageFile(userID, addElements):
 													"elementID" : item["elementID"],
 													"elementType" : item["elementType"],
 													"versions" : [{
-														"versionID" : item["versionID"]
+														"versionID" : item["versionID"],
+														"versionDate" : item["versionDate"]
 													}]
 												}]
 												})
@@ -431,13 +438,15 @@ def updateStorageFile(userID, addElements):
 													"elementID" : item["elementID"],
 													"elementType" : item["elementType"],
 													"versions" : [{
-														"versionID" : item["versionID"]
+														"versionID" : item["versionID"],
+														"versionDate" : item["versionDate"]
 													}]
 												})
 								else:
 									for element in entry["elements"]:
 										if element["elementID"] == item["elementID"]: # on last level (=version) we dont need to check again if a version already exists. this case would have been found earlier and not come to here.
-											element["versions"].append({"versionID" : item["versionID"]}) #TODO: Add title of file in the document										
+											element["versions"].append({"versionID" : item["versionID"],
+														"versionDate" : item["versionDate"]}) #TODO: Add title of file in the document										
 	# if DEBUG:
 		# print(json.dumps(storageFile))
 		# print("storage file after process")
