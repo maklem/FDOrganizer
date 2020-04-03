@@ -10,7 +10,7 @@
         "type" : "string",
         "description" : "id of the project"
       },
-      "project_title" : {
+      "projectTitle" : {
         "type" : "string",
         "description" : "title of the project"
       },
@@ -19,7 +19,7 @@
           "type" : "string",
           "description" : "id of the entry"
         },
-        "entry_title" : {
+        "entryTitle" : {
           "type" : "string",
           "description" : "title of the entry"
         },
@@ -28,7 +28,7 @@
             "type" : "string",
             "description" : "id of the element"
           },
-          "element_type" : {
+          "elementType" : {
             "type" : "string",
             "enum" : [
               "TABLE",
@@ -41,6 +41,10 @@
             "versionID" : {
               "type" : "string",
               "description" : "id of the version"
+            },
+            "versionDate" : {
+              "type" : "string",
+              "description" : "date of the change of this version"
             },
             "title" : {
               "type" : "string",
