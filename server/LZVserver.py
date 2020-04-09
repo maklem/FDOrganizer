@@ -3,7 +3,9 @@ from flask import request
 from flask import Response
 from flask import make_response
 from flask import send_file
+from flask import *
 from pathlib import Path
+from zipfile import *
 from flask_cors import CORS
 import requests
 import json
@@ -18,6 +20,7 @@ labFolderDefaultUserAgentHeader = 'TestprojektFDM; robert.guenther@uni-bayreuth.
 #storage base url - here the downlaoded data is stored, should terminate with a '/'
 storageBaseURL = './LabFolderData/'
 storageFileName = 'storage.json'
+tempFolder = "./tmp/"
 
 #DELETE AFTER DEV
 devUserID = "bt303343"
@@ -136,6 +139,27 @@ def getNotebookEntries():
 	response = requests.get(url, headers=headers)
 	return response.text
 
+@app.route('/download', methods=['GET'])
+def downloadFileToClient():
+	userID = devUserID
+	projectID = request.args.get('project_id', default = '', type = str)
+	entryID = request.args.get('entry_id', default = '', type = str)
+	entryVersionID = request.args.get('entry_version_id', default = '', type = str)
+	# elementID = request.args.get('element_id', default = '', type = str)
+	# versionID = request.args.get('version_id', default = '', type = str)
+	path = ''
+	filename = "test.zip"
+	if userID != '' and projectID != '' and entryID != '' and entryVersionID != '':
+		path = storageBaseURL + userID + "/" + projectID + "/" + entryID + "/" + entryVersionID
+		zipfile = createZipFileFromTree(path,tempFolder + filename) # Todo name for zip file
+	else:
+		return app.response_class(json.dumps({'Error' : 'Missing Parameter id'}),status=200, mimetype='application/json') 
+	try:
+		return send_from_directory(tempFolder,filename,as_attachment=True)
+	except Exception as e:
+		print(e)
+		return app.response_class(json.dumps({'Error' : 'Internal Error'}),status=400, mimetype='application/json') 
+
 @app.route('/elements/download', methods=['POST'])
 def download():
 	#we also need to verify the loged in ldap user here
@@ -148,17 +172,17 @@ def download():
 	data = request.get_data()
 	jsonData = json.loads(data)
 	jsonData = removeAlreadyExistingTupel(userID, jsonData)            
-	downloadFile(userID, jsonData)
+	downloadFileFromLabFolder(userID, jsonData)
 	if len(jsonData) > 0:
 		updateStorageFile(userID,jsonData)
-	return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 		
+	return app.response_class(status=200, mimetype='application/json') 		
     
 
 
 #@app.route('/elements/file' , methods=['GET'])
-def downloadFile(userID, dataArray):
+def downloadFileFromLabFolder(userID, dataArray):
 	if DEBUG:
-		print("-----in downloadFile-----")
+		print("-----in downloadFileFromLabFolder-----")
 	for element in dataArray:		
 		if element["elementType"] == 'IMAGE':
 			url = labFolderBaseURL + '/elements/file/'
@@ -182,7 +206,7 @@ def downloadFile(userID, dataArray):
 		# 	return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
 
 		fileResponse = requests.get(file_url, headers=headers)
-		storageURL = storageBaseURL + userID + "/" + element["projectID"] + "/" + element["entryID"] + "/" + element["elementID"] + "/" + element["versionID"] + "/"
+		storageURL = storageBaseURL + userID + "/" + element["projectID"] + "/" + element["entryID"] + "/" + element["entryVersionID"] + "/" + element["elementID"] + "/" + element["versionID"] + "/"
 		folderPath = Path(storageURL)
 		folderPath.mkdir(mode=0o777, parents=True, exist_ok=True)
 		print(storageURL)
@@ -406,12 +430,15 @@ def updateStorageFile(userID, addElements):
 											"entries" : [{
 												"entryID" : item["entryID"],
 												"entryTitle" : item["entryTitle"],
-												"elements" : [{
-													"elementID" : item["elementID"],
-													"elementType" : item["elementType"],
-													"versions" : [{
-														"versionID" : item["versionID"],
-														"versionDate" : item["versionDate"]
+												"versions" : [{
+													"versionID" : item["entryVersionID"],
+													"versionDate" : item["versionDate"],													
+													"elements" : [{
+														"elementID" : item["elementID"],
+														"elementType" : item["elementType"],
+														"versions" : [{
+															"versionID" : item["versionID"]
+														}]
 													}]
 												}]
 											}]})
@@ -421,32 +448,50 @@ def updateStorageFile(userID, addElements):
 					if len([x for x in proj["entries"] if x["entryID"] == item["entryID"]]) == 0:
 						proj["entries"].append({"entryID" : item["entryID"],
 												"entryTitle" : item["entryTitle"],
-												"elements" : [{
-													"elementID" : item["elementID"],
-													"elementType" : item["elementType"],
-													"versions" : [{
-														"versionID" : item["versionID"],
-														"versionDate" : item["versionDate"]
+												"versions" : [{
+													"versionID" : item["entryVersionID"],
+													"versionDate" : item["versionDate"],													
+													"elements" : [{
+														"elementID" : item["elementID"],
+														"elementType" : item["elementType"],
+														"versions" : [{
+															"versionID" : item["versionID"]
+														}]
 													}]
 												}]
 												})
+						break
 					else:
 						for entry in proj["entries"]:
 							if entry["entryID"] == item["entryID"]:
-								if len([x for x in entry["elements"] if x["elementID"] == item["elementID"]]) == 0:
-									entry["elements"].append({
-													"elementID" : item["elementID"],
-													"elementType" : item["elementType"],
-													"versions" : [{
-														"versionID" : item["versionID"],
-														"versionDate" : item["versionDate"]
-													}]
-												})
+								if len([x for x in entry["versions"] if x["versionID"] == item["entryVersionID"]]) == 0:
+									entry["versions"].append({	"versionID" : item["entryVersionID"],
+																"versionDate" : item["versionDate"],									
+																"elements" : [{
+																	"elementID" : item["elementID"],
+																	"elementType" : item["elementType"],
+																	"versions" : [{
+																		"versionID" : item["versionID"]
+																	}]
+																}]
+															})
+									break
 								else:
-									for element in entry["elements"]:
-										if element["elementID"] == item["elementID"]: # on last level (=version) we dont need to check again if a version already exists. this case would have been found earlier and not come to here.
-											element["versions"].append({"versionID" : item["versionID"],
-														"versionDate" : item["versionDate"]}) #TODO: Add title of file in the document										
+									for version in entry["versions"]:
+										if version["versionID"] == item["entryVersionID"]:
+											if len([x for x in version["elements"] if x["elementID"] == item["elementID"]]) == 0:
+												version["elements"].append({	"elementID" : item["elementID"],
+																		  	"elementType" : item["elementType"],
+																		  	"versions" : [{
+																				"versionID" : item["versionID"]
+																			}]
+																		})
+												break
+											else:
+												for element in entry["elements"]:
+													if element["elementID"] == item["elementID"]: # on last level (=version) we dont need to check again if a version already exists. this case would have been found earlier and not come to here.
+														element["versions"].append({"versionID" : item["versionID"]})
+														break;										
 	# if DEBUG:
 		# print(json.dumps(storageFile))
 		# print("storage file after process")
@@ -464,10 +509,11 @@ def removeAlreadyExistingTupel(userID,checkElements):
 	print("input length: " + str(len(checkElements)))
 	for item in checkElements:
 		newItem = True
-		projectID = item["projectID"]
-		entryID   = item["entryID"]
-		elementID = item["elementID"]
-		versionID = item["versionID"]
+		projectID 	   = item["projectID"]
+		entryID        = item["entryID"]
+		entryVersionID = item["entryVersionID"]
+		elementID      = item["elementID"]
+		versionID      = item["versionID"]
 		if storageFile["projects"] == None:
 			return checkElements
 		if len(storageFile["projects"]) == 0:
@@ -476,11 +522,14 @@ def removeAlreadyExistingTupel(userID,checkElements):
 			if projVal["projectID"] == projectID:
 				for entryVal in projVal["entries"]:
 					if entryVal["entryID"] == entryID:
-						for elementVal in entryVal["elements"]:
-							if elementVal["elementID"] == elementID:
-								for versionVal in elementVal["versions"]:
-									if versionVal["versionID"] == versionID:
-										newItem = False
+						for entryVersionVal in entryVal["versions"]:
+							if entryVersionVal["versionID"] == entryVersionID:
+								for elementVal in entryVersionVal["elements"]:
+									if elementVal["elementID"] == elementID:
+										for versionVal in elementVal["versions"]:
+											if versionVal["versionID"] == versionID:
+												newItem = False
+												break
 										break
 								break
 						break
@@ -489,6 +538,18 @@ def removeAlreadyExistingTupel(userID,checkElements):
 			output.append(item)
 	print("output length: " + str(len(output)))
 	return output
+
+def createZipFileFromTree(rootDir,filename):
+	zf = ZipFile(filename,'w')
+	rootPath = Path (rootDir)
+	files = [f for f in rootPath.rglob("*") if f.is_file()]
+	for file in files:
+		print(file)
+		absname = str(file.resolve())
+		print("file absname:" + absname)
+		print("file arcname:" + absname[absname.rfind("/") + 1:])
+		zf.write(absname,absname[absname.rfind("/") + 1:])
+	zf.close()
 
 
 
