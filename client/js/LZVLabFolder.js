@@ -1,23 +1,23 @@
-var baseURL = "http://localhost:5000";
-var labFolderToken = "";
-var DEBUGlogin = "robert.guenther@uni-bayreuth.de";
-var DEBUGpassword = "krQ3C3LTjIXFmwcpmEaM";
+var baseURL = 'http://localhost:5000';
+var labFolderToken = '';
+var DEBUGlogin = 'robert.guenther@uni-bayreuth.de';
+var DEBUGpassword = 'krQ3C3LTjIXFmwcpmEaM';
 
 if (window.XMLHttpRequest) {
     // code for modern browsers
     var xhttp = new XMLHttpRequest();
 } else {
     // code for old IE browsers
-    var xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    var xhttp = new ActiveXObject('Microsoft.XMLHTTP');
 } 
 
 //Initialization Function
 $( document ).ready(function() {
-	var ct = getCookie("labFolderToken");
-    if (ct != "") {
-    	labFolderToken = ct;
-    	updateContentAfterLogin();
-    }
+	var ct = getCookie('labFolderToken');
+	if (ct != '') {
+		labFolderToken = ct;
+		updateContentAfterLogin();
+	}
 });
 
 // var storageExample = {
@@ -87,9 +87,27 @@ $("#getProjects").click(function(){
 	getProjects();
 })
 
+function clearLocalStorage() {
+	labFolderEntries.entries = Array();
+	labFolderProjects.projects = Array();
+	labFolderMDB.databases = Array();
+	labFolderStorageFile = {};
+	updateLabfolderSelectableProjects();
+	updateProjectMaterialSelection();
+}
+function clearCookies() {
+	setCookie("labFolderToken", "");
+	setCookie("labFolderProjects", "");
+	setCookie("labFolderEntries", "");
+	setCookie("labFolderStorageFile", "");
+	setCookie("labFolderMDB", "");
+}
+
 function downloadSelectedElements() {
 	if($("#labFolderSelectProject").hasClass("selected")) {
 		downloadSelectedEntries();
+		getStorageFile();
+		updateLabfolderSelectableElements();
 	}
 	if($("#labFolderSelectMDB").hasClass("selected")) {
 		downloadSelectedMDBCategories();
@@ -137,7 +155,6 @@ function updateSelectionProjectMDB(clicked) {
 	$(clicked).siblings().removeClass("selected");
 	$(clicked).addClass("selected");
 	displayProjectID = "";
-	//TODO: we need to change the behaviour when material DB ist being selected
 	if($(clicked).hasClass("labFolderProject")) {
 		updateLabfolderSelectableProjects();
 		updateLabfolderSelectableElements();
@@ -148,6 +165,18 @@ function updateSelectionProjectMDB(clicked) {
 	}
 }
 
+function toggleDisplayVersions(clicked) {
+	$(clicked).parent().parent().parent().parent().children(".versionList").children().toggle();
+	if($(clicked).children(".arrow").html() == "v") {
+		$(clicked).children(".arrow").text("x");
+	}
+	else {
+		$(clicked).children(".arrow").text("v");
+	}
+}
+function downloadVersion(clicked) {
+	window.open($(clicked).attr('id'));
+}
 //this var contains the current project ID which is used to filter the elements to display
 var displayProjectID = "";
 
@@ -169,8 +198,14 @@ function updateProjectMaterialSelection() {
 	if (labFolderProjects.projects.length > 0 ) {
 		$("#labFolderSelectProject").removeAttr("disabled");
 	}
+	else {
+		$("#labFolderSelectProject").attr("disabled", true);	
+	}
 	if (labFolderMDB.databases.length > 0 ) {
 		$("#labFolderSelectMDB").removeAttr("disabled");	
+	}
+	else {
+		$("#labFolderSelectMDB").attr("disabled", true);	
 	}
 }
 
@@ -184,12 +219,12 @@ function authenticate(form) {
 					labFolderToken = data.token;
 					setCookie("labFolderToken", labFolderToken);
 					updateContentAfterLogin();
+				}
+				else
+				{
+					$("#labFolderFailedLogin").show();
+				}
 			}
-			else
-			{
-				$("#labFolderFailedLogin").show();
-			}
-		}
 		// unlockXMLHTTPRequest();
 	}
 }
@@ -213,12 +248,10 @@ function logout() {
 					$('form[id=selectableEntries]').empty();
 					$("#labfolderLoginform").show();
 					$("#labFolderLoginSuccesful").hide();
-					setCookie("labFolderToken", "");
-					setCookie("labFolderProjects", "");
-					setCookie("labFolderEntries", "");
-					setCookie("labFolderStorageFile", "");
-					setCookie("labFolderMDB", "");
 					$("#labFolderFailedLogin").hide();
+					clearCookies();
+					clearLocalStorage();
+
 				}
 		// unlockXMLHTTPRequest();
 	}
@@ -280,8 +313,8 @@ function getStorageFile() {
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
-			labFolderStorageFile = JSON.parse(xhttp.response);
-			setCookie("labFolderStorageFile", JSON.stringify(labFolderStorageFile));	
+				labFolderStorageFile = JSON.parse(xhttp.response);
+				setCookie("labFolderStorageFile", JSON.stringify(labFolderStorageFile));	
 			}
 		}
 	}
@@ -404,10 +437,10 @@ function getMDBDatabases() {
 				}
 			}
 		// unlockXMLHTTPRequest();
-		}
 	}
+}
 	// lockXMLHTTPRequest();
-	console.log(url);
+	// console.log(url);
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Authorization", labFolderToken);
@@ -442,15 +475,15 @@ function getMDBCategories() {
 				}
 			}
 		// unlockXMLHTTPRequest();
-		}
-		}
+	}
+}
 	// lockXMLHTTPRequest();
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Authorization", labFolderToken);
 	xhttp.send();	
-	}
-	
+}
+
 }
 
 function updateLabfolderSelectableProjects() {
@@ -478,16 +511,44 @@ function updateLabfolderSelectableElements() {
 	$('form[id=selectableEntries]').empty();
 	var append = '';
 	if (displayProjectID != "") {
+		let storageProject = labFolderStorageFile.projects.find(proj=>proj.projectID == displayProjectID);
 		for (var i=0; i<labFolderEntries.entries.length; i++){
 			var obj = labFolderEntries.entries[i];
-			console.log("objProjID: " + obj.projectID + " displayProjectID: " +  displayProjectID);
+			// console.log("objProjID: " + obj.projeclet db = labFolderMDB.databases.find(db=>db.id == displayProjectID);tID + " displayProjectID: " +  displayProjectID);
 			if (obj.hidden == false && obj.projectID == displayProjectID) {
-				append += '<div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="' + obj.id + '" name="' + obj.id + '">';
-				append += '<label for="' + obj.id + '">' + obj.title + '</label>';
+				var storageEntry;
+				if (storageProject){
+					storageEntry = storageProject.entries.find(entry=>entry.entryID == obj.id);
+				}
+				append += '<div><div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="' + obj.id + '" name="' + obj.id + '">';
+				append += '<label for="' + obj.id + '" class="selectLabel">' + obj.title; 
+				if (storageProject && storageEntry && storageEntry.versions.length > 0) {
+					append += '<span class="versionCounter"><button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);">';
+					append += storageEntry.versions.length + ' version';
+					if (storageEntry.versions.length > 1) {
+						append += 's ';
+					}
+					else {
+						append += ' ';
+					}
+					append += '<span class="arrow">v</span></button></span>';
+				}
+				append += '</label>';
 				append += '</div>\n';
+				append += '<div class="versionList">';
+				if(storageEntry){
+					for (version of storageEntry.versions) {
+						date = new Date(version.versionDate);
+						let formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+						append += '<div class="versionDetail"><span>';
+						append += formatted_date;
+						var dlurl = baseURL + '/download?project_id=' + displayProjectID + '&entry_id=' + obj.id + '&entry_version_id=' + version.versionID;
+						append += '</span><button type="button" class="expandVersionButton" id="' + dlurl + '" + onclick="downloadVersion(this);">Download</button></div>';
+					}
+				}
+				append += '</div></div>';
 			}
-		}
-
+		} 
 
 		$(append).appendTo('#selectableEntries');
 	}
@@ -501,10 +562,10 @@ function updateLabfolderSelectableDatabases() {
 	// console.log("Projectcount:" + labFolderProjects.projects.length);
 	for (var i=0; i < labFolderMDB.databases.length; i++) {
 		var obj = labFolderMDB.databases[i];
-			displayProjectCount++;
-			append += '<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderMDB" id="' + obj.id + '" name="' + obj.id + '"onclick="updateSelectedProject(this);">'
-			append += obj.title;
-			append += "</button>"
+		displayProjectCount++;
+		append += '<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderMDB" id="' + obj.id + '" name="' + obj.id + '"onclick="updateSelectedProject(this);">'
+		append += obj.title;
+		append += "</button>"
 	}
 	if (displayProjectCount > 0){
 		$("#labFolderProjectSelect").html(append);
@@ -558,6 +619,7 @@ function downloadSelectedEntries() {
 							elementID: entry.elements[k].elementID,
 							elementType: entry.elements[k].type,
 							versionID : entry.elements[k].versionID,
+							entryVersionID: entry.versionID,
 							versionDate : entry.versionDate,
 							projectTitle : project.title
 						};
@@ -596,8 +658,8 @@ function downloadSelectedEntries() {
 			xhttp.setRequestHeader("Authorization", labFolderToken);
 			var payload = JSON.stringify(elements);
 			xhttp.send(payload);
+		}
 	}
-}
 
 }
 
@@ -665,8 +727,8 @@ function downloadSelectedMDBCategories() {
 					alert("Fehler: Bitte ID mitgeben!");
 				}
 		// unlockXMLHTTPRequest();
-			}
-		}
+	}
+}
 		// console.log(elements[i].elementID + " " +   elements[i].type);
 		url = baseURL + "/mdb/items?category_id=" + categoryIds[i];
 		// lockXMLHTTPRequest();

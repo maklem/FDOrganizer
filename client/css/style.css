@@ -127,14 +127,27 @@ li a:hover {
   background-color: var(--detail_button_hover_color);
 }
 
-.expandVersionButton .rotate{
-    -moz-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
-    transform: rotate(-90deg);
+.versionDetail {
+  background-color: var(--detail_button_color);
+  color: white;
+  font-weight: bold;
+  /*margin-left: 20px;*/
+  margin-top: 2px;
+  margin-bottom: -1px;
+  margin-right: -45px;
+  white-space: nowrap;
+  width: 97%;
+  padding: 5px;
+  padding-left: 10px;
+  display: none;
 }
 
+.versionDetail .expandVersionButton {
+  border-color: white;
+  display:inline-block;
+  float: right;
+
+}
 /*----dynamicLabFolderContent----*/
 
 .btnEntrySelectionHeader {
