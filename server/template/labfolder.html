@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Titel-Tag</title>
+	<!-- Bootstrap -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class ="row">
+			<div class="col-md-12" id="topBanner">
+				<p>LZV@UNI-BAYREUTH</p>
+			</div>
+			<div data-role="navbar" id="navbarTop">
+				<ul>
+					<li> <a href="./index.html" class="ui-btn-active">HOME</a></li>
+					<li> <a href="./labfolder.html" class="ui-btn-active">LABFOLDER</a></li>
+					<li> <a href="./easydb.html" class="ui-btn-active">EASYDB</a></li>
+					<li> <a href="./history.html" >HISTORY</a></li>
+					<li> <a href="./impressum.html" >IMPRESSUM</a></li>
+				</ul>
+			</div>
+			<div class="col-md-12" id="topBannerPlaceholder">
+				<br>
+			</div>
+			<div class="col-md-8" id="mainPage">
+				<div  id="labFolderEntrySelectionHeader">
+					<div >
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderProject" id="labFolderSelectProject" disabled="true" onclick="updateSelectionProjectMDB(this);">Projekte</button>
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop labFolderMDB" id="labFolderSelectMDB" disabled="true" onclick="updateSelectionProjectMDB(this);">Materialien</button>
+					</div>
+					<div  id="labFolderProjectSelect">
+<!-- 						
+ 						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderProject" id="testproject">Testprojekt</button>
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderProject" id="testproject">Testprojekt</button>
+						<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderProject" id="testproject">Testprojekt</button> -->
+						<!-- <button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderProject" id="testproject">Testprojekt</button> -->
+					</div>
+				</div>
+				<div class="col-md-8">
+					<div class="selections" id=dynamic>
+						<form id="selectableEntries">
+							<!-- <div>
+ 							<div class="entrySelect lzvButton labFolderProject">
+ 									<input type="checkbox" value="" id="1337" name="1337">
+ 									<label for="1337" class="selectLabel">
+ 										Titeldföogjnsldkfjnglksjdnfglkjn
+ 									<span class="versionCounter">
+										<button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);"> 3 versions  <span class="arrow">v</span></button>
+									</span>
+ 									</label>
+							</div>
+							<div class="versionList">
+								<div class="versionDetail">
+ 									<span>
+ 										Version1
+ 									</span>
+ 									<button class="expandVersionButton" id="versionID" onclick="downloadVersion(this);"> Download </button>
+ 								</div>
+ 								<div class="versionDetail">
+ 									<span>
+ 										Version2
+ 									</span>
+ 									<button class="expandVersionButton"> Download </button>
+ 								</div>
+ 								<div class="versionDetail">
+ 									<span>
+ 										Version3
+ 									</span>
+ 									<button class="expandVersionButton"> Download </button>
+ 								</div>
+ 							</div>
+ 						</div>
+							<div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="1338" name="1338">
+							<label for="1338">Titel2</label>
+							</div>
+							<div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="1338" name="1338">
+							<label for="1338">Titel2</label>
+							</div>
+ -->
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div id="labFolderLogin">
+					<div id="labfolderLoginform">
+						<form onsubmit="return false" action ="#">
+							<div id="labFolderLoginFormHeader"><label><strong><h1><b>LabFolder</b></h1></strong></label><br> </div>
+							<label class="formDescriptor" for="username"><h3><b>Username</b></h3></label>
+							<input name="username" type="text" placeholder="Enter Username" required value="robert.guenther@uni-bayreuth.de">
+							<label class="formDescriptor" for="pwd"><h3><b>Password</b></h3></label>
+							<input name="pwd" type="password" placeholder="Enter Password" required value="krQ3C3LTjIXFmwcpmEaM">
+							<div id="labFolderFailedLogin">
+								<label> Wrong Username or password!</label><br>
+							</div>
+							<button type="submit" class="btn lzvButton" id="submitLabFolderButtonLogin" onclick="authenticate(this.form);">Login</button>
+						</form>
+					</div>
+					<div  id="labFolderLoginSuccesful">
+						<label>LabFolder Login Successfull</label><br>
+						<button class="btn lzvButton" id="submitLabFolderButtonLogout" onclick="logout();">Logout</button>
+					</div>
+
+				</div>
+				<div id="labFolderDownloadButton">
+						<button id="downloadSelectedElements" type="button" class="btn lzvButton lzvSideBarRight">Download selected Elements</button>
+						<button id="updateContent" type="button" class="btn lzvButton lzvSideBarRight">Reload Content</button>
+						<button id="selectAllElements" type="button" class="btn lzvButton lzvSideBarRight">Select all</button>
+						<button id="deSelectAllElements" type="button" class="btn lzvButton lzvSideBarRight">Deselect all</button>
+				</div>	
+				<!--these are only here for testing purposes -->			
+<!-- 				<div>
+					<button id="getEntries" type="button" class="btn lzvButton">krieg die Entries...</button>
+					<button id="getProjects" type="button" class="btn lzvButton">krieg die Projecte...</button>
+					<button id="download" type="button" class="btn lzvButton">download...</button>
+					<button id="downloadMDB" type="button" class="btn lzvButton">downloadMDB...</button>
+					<button id="getMDBdatabases" type="button" class="btn lzvButton">download mdb database...</button>
+					<button id="getMDBcats" type="button" class="btn lzvButton">download mdb categories...</button>
+				</div>  -->
+
+			</div>
+
+		</div>
+		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/LZVBase.js"></script>
+		<script src="js/LZVLabFolder.js"></script>
+	</div>
+</body>
+</html>		
