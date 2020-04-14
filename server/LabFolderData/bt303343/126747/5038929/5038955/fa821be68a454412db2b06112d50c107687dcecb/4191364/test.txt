@@ -1,0 +1,12 @@
+<p><span style="font-size: 24px;"><strong>Datenelement</strong></span></p>
+<p><br></p>
+<p>Das Datenelement (DE) befindet sich in der Symbolleiste neben den Funktionen für das Einfügen von<em>Text</em>, <em>Tabellen</em>, <em>Zeichnungen</em>, und <em>Hochladen von Dateien</em>. Diese Möglichkeiten haben Sie bei der Bearbeitung des DEs:</p>
+<p><br></p>
+<ul>
+ <li>Fügen Sie ein <em>Numerisches Datenelement</em> für quantitative Versuchsparameter ein.</li>
+ <li>Fügen Sie ein <em>Beschreibendes Datenelement</em> ein, <em>um Parameter mit qualitativen Daten zu dokumentieren.</em></li>
+ <li><em>Fügen Sie eine <em>Datengruppe</em> mit mehreren experimentellen Parametern ein.</em></li>
+ <li><em>Fügen Sie einen Artikel aus Ihrer Materialdatenbank ein, der hier als <em>Materialelement</em> referenziert wird.</em></li>
+</ul>
+<p><em><br></em></p>
+<p><em>Sehen Sie sich das Beispiel rechts an. &gt;&gt;</em></p>

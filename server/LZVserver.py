@@ -27,6 +27,27 @@ devUserID = "bt303343"
 
 CORS(app)
 
+#----------------------Page Navigation-----------------------------------------
+@app.route('/')
+def navhome():
+	return render_template("index.html")
+
+@app.route('/impressum')
+def navimpressum():
+	return render_template("impressum.html")
+
+@app.route('/history')
+def navhistory():
+	return render_template("history.html")
+
+@app.route('/labfolder')
+def navlabfolder():
+	return render_template("labfolder.html")
+
+@app.route('/easydb')
+def naveasydb():
+	return render_template("easydb.html")
+
 #----------------------Authentification----------------------------------------
 @app.route('/auth/login',methods=['POST'])
 def authenticate():

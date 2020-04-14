@@ -1,0 +1,6 @@
+Informieren Sie sich über den Microsoft Word® und Excel® Support. Nach dem Hochladen einer Datei können Sie folgendes tun: 
+<ul> 
+ <li><strong>Vorschau: </strong>Zeigt Ihnen eine Vorschau, um den Inhalt der Datei zu sehen.</li> 
+ <li><strong>Extrahieren: </strong>Alle Inhalte einer Datei werden extrahiert und dem Eintrag hinzugefügt.</li> 
+ <li><strong>Herunterladen: </strong>Sie können jederzeit eine Datei herunterladen, die Sie in labfolder hochgeladen haben.</li> 
+</ul>
