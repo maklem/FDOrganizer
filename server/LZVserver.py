@@ -299,25 +299,23 @@ def downloadFileFromLabFolder(userID, dataArray):
 			except:
 				print("Error Saving text file")			
 
-@app.route('/mdb/databases', methods=['GET'])
-def getMDBDatabases():
-	url = labFolderBaseURL + '/mdb/databases'
+# @app.route('/mdb/databases', methods=['GET'])
+# def getMDBDatabases():
+# 	url = labFolderBaseURL + '/mdb/databases'
 	
-	#prepare header		
-	headers = {"Content-Type": "application/json",
-				"Authorization" :  "Token " + request.headers['Authorization'],
-				"User-Agent": labFolderDefaultUserAgentHeader
-			  }
-	response = requests.get(url, headers=headers)
-	return response.text
+# 	#prepare header		
+# 	headers = {"Content-Type": "application/json",
+# 				"Authorization" :  "Token " + request.headers['Authorization'],
+# 				"User-Agent": labFolderDefaultUserAgentHeader
+# 			  }
+# 	response = requests.get(url, headers=headers)
+# 	print(url)
+# 	print(response.text)
+# 	return response.text
 
 @app.route('/mdb/categories', methods=['GET'])
 def getMDBCategories():
 	url = labFolderBaseURL + '/mdb/categories'
-	elementID = request.args.get('mdb_id', default = '', type = str)
-	if elementID == '':
-		return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-	url = url + '?mdb_id=' + elementID
 	#prepare header		
 	headers = {"Content-Type": "application/json",
 				"Authorization" :  "Token " + request.headers['Authorization'],

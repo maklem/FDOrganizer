@@ -15,6 +15,7 @@ if (window.XMLHttpRequest) {
 $( document ).ready(function() {
 	var ct = getCookie('labFolderToken');
 	if (ct != '') {
+		$("#labFolderDownloadButton").show();
 		labFolderToken = ct;
 		updateContentAfterLogin();
 	}
@@ -53,7 +54,7 @@ var labFolderProjects = {
 }
 
 var labFolderMDB = {
-	databases: Array()
+	categories: Array()
 }
 
 var labFolderStorageFile; //storage file on server, will be filled with json object containing the files already available on server
@@ -75,13 +76,13 @@ $("#downloadMDB").click(function(){
 	downloadMDB();
 })
 
-$("#getMDBdatabases").click(function(){
-	getMDBDatabases();
-})
+// $("#getMDBdatabases").click(function(){
+// 	getCategories();
+// })
 
-$("#getMDBcats").click(function(){
-	getMDBCategories();
-})
+// $("#getMDBcats").click(function(){
+// 	getMDBCategory();
+// })
 
 $("#getProjects").click(function(){
 	getProjects();
@@ -90,7 +91,7 @@ $("#getProjects").click(function(){
 function clearLocalStorage() {
 	labFolderEntries.entries = Array();
 	labFolderProjects.projects = Array();
-	labFolderMDB.databases = Array();
+	labFolderMDB.categories = Array();
 	labFolderStorageFile = {};
 	updateLabfolderSelectableProjects();
 	updateProjectMaterialSelection();
@@ -160,7 +161,7 @@ function updateSelectionProjectMDB(clicked) {
 		updateLabfolderSelectableElements();
 	}
 	if($(clicked).hasClass("labFolderMDB")) {
-		updateLabfolderSelectableDatabases();
+		// updateLabfolderSelectableDatabases();
 		updateLabfolderSelectableCategories();
 	}
 }
@@ -201,7 +202,7 @@ function updateProjectMaterialSelection() {
 	else {
 		$("#labFolderSelectProject").attr("disabled", true);	
 	}
-	if (labFolderMDB.databases.length > 0 ) {
+	if (labFolderMDB.categories.length > 0 ) {
 		$("#labFolderSelectMDB").removeAttr("disabled");	
 	}
 	else {
@@ -218,6 +219,7 @@ function authenticate(form) {
 				if (!("error" in data))  {
 					labFolderToken = data.token;
 					setCookie("labFolderToken", labFolderToken);
+					$("#labFolderDownloadButton").show();
 					updateContentAfterLogin();
 				}
 				else
@@ -251,6 +253,7 @@ function logout() {
 					$("#labFolderFailedLogin").hide();
 					clearCookies();
 					clearLocalStorage();
+					$("#labFolderDownloadButton").hide();					
 
 				}
 		// unlockXMLHTTPRequest();
@@ -289,8 +292,8 @@ function updateContentAfterLogin() {
 	}
 
 	if (getCookie("labFolderMDB") == "") {
-		getMDBDatabases();
 		getMDBCategories();
+		// getMDBCategory();
 		setCookie("labFolderMDB", JSON.stringify(labFolderMDB));	
 	}
 	else {
@@ -412,28 +415,30 @@ function getEntries() {
 	xhttp.send();	
 }
 
-function getMDBDatabases() {
+function getMDBCategories() {
 	// console.log("in getProjects");
-	var url = baseURL + '/mdb/databases';
+	var url = baseURL + '/mdb/categories';
 	xhttp.onreadystatechange  = function(e) {
 		// console.log("readystatechangeProject");
 		// console.log("ReadyState: " + this.readyState + " Status: " + this.status);
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				// console.log("get project success");
+				console.log(xhttp.response);
 				var parsedData = JSON.parse(xhttp.response);
-				labFolderMDB.databases = new Array();
+				labFolderMDB.categories = new Array();
 				for (i=0; i < parsedData.length; i++) {
 					var obj = parsedData[i];
-					var database = {
+					var category = {
 						title: obj['title'],
 						id: obj['id'],
-						ownerID: obj['owner_id'],
+						creatorID: obj['creator_id'],
 						creationDate: obj['creation_date'],
+						versionID: obj['version_id'],
 						versionDate: obj['version_date'],
 						categories: Array()
 					};
-					labFolderMDB.databases.push(database);
+					labFolderMDB.categories.push(category);
 				}
 			}
 		// unlockXMLHTTPRequest();
@@ -447,44 +452,44 @@ function getMDBDatabases() {
 	xhttp.send();	
 }
 
-function getMDBCategories() {
-	// console.log("in getProjects");
-	var urlBase = baseURL + '/mdb/categories';
-	for (k=0; k<labFolderMDB.databases.length;k++)
-	{
-		var url = urlBase + '?mdb_id=' + labFolderMDB.databases[k].id;
-		xhttp.onreadystatechange  = function(e) {
-		// console.log("readystatechangeProject");
-		// console.log("ReadyState: " + this.readyState + " Status: " + this.status);
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				var parsedData = JSON.parse(xhttp.response);
-				labFolderMDB.databases[k].categories = new Array();
-				// console.log("parsedData: " + parsedData.length);
-				for (i=0; i < parsedData.length; i++) {
-					var obj = parsedData[i];
-					var category = {
-						title: obj['title'],
-						mdbID: obj['mdb_id'],
-						id: obj['id'],
-						creatorID: obj['creator_id'],
-						creationDate: obj['creation_date'],
-						versionDate: obj['version_date']
-					};
-					labFolderMDB.databases[i].categories.push(category);
-				}
-			}
-		// unlockXMLHTTPRequest();
-	}
-}
-	// lockXMLHTTPRequest();
-	xhttp.open('GET', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Authorization", labFolderToken);
-	xhttp.send();	
-}
+// function getMDBCategory() {
+// 	// console.log("in getProjects");
+// 	var urlBase = baseURL + '/mdb/categories';
+// 	for (k=0; k<labFolderMDB.databases.length;k++)
+// 	{
+// 		var url = urlBase + '/' + labFolderMDB.databases[k].id;
+// 		xhttp.onreadystatechange  = function(e) {
+// 		// console.log("readystatechangeProject");
+// 		// console.log("ReadyState: " + this.readyState + " Status: " + this.status);
+// 		if(this.readyState == 4) {
+// 			if(this.status == 200) {
+// 				var parsedData = JSON.parse(xhttp.response);
+// 				labFolderMDB.databases[k].categories = new Array();
+// 				// console.log("parsedData: " + parsedData.length);
+// 				for (i=0; i < parsedData.length; i++) {
+// 					var obj = parsedData[i];
+// 					var category = {
+// 						title: obj['title'],
+// 						id: obj['id'],
+// 						creatorID: obj['creator_id'],
+// 						creationDate: obj['creation_date'],
+// 						versionID: obj['version_id'],
+// 						versionDate: obj['version_date']
+// 					};
+// 					labFolderMDB.databases[i].categories.push(category);
+// 				}
+// 			}
+// 		// unlockXMLHTTPRequest();
+// 	}
+// }
+// 	// lockXMLHTTPRequest();
+// 	xhttp.open('GET', url, false);
+// 	xhttp.setRequestHeader("Content-type", "application/json");
+// 	xhttp.setRequestHeader("Authorization", labFolderToken);
+// 	xhttp.send();	
+// }
 
-}
+// }
 
 function updateLabfolderSelectableProjects() {
 	$("#labFolderProjectSelect").html("");
@@ -555,33 +560,34 @@ function updateLabfolderSelectableElements() {
 
 }
 
-function updateLabfolderSelectableDatabases() {
-	$("#labFolderProjectSelect").html("");
-	var append = "";
-	var displayProjectCount = 0;
-	// console.log("Projectcount:" + labFolderProjects.projects.length);
-	for (var i=0; i < labFolderMDB.databases.length; i++) {
-		var obj = labFolderMDB.databases[i];
-		displayProjectCount++;
-		append += '<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderMDB" id="' + obj.id + '" name="' + obj.id + '"onclick="updateSelectedProject(this);">'
-		append += obj.title;
-		append += "</button>"
-	}
-	if (displayProjectCount > 0){
-		$("#labFolderProjectSelect").html(append);
-		$(".btnEntrySelectionProject").css("width", 100/displayProjectCount + "%")
-	}
+// function updateLabfolderSelectableDatabases() {
+// 	$("#labFolderProjectSelect").html("");
+// 	var append = "";
+// 	var displayProjectCount = 0;
+// 	// console.log("Projectcount:" + labFolderProjects.projects.length);
+// 	for (var i=0; i < labFolderMDB.databases.length; i++) {
+// 		var obj = labFolderMDB.databases[i];
+// 		displayProjectCount++;
+// 		append += '<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderMDB" id="' + obj.id + '" name="' + obj.id + '"onclick="updateSelectedProject(this);">'
+// 		append += obj.title;
+// 		append += "</button>"
+// 	}
+// 	if (displayProjectCount > 0){
+// 		$("#labFolderProjectSelect").html(append);
+// 		$(".btnEntrySelectionProject").css("width", 100/displayProjectCount + "%")
+// 	}
 
-}
+// }
 
 function updateLabfolderSelectableCategories() {
+	$("#labFolderProjectSelect").html("");	
 	$('form[id=selectableEntries]').empty();
 	var append = '';
 	// console.log("Printing Element count: " + labFolderEntries.entries.length);
-	if (displayProjectID != "") {
-		let db = labFolderMDB.databases.find(db=>db.id == displayProjectID);
-		for (var i=0; i<db.categories.length; i++){
-			var obj = db.categories[i];
+	// if (displayProjectID != "") {
+		// let db = labFolderMDB.categories.find(db=>db.id == displayProjectID);
+		for (var i=0; i<labFolderMDB.categories.length; i++){
+			var obj = labFolderMDB.categories[i];
 			append += '<div class="entrySelect lzvButton labFolderMDB"><input type="checkbox" value=""  id="' + obj.id + '" name="' + obj.id + '">';
 			append += '<label for="' + obj.id + '">' + obj.title + '</label>';
 			append += '</div>\n';
@@ -589,7 +595,7 @@ function updateLabfolderSelectableCategories() {
 
 
 		$(append).appendTo('#selectableEntries');
-	}
+	// }
 
 }
 
