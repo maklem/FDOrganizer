@@ -75,11 +75,10 @@ def logoutLabFolder():
 
 def authenticateCouchDB():
 	url = couchDBBaseURL + '/_session'
-    data = 	{ 
-    		"name" :  couchDBAdmin,
+    data = {"name" :  couchDBAdmin,
     		"password" : couchDBPassword
     		}
-    headers={"Content-Type": "application/json"}            
+    headers = {"Content-Type": "application/json"}            
     response = requests.post(url,data=data,headers=headers)
     if json.loads(response.text)["ok"] == True :
     	print("successfully authenticated against couchdb")
