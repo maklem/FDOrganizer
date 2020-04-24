@@ -74,19 +74,17 @@ def logoutLabFolder():
 	return response.text             
 
 def authenticateCouchDB():
-	url = couchDBBaseURL + '/_session'
-    data = {"name" :  couchDBAdmin,
-    		"password" : couchDBPassword
-    		}
-    headers = {"Content-Type": "application/json"}            
-    response = requests.post(url,data=data,headers=headers)
-    if json.loads(response.text)["ok"] == True :
-    	print("successfully authenticated against couchdb")
-    	cookie = response.headers["Set-Cookie"]
-    	couchDBToken = coookie[:cookie.find(";")]
-    	print("couchDBToken: " + couchDBToken)
-    else
-    	print("NOT successfully authenticated against couchdb")
+	url = couchDBURL + '/_session'
+	data =	{"name":  couchDBAdmin,	"password": couchDBPassword	}
+	headers = {"Content-Type": "application/json"}            
+	response = requests.post(url,data=data,headers=headers)
+	if json.loads(response.text)["ok"] == True :
+		print("successfully authenticated against couchdb")
+		cookie = response.headers["Set-Cookie"]
+		couchDBToken = coookie[:cookie.find(";")]
+		print("couchDBToken: " + couchDBToken)
+	else:
+		print("NOT successfully authenticated against couchdb")
 		
 
 #----------------------Projects------------------------------------------------
