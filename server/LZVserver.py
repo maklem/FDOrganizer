@@ -13,6 +13,12 @@ import json
 DEBUG=1	
 
 app = Flask(__name__)
+
+
+#
+# All These Parameteres need to be included in a config file which is root read only and accessed on runtime
+#
+
 #baseURL of labFolder
 labFolderBaseURL = 'https://eln.labfolder.com/api/v2'
 #Testheader - required for access on labfolder, needs to be project name and a contant e-mail to be contacted when problems occur
@@ -22,10 +28,15 @@ storageBaseURL = './LabFolderData/'
 storageFileName = 'storage.json'
 tempFolder = "./tmp/"
 
+#couchDBConfiguration Parameters
 couchDBURL = "localhost:5984"
 couchDBAdmin = "admin"
 couchDBPassword = "aodqfyUQqA"
 couchDBToken = ""
+couchDBStorageDatabaseName = "storage"
+couchDBDocumentDatabaseName = "documents"
+couchDBStaticDatabaseName = "static"
+
 
 #DELETE AFTER DEV
 devUserID = "bt303343"
@@ -78,14 +89,13 @@ def authenticateCouchDB():
 	data =	{"name":  couchDBAdmin,	"password": couchDBPassword	}
 	headers = {"Content-Type": "application/json"}            
 	response = requests.post(url,data=data,headers=headers)
-	if json.loads(response.text)["ok"] == True :
-		print("successfully authenticated against couchdb")
+	if response.status_code == 200:
 		cookie = response.headers["Set-Cookie"]
 		couchDBToken = coookie[:cookie.find(";")]
-		print("couchDBToken: " + couchDBToken)
+		return True
 	else:
-		print("NOT successfully authenticated against couchdb")
-		
+		print("Error logging into couchDB. Wrong Username or Password!")
+		return False
 
 #----------------------Projects------------------------------------------------
 
@@ -404,6 +414,27 @@ def downloadMDBItems():
 def getStorageFile():
 	userID = devUserID
 	return getDatastructure(userID,return_as_string=True)
+
+
+def getDatastructure(userID,return_as_string=False):
+	couchDBPath = couchDBURL + "/" + couchDBStorageDatabaseName + "/" + userID
+	headers = {"Accept": "application/json",
+				"Content-Type" : "application/json",
+				"Cookie" :  couchDBToken
+				} 
+	response = request.get(url,headers=headers)
+	if response:
+		if return_as_string:
+			return response.text
+		else:
+			return json.loads(reponse.text)
+	elif response.status_code == 404:
+		initialData = {"user" : userID, "projects": []}
+		try:
+			new_response = request.put(url,headers=headers,data=initialData)
+			new_response.raise_for_status()
+		except requests.exceptions.HTTPError as e:
+			print("HTTP Error:",e)
 
 def getDatastructure(userID,return_as_string=False):
 	folderPath = storageBaseURL + userID
