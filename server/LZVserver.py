@@ -22,6 +22,11 @@ storageBaseURL = './LabFolderData/'
 storageFileName = 'storage.json'
 tempFolder = "./tmp/"
 
+couchDBURL = "localhost:5984"
+couchDBAdmin = "admin"
+couchDBPassword = "aodqfyUQqA"
+couchDBToken = ""
+
 #DELETE AFTER DEV
 devUserID = "bt303343"
 
@@ -48,9 +53,9 @@ def navlabfolder():
 def naveasydb():
 	return render_template("easydb.html")
 
-#----------------------Authentification----------------------------------------
+#----------------------Authentification LabFolder------------------------------
 @app.route('/auth/login',methods=['POST'])
-def authenticate():
+def authenticateLabFolder():
     url = labFolderBaseURL + '/auth/login'
     data = request.get_data()
     headers={"Content-Type": "application/json"}            
@@ -58,7 +63,7 @@ def authenticate():
     return response.text
 
 @app.route('/auth/logout', methods=['POST'])
-def logout():
+def logoutLabFolder():
 	url = labFolderBaseURL + '/auth/logout'
 	headers = {"Content-Type": "application/json",
 				"Authorization" :  "Token " + request.headers['Authorization'],
@@ -67,6 +72,23 @@ def logout():
 
 	response = requests.post(url, headers=headers)
 	return response.text             
+
+def authenticateCouchDB():
+	url = couchDBBaseURL + '/_session'
+    data = 	{ 
+    		"name" :  couchDBAdmin,
+    		"password" : couchDBPassword
+    		}
+    headers={"Content-Type": "application/json"}            
+    response = requests.post(url,data=data,headers=headers)
+    if json.loads(response.text)["ok"] == True :
+    	print("successfully authenticated against couchdb")
+    	cookie = response.headers["Set-Cookie"]
+    	couchDBToken = coookie[:cookie.find(";")]
+    	print("couchDBToken: " + couchDBToken)
+    else
+    	print("NOT successfully authenticated against couchdb")
+		
 
 #----------------------Projects------------------------------------------------
 
@@ -573,4 +595,5 @@ def createZipFileFromTree(rootDir,filename):
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	authenticateCouchDB()
+	# app.run(debug=True)
