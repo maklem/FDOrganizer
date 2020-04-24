@@ -22,7 +22,7 @@ storageBaseURL = './LabFolderData/'
 storageFileName = 'storage.json'
 tempFolder = "./tmp/"
 
-couchDBURL = "localhost:5984"
+couchDBURL = "https://127.0.0.1:5984"
 couchDBAdmin = "admin"
 couchDBPassword = "aodqfyUQqA"
 couchDBToken = ""
@@ -74,17 +74,19 @@ def logoutLabFolder():
 	return response.text             
 
 def authenticateCouchDB():
-	url = couchDBURL + '/_session'
-	data =	{"name":  couchDBAdmin,	"password": couchDBPassword	}
-	headers = {"Content-Type": "application/json"}            
-	response = requests.post(url,data=data,headers=headers)
-	if json.loads(response.text)["ok"] == True :
-		print("successfully authenticated against couchdb")
-		cookie = response.headers["Set-Cookie"]
-		couchDBToken = coookie[:cookie.find(";")]
-		print("couchDBToken: " + couchDBToken)
-	else:
-		print("NOT successfully authenticated against couchdb")
+        url = couchDBURL + '/_session'
+        data =	{"name":  couchDBAdmin,	"password": couchDBPassword	}
+        headers = {"Content-Type": "application/json"}            
+        response = requests.post(url,data=json.dumps(data),headers=headers)
+        jsonData = json.loads(response.text)
+        print(jsonData)
+        if jsonData["ok"] == True :
+                print("successfully authenticated against couchdb")
+                cookie = response.headers["Set-Cookie"]
+                couchDBToken = cookie[:cookie.find(";")]
+                print("couchDBToken: " + couchDBToken)
+        else:
+                print("NOT successfully authenticated against couchdb")
 		
 
 #----------------------Projects------------------------------------------------
