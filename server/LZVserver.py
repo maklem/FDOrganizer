@@ -29,7 +29,7 @@ storageFileName = 'storage.json'
 tempFolder = "./tmp/"
 
 #couchDBConfiguration Parameters
-couchDBURL = "localhost:5984"
+couchDBURL = "https://127.0.0.1:5984"
 couchDBAdmin = "admin"
 couchDBPassword = "aodqfyUQqA"
 couchDBToken = ""
