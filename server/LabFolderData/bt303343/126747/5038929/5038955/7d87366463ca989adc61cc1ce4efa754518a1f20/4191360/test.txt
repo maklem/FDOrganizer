@@ -1,3 +1,0 @@
-<p><span style="font-size: 24px;"><strong>Dateielemente</strong></span></p>
-<p><br></p>
-<p>Sie können PDF-Dateien in labfolder hochladen und direkt ansehen. Sehen Sie das Beispiel rechts. &gt;&gt;</p>
