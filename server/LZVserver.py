@@ -228,7 +228,7 @@ def download():
 	return app.response_class(status=200, mimetype='application/json') 		
     
 
-
+#TODO adapt to couchdb
 #@app.route('/elements/file' , methods=['GET'])
 def downloadFileFromLabFolder(userID, dataArray):
 	if DEBUG:
@@ -355,6 +355,7 @@ def getMDBCategories():
 	response = requests.get(url, headers=headers)
 	return response.text
 
+#TODO adapt to couchdb
 #----does only support filtering by categoryID----
 @app.route('/mdb/items', methods=['GET'])
 def downloadMDBItems():
@@ -436,52 +437,52 @@ def getDatastructure(userID,return_as_string=False):
 		except requests.exceptions.HTTPError as e:
 			print("HTTP Error:",e)
 
-def getDatastructure(userID,return_as_string=False):
-	folderPath = storageBaseURL + userID
-	userDirectory = Path(folderPath)
-	if not userDirectory.is_dir(): #check if folder already exists
-		createUserFolder(userID)	
-	storageFile = Path(folderPath + '/' + storageFileName)
-	if storageFile.is_file(): #structure object already exists
-		data = storageFile.read_text()
-		if return_as_string:
-			return data
-		else:
-			dataJSON = json.loads(data)
-			return dataJSON
-	else: # storage oject does not exist yet, this should never happen since creation of the folder always creates an initial storage file
-		if return_as_string:
-			return "{}"
-		else:
-			return {} #return empty object
+# def getDatastructure(userID,return_as_string=False):
+# 	folderPath = storageBaseURL + userID
+# 	userDirectory = Path(folderPath)
+# 	if not userDirectory.is_dir(): #check if folder already exists
+# 		createUserFolder(userID)	
+# 	storageFile = Path(folderPath + '/' + storageFileName)
+# 	if storageFile.is_file(): #structure object already exists
+# 		data = storageFile.read_text()
+# 		if return_as_string:
+# 			return data
+# 		else:
+# 			dataJSON = json.loads(data)
+# 			return dataJSON
+# 	else: # storage oject does not exist yet, this should never happen since creation of the folder always creates an initial storage file
+# 		if return_as_string:
+# 			return "{}"
+# 		else:
+# 			return {} #return empty object
 
 
-#creates the folder for the user if it does not exist yet. also creates an empty structure.json object
-def createUserFolder(userID):
-	folderPath = storageBaseURL + userID
-	if DEBUG:
-		print("folderPath: " + folderPath)
-	userDirectory = Path(folderPath)		
-	try:
-		if DEBUG:
-			print("trying to create user folder for " + userID)
-		userDirectory.mkdir(mode=0o700,parents=True, exist_ok=False) #create a file, and catch exception if already exists, return if so, structure file also is there
-		storageFile = Path(folderPath + '/' + storageFileName)
-		storageFile.touch(mode=0o700, exist_ok = True) #touch the file, catch exception (should never happen since it should never already exist)
-		initialData = {"user" : userID, "projects": []}
-		storageFile.write_text(json.dumps(initialData)) #initialize the file with empty array for projects and userID for further usage
-		if DEBUG:
-			print("finsihed creating user folder for " + userID)
-	except FileNotFoundError:
-		if DEBUG:
-			print("EXCEPT in 'createUserFolder': Can't find parent folder.")
-		return
-	except FileExistsError:
-		if DEBUG:
-			print("EXCEPT in 'createUserFolder': Directory already exists.")
-		return
-	except: 
-		return
+# #creates the folder for the user if it does not exist yet. also creates an empty structure.json object
+# def createUserFolder(userID):
+# 	folderPath = storageBaseURL + userID
+# 	if DEBUG:
+# 		print("folderPath: " + folderPath)
+# 	userDirectory = Path(folderPath)		
+# 	try:
+# 		if DEBUG:
+# 			print("trying to create user folder for " + userID)
+# 		userDirectory.mkdir(mode=0o700,parents=True, exist_ok=False) #create a file, and catch exception if already exists, return if so, structure file also is there
+# 		storageFile = Path(folderPath + '/' + storageFileName)
+# 		storageFile.touch(mode=0o700, exist_ok = True) #touch the file, catch exception (should never happen since it should never already exist)
+# 		initialData = {"user" : userID, "projects": []}
+# 		storageFile.write_text(json.dumps(initialData)) #initialize the file with empty array for projects and userID for further usage
+# 		if DEBUG:
+# 			print("finsihed creating user folder for " + userID)
+# 	except FileNotFoundError:
+# 		if DEBUG:
+# 			print("EXCEPT in 'createUserFolder': Can't find parent folder.")
+# 		return
+# 	except FileExistsError:
+# 		if DEBUG:
+# 			print("EXCEPT in 'createUserFolder': Directory already exists.")
+# 		return
+# 	except: 
+# 		return
 
 #updates the storage File with the added files
 def updateStorageFile(userID, addElements):
@@ -608,6 +609,7 @@ def removeAlreadyExistingTupel(userID,checkElements):
 	print("output length: " + str(len(output)))
 	return output
 
+#TODO adapt to couchdb
 def createZipFileFromTree(rootDir,filename):
 	zf = ZipFile(filename,'w')
 	rootPath = Path (rootDir)
