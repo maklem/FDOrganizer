@@ -418,24 +418,25 @@ def getStorageFile():
 
 
 def getDatastructure(userID,return_as_string=False):
-	couchDBPath = couchDBURL + "/" + couchDBStorageDatabaseName + "/" + userID
-	headers = {"Accept": "application/json",
-				"Content-Type" : "application/json",
-				"Cookie" :  couchDBToken
-				} 
-	response = request.get(url,headers=headers)
-	if response:
-		if return_as_string:
-			return response.text
-		else:
-			return json.loads(reponse.text)
-	elif response.status_code == 404:
-		initialData = {"user" : userID, "projects": []}
-		try:
-			new_response = request.put(url,headers=headers,data=initialData)
-			new_response.raise_for_status()
-		except requests.exceptions.HTTPError as e:
-			print("HTTP Error:",e)
+        url = couchDBURL + "/" + couchDBStorageDatabaseName + "/" + userID
+        authenticateCouchDB()
+        headers = {"Accept": "application/json",
+                    "Content-Type" : "application/json",
+                    "Cookie" :  couchDBToken
+                    } 
+        response = requests.get(url,headers=headers)
+        if response:
+                if return_as_string:
+                    return response.text
+                else:
+                    return json.loads(reponse.text)
+        elif response.status_code == 404:
+        	initialData = {"user" : userID, "projects": []}
+        	try:
+                    new_response = requests.put(url,headers=headers,data=initialData)
+                    new_response.raise_for_status()
+                except requests.exceptions.HTTPError as e:
+                    print("HTTP Error:",e)
 
 # def getDatastructure(userID,return_as_string=False):
 # 	folderPath = storageBaseURL + userID
@@ -625,5 +626,5 @@ def createZipFileFromTree(rootDir,filename):
 
 
 if __name__ == '__main__':
-	authenticateCouchDB()
-	# app.run(debug=True)
+	#authenticateCouchDB()
+	app.run(debug=True)
