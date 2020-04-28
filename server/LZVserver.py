@@ -67,11 +67,11 @@ def naveasydb():
 #----------------------Authentification LabFolder------------------------------
 @app.route('/auth/login',methods=['POST'])
 def authenticateLabFolder():
-    url = labFolderBaseURL + '/auth/login'
-    data = request.get_data()
-    headers={"Content-Type": "application/json"}            
-    response = requests.post(url,data=data,headers=headers)
-    return response.text
+	url = labFolderBaseURL + '/auth/login'
+	data = request.get_data()
+	headers={"Content-Type": "application/json"}            
+	response = requests.post(url,data=data,headers=headers)
+	return response.text
 
 @app.route('/auth/logout', methods=['POST'])
 def logoutLabFolder():
@@ -226,7 +226,7 @@ def download():
 	if len(jsonData) > 0:
 		updateStorageFile(userID,jsonData)
 	return app.response_class(status=200, mimetype='application/json') 		
-    
+	
 
 #TODO adapt to couchdb
 #@app.route('/elements/file' , methods=['GET'])
@@ -418,25 +418,25 @@ def getStorageFile():
 
 
 def getDatastructure(userID,return_as_string=False):
-        url = couchDBURL + "/" + couchDBStorageDatabaseName + "/" + userID
-        authenticateCouchDB()
-        headers = {"Accept": "application/json",
-                    "Content-Type" : "application/json",
-                    "Cookie" :  couchDBToken
-                    } 
-        response = requests.get(url,headers=headers)
-        if response:
-                if return_as_string:
-                    return response.text
-                else:
-                    return json.loads(reponse.text)
-        elif response.status_code == 404:
-        	initialData = {"user" : userID, "projects": []}
-        	try:
-                    new_response = requests.put(url,headers=headers,data=initialData)
-                    new_response.raise_for_status()
-                except requests.exceptions.HTTPError as e:
-                    print("HTTP Error:",e)
+		url = couchDBURL + "/" + couchDBStorageDatabaseName + "/" + userID
+		authenticateCouchDB()
+		headers = {"Accept": "application/json",
+					"Content-Type" : "application/json",
+					"Cookie" :  couchDBToken
+					} 
+		response = requests.get(url,headers=headers)
+		if response:
+				if return_as_string:
+					return response.text
+				else:
+					return json.loads(reponse.text)
+		elif response.status_code == 404:
+			initialData = {"user" : userID, "projects": []}
+			try:
+					new_response = requests.put(url,headers=headers,data=initialData)
+					new_response.raise_for_status()
+				except requests.exceptions.HTTPError as e:
+					print("HTTP Error:",e)
 
 # def getDatastructure(userID,return_as_string=False):
 # 	folderPath = storageBaseURL + userID
@@ -552,8 +552,8 @@ def updateStorageFile(userID, addElements):
 										if version["versionID"] == item["entryVersionID"]:
 											if len([x for x in version["elements"] if x["elementID"] == item["elementID"]]) == 0:
 												version["elements"].append({	"elementID" : item["elementID"],
-																		  	"elementType" : item["elementType"],
-																		  	"versions" : [{
+																			"elementType" : item["elementType"],
+																			"versions" : [{
 																				"versionID" : item["versionID"]
 																			}]
 																		})
