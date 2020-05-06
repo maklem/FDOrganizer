@@ -1,183 +1,231 @@
-from flask import Flask
-from flask import request
-from flask import Response
-from flask import make_response
-from flask import send_file
-from flask import *
+"""
+Software for LZV Server.
+"""
+import time
 from pathlib import Path
-from zipfile import *
-from flask_cors import CORS
-import requests
+from zipfile import ZipFile
 import json
+import requests
 
-DEBUG=1 
+from flask import Flask
+from flask_cors import CORS
+from flask import request, render_template, send_from_directory
+# from flask import render_template
+# from flask import send_from_directory
+# from flask import Response
+# from flask import make_response
+# from flask import send_file
+# from flask import *
+# from zipfile import *
 
-app = Flask(__name__)
+DEBUG = 1
+
 
 
 #
-# All These Parameteres need to be included in a config file which is root read only and accessed on runtime
+# All These Parameteres need to be included in a config file which is root read only and accessed
+#on runtime
 #
 
 #baseURL of labFolder
-labFolderBaseURL = 'https://eln.labfolder.com/api/v2'
-#Testheader - required for access on labfolder, needs to be project name and a contant e-mail to be contacted when problems occur
-labFolderDefaultUserAgentHeader = 'TestprojektFDM; robert.guenther@uni-bayreuth.de'
+# CONFIGPARAMS["labFolderBaseURL"] = 'https://eln.labfolder.com/api/v2'
 #storage base url - here the downlaoded data is stored, should terminate with a '/'
-storageBaseURL = './LabFolderData/'
-storageFileName = 'storage.json'
-tempFolder = "./tmp/"
+# storageBaseURL = './LabFolderData/'
+# storage_fileName = 'storage.json'
+# CONFIGPARAMS["tempFolder"] = "./tmp/"
 
 #couchDBConfiguration Parameters
-couchDBBaseURL = "http://127.0.0.1:5984"
-couchDBAdmin = "admin"
-couchDBPassword = "aodqfyUQqA"
-couchDBToken = ""
-couchDBStorageDatabaseName = "storage"
-couchDBDocumentDatabaseName = "documents"
-couchDBStaticDatabaseName = "static"
+# CONFIGPARAMS["couchDBBaseURL"] = "http://127.0.0.1:5984"
+# CONFIGPARAMS["couchDBAdmin"] = "admin"
+# CONFIGPARAMS["couchDBPassword"] = "aodqfyUQqA"
+# couchDBToken = ""
+# CONFIGPARAMS["couchDBStorageDatabaseName"] = "storage"
+# CONFIGPARAMS["couchDBDocumentDatabaseName"] = "documents"
+# CONFIGPARAMS["couchDBStaticDatabaseName"] = "static"
 
 
 #DELETE AFTER DEV
-devUserID = "bt303343"
+DEVUSER_ID = "bt303343"
+#----------------------global Parameters-------------------------------------------
 
-CORS(app)
+CONFIGPARAMS = {}
+
+#----------------------initialization------------------------------------------
+
+APP = Flask(__name__)
+CORS(APP)
+try:
+    with open('config.json') as f:
+        CONFIGPARAMS = json.load(f)
+except:
+    print(("Error loading config-File! Quitting..."))
+
+
 
 #----------------------Page Navigation-----------------------------------------
-@app.route('/')
+@APP.route('/')
 def navhome():
+    '''
+    Navigation to site Home
+    '''
     return render_template("index.html")
 
-@app.route('/impressum')
+@APP.route('/impressum')
 def navimpressum():
+    '''
+    Navigation to site Impressum
+    '''
     return render_template("impressum.html")
 
-@app.route('/history')
+@APP.route('/history')
 def navhistory():
+    '''
+    Navigation to site History
+    '''
     return render_template("history.html")
 
-@app.route('/labfolder')
+@APP.route('/labfolder')
 def navlabfolder():
+    '''
+    Navigation to site Labfolder
+    '''
     return render_template("labfolder.html")
 
-@app.route('/easydb')
+@APP.route('/easydb')
 def naveasydb():
+    '''
+    Navigation to site easyDB
+    '''
     return render_template("easydb.html")
 
 #----------------------Authentification LabFolder------------------------------
-@app.route('/auth/login',methods=['POST'])
-def authenticateLabFolder():
-    url = labFolderBaseURL + '/auth/login'
+@APP.route('/auth/login', methods=['POST'])
+def authenticate_labfolder():
+    '''
+    Authenticate to LabFolder and returns the login answer
+    '''
+    url = CONFIGPARAMS["labFolderBaseURL"] + '/auth/login'
     data = request.get_data()
-    headers={"Content-Type": "application/json"}            
-    response = requests.post(url,data=data,headers=headers)
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, data=data, headers=headers)
     return response.text
 
-@app.route('/auth/logout', methods=['POST'])
-def logoutLabFolder():
-    url = labFolderBaseURL + '/auth/logout'
+@APP.route('/auth/logout', methods=['POST'])
+def logout_labfolder():
+    '''
+    Kills the Session associated to the provided token
+    '''
+    url = CONFIGPARAMS["labFolderBaseURL"] + '/auth/logout'
     headers = {"Content-Type": "application/json",
-                                "Authorization" :  "Token " + request.headers['Authorization'],
-                                "User-Agent": labFolderDefaultUserAgentHeader
-                          }
+               "Authorization" :  "Token " + request.headers['Authorization'],
+               "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
+              }
 
     response = requests.post(url, headers=headers)
     return response.text
 
-def authenticateCouchDB():
-    url = couchDBBaseURL + '/_session'
-    data = "name=" + couchDBAdmin + "&password=" + couchDBPassword
-    # data =  {"name":  couchDBAdmin, "password": couchDBPassword}
+def authenticate_couchdb():
+    '''
+    Authenticate to CouchDB and return login token
+    '''
+    url = CONFIGPARAMS["couchDBBaseURL"] + '/_session'
+    data = "name=" + CONFIGPARAMS["couchDBAdmin"] + "&password=" + CONFIGPARAMS["couchDBPassword"]
+    # data =  {"name":  CONFIGPARAMS["couchDBAdmin"], "password": CONFIGPARAMS["couchDBPassword"]}
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    response = requests.post(url,data=data,headers=headers)
+    response = requests.post(url, data=data, headers=headers)
     if response.status_code == 200:
         if DEBUG:
             print("Succesfully Authenticated, extracting Cookie!")
         cookie = response.headers["Set-Cookie"]
-        couchDBToken = cookie[:cookie.find(";")]
-        return couchDBToken
-    else:
-        if DEBUG:
-            print("Error logging into couchDB. Wrong Username or Password!")
-            print(response.text)
-        return False
+        couchdb_token = cookie[:cookie.find(";")]
+        return couchdb_token
+    if DEBUG:
+        print("Error logging into couchDB. Wrong Username or Password!")
+        print(response.text)
+    return False
 
 #----------------------Projects------------------------------------------------
 
-@app.route('/projects', methods=['GET'])
-def getProjects():
-    url = labFolderBaseURL + '/projects?'
+@APP.route('/projects', methods=['GET'])
+def get_projects():
+    '''
+    Accesses LabFolder by Token and retreives the Projects from User. Answer is returned by REST.
+    '''
+    url = CONFIGPARAMS["labFolderBaseURL"] + '/projects?'
     mod = 0
     #process optional parameters and add them to url if required
-    group_id = request.args.get('group_id', default = '', type = str)
-    if group_id != '' :
+    group_id = request.args.get('group_id', default='', type=str)
+    if group_id != '':
         mod = 1
-        url = url + 'group_id=' + group_id + '&'        
-    owner_id = request.args.get('owner_id', default = '', type = str) 
-    if owner_id != '' :
+        url = url + 'group_id=' + group_id + '&'
+    owner_id = request.args.get('owner_id', default='', type=str)
+    if owner_id != '':
         mod = 1
         url = url + 'owner_id=' + owner_id + '&'
-    only_root_level = request.args.get('only_root_level', default = 0, type = int) 
+    only_root_level = request.args.get('only_root_level', default=0, type=int)
     if only_root_level:
         mod = 1
         url = url + 'only_root_level=true&'
-    folder_id = request.args.get('folder_id', default = '', type = str) 
-    if folder_id != '' :
+    folder_id = request.args.get('folder_id', default='', type=str)
+    if folder_id != '':
         mod = 1
         url = url + 'folder_id=' + folder_id + '&'
-    projects_ids = request.args.get('projects_ids', default = '', type = str) 
-    if projects_ids != '' :
+    projects_ids = request.args.get('projects_ids', default='', type=str)
+    if projects_ids != '':
         mod = 1
         url = url + 'projects_ids=' + projects_ids + '&'
-    limit = request.args.get('limit', default = 20, type = int) 
-    if limit != 20 :
+    limit = request.args.get('limit', default=20, type=int)
+    if limit != 20:
         mod = 1
         url = url + 'limit=' + str(limit) + '&'
-    offset = request.args.get('offset', default = 0, type = int)  
-    if offset != 0 :
+    offset = request.args.get('offset', default=0, type=int)
+    if offset != 0:
         mod = 1
         url = url + 'offset=' + str(offset) + '&'
     #remove '?' from url when no parameter has been added - basically just reset it to default
     if mod == 0:
         url = url.rstrip('?')
-    else: 
+    else:
         url = url.rstrip('&')
-    #prepare header         
+    #prepare header
     headers = {"Content-Type": "application/json",
-                                "Authorization" :  "Token " + request.headers['Authorization'],
-                                "User-Agent": labFolderDefaultUserAgentHeader
-                          }
+               "Authorization" :  "Token " + request.headers['Authorization'],
+               "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
+              }
     response = requests.get(url, headers=headers)
     return response.text
 
 #-------------------Notebook---------------------------------------------------
 
-@app.route('/entries', methods=['GET'])
-def getNotebookEntries():
-    url = labFolderBaseURL + '/entries?'
+@APP.route('/entries', methods=['GET'])
+def get_notebook_entries():
+    '''
+    Accesses LabFolder by Token and retreives the Entries from User. Answer is returned by REST.
+    '''
+    url = CONFIGPARAMS["labFolderBaseURL"] + '/entries?'
     mod = 0
     #process optional parameters and add them to url if required <- !!!currently not yet tested!!!
-    sort = request.args.get('sort', default = '', type = str)
-    if sort != '' :
+    sort = request.args.get('sort', default='', type=str)
+    if sort != '':
         mod = 1
-        url = url + 'sort=' + sort + '&'        
-    omni_empty_title = request.args.get('omni_empty_title', default = 0, type = int) 
+        url = url + 'sort=' + sort + '&'
+    omni_empty_title = request.args.get('omni_empty_title', default=0, type=int)
     if omni_empty_title:
         mod = 1
         url = url + 'omni_empty_title=true&'
-    title = request.args.get('title', default = '', type = str) 
+    title = request.args.get('title', default='', type=str)
     if title != '':
         mod = 1
         url = url + 'title=' + title + '&'
-    limit = request.args.get('limit', default = 20, type = int) 
-    if limit != 20 :
+    limit = request.args.get('limit', default=20, type=int)
+    if limit != 20:
         mod = 1
         url = url + 'limit=' + str(limit) + '&'
-    offset = request.args.get('offset', default = 0, type = int)  
-    if offset != 0 :
+    offset = request.args.get('offset', default=0, type=int)
+    if offset != 0:
         mod = 1
         url = url + 'offset=' + str(offset) + '&'
-    expand = request.args.get('expand', default = '', type = str) 
+    expand = request.args.get('expand', default='', type=str)
     if expand != '':
         mod = 1
         url = url + 'expand=' + expand + '&'
@@ -186,303 +234,288 @@ def getNotebookEntries():
         url = url.rstrip('?')
     else:
         url = url.rstrip('&')
-    #prepare header         
+    #prepare header
     headers = {"Content-Type": "application/json",
-                                "Authorization" :  "Token " + request.headers['Authorization'],
-                                "User-Agent": labFolderDefaultUserAgentHeader
-                          }
+               "Authorization" :  "Token " + request.headers['Authorization'],
+               "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
+              }
     response = requests.get(url, headers=headers)
     return response.text
 
-#TODO adapt to database file storage
-@app.route('/download', methods=['GET'])
-def downloadFileToClient():
-    downloadMeta = {"userID" : devUserID,
-                    "projectID" : request.args.get('project_id', default = '', type = str),
-                    "entryID" : request.args.get('entry_id', default = '', type = str),
-                    "entryVersionID" : request.args.get('entry_version_id', default = '', type = str)}    
+@APP.route('/download', methods=['GET'])
+def download_file_to_client():
+    '''
+    Creates a zip File with the Entry requested by the user, and transfers the zip by HTTP.
+    '''
+    download_meta = {"user_id" : DEVUSER_ID,
+                     "projectID" : request.args.get('project_id', default='', type=str),
+                     "entryID" : request.args.get('entry_id', default='', type=str),
+                     "entryVersionID" : request.args.get('entry_version_id', default='', type=str)
+                    }
     # elementID = request.args.get('element_id', default = '', type = str)
     # versionID = request.args.get('version_id', default = '', type = str)
-    path = ''
-    filename = downloadMeta["userID"] + "-" + time.strftime("%d/%m/%Y") + "-" time.strftime("%H:%M:%S")
-    if downloadMeta["userID"] != '' and downloadMeta["projectID"] != '' and downloadMeta["entryID"] != '' and downloadMeta["entryVersionID"] != '':
-        path = storageBaseURL + userID + "/" + projectID + "/" + entryID + "/" + entryVersionID
-        zipfile = createZipFileFromFiles(downloadMeta,tempFolder + filename) # Todo name for zip file
+    filename = download_meta["user_id"] + "-" + time.strftime("%d-%m-%Y") + "-" \
+               + time.strftime("%H:%M:%S") + ".zip"
+    if download_meta["user_id"] != '' and download_meta["projectID"] != '' and \
+       download_meta["entryID"] != '' and download_meta["entryVersionID"] != '':
+        createZipFileFromFiles(download_meta, CONFIGPARAMS["tempFolder"] + filename)
     else:
-        return app.response_class(json.dumps({'Error' : 'Missing Parameter id'}),status=200, mimetype='application/json') 
+        return APP.response_class(json.dumps({'Error' : 'Missing Parameter id'}),
+                                  status=200, mimetype='application/json')
     try:
-        return send_from_directory(tempFolder,filename,as_attachment=True)
+        return send_from_directory(CONFIGPARAMS["tempFolder"], filename, as_attachment=True)
     except Exception as e:
         print(e)
-        return app.response_class(json.dumps({'Error' : 'Internal Error'}),status=400, mimetype='application/json') 
+        return APP.response_class(json.dumps({'Error' : 'Internal Error'}),
+                                  status=400, mimetype='application/json')
 
-@app.route('/elements/download', methods=['POST'])
+@APP.route('/elements/download', methods=['POST'])
 def download():
+    '''
+    Routed from /elements/download.
+    Manages the download of the requests data provided in REST Request.
+    '''
     #we also need to verify the loged in ldap user here
     #data should contain a json object with structure:
     #{
     #       elementType: [IMAGE,TABLE,TEXT],
     #       elementID: elementID
     #}
-    userID = devUserID
+    user_id = DEVUSER_ID
     data = request.get_data()
-    jsonData = json.loads(data)
-    print("1")
-    jsonData = removeAlreadyExistingTupel(userID, jsonData)
-    print("2")
-    downloadFileFromLabFolder(userID, jsonData)
-    print("3")
-    if len(jsonData) > 0:
-        updateStorageFile(userID,jsonData)
-    print("4")
-    return app.response_class(status=200, mimetype='application/json')
+    json_data = json.loads(data)
+    json_data = remove_already_existing_tupel(user_id, json_data)
+    download_file_from_labfolder(json_data)
+    if len(json_data) > 0:
+        update_storage_file(user_id, json_data)
+    return APP.response_class(status=200, mimetype='application/json')
 
-#TODO adapt to couchdb - TEST
-#@app.route('/elements/file' , methods=['GET'])
-def downloadFileFromLabFolder(userID, dataArray):
+#@APP.route('/elements/file' , methods=['GET'])
+def download_file_from_labfolder(data_array):
+    '''
+    Function is called for File Download from LabFolder. This Function downloads the files and
+    stored it in the database.
+    '''
     if DEBUG:
-        print("-----in downloadFileFromLabFolder-----")
-    token = authenticateCouchDB()
-    if token == False:
+        print("-----in download_file_from_labfolder-----")
+    token = authenticate_couchdb()
+    if not token:
         if DEBUG:
             print("Auth to couchDB not successfull. Returning")
         return
-    for element in dataArray:               
+    for element in data_array:
         if element["elementType"] == 'IMAGE':
-            url = labFolderBaseURL + '/elements/file/'
+            url = CONFIGPARAMS["labFolderBaseURL"] + '/elements/file/'
             file_info_url = url + element["elementID"]
             file_url = file_info_url + '/download'
         elif element["elementType"] == 'TABLE':
-            url = labFolderBaseURL + '/elements/table/'
+            url = CONFIGPARAMS["labFolderBaseURL"] + '/elements/table/'
             file_url = url + element["elementID"]
         elif element["elementType"] == 'TEXT':
-            url = labFolderBaseURL + '/elements/text/'
+            url = CONFIGPARAMS["labFolderBaseURL"] + '/elements/text/'
             file_url = url + element["elementID"]
         else:
             return
         headers = {"Content-Type": "application/json",
-                                "Authorization" :  "Token " + request.headers['Authorization'],
-                                "User-Agent": labFolderDefaultUserAgentHeader
-                          }
-        # couchHeader = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token }  
-        couchHeader = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token} 
-        #element["elementID"] = request.args.get('id', default = '', type = str)
-        # if element["elementID"] == '':
-        #       return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-        fileResponse = requests.get(file_url, headers=headers)
-        # storageURL = storageBaseURL + userID + "/" + element["projectID"] + "/" + element["entryID"] + "/" + element["entryVersionID"] + "/" + element["elementID"] + "/" + element["versionID"] + "/"
-        # folderPath = Path(storageURL)
-        # folderPath.mkdir(mode=0o777, parents=True, exist_ok=True)
-        if DEBUG:
-            print("Header:")
-            print(couchHeader)
-            print("dump:")
-            print(json.dumps(couchHeader))
-        couchDBURL = couchDBBaseURL + "/" + couchDBDocumentDatabaseName
+                   "Authorization" :  "Token " + request.headers['Authorization'],
+                   "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
+                  }
+        couch_header = {"Accept": "application/json",
+                        "Content-Type" : "application/json",
+                        "Cookie" :  token}
+        file_response = requests.get(file_url, headers=headers)
+        couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + \
+                      CONFIGPARAMS["couchDBDocumentDatabaseName"]
         cdbdata = {}
-        newDocumentResponse = requests.post(couchDBURL,headers=couchHeader,data=json.dumps(cdbdata))
+        new_doc_response = requests.post(couchdb_url, headers=couch_header,
+                                         data=json.dumps(cdbdata))
+        json_answer = json.loads(new_doc_response.text)
+        new_rev = json_answer["rev"]
+        couch_header["If-Match"] = new_rev
+        couch_id = json_answer["id"]
+        element["couchdb_doc_id"] = couch_id
+        couchdb_url = couchdb_url + "/" + couch_id + "/"
+        filename = ''
         if DEBUG:
-            print("New Document Response:")
-            print(newDocumentResponse.text)
-        jsonAnswer = json.loads(newDocumentResponse.text)
-        newRev = jsonAnswer["rev"]
-        couchHeader["If-Match"] = newRev
-        couchID = jsonAnswer["id"]
-        element["couchDBDocID"] = couchID
-        couchDBURL = couchDBURL + "/" + couchID + "/"
-        if DEBUG:
-            print("New couch Document created with ID " + couchID)
+            print("New couch Document created with ID " + couch_id)
         if element["elementType"] == 'IMAGE':
-            fileInfoResponse = requests.get(file_info_url, headers=headers)
-            fileInfoResponseJDATA = json.loads(fileInfoResponse.text)
-            filename = fileInfoResponseJDATA["file_name"]
-            filedate = fileInfoResponseJDATA["version_date"]
-            fileversion = fileInfoResponseJDATA["version_id"]
-            fileData = fileResponse.content
-            couchDBURL = couchDBURL + filename
-            couchHeader["Content-Type"] = "image/png"
-            attCreateResponse = requests.put(couchDBURL,headers=couchHeader,data=fileData)
-            if attCreateResponse.status_code ==201 or attCreateResponse.status_code == 202:
+            file_info_response = requests.get(file_info_url, headers=headers)
+            file_info_reponse_jdata = json.loads(file_info_response.text)
+            filename = file_info_reponse_jdata["file_name"]
+            file_data = file_response.content
+            couchdb_url = couchdb_url + filename
+            couch_header["Content-Type"] = "image/png"
+            att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
+            if att_create_response.status_code == 201 or att_create_response.status_code == 202:
                 if DEBUG:
                     print("Succesfully stored image " + filename + " in database")
             else:
                 if DEBUG:
-                    print("Error Storing image file in DB: " + attCreateResponse.text)
+                    print("Error Storing image file in DB: " + att_create_response.text)
                 # if DEBUG:
-                #     print("---trying to write image file")
+                #     print("---trying to write image file"))
                 # file = open(storageURL + filename, "wb")
-                # file.write(fileData)
+                # file.write(file_data)
         elif element["elementType"] == 'TABLE':
-            # fileResponse = requests.get(file_url, headers=headers)
+            # file_response = requests.get(file_url, headers=headers)
             if DEBUG:
                 print("---trying to write table file")
-            fileInfoResponseJDATA = json.loads(fileResponse.text)
-            title = fileInfoResponseJDATA["title"]
-            date = fileInfoResponseJDATA["version_date"]
-            version = fileInfoResponseJDATA["version_id"]
-            content = fileInfoResponseJDATA["content"]
+            file_info_reponse_jdata = json.loads(file_response.text)
+            title = file_info_reponse_jdata["title"]
+            content = file_info_reponse_jdata["content"]
             sheets = content["sheets"]
-            # print(sheets)
-            for sheetKey in sheets:
-                try:                    
-                    data = sheets[sheetKey]["data"]["dataTable"]
+            # print(sheets))
+            file_data = ""
+            for sheet_key in sheets:
+                try:
+                    data = sheets[sheet_key]["data"]["dataTable"]
                 except:
                     if DEBUG:
-                        print("no data in sheet " + sheetKey)
-                    return
-                sheetName = sheets[sheetKey]["name"]
-                fileData = ""
+                        print("no data in sheet " + sheet_key)
+                    continue
+                sheet_name = sheets[sheet_key]["name"]
+                file_data = file_data + sheet_name + "\n"
                 for line in data:
                     for row in data[line]:
                         append = data[line][row]["value"]
                         if type(append) is int:
                             append = str(append)
-                        fileData = fileData + append + ","
-                    fileData = fileData.rstrip(",")
-                    fileData = fileData + "\n"
-                couchDBURL = couchDBURL + title + "-" + sheetName
-                couchHeader["Content-Type"] = "text/plain"
-                attCreateResponse = requests.put(couchDBURL,headers=couchHeader,data=fileData)
-                if attCreateResponse.status_code ==201 or attCreateResponse.status_code == 202:
-                    if DEBUG:
-                        print("Succesfully stored table " + title + "-" + sheetName + " in database")
-                else:
-                    if DEBUG:
-                        print("Error Storing table file in DB: " + attCreateResponse.text)
-                # if DEBUG:
-                # try:
-                #     print("opening")
-                #     file = Path(storageURL + title + "-" + sheetName + ".csv")
-                #     # file = open(storageURL + title + "-" + sheetName + ".csv", "w")
-                #     print("opened")
-                #     file.write_text(fileData)
-                #     print("written")
-                #     print("closed")
-                # except:
-                #     print("Error Saving table file")
+                        file_data = file_data + append + ","
+                    file_data = file_data.rstrip(",")
+                    file_data = file_data + "\n"
+            filename = title
+            couchdb_url = couchdb_url + filename
+            couch_header["Content-Type"] = "text/plain"
+            att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
+            if att_create_response.status_code == 201 or att_create_response.status_code == 202:
+                if DEBUG:
+                    print("Succesfully stored table " + title + "-" + sheet_name + " in database")
+            else:
+                if DEBUG:
+                    print("Error Storing table file in DB: " + att_create_response.text)
         elif element["elementType"] == 'TEXT':
             if DEBUG:
                 print("---trying to write text file")
-            # fileResponse = requests.get(file_url, headers=headers)
-            fileInfoResponseJDATA = json.loads(fileResponse.text)
-            date = fileInfoResponseJDATA["version_date"]
-            version = fileInfoResponseJDATA["version_id"]
-            fileData = fileInfoResponseJDATA["content"]
-            couchDBURL = couchDBURL + couchID 
-            couchHeader["Content-Type"] = "text/plain"
-            attCreateResponse = requests.put(couchDBURL,headers=couchHeader,data=fileData)
-            if attCreateResponse.status_code ==201 or attCreateResponse.status_code == 202:
+            # file_response = requests.get(file_url, headers=headers)
+            file_info_reponse_jdata = json.loads(file_response.text)
+            file_data = file_info_reponse_jdata["content"]
+            filename = couch_id
+            couchdb_url = couchdb_url + filename
+            couch_header["Content-Type"] = "text/plain"
+            att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
+            if att_create_response.status_code == 201 or att_create_response.status_code == 202:
                 if DEBUG:
                     print("Succesfully stored text file in database")
             else:
                 if DEBUG:
-                    print("Error " + str(attCreateResponse.status_code) + " Storing text file in DB: " + attCreateResponse.text)
-            # try:
-            #     file = open(storageURL + "test" + ".txt", "w")
-            #     file.write(fileData)
-            # except:
-            #     print("Error Saving text file")
+                    print("Error " + str(att_create_response.status_code) + \
+                          " Storing text file in DB: " + att_create_response.text)
+        element["couchdb_doc_item_att_name"] = filename
 
-# @app.route('/mdb/databases', methods=['GET'])
-# def getMDBDatabases():
-#       url = labFolderBaseURL + '/mdb/databases'
-        
-#       #prepare header         
-#       headers = {"Content-Type": "application/json",
-#                               "Authorization" :  "Token " + request.headers['Authorization'],
-#                               "User-Agent": labFolderDefaultUserAgentHeader
-#                         }
-#       response = requests.get(url, headers=headers)
-#       print(url)
-#       print(response.text)
-#       return response.text
-
-@app.route('/mdb/categories', methods=['GET'])
-def getMDBCategories():
-    url = labFolderBaseURL + '/mdb/categories'
-    #prepare header         
+@APP.route('/mdb/categories', methods=['GET'])
+def get_mdb_categories():
+    '''
+    Routed from /mdb/categories.
+    Retreives the category information about Material Databse from labfolder and returns this.
+    '''
+    url = CONFIGPARAMS["labFolderBaseURL"] + '/mdb/categories'
+    #prepare header
     headers = {"Content-Type": "application/json",
-                                "Authorization" :  "Token " + request.headers['Authorization'],
-                                "User-Agent": labFolderDefaultUserAgentHeader
-                          }
-    if DEBUG:                         
+               "Authorization" :  "Token " + request.headers['Authorization'],
+               "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
+              }
+    if DEBUG:
         print(url)
     response = requests.get(url, headers=headers)
     return response.text
 
-#TODO adapt to couchdb
-#----does only support filtering by categoryID----
-@app.route('/mdb/items', methods=['GET'])
-def downloadMDBItems():
-    urlItems = labFolderBaseURL + '/mdb/items'
-    urlCategories = labFolderBaseURL + '/mdb/categories'
-    categoryID = request.args.get('category_id', default = '', type = str)
-    if categoryID == '':
-        return json.dumps({'Error' : 'Missing Parameter id'}), 400, {'Content-Type' : 'application/json'} 
-    urlItems = urlItems + '?category_id=' + categoryID
-    urlCategories = urlCategories + '/' + categoryID
-    #prepare header         
+#TODO store downloaded files in another location (not on server storage) -> maybe direct dl?
+#----does only support filtering by category_id----
+@APP.route('/mdb/items', methods=['GET'])
+def download_mdb_items():
+    '''
+    routed from /mdb/items
+    Download the Material Database Items to Server.
+    '''
+    url_items = CONFIGPARAMS["labFolderBaseURL"] + '/mdb/items'
+    url_categories = CONFIGPARAMS["labFolderBaseURL"] + '/mdb/categories'
+    category_id = request.args.get('category_id', default='', type=str)
+    if category_id == '':
+        return APP.response_class(json.dumps({'Error' : 'Missing Parameter id'}),
+                                  status=400,
+                                  mimetype='application/json')
+    url_items = url_items + '?category_id=' + category_id
+    url_categories = url_categories + '/' + category_id
+    #prepare header
     headers = {"Content-Type": "application/json",
-                                "Authorization" :  "Token " + request.headers['Authorization'],
-                                "User-Agent": labFolderDefaultUserAgentHeader
-                          }
+               "Authorization" :  "Token " + request.headers['Authorization'],
+               "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
+              }
     if DEBUG:
-        print(urlItems)
-        print(urlCategories)
-    responseCategories = requests.get(urlCategories, headers=headers)
-    responseItems = requests.get(urlItems, headers=headers)
+        print(url_items)
+        print(url_categories)
+    response_categories = requests.get(url_categories, headers=headers)
+    response_items = requests.get(url_items, headers=headers)
     if DEBUG:
-        print(responseCategories.text)
-        print(responseItems.text)
-    #now we preprocess the answer to a csv 
-    categoryResponseJDATA = json.loads(responseCategories.text)
-    itemResponseJDATA = json.loads(responseItems.text)
-    attributes = categoryResponseJDATA["attributes"]
+        print(response_categories.text)
+        print(response_items.text)
+    #now we preprocess the answer to a csv
+    category_response_jdata = json.loads(response_categories.text)
+    item_response_jdata = json.loads(response_items.text)
+    attributes = category_response_jdata["attributes"]
     attributes_sorted = sorted(attributes, key=lambda x: x["display_order"])
-    title = categoryResponseJDATA["title"]
-    fileData = "Name, "
+    title = category_response_jdata["title"]
+    file_data = "Name, "
     for att in attributes_sorted:
-        fileData = fileData + att["title"] + ","
-    fileData.rstrip(",")
-    fileData = fileData + "\n"
+        file_data = file_data + att["title"] + ","
+    file_data.rstrip(",")
+    file_data = file_data + "\n"
     if DEBUG:
         print("After headline")
-        print(fileData)
-    for item in itemResponseJDATA:
-        fileData = fileData + item["title"] + ","
+        print(file_data)
+    for item in item_response_jdata:
+        file_data = file_data + item["title"] + ","
         for satt in attributes_sorted:
             #write the content of the sorted attribute field. identified by the id of the attribute
-            fileData = fileData + item["custom_attributes"][satt["id"]] + ","
-        fileData.rstrip(",")
-        fileData = fileData + "\n"
-    if DEBUG:               
-        print("After Content")
-        print(fileData)         
-    file = open(title + ".csv", "w")
-    file.write(fileData)
-    file.close
-    return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'} 
-
-@app.route('/storage', methods=['GET'])
-def getStorageFile():
-    userID = devUserID
-    return getDatastructure(userID,return_as_string=True)
-
-
-def getDatastructure(userID,return_as_string=False):
+            file_data = file_data + item["custom_attributes"][satt["id"]] + ","
+        file_data.rstrip(",")
+        file_data = file_data + "\n"
     if DEBUG:
-        print("in getDatastructure")
-    url = couchDBBaseURL + "/" + couchDBStorageDatabaseName + "/" + userID
-    token = authenticateCouchDB()
+        print("After Content")
+        print(file_data)
+    file = open(title + ".csv", "w")
+    file.write(file_data)
+    file.close
+    return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+
+@APP.route('/storage', methods=['GET'])
+def getstorage_file():
+    '''
+    Routed from /storage
+    Requests the storage file, containg metadata about stored files for the requesting user
+    '''
+    user_id = DEVUSER_ID
+    return get_datastructure(user_id, return_as_string=True)
+
+
+def get_datastructure(user_id, return_as_string=False):
+    '''
+    Returns the storage file for @user_id either as (json)string or object.
+    '''
+    if DEBUG:
+        print("in get_datastructure")
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + "/" +\
+          user_id
+    token = authenticate_couchdb()
     if token == False:
         if DEBUG:
             print("Auth to couchDB not successfull. Returning")
         return
-    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token} 
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
     if DEBUG:
         print("trying to get database for user with url: " + url)
         print(headers)
-    response = requests.get(url,headers=headers)
+    response = requests.get(url, headers=headers)
     if response.status_code == 200:
         # if DEBUG:
         #     print("got answer, returning: " + response.text)
@@ -493,10 +526,10 @@ def getDatastructure(userID,return_as_string=False):
     elif response.status_code == 404:
         if DEBUG:
             print("404, creating new document in db")
-        initialData = {"user" : userID, "projects": []}
+        initialData = {"user" : user_id, "projects": []}
         if DEBUG:
             print("initial_data: " + json.dumps(initialData))
-        new_response = requests.put(url,headers=headers,data=json.dumps(initialData))
+        new_response = requests.put(url, headers=headers, data=json.dumps(initialData))
         if DEBUG:
             print(new_response.text)
         # new_response.raise_for_status()
@@ -505,247 +538,224 @@ def getDatastructure(userID,return_as_string=False):
         else:
             return json.loads(initialData)
 
-# def getDatastructure(userID,return_as_string=False):
-#       folderPath = storageBaseURL + userID
-#       userDirectory = Path(folderPath)
-#       if not userDirectory.is_dir(): #check if folder already exists
-#               createUserFolder(userID)        
-#       storageFile = Path(folderPath + '/' + storageFileName)
-#       if storageFile.is_file(): #structure object already exists
-#               data = storageFile.read_text()
-#               if return_as_string:
-#                       return data
-#               else:
-#                       dataJSON = json.loads(data)
-#                       return dataJSON
-#       else: # storage oject does not exist yet, this should never happen since creation of the folder always creates an initial storage file
-#               if return_as_string:
-#                       return "{}"
-#               else:
-#                       return {} #return empty object
-
-
-# #creates the folder for the user if it does not exist yet. also creates an empty structure.json object
-# def createUserFolder(userID):
-#       folderPath = storageBaseURL + userID
-#       if DEBUG:
-#               print("folderPath: " + folderPath)
-#       userDirectory = Path(folderPath)                
-#       try:
-#               if DEBUG:
-#                       print("trying to create user folder for " + userID)
-#               userDirectory.mkdir(mode=0o700,parents=True, exist_ok=False) #create a file, and catch exception if already exists, return if so, structure file also is there
-#               storageFile = Path(folderPath + '/' + storageFileName)
-#               storageFile.touch(mode=0o700, exist_ok = True) #touch the file, catch exception (should never happen since it should never already exist)
-#               initialData = {"user" : userID, "projects": []}
-#               storageFile.write_text(json.dumps(initialData)) #initialize the file with empty array for projects and userID for further usage
-#               if DEBUG:
-#                       print("finsihed creating user folder for " + userID)
-#       except FileNotFoundError:
-#               if DEBUG:
-#                       print("EXCEPT in 'createUserFolder': Can't find parent folder.")
-#               return
-#       except FileExistsError:
-#               if DEBUG:
-#                       print("EXCEPT in 'createUserFolder': Directory already exists.")
-#               return
-#       except: 
-#               return
-
 #updates the storage File with the added files
-def updateStorageFile(userID, addElements):
+def update_storage_file(user_id, addElements):
+    '''
+    updated the storage file for @user_id with new Elements @addElements. Integrity is checked, so
+    heritage is correctly considered.
+    '''
     if DEBUG:
-        print("---in updateStorageFile---")
+        print("---in updatestorage_file---")
         print("writing " + str(len(addElements)) + " items in file")
-    storageFile = getDatastructure(userID)
+    storage_file = get_datastructure(user_id)
     # if DEBUG:
     #       print("storage file before process")
-    #       print(json.dumps(storageFile))
+    #       print(json.dumps(storage_file))
     for item in addElements:
-        if len([x for x in storageFile["projects"] if x["projectID"] == item["projectID"]]) == 0: #if project does not exist yet, we need to create everything to the bottom
-            storageFile["projects"].append({"projectID" : item["projectID"],
-                                            "projectTitle" : item["projectTitle"],
-                                            "entries" : [{
-                                                "entryID" : item["entryID"],
-                                                "entryTitle" : item["entryTitle"],
-                                                "versions" : [{
-                                                    "versionID" : item["entryVersionID"],
-                                                    "versionDate" : item["versionDate"],
-                                                    "elements" : [{
-                                                        "elementID" : item["elementID"],
-                                                        "elementType" : item["elementType"],
-                                                        "versions" : [{
-                                                            "versionID" : item["versionID"],
-                                                            "couchDBDocID" : item["couchDBDocID"]
-                                                        }]
-                                                    }]
-                                                }]
-                                            }]
-                                            })
+        if not [x for x in storage_file["projects"] if x["projectID"] == item["projectID"]]:
+            storage_file["projects"].append({
+                "projectID" : item["projectID"],
+                "projectTitle" : item["projectTitle"],
+                "entries" : [{
+                    "entryID" : item["entryID"],
+                    "entryTitle" : item["entryTitle"],
+                    "versions" : [{
+                        "versionID" : item["entryVersionID"],
+                        "versionDate" : item["versionDate"],
+                        "elements" : [{
+                            "elementID" : item["elementID"],
+                            "elementType" : item["elementType"],
+                            "versions" : [{
+                                "versionID" : item["versionID"],
+                                "couchdb_doc_id" : item["couchdb_doc_id"],
+                                "couchdb_doc_item_att_name" : item["couchdb_doc_item_att_name"]
+                            }]
+                        }]
+                    }]
+                }]
+            })
         else:
-            for proj in storageFile["projects"]:
+            for proj in storage_file["projects"]:
                 if proj["projectID"] == item["projectID"]:
-                    if len([x for x in proj["entries"] if x["entryID"] == item["entryID"]]) == 0:
-                        proj["entries"].append({"entryID" : item["entryID"],
-                                                "entryTitle" : item["entryTitle"],
-                                                "versions" : [{
-                                                    "versionID" : item["entryVersionID"],
-                                                    "versionDate" : item["versionDate"],
-                                                    "elements" : [{
-                                                        "elementID" : item["elementID"],
-                                                        "elementType" : item["elementType"],
-                                                        "versions" : [{
-                                                            "versionID" : item["versionID"],
-                                                            "couchDBDocID" : item["couchDBDocID"]
-                                                        }]
-                                                    }]
-                                                }]
-                                                })
+                    if not [x for x in proj["entries"] if x["entryID"] == item["entryID"]]:
+                        proj["entries"].append({
+                            "entryID" : item["entryID"],
+                            "entryTitle" : item["entryTitle"],
+                            "versions" : [{
+                                "versionID" : item["entryVersionID"],
+                                "versionDate" : item["versionDate"],
+                                "elements" : [{
+                                    "elementID" : item["elementID"],
+                                    "elementType" : item["elementType"],
+                                    "versions" : [{
+                                        "versionID" : item["versionID"],
+                                        "couchdb_doc_id" : item["couchdb_doc_id"],
+                                        "couchdb_doc_item_att_name" : \
+                                            item["couchdb_doc_item_att_name"]
+                                    }]
+                                }]
+                            }]
+                        })
                         break
                     else:
                         for entry in proj["entries"]:
                             if entry["entryID"] == item["entryID"]:
-                                if len([x for x in entry["versions"] if x["versionID"] == item["entryVersionID"]]) == 0:
-                                    entry["versions"].append({  "versionID" : item["entryVersionID"],
-                                                                "versionDate" : item["versionDate"],
-                                                                "elements" : [{
-                                                                    "elementID" : item["elementID"],
-                                                                    "elementType" : item["elementType"],
-                                                                    "versions" : [{
-                                                                        "versionID" : item["versionID"],
-                                                                        "couchDBDocID" : item["couchDBDocID"]
-                                                                    }]
-                                                                }]
-                                                              })
+                                if not [x for x in entry["versions"] if x["versionID"] \
+                                        == item["entryVersionID"]]:
+                                    entry["versions"].append({
+                                        "versionID" : item["entryVersionID"],
+                                        "versionDate" : item["versionDate"],
+                                        "elements" : [{
+                                            "elementID" : item["elementID"],
+                                            "elementType" : item["elementType"],
+                                            "versions" : [{
+                                                "versionID" : item["versionID"],
+                                                "couchdb_doc_id" : item["couchdb_doc_id"],
+                                                "couchdb_doc_item_att_name" : \
+                                                    item["couchdb_doc_item_att_name"]
+                                            }]
+                                        }]
+                                    })
                                     break
                                 else:
                                     for version in entry["versions"]:
                                         if version["versionID"] == item["entryVersionID"]:
-                                            if len([x for x in version["elements"] if x["elementID"] == item["elementID"]]) == 0:
-                                                version["elements"].append({    "elementID" : item["elementID"],
-                                                                                "elementType" : item["elementType"],
-                                                                                "versions" : [{
-                                                                                    "versionID" : item["versionID"],
-                                                                                    "couchDBDocID" : item["couchDBDocID"]
-                                                                                }]
-                                                                            })
+                                            if not [x for x in version["elements"] if x["elementID"] == item["elementID"]]:
+                                                version["elements"].append({
+                                                    "elementID" : item["elementID"],
+                                                    "elementType" : item["elementType"],
+                                                    "versions" : [{
+                                                        "versionID" : item["versionID"],
+                                                        "couchdb_doc_id" : item["couchdb_doc_id"],
+                                                        "couchdb_doc_item_att_name" :\
+                                                            item["couchdb_doc_item_att_name"]
+                                                    }]
+                                                })
                                                 break
                                             else:
                                                 for element in version["elements"]:
-                                                    if element["elementID"] == item["elementID"]: # on last level (=version) we dont need to check again if a version already exists. this case would have been found earlier and not come to here.
-                                                        element["versions"].append({"versionID" : item["versionID"],"couchDBDocID" : item["couchDBDocID"]})
+                                                    if element["elementID"] == item["elementID"]:
+                                                        element["versions"].append({
+                                                            "versionID" : item["versionID"],
+                                                            "couchdb_doc_id" : \
+                                                                item["couchdb_doc_id"],
+                                                            "couchdb_doc_item_att_name" : \
+                                                                item["couchdb_doc_item_att_name"]
+                                                        })
                                                         break
-    # if DEBUG:
-        # print(json.dumps(storageFile))
-        # print("storage file after process")
-    # folderPath = storageBaseURL + userID
-    # file = Path(folderPath + '/' + storageFileName)
-    # file.unlink()
-    # file.write_text(json.dumps(storageFile))
 
-    url = couchDBBaseURL + "/" + couchDBStorageDatabaseName + "/" + userID
-    token = authenticateCouchDB()
-    if token == False:
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + \
+          "/" + user_id
+    token = authenticate_couchdb()
+    if not token:
         return
-    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token} 
-    response = requests.put(url,headers=headers,data=json.dumps(storageFile))
-    if response.status_code == 201 or response.status_code == 202: 
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    response = requests.put(url, headers=headers, data=json.dumps(storage_file))
+    if response.status_code == 201 or response.status_code == 202:
         if DEBUG:
             print("Succesfully stored storage file")
     else:
         if DEBUG:
             print("error storing storage file")
 
-#checks if elements to download already exist in storage file. pops elements which are already existing of the checkArray 
-#checkElements is a list of dicts: (projectID: str, entryID: str, elementID: str, versionID: str)
-def removeAlreadyExistingTupel(userID,checkElements):
-    storageFile = getDatastructure(userID)
+#checks if elements to download already exist in storage file. pops elements which are already
+# existing of the checkArray
+#check_elements is a list of dicts: (projectID: str, entryID: str, elementID: str, versionID: str)
+def remove_already_existing_tupel(user_id, check_elements):
+    '''
+    Checks if in storage file of @user_id there are already files which are identical to
+    @check_elements. @check_elements is stripped of already existing entries and returned.
+    '''
+    storage_file = get_datastructure(user_id)
     if DEBUG:
-        print(json.dumps(storageFile))
+        print(json.dumps(storage_file))
     output = []
-    for item in checkElements:
-        newItem = True
-        projectID          = item["projectID"]
-        entryID        = item["entryID"]
-        entryVersionID = item["entryVersionID"]
-        elementID      = item["elementID"]
-        versionID      = item["versionID"]
+    for item in check_elements:
+        new_item = True
+        project_id = item["projectID"]
+        entry_id = item["entryID"]
+        entry_version_id = item["entryVersionID"]
+        element_id = item["elementID"]
+        version_id = item["versionID"]
         if DEBUG:
-            print("Project ID: " + projectID)
-            print("entry   ID: " + entryID)
-            print("entryVersionID: " + entryVersionID)
-            print("elementID: " + elementID)
-            print("versionID: " + versionID)
-        if storageFile["projects"] == None:
-            return checkElements
-        if len(storageFile["projects"]) == 0:
-            return checkElements
-        for projVal in storageFile["projects"]:
-            if projVal["projectID"] == projectID:
-                print("a")
-                for entryVal in projVal["entries"]:
-                    if entryVal["entryID"] == entryID:
-                        print("b")
-                        for entryVersionVal in entryVal["versions"]:
-                            if entryVersionVal["versionID"] == entryVersionID:
-                                print("c")
-                                for elementVal in entryVersionVal["elements"]:
-                                    if elementVal["elementID"] == elementID:
-                                        print("d")
-                                        for versionVal in elementVal["versions"]:
-                                            if versionVal["versionID"] == versionID:
-                                                print("e")
-                                                newItem = False
+            print("Project ID: " + project_id)
+            print("entry   ID: " + entry_id)
+            print("entryVersionID: " + entry_version_id)
+            print("elementID: " + element_id)
+            print("versionID: " + version_id)
+        if storage_file["projects"] is None:
+            return check_elements
+        if not storage_file["projects"]:
+            return check_elements
+        for proj_val in storage_file["projects"]:
+            if proj_val["projectID"] == project_id:
+                for entry_val in proj_val["entries"]:
+                    if entry_val["entryID"] == entry_id:
+                        for entry_version_val in entry_val["versions"]:
+                            if entry_version_val["versionID"] == entry_version_id:
+                                for element_val in entry_version_val["elements"]:
+                                    if element_val["elementID"] == element_id:
+                                        for version_val in element_val["versions"]:
+                                            if version_val["versionID"] == version_id:
+                                                new_item = False
                                                 break
                                         break
                                 break
                         break
                 break
-        if newItem:
+        if new_item:
             output.append(item)
     if DEBUG:
         print("output length: " + str(len(output)))
     return output
 
-#TODO adapt to couchdb
-def createZipFileFromFiles(downloadMeta,filename):
-    zf = ZipFile(filename,'w')
-    cdbDocUrlBase = couchDBURL = couchDBBaseURL + "/" + couchDBDocumentDatabaseName + "/" 
-    storageFile = getDatastructure(downloadMeta["userID"])
-    jsonStorage = json.loads(storageFile)
-    proj = [x for x in jsonStorage["projects"] if x["projectID"] == jsonStorage["projectID"]]
-    entry = [x for x in proj["entries"] if x["entryID"] == jsonStorage["entryID"]]
-    entryVersion = [x for x in entry["versions"] if x["versionID"] == jsonStorage["entryVersionID"]]
-    for ele in entryVersion["elements"]:
-        cdbDocUrl = cdbDocUrlBase + ele["versions"][0]["couchDBDocID"] #each element should only have one version, so wen access the first element
-        tmpPathFile = Path(tempFolder + ele["elementID"])
-        token = authenticateCouchDB()
-        if token == False:
+def createZipFileFromFiles(download_meta, filename):
+    '''
+    create zip file with name @filenmane for requested files in @download_meta.
+    '''
+    zip_file = ZipFile(filename, 'w')
+    cdb_doc_url_base = CONFIGPARAMS["couchDBBaseURL"] + "/" + \
+                       CONFIGPARAMS["couchDBDocumentDatabaseName"] + "/"
+    storage_file = get_datastructure(download_meta["user_id"])
+    proj = [x for x in storage_file["projects"] if x["projectID"] == download_meta["projectID"]][0]
+    entry = [y for y in proj["entries"] if y["entryID"] == download_meta["entryID"]][0]
+    entry_version = [z for z in entry["versions"] \
+        if z["versionID"] == download_meta["entryVersionID"]][0]
+    for ele in entry_version["elements"]:
+        filename = ele["versions"][0]["couchdb_doc_item_att_name"]
+        #each element should only have one version, so wen access the first element
+        cdb_doc_url = cdb_doc_url_base + ele["versions"][0]["couchdb_doc_id"] + "/" \
+        + filename
+        tmp_path_file = Path(CONFIGPARAMS["tempFolder"] + ele["elementID"])
+        token = authenticate_couchdb()
+        if not token:
             return
-        headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token} 
-        response = requests.get(cdbDocUrlBase,headers=headers)
+        headers = {"Accept": "application/json",
+                   "Content-Type" : "application/json",
+                   "Cookie" :  token
+                  }
+        response = requests.get(cdb_doc_url, headers=headers)
         if response:
             if ele["elementType"] == "TEXT" or ele["elementType"] == "TABLE":
-                tmpPathFile.write_text(response.text)
+                tmp_path_file.write_text(response.text)
             elif ele["elementType"] == "IMAGE":
-                tmpPathFile.write_bytes(response.content)
-            absname = str(tmpPathFile.resolve())
-            print("file absname:" + absname)
-            print("file arcname:" + absname[absname.rfind("/") + 1:])
+                tmp_path_file.write_bytes(response.content)
+            absname = str(tmp_path_file.resolve())
             if DEBUG:
                 print("writing in zip file")
-            zf.write(absname,absname[absname.rfind("/") + 1:])
+            zip_file.write(absname, arcname=filename)
             if DEBUG:
                 print("finished writing in zip file")
                 print("removing file")
             try:
-                tmpPathFile.unlink()
-            except e:
-                print("error deleting file from filesystem")
-    zf.close()
+                tmp_path_file.unlink()
+            except FileNotFoundError:
+                print("Error deleting file from filesystem: File not Found")
+    zip_file.close()
+    # return zf
 
 
 
 if __name__ == '__main__':
-    #authenticateCouchDB()
-    app.run(debug=True)
+    #authenticate_couchdb()
+    APP.run(debug=True)
