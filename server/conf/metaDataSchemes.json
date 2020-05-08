@@ -110,7 +110,7 @@
 				"field_type" : "string",
 				"field_mandatory" : false,
 				"field_multiple" : true,
-				"field_description" : "Information about rights held in and over the resource."				
+				"field_description" : "Information about rights held in and over the resource."
 			}
 		]	
 	}

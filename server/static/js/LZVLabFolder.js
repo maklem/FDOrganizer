@@ -21,26 +21,6 @@ $( document ).ready(function() {
 	}
 });
 
-// var storageExample = {
-// 	user = "bt303343",
-// 	projects: Array({
-// 		title = "Projekttitel",
-// 		projID = "1337",
-// 		entries: Array({
-// 			entryID = "1338",
-// 			title = "entrytitle",
-// 			elements: Array({
-// 				elementID = "1339",
-// 				elementType = "TABLE",
-// 				versions: Array({
-// 					version_id = "1340",
-// 					title = "filename"
-// 				})
-// 			})
-// 		})
-// 	})
-// }
-
 
 var xhttpMutexLocked = false; 
 
@@ -669,47 +649,6 @@ function downloadSelectedEntries() {
 
 }
 
-// function downloadElement(id, type) {
-// 	var url = baseURL;
-// 	switch(type) {
-// 		case 'IMAGE':
-// 		console.log("Image");	
-// 		url = baseURL + '/elements/file';
-// 		break;
-// 		case 'TABLE':
-// 		console.log("Table");	
-// 		url = baseURL + '/elements/table';		
-// 		break;
-// 		case 'TEXT':
-// 		console.log("Text");	
-// 		url = baseURL + '/elements/text';
-// 		break;
-// 		default:
-// 		console.log("Error returning");
-// 		return;
-// 	}
-// 	xhttp.onreadystatechange  = function(e) {
-// 		if(this.readyState == 4) {
-// 			if(this.status == 200) {
-// 				var answer = xhttp.response;
-
-// 				console.log("Answer:" +  answer);
-
-// 			}
-// 			if(this.status == 400) {
-// 				alert("Fehler: Bitte ID mitgeben!");
-// 			}
-// 		// unlockXMLHTTPRequest();
-// 	}
-// }
-// 	url = url + "?id=" + id;
-// 	// lockXMLHTTPRequest();
-// 	xhttp.open('GET', url, false);
-// 	xhttp.setRequestHeader("Content-type", "application/json");
-// 	xhttp.setRequestHeader("Authorization", labFolderToken);
-// 	xhttp.send();	
-// }
-
 function downloadSelectedMDBCategories() {
 	console.log("download MDB");
 	//first get ids to download, then do that
@@ -744,50 +683,8 @@ function downloadSelectedMDBCategories() {
 		xhttp.setRequestHeader("Authorization", labFolderToken);
 		xhttp.send();	
 	}
-
-
 }
 
 
-// function downloadFile(id) {
-// 	var url = baseURL + '/elements/file';
-// 	xhttp.onreadystatechange  = function(e) {
-// 		if(this.readyState == 4 && this.status == 200) {
-// 			var answer = xhttp.response;
 
-// 			console.log("Answer:" +  answer);
-
-// 		}
-// 		if(this.status == 400) {
-// 			alert("Fehler: Bitte ID mitgeben!");
-// 		}
-
-// 	}
-// 	url = url + "?id=" + id;
-// 	xhttp.open('GET', url, true);
-// 	xhttp.setRequestHeader("Content-type", "application/json");
-// 	xhttp.setRequestHeader("Authorization", token);
-// 	xhttp.send();	
-// }
-
-// function downloadTable(id) {
-// 	var url = baseURL + '/elements/table';
-// 	xhttp.onreadystatechange  = function(e) {
-// 		if(this.readyState == 4 && this.status == 200) {
-// 			var answer = xhttp.response;
-
-// 			console.log("Answer:" +  answer);
-
-// 		}
-// 		if(this.status == 400) {
-// 			alert("Fehler: Bitte ID mitgeben!");
-// 		}
-
-// 	}
-// 	url = url + "?id=" + id;
-// 	xhttp.open('GET', url, true);
-// 	xhttp.setRequestHeader("Content-type", "application/json");
-// 	xhttp.setRequestHeader("Authorization", token);
-// 	xhttp.send();	
-// }
 

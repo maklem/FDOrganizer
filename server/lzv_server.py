@@ -98,6 +98,13 @@ def naveasydb():
     '''
     return render_template("easydb.html")
 
+@APP.route('/metadata')
+def navmetadata():
+    '''
+    Navigation to site metadata
+    '''
+    return render_template("metadata.html")
+
 #----------------------Authentification LabFolder------------------------------
 @APP.route('/auth/login', methods=['POST'])
 def authenticate_labfolder():
@@ -667,7 +674,7 @@ if __name__ == '__main__':
     APP.run(debug=True)
 
 
-@APP.route('/metdata', methods=['GET'])
+@APP.route('/metdata/structures', methods=['GET'])
 def get_metadata():
     '''
         Return Metadata structure file from server, providing information about supported meta data
