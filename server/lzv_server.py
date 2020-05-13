@@ -667,6 +667,17 @@ def create_zip_from_files(download_meta, filename):
     zip_file.close()
     # return zf
 
+@APP.route('/metadata/structures', methods=['GET'])
+def get_metadata():
+    '''
+        Return Metadata structure file from server, providing information about supported meta data
+    '''
+    print("in get meta")
+    data = ''
+    with open(CONFIGPARAMS["METADATA_INFO_FILE"]) as file:
+        data = file.read()
+    print(data)
+    return json.dumps(data)
 
 
 if __name__ == '__main__':
@@ -674,12 +685,3 @@ if __name__ == '__main__':
     APP.run(debug=True)
 
 
-@APP.route('/metdata/structures', methods=['GET'])
-def get_metadata():
-    '''
-        Return Metadata structure file from server, providing information about supported meta data
-    '''
-    data = ''
-    with open('METADATA_INFO_FILE') as file:
-        data = file.read()
-    return json.dumps(data)

@@ -8,5 +8,5 @@
 	"couchDBStorageDatabaseName" : "storage"	,
 	"couchDBDocumentDatabaseName" : "documents"	,
 	"couchDBStaticDatabaseName" : "static",	
-	"METADATA_INFO_FILE" : "metastructs.json"
+	"METADATA_INFO_FILE" : "./conf/metaDataSchemes.json"
 }

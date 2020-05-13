@@ -1,14 +1,26 @@
 {% extends "template.html" %}
 {% block content %}
 	<div class="col-md-2" id="sidebar">
-		<button class="sidebarItem sideBarMainItem" id="newMetaItem">New Item</button><br>
+		<button class="sidebarItem sideBarMainItem" id="newMetaItems" onclick="toggleDisplaySubItems(this);">New Item <span class="arrow">v</span></button><br>
+		<div id="newItemsSubItems">
+			<!-- <button class="sideBarItem sideBarSubItem" id="test">DC 1.1</button><br> -->
+		</div>
 		<div id="myItems">
-			<button class="sideBarItem sideBarMainItem" id="myMetaItems" onclick="toggleDisplaySubItems(this);">My Items <span class="arrow">v</span></button><br>
-			<button class="sideBarItem sideBarSubItem" id="test">Subitem</button><br>
+			<button class="sideBarItem sideBarMainItem" id="myItems" onclick="toggleDisplaySubItems(this);">My Items <span class="arrow">v</span></button><br>
+		<div id="myItemsSubItems">
+			<!-- <button class="sideBarItem sideBarSubItem" id="test">Subitem</button><br> -->
+		</div>
 	</div>
 	</div>
 	<div class="col-md-10" id="mainpage">
-		<p id="metaDataForm">Test</p>
+		<div id="metaDataMainForm"> 
+			<div id="metaDataFormHeader">Header</div>
+			<form id="metaDataForm">
+			<!-- <label class="formDescriptor" for="username"><h3><b>Username</b></h3></label>
+						<input name="username" type="text" placeholder="Enter Username" required value="robert.guenther@uni-bayreuth.de"> -->
+			</form>
+			<div id="metaDataFormFooter">Footer</div>
+		</div>
 	</div>
 
 {% endblock %}

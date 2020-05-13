@@ -1,15 +1,15 @@
-var baseURL = 'http://localhost:5000';
-var labFolderToken = '';
-var DEBUGlogin = 'robert.guenther@uni-bayreuth.de';
-var DEBUGpassword = 'krQ3C3LTjIXFmwcpmEaM';
+// var baseURL = 'http://localhost:5000';
+// var labFolderToken = '';
+// var DEBUGlogin = 'robert.guenther@uni-bayreuth.de';
+// var DEBUGpassword = 'krQ3C3LTjIXFmwcpmEaM';
 
-if (window.XMLHttpRequest) {
-    // code for modern browsers
-    var xhttp = new XMLHttpRequest();
-} else {
-    // code for old IE browsers
-    var xhttp = new ActiveXObject('Microsoft.XMLHTTP');
-} 
+// if (window.XMLHttpRequest) {
+//     // code for modern browsers
+//     var xhttp = new XMLHttpRequest();
+// } else {
+//     // code for old IE browsers
+//     var xhttp = new ActiveXObject('Microsoft.XMLHTTP');
+// } 
 
 //Initialization Function
 $( document ).ready(function() {
