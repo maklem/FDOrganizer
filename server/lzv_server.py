@@ -159,41 +159,41 @@ def get_projects():
     Accesses LabFolder by Token and retreives the Projects from User. Answer is returned by REST.
     '''
     url = CONFIGPARAMS["labFolderBaseURL"] + '/projects?'
-    mod = 0
     #process optional parameters and add them to url if required
-    group_id = request.args.get('group_id', default='', type=str)
-    if group_id != '':
-        mod = 1
-        url = url + 'group_id=' + group_id + '&'
-    owner_id = request.args.get('owner_id', default='', type=str)
-    if owner_id != '':
-        mod = 1
-        url = url + 'owner_id=' + owner_id + '&'
-    only_root_level = request.args.get('only_root_level', default=0, type=int)
-    if only_root_level:
-        mod = 1
-        url = url + 'only_root_level=true&'
-    folder_id = request.args.get('folder_id', default='', type=str)
-    if folder_id != '':
-        mod = 1
-        url = url + 'folder_id=' + folder_id + '&'
-    projects_ids = request.args.get('projects_ids', default='', type=str)
-    if projects_ids != '':
-        mod = 1
-        url = url + 'projects_ids=' + projects_ids + '&'
-    limit = request.args.get('limit', default=20, type=int)
-    if limit != 20:
-        mod = 1
-        url = url + 'limit=' + str(limit) + '&'
-    offset = request.args.get('offset', default=0, type=int)
-    if offset != 0:
-        mod = 1
-        url = url + 'offset=' + str(offset) + '&'
-    #remove '?' from url when no parameter has been added - basically just reset it to default
-    if mod == 0:
-        url = url.rstrip('?')
-    else:
-        url = url.rstrip('&')
+    # mod = 0
+    # group_id = request.args.get('group_id', default='', type=str)
+    # if group_id != '':
+    #     mod = 1
+    #     url = url + 'group_id=' + group_id + '&'
+    # owner_id = request.args.get('owner_id', default='', type=str)
+    # if owner_id != '':
+    #     mod = 1
+    #     url = url + 'owner_id=' + owner_id + '&'
+    # only_root_level = request.args.get('only_root_level', default=0, type=int)
+    # if only_root_level:
+    #     mod = 1
+    #     url = url + 'only_root_level=true&'
+    # folder_id = request.args.get('folder_id', default='', type=str)
+    # if folder_id != '':
+    #     mod = 1
+    #     url = url + 'folder_id=' + folder_id + '&'
+    # projects_ids = request.args.get('projects_ids', default='', type=str)
+    # if projects_ids != '':
+    #     mod = 1
+    #     url = url + 'projects_ids=' + projects_ids + '&'
+    # limit = request.args.get('limit', default=20, type=int)
+    # if limit != 20:
+    #     mod = 1
+    #     url = url + 'limit=' + str(limit) + '&'
+    # offset = request.args.get('offset', default=0, type=int)
+    # if offset != 0:
+    #     mod = 1
+    #     url = url + 'offset=' + str(offset) + '&'
+    # #remove '?' from url when no parameter has been added - basically just reset it to default
+    # if mod == 0:
+    #     url = url.rstrip('?')
+    # else:
+    #     url = url.rstrip('&')
     #prepare header
     headers = {"Content-Type": "application/json",
                "Authorization" :  "Token " + request.headers['Authorization'],
@@ -210,37 +210,37 @@ def get_notebook_entries():
     Accesses LabFolder by Token and retreives the Entries from User. Answer is returned by REST.
     '''
     url = CONFIGPARAMS["labFolderBaseURL"] + '/entries?'
-    mod = 0
     #process optional parameters and add them to url if required <- !!!currently not yet tested!!!
-    sort = request.args.get('sort', default='', type=str)
-    if sort != '':
-        mod = 1
-        url = url + 'sort=' + sort + '&'
-    omni_empty_title = request.args.get('omni_empty_title', default=0, type=int)
-    if omni_empty_title:
-        mod = 1
-        url = url + 'omni_empty_title=true&'
-    title = request.args.get('title', default='', type=str)
-    if title != '':
-        mod = 1
-        url = url + 'title=' + title + '&'
-    limit = request.args.get('limit', default=20, type=int)
-    if limit != 20:
-        mod = 1
-        url = url + 'limit=' + str(limit) + '&'
-    offset = request.args.get('offset', default=0, type=int)
-    if offset != 0:
-        mod = 1
-        url = url + 'offset=' + str(offset) + '&'
-    expand = request.args.get('expand', default='', type=str)
-    if expand != '':
-        mod = 1
-        url = url + 'expand=' + expand + '&'
-    #remove '?' from url when no parameter has been added - basically just reset it to default
-    if mod == 0:
-        url = url.rstrip('?')
-    else:
-        url = url.rstrip('&')
+    # mod = 0
+    # sort = request.args.get('sort', default='', type=str)
+    # if sort != '':
+    #     mod = 1
+    #     url = url + 'sort=' + sort + '&'
+    # omni_empty_title = request.args.get('omni_empty_title', default=0, type=int)
+    # if omni_empty_title:
+    #     mod = 1
+    #     url = url + 'omni_empty_title=true&'
+    # title = request.args.get('title', default='', type=str)
+    # if title != '':
+    #     mod = 1
+    #     url = url + 'title=' + title + '&'
+    # limit = request.args.get('limit', default=20, type=int)
+    # if limit != 20:
+    #     mod = 1
+    #     url = url + 'limit=' + str(limit) + '&'
+    # offset = request.args.get('offset', default=0, type=int)
+    # if offset != 0:
+    #     mod = 1
+    #     url = url + 'offset=' + str(offset) + '&'
+    # expand = request.args.get('expand', default='', type=str)
+    # if expand != '':
+    #     mod = 1
+    #     url = url + 'expand=' + expand + '&'
+    # #remove '?' from url when no parameter has been added - basically just reset it to default
+    # if mod == 0:
+    #     url = url.rstrip('?')
+    # else:
+    #     url = url.rstrip('&')
     #prepare header
     headers = {"Content-Type": "application/json",
                "Authorization" :  "Token " + request.headers['Authorization'],
@@ -679,9 +679,54 @@ def get_metadata():
     print(data)
     return json.dumps(data)
 
+@APP.route('/metadata/user', methods=['GET'])
+def get_user_stored_metadata():
+    '''
+        Routed from /metadata/user GET
+        Gets the stored metadata sets for the requesting user
+    '''
+    user_id = DEVUSER_ID
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"] + "/"\
+          + user_id
+    token = authenticate_couchdb()
+    if not token:
+        if DEBUG:
+            print("Auth to couchDB not successfull. Returning")
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    if DEBUG:
+        print("trying to get metadata for user with url: " + url)
+        print(headers)
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        # if DEBUG:
+        #     print("got answer, returning: " + response.text)
+        return response.text
+    return ''
+
+@APP.route('/metadata/user', methods=['PUT'])
+def store_user_metadata():
+    '''
+        Routed from /metadata/user PUT
+        Stores an updated metadata set for the user, version managing is done on client side
+    '''
+    user_id = DEVUSER_ID
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"] + "/"\
+          + user_id
+    token = authenticate_couchdb()
+    if not token:
+        if DEBUG:
+            print("Auth to couchDB not successfull. Returning")
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    if DEBUG:
+        print("trying to get metadata for user with url: " + url)
+        print(headers)
+    response = requests.put(url, headers=headers, data=request.get_data())
+    if response:
+        return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error Storing file'}), 500, {'Content-Type' : 'application/json'}
 
 if __name__ == '__main__':
     #authenticate_couchdb()
     APP.run(debug=True)
-
-

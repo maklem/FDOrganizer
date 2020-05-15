@@ -1,12 +1,13 @@
-{	
-	"labFolderBaseURL" : "https://eln.labfolder.com/api/v2"	,
-	"labFolderDefaultUserAgentHeader" : "TestprojektFDM; robert.guenther@uni-bayreuth.de"	,
-	"tempFolder" : "./tmp/"	,
-	"couchDBBaseURL" : "http://127.0.0.1:5984"	,
-	"couchDBAdmin" : "admin"	,
-	"couchDBPassword" : "aodqfyUQqA"	,
-	"couchDBStorageDatabaseName" : "storage"	,
-	"couchDBDocumentDatabaseName" : "documents"	,
-	"couchDBStaticDatabaseName" : "static",	
-	"METADATA_INFO_FILE" : "./conf/metaDataSchemes.json"
+{
+  "labFolderBaseURL": "https://eln.labfolder.com/api/v2",
+  "labFolderDefaultUserAgentHeader": "TestprojektFDM; robert.guenther@uni-bayreuth.de",
+  "tempFolder": "./tmp/",
+  "couchDBBaseURL": "http://127.0.0.1:5984",
+  "couchDBAdmin": "admin",
+  "couchDBPassword": "aodqfyUQqA",
+  "couchDBStorageDatabaseName": "storage",
+  "couchDBMetaDataDatabaseName": "metadata",
+  "couchDBDocumentDatabaseName": "documents",
+  "couchDBStaticDatabaseName": "static",
+  "METADATA_INFO_FILE": "./conf/metaDataSchemes.json"
 }
