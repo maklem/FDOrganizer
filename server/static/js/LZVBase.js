@@ -11,6 +11,15 @@ if (window.XMLHttpRequest) {
     var xhttp = new ActiveXObject('Microsoft.XMLHTTP');
 } 
 
+function setLocalStorage(cname,cvalue) {
+  localStorage.setItem(cname, cvalue);
+}
+
+function getLocalStorage(cname) {
+  var item = localStorage.getItem(cname);
+  return item;
+}
+
 //we are only setting cookies which are deleted after closing browser window
 function setCookie(cname, cvalue) {
   document.cookie = cname + "=" + cvalue + ";path=/";
@@ -36,4 +45,11 @@ function uuidv4() {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
+}
+
+function getType(p) {
+    if (Array.isArray(p)) return 'array';
+    else if (typeof p == 'string') return 'string';
+    else if (p != null && typeof p == 'object') return 'object';
+    else return 'other';
 }

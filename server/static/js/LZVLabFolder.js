@@ -78,10 +78,10 @@ function clearLocalStorage() {
 }
 function clearCookies() {
 	setCookie("labFolderToken", "");
-	setCookie("labFolderProjects", "");
-	setCookie("labFolderEntries", "");
-	setCookie("labFolderStorageFile", "");
-	setCookie("labFolderMDB", "");
+	setLocalStorage("labFolderProjects", "");
+	setLocalStorage("labFolderEntries", "");
+	setLocalStorage("labFolderStorageFile", "");
+	setLocalStorage("labFolderMDB", "");
 }
 
 function downloadSelectedElements() {
@@ -123,10 +123,10 @@ $("#deSelectAllElements").click(function(){
 })
 
 $("#updateContent").click(function(){
-	setCookie("labFolderProjects", "");
-	setCookie("labFolderEntries", "");
-	setCookie("labFolderMDB", "");
-	setCookie("labFolderStorageFile", "");
+	setLocalStorage("labFolderProjects", "");
+	setLocalStorage("labFolderEntries", "");
+	setLocalStorage("labFolderMDB", "");
+	setLocalStorage("labFolderStorageFile", "");
 	updateContentAfterLogin();
 })
 
@@ -255,37 +255,37 @@ function updateContentAfterLogin() {
 	$("#labFolderFailedLogin").hide();
 	$("#labfolderLoginform").hide();
 	$("#labFolderLoginSuccesful").show();
-	if (getCookie("labFolderProjects") == "") {
+	if (getLocalStorage("labFolderProjects") == "") {
 		getProjects();
-		setCookie("labFolderProjects", JSON.stringify(labFolderProjects));	
+		setLocalStorage("labFolderProjects", JSON.stringify(labFolderProjects));	
 	}
 	else {
-		labFolderProjects = JSON.parse(getCookie("labFolderProjects"));
+		labFolderProjects = JSON.parse(getLocalStorage("labFolderProjects"));
 	}
 
-	if (getCookie("labFolderEntries") == "") {
+	if (getLocalStorage("labFolderEntries") == "") {
 		getEntries();
-		setCookie("labFolderEntries", JSON.stringify(labFolderEntries));	
+		setLocalStorage("labFolderEntries", JSON.stringify(labFolderEntries));	
 	}
 	else {
-		labFolderEntries = JSON.parse(getCookie("labFolderEntries"));
+		labFolderEntries = JSON.parse(getLocalStorage("labFolderEntries"));
 	}
 
-	if (getCookie("labFolderMDB") == "") {
+	if (getLocalStorage("labFolderMDB") == "") {
 		getMDBCategories();
 		// getMDBCategory();
-		setCookie("labFolderMDB", JSON.stringify(labFolderMDB));	
+		setLocalStorage("labFolderMDB", JSON.stringify(labFolderMDB));	
 	}
 	else {
-		labFolderMDB = JSON.parse(getCookie("labFolderMDB"));
+		labFolderMDB = JSON.parse(getLocalStorage("labFolderMDB"));
 	}
 
-	if (getCookie("labFolderStorageFile") == "") {
+	if (getLocalStorage("labFolderStorageFile") == "") {
 		getStorageFile();
-		setCookie("labFolderStorageFile", JSON.stringify(labFolderStorageFile));	
+		setLocalStorage("labFolderStorageFile", JSON.stringify(labFolderStorageFile));	
 	}
 	else {
-		labFolderStorageFile = JSON.parse(getCookie("labFolderStorageFile"));
+		labFolderStorageFile = JSON.parse(getLocalStorage("labFolderStorageFile"));
 	}
 	
 	updateProjectMaterialSelection();
@@ -297,7 +297,7 @@ function getStorageFile() {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				labFolderStorageFile = JSON.parse(xhttp.response);
-				setCookie("labFolderStorageFile", JSON.stringify(labFolderStorageFile));	
+				setLocalStorage("labFolderStorageFile", JSON.stringify(labFolderStorageFile));	
 			}
 		}
 	}

@@ -1,1 +1,295 @@
-{"schemes":[{"title":"Dublin Core","version":"1.1","identifier":"DC1.1","fields":[{"field_name":"title","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Name given to the resource."},{"field_name":"creator","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Entity primarily responsible for making the resource."},{"field_name":"subject","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Topic of the resource. (Keywords)"},{"field_name":"description","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Description may include, but is not limited to, an abstract, a table of contents, a graphical representation, or a free-text account of the resource."},{"field_name":"publisher","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Entity responsible for making the resource available."},{"field_name":"contributor","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Additional contributors the the resource."},{"field_name":"date","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Point of time associated with the creation of the resource. (f.e. date of release)"},{"field_name":"type","field_type":"cv","field_mandatory":false,"field_multiple":true,"field_options":["Collection","Dataset","Event","Image","InteractiveResource","MovingImage","PhysicalObject","Service","Software","Sound","Still Image","Text"],"field_description":"Resource type according to DCMI-Type."},{"field_name":"format","field_type":"cv","field_mandatory":false,"field_multiple":true,"field_options":["application","audio","example","image","message","model","multipart","text","video"],"field_description":"Resource format according to Internet Media Type."},{"field_name":"identifier","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Sequence of characters that uniquely identifies this resource (f.e. IBAN, DOI)"},{"field_name":"source","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Related resource from which the described resource is derived."},{"field_name":"language","field_type":"cv","field_mandatory":false,"field_multiple":true,"field_options":["eng","de"],"field_description":"Language of the resource."},{"field_name":"relation","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Related resource."},{"field_name":"coverage","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Spatial or temporal topic of the resource, spatial applicability of the resource, or jurisdiction under which the resource is relevant."},{"field_name":"rights","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Information about rights held in and over the resource."}]},{"title":"Dublin Core","version":"1.1","identifier":"DC1.1Mini","fields":[{"field_name":"title","field_type":"string","field_mandatory":false,"field_multiple":true,"field_description":"Name given to the resource."},{"field_name":"creator","field_type":"int","field_mandatory":true,"field_multiple":false,"field_description":"Entity primarily responsible for making the resource."},{"field_name":"type","field_type":"cv","field_mandatory":false,"field_multiple":true,"field_options":["Collection","Dataset","Event","Image","InteractiveResource","MovingImage","PhysicalObject","Service","Software","Sound","Still Image","Text"],"field_description":"Resource type according to DCMI-Type."}]}]}
+{
+  "schemes": [
+    {
+      "title": "Dublin Core",
+      "version": "1.1",
+      "identifier": "DC1.1",
+      "active": true,
+      "fields": [
+        {
+          "field_name": "title",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Name given to the resource."
+        },
+        {
+          "field_name": "creator",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Entity primarily responsible for making the resource."
+        },
+        {
+          "field_name": "subject",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Topic of the resource. (Keywords)"
+        },
+        {
+          "field_name": "description",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Description may include, but is not limited to, an abstract, a table of contents, a graphical representation, or a free-text account of the resource."
+        },
+        {
+          "field_name": "publisher",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Entity responsible for making the resource available."
+        },
+        {
+          "field_name": "contributor",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Additional contributors the the resource."
+        },
+        {
+          "field_name": "date",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Point of time associated with the creation of the resource. (f.e. date of release)"
+        },
+        {
+          "field_name": "type",
+          "field_type": "cv",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_options": [
+            "Collection",
+            "Dataset",
+            "Event",
+            "Image",
+            "InteractiveResource",
+            "MovingImage",
+            "PhysicalObject",
+            "Service",
+            "Software",
+            "Sound",
+            "Still Image",
+            "Text"
+          ],
+          "field_description": "Resource type according to DCMI-Type."
+        },
+        {
+          "field_name": "format",
+          "field_type": "cv",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_options": [
+            "Application",
+            "Audio",
+            "Example",
+            "Image",
+            "Message",
+            "Model",
+            "Multipart",
+            "Text",
+            "Video"
+          ],
+          "field_description": "Resource format according to Internet Media Type."
+        },
+        {
+          "field_name": "identifier",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Sequence of characters that uniquely identifies this resource (f.e. IBAN, DOI)"
+        },
+        {
+          "field_name": "source",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Related resource from which the described resource is derived."
+        },
+        {
+          "field_name": "language",
+          "field_type": "cv",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_options": [
+            "eng",
+            "de"
+          ],
+          "field_description": "Language of the resource."
+        },
+        {
+          "field_name": "relation",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Related resource."
+        },
+        {
+          "field_name": "coverage",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Spatial or temporal topic of the resource, spatial applicability of the resource, or jurisdiction under which the resource is relevant."
+        },
+        {
+          "field_name": "rights",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Information about rights held in and over the resource."
+        }
+      ]
+    },
+    {
+      "title": "Dublin Core Mini",
+      "version": "1.1",
+      "identifier": "DC1.1Mini",
+      "active": false,
+      "fields": [
+        {
+          "field_name": "title",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "Name given to the resource."
+        },
+        {
+          "field_name": "creator",
+          "field_type": "int",
+          "field_mandatory": true,
+          "field_multiple": false,
+          "field_description": "Entity primarily responsible for making the resource."
+        },
+        {
+          "field_name": "type",
+          "field_type": "cv",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_options": [
+            "Collection",
+            "Dataset",
+            "Event",
+            "Image",
+            "InteractiveResource",
+            "MovingImage",
+            "PhysicalObject",
+            "Service",
+            "Software",
+            "Sound",
+            "Still Image",
+            "Text"
+          ],
+          "field_description": "Resource type according to DCMI-Type."
+        }
+      ]
+    },
+    {
+      "title": "DataCite",
+      "version": "4.3",
+      "identifier": "DATACITE4.3",
+      "active": true,
+      "fields": [
+        {
+          "field_name": "Identifier",
+          "field_type": "string",
+          "field_mandatory": true,
+          "field_multiple": false,
+          "field_description": "Unique Identifier of the Item (DOI,...)"
+        },
+        {
+          "field_name": "Identifier Type",
+          "field_type": "cv",
+          "field_mandatory": true,
+          "field_multiple": false,
+          "field_description": "The type of the main identifier.",
+          "field_options": [
+            "DOI"
+          ]
+        },
+        {
+          "field_name": "Creator",
+          "field_type": "string",
+          "field_mandatory": true,
+          "field_multiple": true,
+          "field_description": "Main Creator of the Item. (Family Name, Given Name)"
+        },
+        {
+          "field_name": "Title",
+          "field_type": "string",
+          "field_mandatory": true,
+          "field_multiple": false,
+          "field_description": "Title of the Item."
+        },
+        {
+          "field_name": "Publisher",
+          "field_type": "string",
+          "field_mandatory": true,
+          "field_multiple": true,
+          "field_description": "The name of the publisher of the item."
+        },
+        {
+          "field_name": "Publication Year",
+          "field_type": "sring",
+          "field_mandatory": true,
+          "field_multiple": false,
+          "field_description": "The year the data was or will be made publicly available. (YYYY)",
+          "field_verification" : "^[0-9]{4}$"
+        },
+        {
+          "field_name": "Resource Type General",
+          "field_type": "cv",
+          "field_mandatory": true,
+          "field_multiple": false,
+          "field_description": "A description of the resource.",
+          "field_options": [
+            "Audiovisual",
+            "Collection",
+            "DataPaper",
+            "Dataset",
+            "Event",
+            "Image",
+            "InteractiveResource",
+            "Model",
+            "Phytical Object",
+            "Service",
+            "Software",
+            "Sound",
+            "Text",
+            "Workflow",
+            "Other"
+          ]
+        },
+        {
+          "field_name": "Resource Type Specific",
+          "field_type": "string",
+          "field_mandatory": true,
+          "field_multiple": false,
+          "field_description": "A term for a more detailed description of the general resource. (f.e. Conference Abstract)"
+        },
+        {
+          "field_name": "Subject",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "The subject of the item. Use subject classification of dfg if possible."
+        },
+        {
+          "field_name": "Language",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": true,
+          "field_description": "The language the main part of the work is in."
+        },
+        {
+          "field_name": "License",
+          "field_type": "string",
+          "field_mandatory": false,
+          "field_multiple": false,
+          "field_description": "License the work is published with (f.e. CC BY 4.0, ...)"
+        }
+      ]
+    }
+  ]
+}

@@ -700,8 +700,11 @@ def get_user_stored_metadata():
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         # if DEBUG:
-        #     print("got answer, returning: " + response.text)
+        print("got answer, returning: " + response.text)
+        print("Response: \n" + response.text)
         return response.text
+    print("not successfull")
+    print("Response: \n" + '')
     return ''
 
 @APP.route('/metadata/user', methods=['PUT'])
@@ -720,9 +723,10 @@ def store_user_metadata():
         return ''
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
     if DEBUG:
-        print("trying to get metadata for user with url: " + url)
+        print("trying to put metadata for user with url: " + url)
         print(headers)
-    response = requests.put(url, headers=headers, data=request.get_data())
+    response = requests.put(url, headers=headers, data=json.loads(request.get_data()))
+    print (response.text)
     if response:
         return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
     return json.dumps({'Result' : 'Error Storing file'}), 500, {'Content-Type' : 'application/json'}
