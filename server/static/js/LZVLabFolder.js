@@ -8,7 +8,7 @@
 
 //Initialization Function
 $( document ).ready(function() {
-	var ct = getCookie('labFolderToken');
+	var ct = getLocalStorage('labFolderToken');
 	if (ct != '') {
 		$("#labFolderDownloadButton").show();
 		labFolderToken = ct;
@@ -70,7 +70,7 @@ function clearLocalStorage() {
 	updateProjectMaterialSelection();
 }
 function clearCookies() {
-	setCookie("labFolderToken", "");
+	setLocalStorage("labFolderToken", "");
 	setLocalStorage("labFolderProjects", "");
 	setLocalStorage("labFolderEntries", "");
 	setLocalStorage("labFolderStorageFile", "");
@@ -191,7 +191,7 @@ function authenticate(form) {
 				data = JSON.parse(xhttp.response) ;
 				if (!("error" in data))  {
 					labFolderToken = data.token;
-					setCookie("labFolderToken", labFolderToken);
+					setLocalStorage("labFolderToken", labFolderToken);
 					$("#labFolderDownloadButton").show();
 					updateContentAfterLogin();
 				}
