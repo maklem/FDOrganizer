@@ -28,7 +28,7 @@ CONFIGPARAMS = {}
 
 #----------------------initialization------------------------------------------
 
-with open('./conf/config.json') as f:
+with open('/server/lzv/server/conf/config.json') as f:
     CONFIGPARAMS = json.load(f)
 
 

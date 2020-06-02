@@ -9,5 +9,5 @@
   "couchDBMetaDataDatabaseName": "metadata",
   "couchDBDocumentDatabaseName": "documents",
   "couchDBStaticDatabaseName": "static",
-  "METADATA_INFO_FILE": "./conf/metaDataSchemes.json"
+  "METADATA_INFO_FILE": "/server/lzv/server/conf/metaDataSchemes.json"
 }

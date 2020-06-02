@@ -1,8 +1,3 @@
-// var baseURL = 'http://localhost:5000';
-// var labFolderToken = '';
-// var DEBUGlogin = 'robert.guenther@uni-bayreuth.de';
-// var DEBUGpassword = 'krQ3C3LTjIXFmwcpmEaM';
-
 // if (window.XMLHttpRequest) {
 //     // code for modern browsers
 //     var xhttp = new XMLHttpRequest();
@@ -21,8 +16,6 @@ $( document ).ready(function() {
 	}
 });
 
-
-var xhttpMutexLocked = false; 
 
 //contains the entries of the loged in user from labfolder, these are stored in cookies with same name
 var labFolderEntries = {

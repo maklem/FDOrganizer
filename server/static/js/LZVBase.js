@@ -1,4 +1,5 @@
-var baseURL = 'http://localhost:5000';
+//var baseURL = 'btrvx159.rz.uni-bayreuth.de';
+var baseURL = '';
 var labFolderToken = '';
 var DEBUGlogin = 'robert.guenther@uni-bayreuth.de';
 var DEBUGpassword = 'krQ3C3LTjIXFmwcpmEaM';

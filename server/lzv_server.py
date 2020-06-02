@@ -57,7 +57,7 @@ CONFIGPARAMS = {}
 
 APP = Flask(__name__)
 CORS(APP)
-with open('./conf/config.json') as f:
+with open('/server/lzv/server/conf/config.json') as f:
     CONFIGPARAMS = json.load(f)
 
 

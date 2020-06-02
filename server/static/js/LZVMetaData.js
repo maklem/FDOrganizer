@@ -30,7 +30,9 @@ function unloadPage(){
 
 function getMetaDataStructureInformation(){
 	console.log("get strcuture data");
-	var url = baseURL + '/metadata/structures';
+	console.log(baseURL);
+	var url = baseURL +  '/metadata/structures';
+	console.log(url);
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -52,7 +54,7 @@ function getMetaDataStructureInformation(){
 
 function getMetaDataUserSets() {
 	console.log("get user data");
-	var url = baseURL + '/metadata/user';
+	var url = baseURL +  '/metadata/user';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -141,6 +143,7 @@ function saveActiveMetaDataSet() {
 }
 
 //TODO fill! Also Button required to do this!
+//TODO: This needs to be reworked, so deleting is done on server after checking for correct set_id, since this provides entry for falsely deleting a not self owned entry.
 function deleteMetaDataSet(clicked) {
 	if(confirm("Are you sure that you want to delete this metadata set? This can not be undone!")){
 		var c_str = getLocalStorage("metaDataUserSets");
