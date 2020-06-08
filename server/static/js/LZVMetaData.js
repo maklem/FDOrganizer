@@ -121,7 +121,7 @@ function saveActiveMetaDataSet() {
 	}
 	var c_str = getLocalStorage("metaDataUserSets");
 	var cookieData;
-	if (c_str == ''){
+	if (c_str === null || c_str == ''){
 		cookieData = {'user_sets' : []};
 	}
 	else {

@@ -124,7 +124,7 @@ def logout_labfolder():
     '''
     url = CONFIGPARAMS["labFolderBaseURL"] + '/auth/logout'
     headers = {"Content-Type": "application/json",
-               "Authorization" :  "Token " + request.headers['Authorization'],
+               "Authorization" :  "Token " + request.headers['Token'],
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
               }
 
@@ -158,7 +158,7 @@ def get_projects():
     '''
     Accesses LabFolder by Token and retreives the Projects from User. Answer is returned by REST.
     '''
-    url = CONFIGPARAMS["labFolderBaseURL"] + '/projects?'
+    url = CONFIGPARAMS["labFolderBaseURL"] + '/projects'
     #process optional parameters and add them to url if required
     # mod = 0
     # group_id = request.args.get('group_id', default='', type=str)
@@ -195,8 +195,10 @@ def get_projects():
     # else:
     #     url = url.rstrip('&')
     #prepare header
+    print("-------------\n")
+    print(request.headers['Token'])
     headers = {"Content-Type": "application/json",
-               "Authorization" :  "Token " + request.headers['Authorization'],
+               "Authorization" :  "Token " + request.headers['Token'],
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
               }
     response = requests.get(url, headers=headers)
@@ -209,7 +211,7 @@ def get_notebook_entries():
     '''
     Accesses LabFolder by Token and retreives the Entries from User. Answer is returned by REST.
     '''
-    url = CONFIGPARAMS["labFolderBaseURL"] + '/entries?'
+    url = CONFIGPARAMS["labFolderBaseURL"] + '/entries'
     #process optional parameters and add them to url if required <- !!!currently not yet tested!!!
     # mod = 0
     # sort = request.args.get('sort', default='', type=str)
@@ -243,7 +245,7 @@ def get_notebook_entries():
     #     url = url.rstrip('&')
     #prepare header
     headers = {"Content-Type": "application/json",
-               "Authorization" :  "Token " + request.headers['Authorization'],
+               "Authorization" :  "Token " + request.headers['Token'],
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
               }
     response = requests.get(url, headers=headers)
@@ -313,7 +315,7 @@ def download_file_from_labfolder(data_array):
         else:
             continue
         headers = {"Content-Type": "application/json",
-                   "Authorization" :  "Token " + request.headers['Authorization'],
+                   "Authorization" :  "Token " + request.headers['Token'],
                    "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
                   }
         couch_header = {"Accept": "application/json",
@@ -383,7 +385,7 @@ def get_mdb_categories():
     url = CONFIGPARAMS["labFolderBaseURL"] + '/mdb/categories'
     #prepare header
     headers = {"Content-Type": "application/json",
-               "Authorization" :  "Token " + request.headers['Authorization'],
+               "Authorization" :  "Token " + request.headers['Token'],
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
               }
     if DEBUG:
@@ -410,7 +412,7 @@ def download_mdb_items():
     url_categories = url_categories + '/' + category_id
     #prepare header
     headers = {"Content-Type": "application/json",
-               "Authorization" :  "Token " + request.headers['Authorization'],
+               "Authorization" :  "Token " + request.headers['Token'],
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
               }
     response_categories = requests.get(url_categories, headers=headers)

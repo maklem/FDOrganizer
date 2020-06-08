@@ -13,12 +13,20 @@ if (window.XMLHttpRequest) {
 } 
 
 function setLocalStorage(cname,cvalue) {
-  localStorage.setItem(cname, cvalue);
+  sessionStorage.setItem(cname, cvalue);
 }
 
 function getLocalStorage(cname) {
-  var item = localStorage.getItem(cname);
+  var item = sessionStorage.getItem(cname);
   return item;
+}
+
+function deleteLocalStorage(cname) {
+  sessionStorage.removeItem(cname);
+}
+
+function clearAllLocalStorage() {
+  sessionStorage.clear();
 }
 
 //we are only setting cookies which are deleted after closing browser window
