@@ -5,13 +5,17 @@ import time
 from pathlib import Path
 from zipfile import ZipFile
 import json
+import secrets
 import requests
 
-from flask import Flask
+from flask import Flask, session
 from flask import request, render_template, send_from_directory
+from flask_session import Session
 from flask_cors import CORS
-# from flask import render_template
+
+import ldap
 # from flask import send_from_directory
+# from flask import render_template
 # from flask import Response
 # from flask import make_response
 # from flask import send_file
@@ -20,46 +24,23 @@ from flask_cors import CORS
 
 DEBUG = 1
 
-
-
-
-
-#AuthSession=YWRtaW46NUVCM0YwQjk6n3RqJxMQvimCpsptPsjwuputD-8
-#
-# All These Parameteres need to be included in a config file which is root read only and accessed
-#on runtime
-#
-
-#baseURL of labFolder
-# CONFIGPARAMS["labFolderBaseURL"] = 'https://eln.labfolder.com/api/v2'
-#storage base url - here the downlaoded data is stored, should terminate with a '/'
-# storageBaseURL = './LabFolderData/'
-# storage_fileName = 'storage.json'
-# CONFIGPARAMS["tempFolder"] = "./tmp/"
-
-#couchDBConfiguration Parameters
-# CONFIGPARAMS["couchDBBaseURL"] = "http://127.0.0.1:5984"
-# CONFIGPARAMS["couchDBAdmin"] = "admin"
-# CONFIGPARAMS["couchDBPassword"] = "aodqfyUQqA"
-# couchDBToken = ""
-# CONFIGPARAMS["couchDBStorageDatabaseName"] = "storage"
-# CONFIGPARAMS["couchDBDocumentDatabaseName"] = "documents"
-# CONFIGPARAMS["couchDBStaticDatabaseName"] = "static"
-
-
-#DELETE AFTER DEV
-DEVUSER_ID = "bt303343"
 #----------------------global Parameters-------------------------------------------
 
 CONFIGPARAMS = {}
+FAILED_AUTHENTICATION = 'Failed Authentication, please login to use this service!'
+
 
 #----------------------initialization------------------------------------------
 
 APP = Flask(__name__)
-CORS(APP)
 with open('/server/lzv/server/conf/config.json') as f:
     CONFIGPARAMS = json.load(f)
-
+APP.secret_key = 'any random string'
+APP.config['SESSION_TYPE'] = 'filesystem'
+APP.config['PERMANENT_SESSION_LIFETIME'] = 43200
+APP.config['SESSION_PERMANENT'] = False
+CORS(APP)
+Session(APP)
 
 
 #----------------------Page Navigation-----------------------------------------
@@ -68,6 +49,10 @@ def navhome():
     '''
     Navigation to site Home
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
     return render_template("index.html")
 
 @APP.route('/impressum')
@@ -75,6 +60,10 @@ def navimpressum():
     '''
     Navigation to site Impressum
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
     return render_template("impressum.html")
 
 @APP.route('/history')
@@ -82,6 +71,10 @@ def navhistory():
     '''
     Navigation to site History
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
     return render_template("history.html")
 
 @APP.route('/labfolder')
@@ -89,6 +82,10 @@ def navlabfolder():
     '''
     Navigation to site Labfolder
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
     return render_template("labfolder.html")
 
 @APP.route('/easydb')
@@ -96,6 +93,10 @@ def naveasydb():
     '''
     Navigation to site easyDB
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
     return render_template("easydb.html")
 
 @APP.route('/metadata')
@@ -103,25 +104,123 @@ def navmetadata():
     '''
     Navigation to site metadata
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
     return render_template("metadata.html")
 
+@APP.route('/login', methods=['GET'])
+def navlogin():
+    '''
+    Navigation to login site
+    '''
+    return render_template("login.html")
+
+
+#----------------------Authenticate LDAP --------------------------------------
+def authenticate_ldap(uname, pword):
+    '''
+        Authenticate against LDAP Server, return true if uname,pword is correct, false else
+    '''
+    ldap_server = "ldaps://proxy-ubtrz.uni-bayreuth.de:636"
+    ldap_base = "ou=users,ou=rz-ad,o=uni-bayreuth"
+    user_dn = "cn="+uname+","+ldap_base
+    try:
+        connect = ldap.initialize(ldap_server)
+        connect.bind_s(user_dn, pword)
+        connect.unbind_s()
+        return True
+    except ldap.LDAPError:
+        connect.unbind_s()
+        return False
+
+def create_sessionid():
+    '''
+        Creates a cryptographically-secure, URL-safe string
+    '''
+    return secrets.token_urlsafe(64)
+
+def create_user_session(userid):
+    '''
+        create new session for user. check if correct credentials to ad if true, create new session
+    '''
+    session[userid] = create_sessionid()
+def check_session(userid, sessionid):
+    '''
+        check if provided session id is valid
+    '''
+    return session.get(userid) == sessionid
+
+def get_sessionid(userid):
+    '''
+    return the session id for userid
+    '''
+    return session.get(userid)
+
+def logout_session(userid):
+    '''
+        deletes the session object for user userid
+    '''
+    session.pop(userid)
+
+@APP.route('/login', methods=['POST'])
+def login_lzv():
+    '''
+    Login to lzv site. Performs a lookup to ldap server to verify credentials.
+    Returns a session token to user, to authenticate your session against.
+    '''
+    if 'session_user' in request.cookies and 'session_auth' in request.cookies:
+        if check_session(request.cookies['session_user'], request.cookies['session_auth']):
+            return json.dumps({'session_id' : request.cookies['session_auth'], 
+                               'username' : request.cookies['session_user']}), \
+                               200, \
+                               {'Content-Type' : 'application/json'} 
+    data = json.loads(request.get_data())
+    if authenticate_ldap(data['username'], data['password']):
+        create_user_session(data['username'])
+        return json.dumps({'session_id' : get_sessionid(data['username']), \
+               'username' : data['username']}), 200, {'Content-Type' : 'application/json'}
+    return {'Error' : 'invalid credentials'}, 401, {'Content-Type' : 'application/json'}
+
+@APP.route('/logout', methods=['POST'])
+def logout_lzv():
+    '''
+    Logout User from lzv System. Deletes local stored session id.
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    logout_session(request.cookies['session_user'])
+    return json.dumps({'Message': 'All good!'}), 200, {'Content-Type' : 'application/json'}
+
+
 #----------------------Authentification LabFolder------------------------------
-@APP.route('/auth/login', methods=['POST'])
+@APP.route('/labfolder/auth/login', methods=['POST'])
 def authenticate_labfolder():
     '''
     Authenticate to LabFolder and returns the login answer
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     url = CONFIGPARAMS["labFolderBaseURL"] + '/auth/login'
     data = request.get_data()
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, data=data, headers=headers)
     return response.text
 
-@APP.route('/auth/logout', methods=['POST'])
+@APP.route('/labfolder/auth/logout', methods=['POST'])
 def logout_labfolder():
     '''
     Kills the Session associated to the provided token
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     url = CONFIGPARAMS["labFolderBaseURL"] + '/auth/logout'
     headers = {"Content-Type": "application/json",
                "Authorization" :  "Token " + request.headers['Token'],
@@ -153,11 +252,15 @@ def authenticate_couchdb():
 
 #----------------------Projects------------------------------------------------
 
-@APP.route('/projects', methods=['GET'])
+@APP.route('/labfolder/projects', methods=['GET'])
 def get_projects():
     '''
     Accesses LabFolder by Token and retreives the Projects from User. Answer is returned by REST.
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     url = CONFIGPARAMS["labFolderBaseURL"] + '/projects'
     #process optional parameters and add them to url if required
     # mod = 0
@@ -195,8 +298,6 @@ def get_projects():
     # else:
     #     url = url.rstrip('&')
     #prepare header
-    print("-------------\n")
-    print(request.headers['Token'])
     headers = {"Content-Type": "application/json",
                "Authorization" :  "Token " + request.headers['Token'],
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
@@ -206,11 +307,15 @@ def get_projects():
 
 #-------------------Notebook---------------------------------------------------
 
-@APP.route('/entries', methods=['GET'])
+@APP.route('/labfolder/entries', methods=['GET'])
 def get_notebook_entries():
     '''
     Accesses LabFolder by Token and retreives the Entries from User. Answer is returned by REST.
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     url = CONFIGPARAMS["labFolderBaseURL"] + '/entries'
     #process optional parameters and add them to url if required <- !!!currently not yet tested!!!
     # mod = 0
@@ -251,12 +356,16 @@ def get_notebook_entries():
     response = requests.get(url, headers=headers)
     return response.text
 
-@APP.route('/download', methods=['GET'])
+@APP.route('/labfolder/download', methods=['GET'])
 def download_file_to_client():
     '''
     Creates a zip File with the Entry requested by the user, and transfers the zip by HTTP.
     '''
-    download_meta = {"user_id" : DEVUSER_ID,
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    download_meta = {"user_id" : request.cookies['session_user'],
                      "projectID" : request.args.get('project_id', default='', type=str),
                      "entryID" : request.args.get('entry_id', default='', type=str),
                      "entryVersionID" : request.args.get('entry_version_id', default='', type=str)
@@ -273,7 +382,7 @@ def download_file_to_client():
                                   status=200, mimetype='application/json')
     return send_from_directory(CONFIGPARAMS["tempFolder"], filename, as_attachment=True)
 
-@APP.route('/elements/download', methods=['POST'])
+@APP.route('/labfolder/elements/download', methods=['POST'])
 def download():
     '''
     Routed from /elements/download.
@@ -285,11 +394,22 @@ def download():
     #       elementType: [IMAGE,TABLE,TEXT],
     #       elementID: elementID
     #}
-    user_id = DEVUSER_ID
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
     data = request.get_data()
     json_data = json.loads(data)
+    print("before remove:")
+    print(json_data)
     json_data = remove_already_existing_tupel(user_id, json_data)
+    print("after remove:")
+    print(json_data)
     download_file_from_labfolder(json_data)
+    print("downloaded: ")
+    print(user_id)
+    print(json_data)
     if json_data:
         update_storage_file(user_id, json_data)
     return APP.response_class(status=200, mimetype='application/json')
@@ -360,28 +480,42 @@ def process_table_data(sheets):
         Processes data from sheets to a flat csv string
     '''
     file_data = ''
+    print("sheets")
+    print(sheets)
     for sheet_key in sheets:
-        if not sheets[sheet_key]["data"]["dataTable"]:
+        print("/////////////")
+        print(sheet_key)
+        print(sheets[sheet_key])
+        try:
+            data = sheets[sheet_key]["data"]["dataTable"]
+        except (AttributeError, KeyError):
+            print("caught except")
             continue
-        data = sheets[sheet_key]["data"]["dataTable"]
+        # if not sheets[sheet_key]["data"]["dataTable"]:
+        #     continue
+        # data = sheets[sheet_key]["data"]["dataTable"]
         file_data = file_data + sheets[sheet_key]["name"] + "\n"
         for line in data:
             for row in data[line]:
                 if isinstance(data[line][row]["value"], int):
                     file_data = file_data + str(data[line][row]["value"]) + ","
                 else:
-                    file_data = file_data + data[line][row]["value"] + ","
+                    file_data = file_data + str(data[line][row]["value"]) + ","
             file_data = file_data.rstrip(",")
             file_data = file_data + "\n"
     return file_data
 
 
-@APP.route('/mdb/categories', methods=['GET'])
+@APP.route('/labfolder/mdb/categories', methods=['GET'])
 def get_mdb_categories():
     '''
     Routed from /mdb/categories.
     Retreives the category information about Material Databse from labfolder and returns this.
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     url = CONFIGPARAMS["labFolderBaseURL"] + '/mdb/categories'
     #prepare header
     headers = {"Content-Type": "application/json",
@@ -395,24 +529,34 @@ def get_mdb_categories():
 
 #TODO store downloaded files in another location (not on server storage) -> maybe direct dl?
 #----does only support filtering by category_id----
-@APP.route('/mdb/items', methods=['GET'])
+@APP.route('/labfolder/mdb/items', methods=['GET'])
 def download_mdb_items():
     '''
     routed from /mdb/items
     Download the Material Database Items to Server.
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     url_items = CONFIGPARAMS["labFolderBaseURL"] + '/mdb/items'
     url_categories = CONFIGPARAMS["labFolderBaseURL"] + '/mdb/categories'
     category_id = request.args.get('category_id', default='', type=str)
+    token = request.args.get('token', default='', type=str)
     if category_id == '':
         return APP.response_class(json.dumps({'Error' : 'Missing Parameter id'}),
                                   status=400,
                                   mimetype='application/json')
+    if token == '':
+        return APP.response_class(json.dumps({'Error' : 'Missing Labfolder Token'}),
+                                  status=400,
+                                  mimetype='application/json')        
     url_items = url_items + '?category_id=' + category_id
     url_categories = url_categories + '/' + category_id
     #prepare header
+    print(request.headers)
     headers = {"Content-Type": "application/json",
-               "Authorization" :  "Token " + request.headers['Token'],
+               "Authorization" :  "Token " + token,
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
               }
     response_categories = requests.get(url_categories, headers=headers)
@@ -420,8 +564,7 @@ def download_mdb_items():
     #now we preprocess the answer to a csv
     category_response_jdata = json.loads(response_categories.text)
     item_response_jdata = json.loads(response_items.text)
-    attributes_sorted = sorted(category_response_jdata["attributes"],\
-                               key=lambda x: x["display_order"])
+    attributes_sorted = category_response_jdata["attributes"]
     title = category_response_jdata["title"]
     file_data = "Name, "
     for att in attributes_sorted:
@@ -435,18 +578,26 @@ def download_mdb_items():
             file_data = file_data + item["custom_attributes"][satt["id"]] + ","
         file_data.rstrip(",")
         file_data = file_data + "\n"
-    file = open(title + ".csv", "w")
+    filename = title + ".csv"
+    filename = filename.replace(">", "_")
+    filename = filename.replace(" ", "")
+    file = open(CONFIGPARAMS["tempFolder"] + filename, "w")
     file.write(file_data)
     file.close()
-    return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return send_from_directory(CONFIGPARAMS["tempFolder"], filename, as_attachment=True)
+    # return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
 
-@APP.route('/storage', methods=['GET'])
+@APP.route('/labfolder/storage', methods=['GET'])
 def getstorage_file():
     '''
     Routed from /storage
     Requests the storage file, containg metadata about stored files for the requesting user
     '''
-    user_id = DEVUSER_ID
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
     return get_datastructure(user_id, return_as_string=True)
 
 
@@ -599,29 +750,46 @@ def remove_already_existing_tupel(user_id, check_elements):
     '''
     storage_file = get_datastructure(user_id)
     if DEBUG:
+        print("----------in remove_existing_tuples----------\n")
+        print("storage:")
         print(json.dumps(storage_file))
+        print("check:")
+        print(json.dumps(check_elements))
     output = []
     if storage_file["projects"] is None or not storage_file["projects"]:
+        print("1")
         return check_elements
     for item in check_elements:
         proj_vals = [x for x in storage_file["projects"] if x["projectID"] == item["projectID"]]
         if not proj_vals:
+            print("2")
+            output.append(item)
             continue
         entry_vals = [x for x in proj_vals[0]["entries"] if x["entryID"] == item["entryID"]]
         if not entry_vals:
+            print("3")
+            output.append(item)
             continue
-        entry_version_vals = [x for x in entry_vals["versions"] \
+        entry_version_vals = [x for x in entry_vals[0]["versions"] \
                               if x["versionID"] == item["entryVersionID"]]
         if not entry_version_vals:
+            print("4")
+            output.append(item)
             continue
-        element_vals = [x for x in entry_version_vals["elements"] \
+        element_vals = [x for x in entry_version_vals[0]["elements"] \
                         if x["elementID"] == item["elementID"]]
-        if element_vals:
+        if not element_vals:
+            print("5")
+            output.append(item)
             continue
-        version_vals = [x for x in element_vals["versions"] if x["versionID"] == item["versionID"]]
-        if not version_vals:
+        version_vals = [x for x in element_vals[0]["versions"] if x["versionID"] == item["versionID"]]
+        if version_vals:
+            print("6")
             continue
+        print("append")
         output.append(item)
+    print(output)
+    print("----------end remove_existing_tuples----------\n")
     return output
 
 def create_zip_from_files(download_meta, filename):
@@ -674,6 +842,10 @@ def get_metadata():
     '''
         Return Metadata structure file from server, providing information about supported meta data
     '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     print("in get meta")
     data = ''
     with open(CONFIGPARAMS["METADATA_INFO_FILE"]) as file:
@@ -687,7 +859,11 @@ def get_user_stored_metadata():
         Routed from /metadata/user GET
         Gets the stored metadata sets for the requesting user
     '''
-    user_id = DEVUSER_ID
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
     url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"] + "/"\
           + user_id
     token = authenticate_couchdb()
@@ -715,7 +891,11 @@ def store_user_metadata():
         Routed from /metadata/user PUT
         Stores an updated metadata set for the user, version managing is done on client side
     '''
-    user_id = DEVUSER_ID
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
     url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"] + "/"\
           + user_id
     token = authenticate_couchdb()
@@ -727,6 +907,8 @@ def store_user_metadata():
     if DEBUG:
         print("trying to put metadata for user with url: " + url)
         print(headers)
+        print("data:")
+        print(json.loads(request.get_data()))
     response = requests.put(url, headers=headers, data=json.loads(request.get_data()))
     print (response.text)
     if response:

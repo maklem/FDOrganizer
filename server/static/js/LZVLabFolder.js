@@ -1,10 +1,15 @@
 //Initialization Function
 $( document ).ready(function() {
 	var ct = getLocalStorage('labFolderToken');
-	if (ct ==! null && ct != '') {
+	if (ct && ct != '') {
 		$("#labFolderDownloadButton").show();
 		labFolderToken = ct;
 		updateContentAfterLogin();
+	}
+	if(checkLZVLogin())
+	{
+		console.log("maḱing visivle");
+		$('#logout_lzv').show();
 	}
 });
 
@@ -169,7 +174,7 @@ function updateProjectMaterialSelection() {
 }
 
 function authenticate(form) {
-	var url = baseURL + '/auth/login';
+	var url = baseURL + '/labfolder/auth/login';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -199,7 +204,7 @@ function authenticate(form) {
 
 function logout() {
 	if (labFolderToken != '') { 
-		var url = baseURL + '/auth/logout';
+		var url = baseURL + '/labfolder/auth/logout';
 		xhttp.onreadystatechange  = function(e) {
 			if(this.readyState == 4) {
 				if(this.status == 200) {
@@ -218,10 +223,6 @@ function logout() {
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Token", labFolderToken);
 	xhttp.send();
-}
-else
-{
-	alert("Not Logged in!");
 }
 }
 
@@ -266,7 +267,7 @@ function updateContentAfterLogin() {
 }
 
 function getStorageFile() {
-	var url = baseURL + '/storage';
+	var url = baseURL + '/labfolder/storage';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -283,7 +284,7 @@ function getStorageFile() {
 }
 
 function getProjects() {
-	var url = baseURL + '/projects';
+	var url = baseURL + '/labfolder/projects';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -313,7 +314,7 @@ function getProjects() {
 }
 
 function getEntries() {
-	var url = baseURL + '/entries';
+	var url = baseURL + '/labfolder/entries';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -355,7 +356,7 @@ function getEntries() {
 }
 
 function getMDBCategories() {
-	var url = baseURL + '/mdb/categories';
+	var url = baseURL + '/labfolder/mdb/categories';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
@@ -437,7 +438,7 @@ function updateLabfolderSelectableElements() {
 						let formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 						append += '<div class="versionDetail"><span>';
 						append += formatted_date;
-						var dlurl = baseURL + '/download?project_id=' + displayProjectID + '&entry_id=' + obj.id + '&entry_version_id=' + version.versionID;
+						var dlurl = baseURL + '/labfolder/download?project_id=' + displayProjectID + '&entry_id=' + obj.id + '&entry_version_id=' + version.versionID;
 						append += '</span><button type="button" class="expandVersionButton" id="' + dlurl + '" + onclick="downloadVersion(this);">Download</button></div>';
 					}
 				}
@@ -456,8 +457,11 @@ function updateLabfolderSelectableCategories() {
 	var append = '';
 		for (var i=0; i<labFolderMDB.categories.length; i++){
 			var obj = labFolderMDB.categories[i];
-			append += '<div class="entrySelect lzvButton labFolderMDB"><input type="checkbox" value=""  id="' + obj.id + '" name="' + obj.id + '">';
+			// append += '<div class="entrySelect lzvButton labFolderMDB"><input type="checkbox" value=""  id="' + obj.id + '" name="' + obj.id + '">';
+			append += '<div class="entrySelect lzvButton labFolderMDB">';
 			append += '<label for="' + obj.id + '">' + obj.title + '</label>';
+			var dlurl = baseURL + '/labfolder/mdb/items?category_id=' + obj.id + '&token=' + getLocalStorage("labFolderToken");
+						append += '<button type="button" class="expandVersionButton floatRight" id="' + dlurl + '" + onclick="downloadVersion(this);">Download</button>';
 			append += '</div>\n';
 		}
 
@@ -503,7 +507,7 @@ function downloadSelectedEntries() {
 		}
 		//elements contains the set of id, entryTitle, elementID. These should now be downloaded from server and saved in  a folder structure
 		if (elements.length > 0) {
-			var url = baseURL + '/elements/download';
+			var url = baseURL + '/labfolder/elements/download';
 			xhttp.onreadystatechange  = function(e) {
 				if(this.readyState == 4) {
 					if(this.status == 200) {
@@ -547,7 +551,7 @@ function downloadSelectedMDBCategories() {
 				}
 	}
 }
-		url = baseURL + "/mdb/items?category_id=" + categoryIds[i];
+		url = baseURL + "/labfolder/mdb/items?category_id=" + categoryIds[i];
 		xhttp.open('GET', url, false);
 		xhttp.setRequestHeader("Content-type", "application/json");
 		xhttp.setRequestHeader("Token", labFolderToken);

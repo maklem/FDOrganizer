@@ -2,6 +2,10 @@
 $( document ).ready(function() {
 	getMetaDataStructureInformation();
 	getMetaDataUserSets();
+	if(checkLZVLogin())
+	{
+		$('#logout_lzv').show();
+	}
 	// metaStruc = getLocalStorage("metaDataStructs");
 	// createFormForNewSchemeItem('DC1.1Mini')
 });
@@ -9,13 +13,11 @@ $( document ).ready(function() {
 var unsaved = false;
 
 $(":input").change(function(){ //triggers change in all input fields including text type
-	console.log("detected change f1");
     unsaved = true;
 });
 
 // Monitor dynamic inputs
 $(document).on('change', 'input, select', function(){ //triggers change in all input fields including text type
-	console.log("detected change f2");
     unsaved = true;
 });
 
@@ -78,7 +80,7 @@ function sendUserMetaSetsToServer() {
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
-				
+				getMetaDataUserSets();
 			}
 		}
 	}

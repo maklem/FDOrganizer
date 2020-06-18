@@ -70,6 +70,11 @@ li a:hover {
   color: white;
 }
 
+#logout_lzv {
+  display: none;
+  float: right;
+}
+
 /*basic button design*/
 
 .lzvButton {
@@ -105,6 +110,7 @@ li a:hover {
   margin-left: -25px;
   margin-top: 2px;
   margin-bottom: -1px;
+  height: 90%;
 }
 
 .selectLabel {
@@ -121,6 +127,10 @@ li a:hover {
   border-radius: 5px;
   background-color: var(--detail_button_color); 
   border: none;
+}
+
+.floatRight {
+  float: right;
 }
 
 .expandVersionButton:hover {
@@ -209,6 +219,18 @@ li a:hover {
   padding-top: 2px;
   margin: 0;
   margin-top: 3px;
+}
+
+/*------LZV Login-------*/
+#lzvLoginSuccesful {
+  display: none;
+  height: 100px;
+  max-height: 100px; 
+}
+
+#lzvFailedLogin{
+  display: none;
+  color: red;
 }
 /*Download buttons*/
 
@@ -333,8 +355,9 @@ img.avatar {
 
 .arrow {
   float: right;
-  margin-right: 1px;
+  margin-right: -1px;
   display:inline-block;
+  padding-left: 4px;
 }
 
 .sidebarSubItem {

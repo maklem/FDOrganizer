@@ -62,3 +62,32 @@ function getType(p) {
     else if (p != null && typeof p == 'object') return 'object';
     else return 'other';
 }
+
+function checkLZVLogin() {
+    var auth = getCookie("session_auth");
+    var user = getCookie("session_user");
+    if ( auth && user && auth != '' && user != ''){
+      return true;
+    }
+    else {
+      return false;
+    }
+}
+
+function logout_lzv() {
+  if (checkLZVLogin()) { 
+    var url = baseURL + '/logout';
+    xhttp.onreadystatechange  = function(e) {
+      if(this.readyState == 4) {
+        if(this.status == 200) {
+          setCookie("session_auth", '');
+          setCookie("session_user", '');
+          window.location.reload(true);
+        }
+      }
+    }
+    xhttp.open('POST', url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+  }
+}
