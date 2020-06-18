@@ -401,15 +401,8 @@ def download():
     user_id = request.cookies['session_user']
     data = request.get_data()
     json_data = json.loads(data)
-    print("before remove:")
-    print(json_data)
     json_data = remove_already_existing_tupel(user_id, json_data)
-    print("after remove:")
-    print(json_data)
     download_file_from_labfolder(json_data)
-    print("downloaded: ")
-    print(user_id)
-    print(json_data)
     if json_data:
         update_storage_file(user_id, json_data)
     return APP.response_class(status=200, mimetype='application/json')
@@ -480,16 +473,10 @@ def process_table_data(sheets):
         Processes data from sheets to a flat csv string
     '''
     file_data = ''
-    print("sheets")
-    print(sheets)
     for sheet_key in sheets:
-        print("/////////////")
-        print(sheet_key)
-        print(sheets[sheet_key])
         try:
             data = sheets[sheet_key]["data"]["dataTable"]
         except (AttributeError, KeyError):
-            print("caught except")
             continue
         # if not sheets[sheet_key]["data"]["dataTable"]:
         #     continue
@@ -527,7 +514,6 @@ def get_mdb_categories():
     response = requests.get(url, headers=headers)
     return response.text
 
-#TODO store downloaded files in another location (not on server storage) -> maybe direct dl?
 #----does only support filtering by category_id----
 @APP.route('/labfolder/mdb/items', methods=['GET'])
 def download_mdb_items():
@@ -554,7 +540,6 @@ def download_mdb_items():
     url_items = url_items + '?category_id=' + category_id
     url_categories = url_categories + '/' + category_id
     #prepare header
-    print(request.headers)
     headers = {"Content-Type": "application/json",
                "Authorization" :  "Token " + token,
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
@@ -757,39 +742,31 @@ def remove_already_existing_tupel(user_id, check_elements):
         print(json.dumps(check_elements))
     output = []
     if storage_file["projects"] is None or not storage_file["projects"]:
-        print("1")
         return check_elements
     for item in check_elements:
         proj_vals = [x for x in storage_file["projects"] if x["projectID"] == item["projectID"]]
         if not proj_vals:
-            print("2")
             output.append(item)
             continue
         entry_vals = [x for x in proj_vals[0]["entries"] if x["entryID"] == item["entryID"]]
         if not entry_vals:
-            print("3")
             output.append(item)
             continue
         entry_version_vals = [x for x in entry_vals[0]["versions"] \
                               if x["versionID"] == item["entryVersionID"]]
         if not entry_version_vals:
-            print("4")
             output.append(item)
             continue
         element_vals = [x for x in entry_version_vals[0]["elements"] \
                         if x["elementID"] == item["elementID"]]
         if not element_vals:
-            print("5")
             output.append(item)
             continue
-        version_vals = [x for x in element_vals[0]["versions"] if x["versionID"] == item["versionID"]]
+        version_vals = [x for x in element_vals[0] \
+                       ["versions"] if x["versionID"] == item["versionID"]]
         if version_vals:
-            print("6")
             continue
-        print("append")
         output.append(item)
-    print(output)
-    print("----------end remove_existing_tuples----------\n")
     return output
 
 def create_zip_from_files(download_meta, filename):
@@ -846,11 +823,9 @@ def get_metadata():
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    print("in get meta")
     data = ''
     with open(CONFIGPARAMS["METADATA_INFO_FILE"]) as file:
         data = file.read()
-    print(data)
     return json.dumps(data)
 
 @APP.route('/metadata/user', methods=['GET'])
@@ -878,11 +853,7 @@ def get_user_stored_metadata():
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         # if DEBUG:
-        print("got answer, returning: " + response.text)
-        print("Response: \n" + response.text)
         return response.text
-    print("not successfull")
-    print("Response: \n" + '')
     return ''
 
 @APP.route('/metadata/user', methods=['PUT'])
@@ -910,7 +881,6 @@ def store_user_metadata():
         print("data:")
         print(json.loads(request.get_data()))
     response = requests.put(url, headers=headers, data=json.loads(request.get_data()))
-    print (response.text)
     if response:
         return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
     return json.dumps({'Result' : 'Error Storing file'}), 500, {'Content-Type' : 'application/json'}
