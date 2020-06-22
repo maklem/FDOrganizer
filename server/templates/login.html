@@ -1,0 +1,35 @@
+{% extends "template.html" %}
+{% block content %}
+<div class="col-md-8" id="mainPage">
+	<div class="col-md-8">
+		Please authenticate to use this service!
+		<div id="lzvLogin">
+				<div id="lzvLoginform">
+					<form onsubmit="return false" action ="#">
+						<label class="formDescriptor" for="username"><h3><b>Username</b></h3></label>
+						<input name="username" type="text" placeholder="Enter Username (btxxxxxx)" required value="">
+						<label class="formDescriptor" for="pwd"><h3><b>Password</b></h3></label>
+						<input name="pwd" type="password" placeholder="Enter Password" required value="">
+						<div id="lzvFailedLogin">
+							<label> Wrong Username or password!</label><br>
+						</div>
+						<button type="submit" class="btn lzvButton" id="submitlzvButtonLogin" onclick="authenticate(this.form);">Login</button>
+					</form>
+				</div>
+				<div  id="lzvLoginSuccesful">
+					<label>Login Successfull</label><br>
+					<button class="btn lzvButton" id="submitlzvButtonLogout" onclick="logout();">Logout</button>
+				</div>
+
+			</div>
+	</div>
+</div>
+<div class="col-md-4">
+				
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static',     filename='js/LZVBase.js') }}"></script>
+<script src="{{ url_for('static',     filename='js/LZVLogin.js') }}"></script>
+{% endblock %}
