@@ -9,5 +9,8 @@
   "couchDBMetaDataDatabaseName": "metadata",
   "couchDBDocumentDatabaseName": "documents",
   "couchDBStaticDatabaseName": "static",
-  "METADATA_INFO_FILE": "/server/lzv/server/conf/metaDataSchemes.json"
+  "couchDBIngestsDatabaseName": "ingests",
+  "METADATA_INFO_FILE": "/server/lzv/server/conf/metaDataSchemes.json",
+  "LZV_REVIEW": "/lzv_ingest_review/",
+  "LZV_HOTFOLDER": "/lzv_hotfolder/"
 }

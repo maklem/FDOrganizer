@@ -110,6 +110,17 @@ def navmetadata():
         return render_template("login.html")
     return render_template("metadata.html")
 
+@APP.route('/lzv')
+def navlzvingest():
+    '''
+    Navigation to site metadata
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
+    return render_template("lzvingest.html")
+
 @APP.route('/login', methods=['GET'])
 def navlogin():
     '''
@@ -573,7 +584,7 @@ def download_mdb_items():
     # return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
 
 @APP.route('/labfolder/storage', methods=['GET'])
-def getstorage_file():
+def get_storage_file():
     '''
     Routed from /storage
     Requests the storage file, containg metadata about stored files for the requesting user
@@ -812,7 +823,6 @@ def create_zip_from_files(download_meta, filename):
             except FileNotFoundError:
                 print("Error deleting file from filesystem: File not Found")
     zip_file.close()
-    # return zf
 
 @APP.route('/metadata/structures', methods=['GET'])
 def get_metadata():
@@ -884,6 +894,109 @@ def store_user_metadata():
     if response:
         return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
     return json.dumps({'Result' : 'Error Storing file'}), 500, {'Content-Type' : 'application/json'}
+
+@APP.route("/ingest/submit", methods=['PUT'])
+def submit_user_ingest_to_review():
+    '''
+        User Ingest provided in data is submitted to the lzv process. We need to safe the submitted
+        ingest in a seperate db so it cant be deleted since we need to verify to always have access
+        to the provided data. Ingests are first stored in a review
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    token = authenticate_couchdb()
+    if not token:
+        if DEBUG:
+            print("Auth to couchDB not successfull. Returning")
+        return json.dumps({'Result' : 'Internal Server Error'}), 500,\
+                          {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    storage_file = get_datastructure(user_id)
+    ingest = json.loads(request.get_data())
+    ingest_review_path = CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"] + "/content/"
+    ingest['user_id'] = user_id
+    print("---")
+    print(json.dumps(ingest))
+    for ingest_element in ingest['content']:
+        print("ingest_element:---")
+        print(json.dumps(ingest_element))
+        version = search_for_version(storage_file, ingest_element['version_id'])
+        if version is not None:
+            filename = version['entry_title'] + '-'\
+            + version['version']['versionID']
+            # print("version:---")
+            # print(json.dumps(version))
+            download_files_to_path(ingest_review_path, filename, version['version'])
+            ingest_element['path'] = filename
+        else:
+            if DEBUG:
+                print("didnt find version in storage File")
+    #store a file in the database for review
+    couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBIngestsDatabaseName"]\
+        + "/" + ingest['ingest_id']
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    if DEBUG:
+        print("trying to submit ingest for user with url: " + couchdb_url)
+        print(headers)
+        print("ingest:")
+        print(json.dumps(ingest))
+    response = requests.put(couchdb_url, headers=headers, data=ingest)
+    if response:
+        return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error Storing ingest'}), 500,\
+                      {'Content-Type' : 'application/json'}
+
+def download_files_to_path(path, element_name, version):
+    '''
+        downlaods the file provided in version from couchdb and saves it in element_name. filename 
+        should contain the path from root
+    '''
+    cdb_doc_url_base = CONFIGPARAMS["couchDBBaseURL"] + "/" + \
+                       CONFIGPARAMS["couchDBDocumentDatabaseName"] + "/"
+    token = authenticate_couchdb()
+    if not token:
+        return
+    tmp_path_file = Path(path)
+    tmp_path_file.mkdir(mode=0o770, parents=True, exist_ok=True)
+    for ele in version["elements"]:
+        #each element should only have one version, so wen access the first element
+        cdb_doc_url = cdb_doc_url_base + ele["versions"][0]["couchdb_doc_id"] + "/" \
+        + ele["versions"][0]["couchdb_doc_item_att_name"]
+        if ele["elementType"] == "TEXT":
+            filetype = '.txt'
+        elif ele["elementType"] == "TABLE":
+            filetype = '.csv'
+        elif ele["elementType"] == "IMAGE":
+            filetype = '.png'
+        tmp_file = Path(path+element_name+'-'+ele["versions"][0]["versionID"]+filetype)
+        # print(tmp_file)
+        # print(path)
+        tmp_file.touch(mode=0o770, exist_ok=True)
+        headers = {"Accept": "application/json",
+                   "Content-Type" : "application/json",
+                   "Cookie" :  token
+                  }
+        response = requests.get(cdb_doc_url, headers=headers)
+        if response:
+            if ele["elementType"] == "TEXT" or ele["elementType"] == "TABLE":
+                tmp_file.write_text(response.text)
+            elif ele["elementType"] == "IMAGE":
+                tmp_file.write_bytes(response.content)
+
+
+def search_for_version(storage_file, version_id):
+    '''
+        searched in storage_file for a entry version with id version id. returns the version object.
+    '''
+    for project in storage_file['projects']:
+        for entry in project['entries']:
+            for version in entry['versions']:
+                if version['versionID'] == version_id:
+                    return {'version': version, 'entry_title': entry['entryTitle'],\
+                            'entry_id' : entry['entryID'], 'project_id' : project['projectID']}
+    return None
 
 if __name__ == '__main__':
     #authenticate_couchdb()

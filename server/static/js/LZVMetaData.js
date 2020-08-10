@@ -31,20 +31,13 @@ function unloadPage(){
 }
 
 function getMetaDataStructureInformation(){
-	console.log("get strcuture data");
-	console.log(baseURL);
 	var url = baseURL +  '/metadata/structures';
-	console.log(url);
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
-				console.log(parsedJSON);
-				console.log(JSON.stringify(parsedJSON));
 				setLocalStorage("metaDataStructs", JSON.stringify(parsedJSON));
 				setLocalStorage("test", JSON.stringify(parsedJSON));
-				console.log("getLocalStorage");
-				console.log(getLocalStorage("metaDataStructs"));
 				updateSideBarMetaSchemes(parsedJSON);	
 			}
 		}
@@ -55,13 +48,11 @@ function getMetaDataStructureInformation(){
 }
 
 function getMetaDataUserSets() {
-	console.log("get user data");
 	var url = baseURL +  '/metadata/user';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				if (xhttp.response != "") {
-					console.log(xhttp.response);
 					parsedJSON =  JSON.parse(xhttp.response);
 					setLocalStorage("metaDataUserSets", JSON.stringify(parsedJSON));
 					updateSideBarUserSets(parsedJSON);
@@ -75,7 +66,6 @@ function getMetaDataUserSets() {
 }
 
 function sendUserMetaSetsToServer() {
-	console.log("sending Meta");
 	var url = baseURL + '/metadata/user';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
@@ -137,11 +127,21 @@ function saveActiveMetaDataSet() {
 	else {
 		cookieData.user_sets.push(saveData);
 	}
-	console.log(cookieData);
 	setLocalStorage("metaDataUserSets", JSON.stringify(cookieData));
 	updateSideBarUserSets(cookieData);
 	unsaved = false;
 	sendUserMetaSetsToServer();
+}
+
+function copyActiveMetaDataSet() {
+	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
+	userSets= JSON.parse(getLocalStorage("metaDataUserSets"));
+	clicked_set_id = $('#title').attr('set_id');
+	var user_set = userSets.user_sets.find(set=>set.set_id == clicked_set_id);
+	if (user_set && user_set !== null){
+		var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
+		fillMetaDataForm(meta_struc,user_set,true);
+	}
 }
 
 //TODO fill! Also Button required to do this!
@@ -151,20 +151,13 @@ function deleteMetaDataSet(clicked) {
 		var c_str = getLocalStorage("metaDataUserSets");
 		clickedID = $(clicked).attr('set_id');
 		cookieData = JSON.parse(c_str);
-		console.log("before:");
-		console.log(cookieData);
 		var delete_set = cookieData.user_sets.find(set=>set.set_id == clickedID);
-		console.log("delete_set:");
-		console.log(delete_set);
 		if(delete_set) {
 			var index = cookieData.user_sets.indexOf(delete_set);
-			console.log("index:" + index);
 			if (index > -1) {
 				cookieData.user_sets.splice(index,1);
 			}
 		}
-		console.log("after:");
-		console.log(cookieData);
 		setLocalStorage("metaDataUserSets", JSON.stringify(cookieData));
 		updateSideBarUserSets(cookieData);
 		sendUserMetaSetsToServer();
@@ -222,9 +215,7 @@ function createFormForNewSchemeItem(clicked){
         	return;
         }
     }
-    console.log(getLocalStorage("metaDataStructs"));
 	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
-	console.log(metaStructure);
 	clickedID = $(clicked).attr('id');
 	var clickedStruc = metaStructure.schemes.find(struc=>struc.identifier == clickedID);
 	if(clickedStruc) {
@@ -244,24 +235,29 @@ function createFormForExistingSchemeSet(clicked) {
 	clicked_set_id = $(clicked).attr('id');
 	var user_set = userSets.user_sets.find(set=>set.set_id == clicked_set_id);
 	var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
-
 	fillMetaDataForm(meta_struc,user_set);
 }
-
 
 //this function creates a form for creation of meta data
 //if userInput = NULL a new metaDataSet is created, if not null then an existing scheme is modified and already existing entries are displayed
 //metaStruc a single metaStrucuture JSON object
 //userInput the correlated userMetaSet for that struc, which is required when a existing set should be updated
-function fillMetaDataForm(metaStruc,userInputSet = null){
-	var  hasUserInput = false
+function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
+	var  hasUserInput = false;
+	var set_id;
 	if(userInputSet !== null) {
 		hasUserInput = true;
+		set_id = userInputSet.set_id;
 	}
-	var set_id = (hasUserInput) ? userInputSet.set_id : uuidv4();
+	if(recreateID || userInputSet === null){
+		set_id = uuidv4();
+	}
 	var headerHTML = '<div id="title" set_id="'+ set_id +'" name="' + metaStruc.identifier + '">' + metaStruc.title + " v" + metaStruc.version + '</div></div>';
 	headerHTML += '<div class="metaFormElement"><label class="formDescriptor" for="metaSchemeName">Name of Metadata Set:</label>';
 	var title = (hasUserInput) ? userInputSet.name : '';
+	if( recreateID) {
+		title = '';
+	}
 	headerHTML += '<div class="metaFormUIField"><input required name="metaSchemeName" type="text" value="' + title + '"></div></div><hr>';
 	$('#metaDataFormHeader').empty();
 	$(headerHTML).appendTo('#metaDataFormHeader');
@@ -302,10 +298,7 @@ function fillMetaDataForm(metaStruc,userInputSet = null){
 				break;
 		}
 		if (field.field_type != 'cv') {
-
 			if(field.field_verification) {
-				console.log("text");
-				console.log(field.field_verification);
 				inputHTML += 'pattern="' + field.field_verification + '" ';
 			}
 			inputHTML += '>';
@@ -322,12 +315,11 @@ function fillMetaDataForm(metaStruc,userInputSet = null){
 	$('#metaDataFormFooter').empty();
 	var footerHTML = '<div id="footerButtonDiv">';
 	footerHTML += '<button type="button" class="btn lzvButton" id="saveMetaDataForm" onclick="saveActiveMetaDataSet();">Save</button>';
+	footerHTML += '<button type="button" class="btn lzvButton" id="copyMetaDataSet" onclick="copyActiveMetaDataSet();">Copy Set</button>';
 	footerHTML += '<button type="button" class="btn lzvButton" id="exportToDC" onclick="exportSetToDC();">Export to Dublin Core</button>';
 	// footerHTML += '<button type="button" class="btn lzvButton" id="exportToXML" onclick="exportSetToXML();">Export to XML</button>';
 	footerHTML += '<button type="button" class="btn lzvButton" id="exportToJSON" onclick="exportSetToJSON();">Export to JSON</button>';
 	// function exportSetToXML() {}
-	// function exportSetToJSON() {}
-	// function exportSetToDC() {}
 	footerHTML += '</div>';
 	$(footerHTML).appendTo('#metaDataFormFooter');
 	if (hasUserInput) { //fill fields with values from user field
@@ -394,8 +386,6 @@ function removeMetaDataField(clicked){
 		$(clicked).parent().remove();
 	}
 }
-//<label class="formDescriptor" for="username"><h3><b>Username</b></h3></label>
-//<input name="username" type="text" placeholder="Enter Username" required value="robert.guenther@uni-bayreuth.de">
 
 function updateSideBar() {
 	var metaSchemes = JSON.parse(getLocalStorage("metaDataStructs"));
@@ -406,14 +396,12 @@ function updateSideBar() {
 	if (userSets) {
 		updateSideBarUserSets(userSets);
 	}
-
 }
 
 function updateSideBarMetaSchemes(metaStruc) {
 	$('#newItemsSubItems').empty();
 	var append = '';
 	for (scheme of metaStruc.schemes) {
-		console.log(scheme.fields);
 		if(scheme.active){
 		append += '<button class="sidebarItem sidebarSubItem" id="' + scheme.identifier + '" onclick="createFormForNewSchemeItem(this);">' + scheme.title + ' ' + scheme.version + '</button><br>';
 	}

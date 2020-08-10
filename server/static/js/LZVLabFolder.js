@@ -8,7 +8,6 @@ $( document ).ready(function() {
 	}
 	if(checkLZVLogin())
 	{
-		console.log("maḱing visivle");
 		$('#logout_lzv').show();
 	}
 });
@@ -279,7 +278,6 @@ function getStorageFile() {
 
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.setRequestHeader("Token", labFolderToken);
 	xhttp.send();	
 }
 
