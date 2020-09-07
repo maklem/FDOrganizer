@@ -1,0 +1,41 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="col-md-2" id="sidebar">
+		<div id="newItems">
+			<button class="sidebarItem sidebarMainItem" id="newIngestItem" onclick="newLZVIngest(this);">New LZV Ingest</button><br>
+			<!-- <button class="sideBarItem sideBarSubItem" id="test">DC 1.1</button><br> -->
+			<div id="newItemsSubItems">
+			</div>
+		</div>
+		<div id="myItems">
+			<button class="sidebarItem sidebarMainItem" id="myIngestsButton" onclick="toggleDisplaySubItems(this);">My Ingests <span class="arrow">v</span></button><br>
+		<div id="myItemsSubItems">
+			
+		</div>
+		</div>
+		<div id="submittedItems">
+			<button class="sidebarItem sidebarMainItem" id="submittedIngestsButton" onclick="toggleDisplaySubItems(this);">Submtited Ingests <span class="arrow">v</span></button><br>
+		<div id="submittedItemsSubItems">
+			
+		</div>
+		</div>
+	</div>
+	<div class="col-md-8" id="mainpage">
+		<div id="metaDataMainForm"> 
+			<div id="ingestFormHeader"></div>
+			<form id="ingestForm">
+
+			</form>
+			<div id="ingestFormFooter"></div>
+		</div>
+		<div id="popupForm">
+		</div>
+	</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static',     filename='js/LZVBase.js') }}"></script>
+<script src="{{ url_for('static',     filename='js/LZVMetaData.js') }}"></script>
+<script src="{{ url_for('static',     filename='js/LZVIngest.js') }}"></script>
+{% endblock %}
+	

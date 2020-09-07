@@ -113,7 +113,7 @@ def navmetadata():
 @APP.route('/lzv')
 def navlzvingest():
     '''
-    Navigation to site metadata
+    Navigation to site ingest
     '''
     if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
         return render_template("login.html")
@@ -121,13 +121,25 @@ def navlzvingest():
         return render_template("login.html")
     return render_template("lzvingest.html")
 
+@APP.route('/review')
+def navlzvreview():
+    '''
+    Navigation to site review. Need to check auth for reviewer
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
+    if not check_user_permission_review(request.cookies['session_user']):
+        return render_template("index.html")
+    return render_template("lzvreview.html")
+
 @APP.route('/login', methods=['GET'])
 def navlogin():
     '''
     Navigation to login site
     '''
     return render_template("login.html")
-
 
 #----------------------Authenticate LDAP --------------------------------------
 def authenticate_ldap(uname, pword):
@@ -145,6 +157,15 @@ def authenticate_ldap(uname, pword):
     except ldap.LDAPError:
         connect.unbind_s()
         return False
+
+def check_user_permission_review(user_id):
+    '''
+        Check if user_id is in config file named under REVIEW_PERMITTED_USERS
+    '''
+    for val in  CONFIGPARAMS["REVIEW_PERMITTED_USERS"]:
+        if val == user_id:
+            return True
+    return False
 
 def create_sessionid():
     '''
@@ -812,12 +833,7 @@ def create_zip_from_files(download_meta, filename):
             elif ele["elementType"] == "IMAGE":
                 tmp_path_file.write_bytes(response.content)
             absname = str(tmp_path_file.resolve())
-            if DEBUG:
-                print("writing in zip file")
             zip_file.write(absname, arcname=filename)
-            if DEBUG:
-                print("finished writing in zip file")
-                print("removing file")
             try:
                 tmp_path_file.unlink()
             except FileNotFoundError:
@@ -853,16 +869,10 @@ def get_user_stored_metadata():
           + user_id
     token = authenticate_couchdb()
     if not token:
-        if DEBUG:
-            print("Auth to couchDB not successfull. Returning")
         return ''
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
-    if DEBUG:
-        print("trying to get metadata for user with url: " + url)
-        print(headers)
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        # if DEBUG:
         return response.text
     return ''
 
@@ -881,12 +891,59 @@ def store_user_metadata():
           + user_id
     token = authenticate_couchdb()
     if not token:
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    response = requests.put(url, headers=headers, data=json.loads(request.get_data()))
+    if response:
+        return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error Storing file'}), 500, {'Content-Type' : 'application/json'}
+
+@APP.route('/ingest/user', methods=['GET'])
+def get_user_stored_ingests():
+    '''
+        Routed from /ingest/user GET
+        Gets the stored ingests for the requesting user
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBIngestsDatabaseName"] + "/"\
+          + user_id
+    token = authenticate_couchdb()
+    if not token:
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    response = requests.get(url, headers=headers)
+    if DEBUG:
+        print("reponse.text")
+        print(response.text)
+    if response.status_code == 200:
+        return response.text
+    return json.dumps({'Result' : 'Internal Error'}), 500, {'Content-Type' : 'application/json'}
+
+@APP.route('/ingest/user', methods=['PUT'])
+def store_user_ingests():
+    '''
+        Routed from /ingest/user PUT
+        Stores an updated ingests for the user, version managing is done on client side
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBIngestsDatabaseName"] + "/"\
+          + user_id
+    token = authenticate_couchdb()
+    if not token:
         if DEBUG:
             print("Auth to couchDB not successfull. Returning")
         return ''
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
     if DEBUG:
-        print("trying to put metadata for user with url: " + url)
+        print("trying to put ingests for user with url: " + url)
         print(headers)
         print("data:")
         print(json.loads(request.get_data()))
@@ -900,7 +957,7 @@ def submit_user_ingest_to_review():
     '''
         User Ingest provided in data is submitted to the lzv process. We need to safe the submitted
         ingest in a seperate db so it cant be deleted since we need to verify to always have access
-        to the provided data. Ingests are first stored in a review
+        to the provided data. Ingests are first stored in a review database. after review 
     '''
     if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
@@ -908,8 +965,6 @@ def submit_user_ingest_to_review():
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     token = authenticate_couchdb()
     if not token:
-        if DEBUG:
-            print("Auth to couchDB not successfull. Returning")
         return json.dumps({'Result' : 'Internal Server Error'}), 500,\
                           {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
@@ -917,35 +972,75 @@ def submit_user_ingest_to_review():
     ingest = json.loads(request.get_data())
     ingest_review_path = CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"] + "/content/"
     ingest['user_id'] = user_id
-    print("---")
-    print(json.dumps(ingest))
     for ingest_element in ingest['content']:
-        print("ingest_element:---")
-        print(json.dumps(ingest_element))
         version = search_for_version(storage_file, ingest_element['version_id'])
         if version is not None:
-            filename = version['entry_title'] + '-'\
-            + version['version']['versionID']
-            # print("version:---")
-            # print(json.dumps(version))
+            filename = version['entry_title'] + '-' + version['version']['versionID']
             download_files_to_path(ingest_review_path, filename, version['version'])
-            ingest_element['path'] = filename
+            ingest_element['path'] = ingest_review_path + filename
         else:
             if DEBUG:
                 print("didnt find version in storage File")
     #store a file in the database for review
-    couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBIngestsDatabaseName"]\
-        + "/" + ingest['ingest_id']
+    couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/"\
+                  + CONFIGPARAMS["couchDBIngestReviewDatabaseName"] + "/" + ingest['ingest_id']
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
     if DEBUG:
         print("trying to submit ingest for user with url: " + couchdb_url)
         print(headers)
         print("ingest:")
         print(json.dumps(ingest))
-    response = requests.put(couchdb_url, headers=headers, data=ingest)
+    response = requests.put(couchdb_url, headers=headers, data=json.dumps(ingest))
+    print(response.text)
     if response:
         return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
     return json.dumps({'Result' : 'Error Storing ingest'}), 500,\
+                      {'Content-Type' : 'application/json'}
+
+def query_review_db(query):
+    '''
+        Query the review Couch db with given query json object and return the result
+    '''
+    token = authenticate_couchdb()
+    if not token:
+        return json.dumps({'Result' : 'Internal Server Error'}), 500,\
+                          {'Content-Type' : 'application/json'}
+    couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/"\
+                  + CONFIGPARAMS["couchDBIngestReviewDatabaseName"] + "/_find"
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    response = requests.post(couchdb_url, headers=headers, data=json.dumps(query))
+    return response
+
+@APP.route("/ingest/toreview", methods=['GET'])
+def get_toreview_ingests():
+    '''
+        get Ingests which need to be reviewed. Review permission is checked before returning
+         information. if no permission is available for review 401 is returned.
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_user_permission_review(request.cookies['session_user']):
+        return {'Error' : "NOT AUTHORIZED FOR REVIEW"}, 401, {'Content-Type' : 'application/json'}
+    query = {"selector": {"state": "REVIEW"}}
+    response = query_review_db(query)
+    return response
+
+@APP.route("/ingest/submitted", methods=['GET'])
+def get_submitted_ingests():
+    '''
+        Get the submitted ingests for user from database
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    query = {"selector": {"user_id": request.cookies['session_user']}}
+    response = query_review_db(query)
+    if response:
+        return response.text
+    return json.dumps({'Result' : 'Error requesting submitted ingests'}), 500,\
                       {'Content-Type' : 'application/json'}
 
 def download_files_to_path(path, element_name, version):

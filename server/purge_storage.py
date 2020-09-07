@@ -2,6 +2,7 @@
     Script for purging the storageFile couchDB for testing purposes
 '''
 import json
+import sys
 import requests
 #baseURL of labFolder
 # CONFIGPARAMS["labFolderBaseURL"] = 'https://eln.labfolder.com/api/v2'
@@ -48,24 +49,29 @@ def authenticate_couchdb():
     return False
 
 
-def purge_storage_file():
+def purge_database(database_name):
     '''
         Purges the storage file
     '''
     token = authenticate_couchdb()
     if not token:
         return
-    purge_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + "/" + "_purge"
+    purge_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + database_name + "/" + "_purge"
     print(purge_url)
-    get_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + "/" + DEVUSER_ID
+    get_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + database_name + "/_all_docs"
     print(get_url)
     couch_header = {"Accept": "application/json",
                     "Content-Type" : "application/json",
                     "Cookie" :  token}
     rev_response = json.loads(requests.get(get_url, headers=couch_header).text)
+    print(json.dumps(rev_response))
     if not rev_response:
         print("Error geting revision info")
-    data = {DEVUSER_ID : [rev_response["_rev"]]}
+    data = {}
+    for doc in rev_response['rows']:
+        data[doc['id']] = []
+        data[doc['id']].append(doc['value']['rev'])
+    print(json.dumps(data))
     response = requests.post(purge_url, headers=couch_header, data=json.dumps(data))
     if response:
         print("succesfully purged with message: ")
@@ -76,4 +82,7 @@ def purge_storage_file():
 
 
 if __name__ == '__main__':
-    purge_storage_file()
+    if len(sys.argv) == 2:
+        purge_database(str(sys.argv[1]))
+    else:
+        print("usage: purge_storage.py <database_name>")

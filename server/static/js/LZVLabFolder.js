@@ -77,7 +77,6 @@ function downloadSelectedElements() {
 	}
 } 
 
-
 $("#selectAllElements").click(function(){
 	var childrenDiv = $('form[id=selectableEntries]').children();
 	for (var i = 0; i < childrenDiv.length; i++) {
@@ -88,7 +87,6 @@ $("#selectAllElements").click(function(){
 			}
 		}
 	}
-
 })
 
 $("#deSelectAllElements").click(function(){
@@ -485,7 +483,7 @@ function downloadSelectedEntries() {
 			for (var i=0; i < ids.length; i++) {
 				if (entry.id == ids[i]) {
 					for (var k = 0 ; k < entry.elements.length; k++ ) {
-						let project = labFolderProjects.projects.find(proj=>proj.id == entry.projectID);	
+						let project = labFolderProjects.projects.find(proj=>proj.id == entry.projectID);
 						var element = {
 							entryID: entry.id,
 							entryTitle: entry.title,
@@ -497,7 +495,7 @@ function downloadSelectedEntries() {
 							versionDate : entry.versionDate,
 							projectTitle : project.title
 						};
-						elements.push(element);	
+						elements.push(element);
 					}
 					
 				}
@@ -553,6 +551,6 @@ function downloadSelectedMDBCategories() {
 		xhttp.open('GET', url, false);
 		xhttp.setRequestHeader("Content-type", "application/json");
 		xhttp.setRequestHeader("Token", labFolderToken);
-		xhttp.send();	
+		xhttp.send();
 	}
 }

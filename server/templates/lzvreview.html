@@ -1,0 +1,32 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="col-md-2" id="sidebar">
+		<div id="toReviewIngests">
+			<button class="sidebarItem sidebarMainItem" id="toReviewIngestsToggle" onclick="toggleDisplayToReview(this);">Ingests to Review:</button><br>
+			<!-- <button class="sideBarItem sideBarSubItem" id="test">DC 1.1</button><br> -->
+			<div id="toReviewIngestsSubItems">
+			</div>
+		</div>
+		<div id="reviewedIngests">
+			<button class="sidebarItem sidebarMainItem" id="reviewedIngestsToggle" onclick="toggleDisplayReviewedIngests(this);">Reviewed Ingests <span class="arrow">v</span></button><br>
+		<div id="reviewedIngestsSubItems">
+			
+		</div>
+	</div>
+	</div>
+	<div class="col-md-8" id="mainpage">
+		<div id="metaDataMainForm"> 
+			<div id="metaDataFormHeader"></div>
+			<form id="metaDataForm">
+
+			</form>
+			<div id="metaDataFormFooter"></div>
+		</div>
+	</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static',     filename='js/LZVBase.js') }}"></script>
+<script src="{{ url_for('static',     filename='js/LZVReview.js') }}"></script>
+{% endblock %}
+	

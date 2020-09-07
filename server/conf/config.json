@@ -10,7 +10,9 @@
   "couchDBDocumentDatabaseName": "documents",
   "couchDBStaticDatabaseName": "static",
   "couchDBIngestsDatabaseName": "ingests",
+  "couchDBIngestReviewDatabaseName": "ingest_review",
   "METADATA_INFO_FILE": "/server/lzv/server/conf/metaDataSchemes.json",
   "LZV_REVIEW": "/lzv_ingest_review/",
-  "LZV_HOTFOLDER": "/lzv_hotfolder/"
+  "LZV_HOTFOLDER": "/lzv_hotfolder/",
+  "REVIEW_PERMITTED_USERS": ["bt303343", "btxxxxxx"]
 }

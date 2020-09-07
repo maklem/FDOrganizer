@@ -1,44 +1,13 @@
-//Initialization Function
-$( document ).ready(function() {
-	getMetaDataStructureInformation();
-	getMetaDataUserSets();
-	if(checkLZVLogin())
-	{
-		$('#logout_lzv').show();
-	}
-	// metaStruc = getLocalStorage("metaDataStructs");
-	// createFormForNewSchemeItem('DC1.1Mini')
-});
-
-var unsaved = false;
-
-$(":input").change(function(){ //triggers change in all input fields including text type
-    unsaved = true;
-});
-
-// Monitor dynamic inputs
-$(document).on('change', 'input, select', function(){ //triggers change in all input fields including text type
-    unsaved = true;
-});
-
-function unloadPage(){ 
-    if(unsaved){
-    	if(confirm("You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?")){}
-        else {
-        	return;
-        }
-    }
-}
-
-function getMetaDataStructureInformation(){
+function getMetaDataStructureInformation(updateSideBar = true){
 	var url = baseURL +  '/metadata/structures';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
 				setLocalStorage("metaDataStructs", JSON.stringify(parsedJSON));
-				setLocalStorage("test", JSON.stringify(parsedJSON));
-				updateSideBarMetaSchemes(parsedJSON);	
+				if(updateSideBar) {
+					updateSideBarMetaSchemes(parsedJSON);	
+				}
 			}
 		}
 	}
@@ -47,7 +16,7 @@ function getMetaDataStructureInformation(){
 	xhttp.send();	
 }
 
-function getMetaDataUserSets() {
+function getMetaDataUserSets(updateSideBar = true) {
 	var url = baseURL +  '/metadata/user';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
@@ -55,7 +24,9 @@ function getMetaDataUserSets() {
 				if (xhttp.response != "") {
 					parsedJSON =  JSON.parse(xhttp.response);
 					setLocalStorage("metaDataUserSets", JSON.stringify(parsedJSON));
-					updateSideBarUserSets(parsedJSON);
+					if(updateSideBar) {
+						updateSideBarUserSets(parsedJSON);
+					}
 				}
 			}
 		}
@@ -70,7 +41,7 @@ function sendUserMetaSetsToServer() {
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
-				getMetaDataUserSets();
+				getMetaDataUserSets(true);
 			}
 		}
 	}
@@ -79,11 +50,17 @@ function sendUserMetaSetsToServer() {
 	xhttp.send(JSON.stringify(getLocalStorage("metaDataUserSets")));
 }
 
+function searchMetaDataUserSetsByID(id) {
+	var c_str = getLocalStorage("metaDataUserSets");
+	cookieData = JSON.parse(c_str);
+	return cookieData.user_sets.find(set=>set.set_id == id);
+}
 
 function getActiveMetaDataSet() {
 	var saveData = {};
 	var formHeaderFields = $('#metaDataFormHeader');
 	var formFieldsInput = $('#metaDataForm').find('input, select'); 
+	console.log(formHeaderFields);
 	saveData.name = formHeaderFields.find('input')[0].value;
 	saveData.identifier = formHeaderFields.find('#title').attr('name');
 	saveData.set_id = formHeaderFields.find('#title').attr('set_id');
@@ -410,6 +387,7 @@ function updateSideBarMetaSchemes(metaStruc) {
 }
 
 function updateSideBarUserSets(userSets){
+	console.log("updateSideBarUserSets");
 	$('#myItemsSubItems').empty();
 	var append = '';
 	for (set of userSets.user_sets) {

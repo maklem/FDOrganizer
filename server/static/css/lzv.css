@@ -280,6 +280,23 @@ img.avatar {
   padding: 16px;
 }
 
+/*overlay (popup form)*/
+#popupForm {
+    display: none;
+    position: fixed;
+    top: 200px;
+    left: 300px;
+    width: 80%;
+    height: 70%;
+    border-style: solid;
+    border-color: #ccc;
+    border-radius: 5px;
+    background-color: #eee;
+    filter:alpha(opacity=50);
+    z-index: 10000;
+    overflow-y: scroll;
+}
+
 /*Checkboxes styles*/
 .selections input[type="checkbox"] { display: none; }
 
@@ -501,9 +518,15 @@ select{
   padding-left: -10px;*/
 }
 
+
 .metaFormUIField .duplicateMetaButton {
   background-color: var(--main_button_color);
-  
+  margin-left: 2px;
+}
+
+.metaFormUIField .openMetaPopup {
+  background-color: var(--main_button_color);
+  margin-left: 2px;
 }
 
 .metaFormUIField .removeMetaFieldButton {
@@ -516,4 +539,22 @@ select{
 
 input:required:invalid, select:required:invalid {
   box-shadow: inset 0px 0px 3px rgba(255, 0, 0, 0.85);
+}
+
+.staticFormContent {
+  width: 100%;
+}
+
+.staticText {
+
+}
+
+table, th, td {
+  border: 1px solid #bbbbbb;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
 }
