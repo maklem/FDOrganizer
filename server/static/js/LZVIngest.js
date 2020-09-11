@@ -5,7 +5,6 @@ $( document ).ready(function() {
 	}
 	getStorageFile();
 	var flat_storage = convertStorageFileToFlat();
-	console.log(flat_storage);
 	setLocalStorage("labFolderStorageFileFlat", JSON.stringify(flat_storage));
 	getMetaDataStructureInformation(false);
 	getMetaDataUserSets(false);
@@ -36,7 +35,7 @@ function getUserIngests() {
 				}
 			}
 		}
-	}
+	};
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send();
@@ -51,7 +50,7 @@ function getStorageFile() {
 				setLocalStorage("labFolderStorageFile", JSON.stringify(labFolderStorageFile));
 			}
 		}
-	}
+	};
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send();
@@ -69,7 +68,7 @@ function getSubmittedIngests() {
 				}
 			}
 		}
-	}
+	};
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send();
@@ -99,7 +98,7 @@ function sendUserIngestsToServer() {
 				updateSideBarUserIngests(JSON.parse(getLocalStorage("userIngests")));
 			}
 		}
-	}
+	};
 	xhttp.open('PUT', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send(JSON.stringify(getLocalStorage("userIngests")));
@@ -109,8 +108,8 @@ function updateSideBarSubmittedIngests(submittedIngests)  {
 	$('#submittedItemsSubItems').empty();
 	var append = '';
 	if (submittedIngests) {
-	for (ingest of submittedIngests) {
-		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet sideBarSubmittedItems" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(this);">' + ingest.name + '</button>';
+	for (var ingest of submittedIngests) {
+		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet sideBarSubmittedItems" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(' + ingest.ingest_id + ');">' + ingest.name + '</button>';
 		append += '</div>';
 	}
 	$(append).appendTo('#submittedItemsSubItems');
@@ -121,11 +120,11 @@ function updateSideBarUserIngests(userIngests) {
 	$('#myItemsSubItems').empty();
 	var append = '';
 	if (userIngests.user_sets) {
-	for (ingest of userIngests.user_sets) {
+	for (var ingest of userIngests.user_sets) {
 		if (ingest.state == "NEW") {
-		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForExistingIngest(this);">' + ingest.name + '</button><div class="round-button">';
+		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForExistingIngest(' + ingest.ingest_id + ');">' + ingest.name + '</button><div class="round-button">';
 		// if(!ingest.state == "SUBMITTED") {
-			append += '<button class="btn deleteSetButton" ingest_id="'+ ingest.ingest_id + '" onclick="deleteIngest(this);"><span>-</span></button>';
+			append += '<button class="btn deleteSetButton" ingest_id="'+ ingest.ingest_id + '" onclick="deleteIngest(' + ingest.ingest_id + ');"><span>-</span></button>';
 		// }
 		append += '</div></div>';
 		}
@@ -137,11 +136,10 @@ function updateSideBarUserIngests(userIngests) {
 //TODO This function is probably an entry for unwanted manipulation. This need to be checked: Users should only be able to delete ingests 
 //which are not submitted yet (or else we would lose data). alternatively we dont "store" submitted user ingests on the same place, but in
 //a seperate database and gather data for the sidebar from 2 playes (one which is modifyable, one which is fixed)
-function deleteIngest(clicked) {
+function deleteIngest(clicked_id) {
 	// if(!submitted) {
 	if(confirm("Are you sure that you want to delete this Ingest? This can not be undone!")) {
-		clickedID = $(clicked).attr('ingest_id');
-		deleteIngestFromStorage(clickedID);
+		deleteIngestFromStorage(clicked_id);
 	}
 	// }
 }
@@ -171,7 +169,7 @@ function createFormForNewIngest(){
 	fillIngestForm();
 }
 
-function createFormForExistingIngest(clicked) {
+function createFormForExistingIngest(clicked_id) {
     if(unsaved){
     	if(confirm("You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?")){}
         else {
@@ -179,14 +177,11 @@ function createFormForExistingIngest(clicked) {
         }
     }
     closeMetaPopup();
-	// userSets= JSON.parse(getLocalStorage("userIngests"));
-	clicked_set_id = $(clicked).attr('id');
-    var user_set = searchUserIngestsByID(clicked_set_id);
-	// var user_set = userSets.user_sets.find(set=>set.ingest_id == clicked_set_id);
+    var user_set = searchUserIngestsByID(clicked_id);
 	fillIngestForm(user_set);
 }
 
-function createFormForSubmittedIngest(clicked) {
+function createFormForSubmittedIngest(clicked_id) {
 	    if(unsaved){
     	if(confirm("You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?")){}
         else {
@@ -195,8 +190,7 @@ function createFormForSubmittedIngest(clicked) {
     }
     closeMetaPopup();
 	userSets= JSON.parse(getLocalStorage("submittedIngests"));
-	clicked_set_id = $(clicked).attr('id');
-	var user_set = userSets.find(set=>set.ingest_id == clicked_set_id);
+	var user_set = userSets.find(set=>set.ingest_id == clicked_id);
 	fillSubmittedIngestForm(user_set);
 }
 
@@ -205,20 +199,20 @@ function fillSubmittedIngestForm(userInputSet) {
 	var headerHTML = '<div id="title" ingest_id="'+ userInputSet.ingest_id +'" name="ingestTitle">Submitted Ingest</div><hr>';
 	headerHTML += '<div class="staticFormContent orig">';
 	headerHTML += '<div class="staticText">Name of Ingest: ' + userInputSet.name + '</div>';
-	headerHTML += '<div class="staticText">Ingest Metadata: '+ userInputSet.metadata.name +'</div>'
-	headerHTML += '<div class="staticText">State: '+ userInputSet.state +'</div>'
+	headerHTML += '<div class="staticText">Ingest Metadata: '+ userInputSet.metadata.name +'</div>';
+	headerHTML += '<div class="staticText">State: '+ userInputSet.state +'</div>';
 	var date = new Date(userInputSet.ingest_metadata.submit_date);
 	var formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-	headerHTML += '<div class="staticText">Submission Date: '+ formatted_date +'</div>'
+	headerHTML += '<div class="staticText">Submission Date: '+ formatted_date +'</div>';
 	if(userInputSet.ingest_metadata.review_date !== undefined) {
 		date = new Date(userInputSet.ingest_metadata.review_date);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		headerHTML += '<div class="staticText">Review Date: '+ formatted_date +'</div>'
+		headerHTML += '<div class="staticText">Review Date: '+ formatted_date +'</div>';
 	}
 	if(userInputSet.ingest_metadata.ingest_date !== undefined) {
 		date = new Date(userInputSet.ingest_metadata.ingest_date);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		headerHTML += '<div class="staticText">Ingest Date: '+ formatted_date +'</div>'
+		headerHTML += '<div class="staticText">Ingest Date: '+ formatted_date +'</div>';
 	}
 	headerHTML += '</div><hr>';
 	$('#ingestFormHeader').empty();
@@ -228,8 +222,8 @@ function fillSubmittedIngestForm(userInputSet) {
 	inputHTML += '<div class="staticFormContent orig"><table><tr><th>Content</th><th>Metadata</th></tr>';
 	for (var i = 0; i < userInputSet.content.length; i++) {
 		var con = userInputSet.content[i];
-		var date = new Date(con.version_data.entry_version_date);
-		var formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+		date = new Date(con.version_data.entry_version_date);
+		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 		inputHTML += '<tr><td>' + con.version_data.entry_title+' - ' + formatted_date +'</td>';
 		if (con.metadata_userset !== undefined) {
 			inputHTML += '<td>' + con.metadata_userset.name + '</td>';
@@ -267,8 +261,8 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	var mdUserSets = getLocalStorage("metaDataUserSets");
 	var metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
 	headerHTML += '<div class="metaFormUIField"><input required name="ingestName" type="text" value="' + title + '"></div>';
+	var mdUserSetsJSON= JSON.parse(mdUserSets);
 	if(mdUserSets != '') {
-		var mdUserSetsJSON = JSON.parse(mdUserSets);
 		headerHTML += '<select required name="ingest_header_metadata">\n';
 		headerHTML += '<option selected value=""></option>';
 		for (var j=0; j<mdUserSetsJSON.user_sets.length; j++){
@@ -283,8 +277,8 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	var inputHTML = '';
 	inputHTML += '<div class="metaFormElement"><label class="formDescriptor" for="ingest_content">';
 	inputHTML += '<div class="metaFieldName">Data Set</div><div class="metaFieldDescription">Subtext</div></label>';
+	var lfStorageJSON = JSON.parse(lfStorage);
 	if( lfStorage != '' && mdUserSets != '') {
-		var lfStorageJSON = JSON.parse(lfStorage);
 		inputHTML += '<div class="metaFormUIField metaFormCVField orig">';
 		if (lfStorageJSON.length == 0){
 			inputHTML += "No Data Sets have been created yet. Please create data packages before creating a lzv ingest!";
@@ -317,7 +311,7 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 		}
 	}
 	if (lfStorageJSON.length > 0 && mdUserSetsJSON.user_sets.length > 0){
-	inputHTML += '<button type="button" class="duplicateMetaButton" id="ingest_content" onclick="duplicateIngestField(this);">+</button>';
+		inputHTML += '<button type="button" class="duplicateMetaButton" id="ingest_content" onclick="duplicateIngestField(this);">+</button>';
 	}
 	inputHTML += '</div>';
 	$(inputHTML).appendTo('#ingestForm');
@@ -549,7 +543,7 @@ function submitIngest() {
 				getSubmittedIngests();
 			}
 		}
-	}
+	};
 	// var metaSets = JSON.parse(getLocalStorage("metaDataUserSets"));
 	// var data = JSON.parse(getLocalStorage("labFolderStorageFile"));
 	var payload = getActiveIngest();

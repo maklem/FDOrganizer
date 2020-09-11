@@ -10,7 +10,7 @@ function getMetaDataStructureInformation(updateSideBar = true){
 				}
 			}
 		}
-	}
+	};
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send();	
@@ -30,7 +30,7 @@ function getMetaDataUserSets(updateSideBar = true) {
 				}
 			}
 		}
-	}
+	};
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send();
@@ -44,7 +44,7 @@ function sendUserMetaSetsToServer() {
 				getMetaDataUserSets(true);
 			}
 		}
-	}
+	};
 	xhttp.open('PUT', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send(JSON.stringify(getLocalStorage("metaDataUserSets")));
@@ -68,7 +68,7 @@ function getActiveMetaDataSet() {
 	for (var i = 0; i <formFieldsInput.length; i++) {
 		var field = formFieldsInput[i];
 		if(field.value) {
-			var name = field.name
+			var name = field.name;
 			var saveDataField = saveData.fields.find(f=>f.field_name == name);
 			if (saveDataField) {
 				saveDataField.values.push(field.value);
@@ -300,8 +300,8 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 	footerHTML += '</div>';
 	$(footerHTML).appendTo('#metaDataFormFooter');
 	if (hasUserInput) { //fill fields with values from user field
-		for(var i = 0; i < userInputSet.fields.length; i++) {
-			var field = userInputSet.fields[i];
+		for(var k = 0; k < userInputSet.fields.length; k++) {
+			var field = userInputSet.fields[k];
 			var input = $('#metaDataForm').find('input[name=' + field.field_name +  ']');
 			if (input.length>0){
 				input.attr('value',field.values[0]);
@@ -310,8 +310,8 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 				var select = $('#metaDataForm').find('select[name=' + field.field_name +  ']');
 				select.val(field.values[0]);
 			}
-			for( var j = 1; j < field.values.length; j++){
-				duplicateMetaDataField($('#metaDataForm').find('input[name=' + field.field_name +  '], select[name=' + field.field_name +  ']').siblings('button'), field.values[j]);
+			for( var l = 1; l < field.values.length; l++){
+				duplicateMetaDataField($('#metaDataForm').find('input[name=' + field.field_name +  '], select[name=' + field.field_name +  ']').siblings('button'), field.values[l]);
 			}
 		}
 	}
@@ -378,7 +378,7 @@ function updateSideBar() {
 function updateSideBarMetaSchemes(metaStruc) {
 	$('#newItemsSubItems').empty();
 	var append = '';
-	for (scheme of metaStruc.schemes) {
+	for (var scheme of metaStruc.schemes) {
 		if(scheme.active){
 		append += '<button class="sidebarItem sidebarSubItem" id="' + scheme.identifier + '" onclick="createFormForNewSchemeItem(this);">' + scheme.title + ' ' + scheme.version + '</button><br>';
 	}
@@ -390,7 +390,7 @@ function updateSideBarUserSets(userSets){
 	console.log("updateSideBarUserSets");
 	$('#myItemsSubItems').empty();
 	var append = '';
-	for (set of userSets.user_sets) {
+	for (var set of userSets.user_sets) {
 		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + set.set_id + '" onclick="createFormForExistingSchemeSet(this);">' + set.name + '</button><div class="round-button"><button class="btn deleteSetButton" set_id="'+ set.set_id + '" onclick="deleteMetaDataSet(this);"><span>-</span></button></div></div>';
 	}
 	$(append).appendTo('#myItemsSubItems');

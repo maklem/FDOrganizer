@@ -85,7 +85,7 @@ function logout_lzv() {
           window.location.reload(true);
         }
       }
-    }
+    };
     xhttp.open('POST', url, false);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
@@ -96,11 +96,11 @@ function convertStorageFileToFlat() {
   var storage_file = getLocalStorage("labFolderStorageFile");
   var flat_storage = [];
   storage_file = JSON.parse(storage_file);
-  for (project of storage_file.projects) {
-    for (entry of project.entries) {
-      for (entry_version of entry.versions) {
-        for (element of entry_version.elements) {
-          for (element_version of element.versions) {
+  for (var project of storage_file.projects) {
+    for (var entry of project.entries) {
+      for (var entry_version of entry.versions) {
+        for (var element of entry_version.elements) {
+          for (var element_version of element.versions) {
             var append = {
               "project_id" : project.projectID,
               "project_title" : project.projectTitle,
@@ -113,7 +113,7 @@ function convertStorageFileToFlat() {
               "element_version_id" : element_version.versionID,
               "element_version_couchdb_doc_id" : element_version.couchdb_doc_id,
               "element_version_couchdb_doc_item_att_name" : element_version.couchdb_doc_item_att_name
-            }
+            };
             flat_storage.push(append);
           }
         }
