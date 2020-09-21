@@ -109,8 +109,9 @@ function updateSideBarSubmittedIngests(submittedIngests)  {
 	var append = '';
 	if (submittedIngests) {
 	for (var ingest of submittedIngests) {
-		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet sideBarSubmittedItems" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(' + ingest.ingest_id + ');">' + ingest.name + '</button>';
-		append += '</div>';
+		console.log(ingest.ingest_id)
+		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet sideBarSubmittedItems" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(this);">' + ingest.name + '</button></div>';
+
 	}
 	$(append).appendTo('#submittedItemsSubItems');
 	}
@@ -122,10 +123,8 @@ function updateSideBarUserIngests(userIngests) {
 	if (userIngests.user_sets) {
 	for (var ingest of userIngests.user_sets) {
 		if (ingest.state == "NEW") {
-		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForExistingIngest(' + ingest.ingest_id + ');">' + ingest.name + '</button><div class="round-button">';
-		// if(!ingest.state == "SUBMITTED") {
-			append += '<button class="btn deleteSetButton" ingest_id="'+ ingest.ingest_id + '" onclick="deleteIngest(' + ingest.ingest_id + ');"><span>-</span></button>';
-		// }
+		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForExistingIngest(this);">' + ingest.name + '</button><div class="round-button">';
+		append += '<button class="btn deleteSetButton" id="' + ingest.ingest_id + '" onclick="deleteIngest(this);"><span>-</span></button>';
 		append += '</div></div>';
 		}
 	}
@@ -136,9 +135,10 @@ function updateSideBarUserIngests(userIngests) {
 //TODO This function is probably an entry for unwanted manipulation. This need to be checked: Users should only be able to delete ingests 
 //which are not submitted yet (or else we would lose data). alternatively we dont "store" submitted user ingests on the same place, but in
 //a seperate database and gather data for the sidebar from 2 playes (one which is modifyable, one which is fixed)
-function deleteIngest(clicked_id) {
+function deleteIngest(clicked) {
 	// if(!submitted) {
 	if(confirm("Are you sure that you want to delete this Ingest? This can not be undone!")) {
+		clicked_id = $(clicked).attr('id');
 		deleteIngestFromStorage(clicked_id);
 	}
 	// }
@@ -169,7 +169,7 @@ function createFormForNewIngest(){
 	fillIngestForm();
 }
 
-function createFormForExistingIngest(clicked_id) {
+function createFormForExistingIngest(clicked) {
     if(unsaved){
     	if(confirm("You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?")){}
         else {
@@ -177,12 +177,13 @@ function createFormForExistingIngest(clicked_id) {
         }
     }
     closeMetaPopup();
+    var clicked_id = $(clicked).attr('id');
     var user_set = searchUserIngestsByID(clicked_id);
 	fillIngestForm(user_set);
 }
 
-function createFormForSubmittedIngest(clicked_id) {
-	    if(unsaved){
+function createFormForSubmittedIngest(clicked) {
+	if(unsaved){
     	if(confirm("You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?")){}
         else {
         	return;
@@ -190,12 +191,12 @@ function createFormForSubmittedIngest(clicked_id) {
     }
     closeMetaPopup();
 	userSets= JSON.parse(getLocalStorage("submittedIngests"));
+	var clicked_id = $(clicked).attr('id');
 	var user_set = userSets.find(set=>set.ingest_id == clicked_id);
 	fillSubmittedIngestForm(user_set);
 }
 
 function fillSubmittedIngestForm(userInputSet) {
-	console.log(JSON.stringify(userInputSet));
 	var headerHTML = '<div id="title" ingest_id="'+ userInputSet.ingest_id +'" name="ingestTitle">Submitted Ingest</div><hr>';
 	headerHTML += '<div class="staticFormContent orig">';
 	headerHTML += '<div class="staticText">Name of Ingest: ' + userInputSet.name + '</div>';
@@ -224,7 +225,7 @@ function fillSubmittedIngestForm(userInputSet) {
 		var con = userInputSet.content[i];
 		date = new Date(con.version_data.entry_version_date);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		inputHTML += '<tr><td>' + con.version_data.entry_title+' - ' + formatted_date +'</td>';
+		inputHTML += '<tr><td>' + con.version_data.entry_title +' - ' + formatted_date +'</td>';
 		if (con.metadata_userset !== undefined) {
 			inputHTML += '<td>' + con.metadata_userset.name + '</td>';
 		}
