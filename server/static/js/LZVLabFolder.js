@@ -16,15 +16,15 @@ $( document ).ready(function() {
 //contains the entries of the loged in user from labfolder, these are stored in cookies with same name
 var labFolderEntries = {
 	entries: Array()
-}
+};
 
 var labFolderProjects = {
 	projects: Array()
-}
+};
 
 var labFolderMDB = {
 	categories: Array()
-}
+};
 
 var labFolderStorageFile; //storage file on server, will be filled with json object containing the files already available on server
 
@@ -32,23 +32,23 @@ var labFolderStorageFile; //storage file on server, will be filled with json obj
 
 $("#logoutButton").click(function(){
 	logout();
-})
+});
+
 $("#getEntries").click(function(){
 	getEntries();	
-})
+});
 
 $("#downloadSelectedElements").click(function(){
 	downloadSelectedElements();
-})
+});
 
 $("#downloadMDB").click(function(){
 	downloadMDB();
-})
-
+});
 
 $("#getProjects").click(function(){
 	getProjects();
-})
+});
 
 function clearLocalStorage() {
 	labFolderEntries.entries = Array();
@@ -87,7 +87,7 @@ $("#selectAllElements").click(function(){
 			}
 		}
 	}
-})
+});
 
 $("#deSelectAllElements").click(function(){
 	var childrenDiv = $('form[id=selectableEntries]').children();
@@ -99,8 +99,7 @@ $("#deSelectAllElements").click(function(){
 			}
 		}
 	}
-
-})
+});
 
 $("#updateContent").click(function(){
 	setLocalStorage("labFolderProjects", "");
@@ -108,14 +107,14 @@ $("#updateContent").click(function(){
 	setLocalStorage("labFolderMDB", "");
 	setLocalStorage("labFolderStorageFile", "");
 	updateContentAfterLogin();
-})
+});
 
 //switch between (currently) Project and MaterialDB to select. Updates Projects and Materials to display
 function updateSelectionProjectMDB(clicked) {
 	if($(clicked).hasClass("selected")) { return;}
 	$(clicked).siblings().removeClass("selected");
 	$(clicked).addClass("selected");
-	displayProjectID = "";
+	display_project_id = "";
 	if($(clicked).hasClass("labFolderProject")) {
 		updateLabfolderSelectableProjects();
 		updateLabfolderSelectableElements();
@@ -139,14 +138,14 @@ function downloadVersion(clicked) {
 	window.open($(clicked).attr('id'));
 }
 //this var contains the current project ID which is used to filter the elements to display
-var displayProjectID = "";
+var display_project_id = "";
 
 //being called when another Project is clicked in the selection screen. Updates the globald project ID and calls update function
 function updateSelectedProject(clicked) {
 	if($(clicked).hasClass("selected")) { return;}
 	$(clicked).siblings().removeClass("selected");
 	$(clicked).addClass("selected");
-	displayProjectID = $(clicked).attr('id');
+	display_project_id = $(clicked).attr('id');
 	if($(clicked).hasClass("labFolderProject")) {
 		updateLabfolderSelectableElements();
 	}
@@ -188,7 +187,7 @@ function authenticate(form) {
 				}
 			}
 	}
-	}
+	};
 	var username = form.elements['username'].value;
 	var password = form.elements['pwd'].value;
 	if (username != '' && password != '') {
@@ -215,7 +214,7 @@ function logout() {
 
 				}
 	}
-}
+};
 	xhttp.open('POST', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Token", labFolderToken);
@@ -272,7 +271,7 @@ function getStorageFile() {
 				setLocalStorage("labFolderStorageFile", JSON.stringify(labFolderStorageFile));	
 			}
 		}
-	}
+	};
 
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
@@ -291,18 +290,18 @@ function getProjects() {
 				var project = {
 					title: obj['title'],
 					id: obj['id'],
-					ownerID: obj['owner_id'],
-					groupID: obj['group_id'],
-					folderID: obj['folder_id'],
+					owner_id: obj['owner_id'],
+					group_id: obj['group_id'],
+					folder_id: obj['folder_id'],
 					hidden: obj['hidden'],
-					creationDate: obj['creation_date'],
-					versionDate: obj['version_date']
+					creation_date: obj['creation_date'],
+					version_date: obj['version_date']
 				};
 				labFolderProjects.projects.push(project);
 			}
 		}
 	}
-}
+};
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Token", labFolderToken);
@@ -315,36 +314,37 @@ function getEntries() {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				var parsedData = JSON.parse(xhttp.response);
-				labFolderEntries.entries = new Array();
+				labFolderEntries.entries = [];
 				for (var i=0; i < parsedData.length; i++) {
 					var obj = parsedData[i];
 					var entry = {
 						elements: Array(),
 						title: obj['title'],
 						id: obj['id'],
-						projectID: obj['project_id'],
-						versionID: obj['version_id'],
-						authorID: obj['author_id'],
-						creationDate: obj['creation_date'],
-						versionDate: obj['version_date'],
-						entryNumber: obj['entry_number'],
+						project_id: obj['project_id'],
+						version_id: obj['version_id'],
+						author_id: obj['author_id'],
+						creation_data: obj['creation_date'],
+						version_date: obj['version_date'],
+						entry_number: obj['entry_number'],
 						hidden: obj['hidden'],
 						editable: obj['editable']
 					};
 					for (var j = 0; j < obj['elements'].length; j++) {
 						var ele = obj['elements'][j];
 						var element = {
-							elementID: ele['id'],
+							element_id: ele['id'],
 							type: ele['type'],
-							versionID: ele['version_id']
+							version_id: ele['version_id']
 						};
 						entry.elements.push(element);
 					}
-					labFolderEntries.entries.push(entry);				
+					labFolderEntries.entries.push(entry);
 				}
 			}
 	}
-}
+};
+
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Token", labFolderToken);
@@ -363,10 +363,10 @@ function getMDBCategories() {
 					var category = {
 						title: obj['title'],
 						id: obj['id'],
-						creatorID: obj['creator_id'],
-						creationDate: obj['creation_date'],
-						versionID: obj['version_id'],
-						versionDate: obj['version_date'],
+						creator_idID: obj['creator_id'],
+						creation_date: obj['creation_date'],
+						version_id: obj['version_id'],
+						version_date: obj['version_date'],
 						categories: Array()
 					};
 					labFolderMDB.categories.push(category);
@@ -390,12 +390,12 @@ function updateLabfolderSelectableProjects() {
 			displayProjectCount++;
 			append += '<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderProject" id="' + obj.id + '" name="' + obj.id + '"onclick="updateSelectedProject(this);">'
 			append += obj.title;
-			append += "</button>"
+			append += "</button>";
 		}
 	}
 	if (displayProjectCount > 0){
 		$("#labFolderProjectSelect").html(append);
-		$(".btnEntrySelectionProject").css("width", 100/displayProjectCount + "%")
+		$(".btnEntrySelectionProject").css("width", 100/displayProjectCount + "%");
 	}
 
 }
@@ -403,21 +403,22 @@ function updateLabfolderSelectableProjects() {
 function updateLabfolderSelectableElements() {
 	$('form[id=selectableEntries]').empty();
 	var append = '';
-	if (displayProjectID != "") {
-		let storageProject = labFolderStorageFile.projects.find(proj=>proj.projectID == displayProjectID);
+	if (display_project_id != "") {
+		let display_objects_storage = labFolderStorageFile.filter(proj=>proj.origin_metadata.project_id == display_project_id);
 		for (var i=0; i<labFolderEntries.entries.length; i++){
 			var obj = labFolderEntries.entries[i];
-			if (obj.hidden == false && obj.projectID == displayProjectID) {
-				var storageEntry;
-				if (storageProject){
-					storageEntry = storageProject.entries.find(entry=>entry.entryID == obj.id);
+			if (obj.hidden == false && obj.project_id == display_project_id) {
+				var storage_entry;
+				if (display_objects_storage){
+					storage_entry = display_objects_storage.filter(entry=>entry.origin_metadata.entry_id == obj.id);
 				}
+				var unique_entry_versions = storage_entry.map(item => item.origin_metadata.entry_version_id).filter((value, index, self) => self.indexOf(value) === index).length;
 				append += '<div><div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="' + obj.id + '" name="' + obj.id + '">';
 				append += '<label for="' + obj.id + '" class="selectLabel">' + obj.title; 
-				if (storageProject && storageEntry && storageEntry.versions.length > 0) {
+				if (display_objects_storage && storage_entry && unique_entry_versions > 0) {
 					append += '<span class="versionCounter"><button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);">';
-					append += storageEntry.versions.length + ' version';
-					if (storageEntry.versions.length > 1) {
+					append += unique_entry_versions + ' version';
+					if (unique_entry_versions > 1) {
 						append += 's ';
 					}
 					else {
@@ -428,13 +429,17 @@ function updateLabfolderSelectableElements() {
 				append += '</label>';
 				append += '</div>\n';
 				append += '<div class="versionList">';
-				if(storageEntry){
-					for (version of storageEntry.versions) {
-						date = new Date(version.versionDate);
+				if(unique_entry_versions > 0){
+					var done_versions = {};
+					for (var j = 0; j < storage_entry.length; j++) {
+						var entry_version_id = storage_entry[j].origin_metadata.entry_version_id;
+						if (done_versions[entry_version_id]) {continue;}
+						done_versions[entry_version_id] = true;
+						date = new Date(storage_entry[j].origin_metadata.entry_version_date);
 						let formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 						append += '<div class="versionDetail"><span>';
 						append += formatted_date;
-						var dlurl = baseURL + '/labfolder/download?project_id=' + displayProjectID + '&entry_id=' + obj.id + '&entry_version_id=' + version.versionID;
+						var dlurl = baseURL + '/labfolder/download?project_id=' + display_project_id + '&entry_id=' + obj.id + '&entry_version_id=' + storage_entry[j].origin_metadata.entry_version_id;
 						append += '</span><button type="button" class="expandVersionButton" id="' + dlurl + '" + onclick="downloadVersion(this);">Download</button></div>';
 					}
 				}
@@ -469,7 +474,7 @@ function updateLabfolderSelectableCategories() {
 
 function downloadSelectedEntries() {
 	//first get ids to download, then do that
-	var ids = new Array(); //ids for entry which will be downloaded
+	var ids = []; //ids for entry which will be downloaded
 	var form = $('form[id=selectableEntries]')[0];
 	for (var i = 0; i < form.elements.length; i++) {
 		if(form.elements[i].checked){
@@ -477,23 +482,24 @@ function downloadSelectedEntries() {
 		}
 	}
 	if(ids.length > 0) {
-		var elements = new Array(); //these are to single elements to be downloaded later
+		var elements = []; //these are to single elements to be downloaded later
 		for (var j=0; j < labFolderEntries.entries.length; j++) {
 			var entry = labFolderEntries.entries[j];
 			for (var i=0; i < ids.length; i++) {
 				if (entry.id == ids[i]) {
 					for (var k = 0 ; k < entry.elements.length; k++ ) {
-						let project = labFolderProjects.projects.find(proj=>proj.id == entry.projectID);
+						let project = labFolderProjects.projects.find(proj=>proj.id == entry.project_id);
 						var element = {
-							entryID: entry.id,
-							entryTitle: entry.title,
-							projectID: entry.projectID,
-							elementID: entry.elements[k].elementID,
-							elementType: entry.elements[k].type,
-							versionID : entry.elements[k].versionID,
-							entryVersionID: entry.versionID,
-							versionDate : entry.versionDate,
-							projectTitle : project.title
+							project_id: entry.project_id,
+							project_title : project.title,
+							entry_id: entry.id,
+							entry_title: entry.title,
+							entry_hidden : entry.hidden,
+							entry_version_date : entry.version_date,
+							entry_version_id: entry.version_id,
+							element_id: entry.elements[k].element_id,
+							element_type: entry.elements[k].type,
+							element_version_id : entry.elements[k].version_id
 						};
 						elements.push(element);
 					}
@@ -513,9 +519,7 @@ function downloadSelectedEntries() {
 						console.log("Fehler: Bitte ID mitgeben!");
 					}
 				}
-			}
-
-
+			};
 			xhttp.open('POST', url, false);
 			xhttp.setRequestHeader("Content-type", "application/json");
 			xhttp.setRequestHeader("Token", labFolderToken);
@@ -545,8 +549,8 @@ function downloadSelectedMDBCategories() {
 				if(this.status == 400) {
 					alert("Fehler: Bitte ID mitgeben!");
 				}
-	}
-}
+			}
+		};
 		url = baseURL + "/labfolder/mdb/items?category_id=" + categoryIds[i];
 		xhttp.open('GET', url, false);
 		xhttp.setRequestHeader("Content-type", "application/json");
