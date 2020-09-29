@@ -321,7 +321,7 @@ def get_notebook_entries():
     response = requests.get(url, headers=headers)
     return response.text
 
-@APP.route('/labfolder/download', methods=['POST'])
+@APP.route('/labfolder/download', methods=['GET'])
 def download_file_to_client():
     '''
     Creates a zip File with the Entry requested by the user, and transfers the zip by HTTP.
@@ -331,13 +331,21 @@ def download_file_to_client():
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    data = request.get_data()
-    download_meta = []
-    for item in data:
-        query = {"owner" : request.cookies['session_user'], "id" : item['id']}
-        download_meta.append(
-            json.loads(query_db(query, CONFIGPARAMS['couchDBStorageDatabaseName']))
-            )
+    project_id = request.args.get('project_id')
+    entry_id = request.args.get('entry_id')
+    entry_version_id = request.args.get('entry_version_id')
+
+    query = {"selector": {"owner" : request.cookies['session_user'],
+                "data_object_metadata" : {
+                    "content_origin" : "labfolder"
+                },
+                "origin_metadata" : {
+                    "project_id" : project_id,
+                    "entry_id" : entry_id,
+                    "entry_version_id" : entry_version_id
+                }}}
+    download_meta = json.loads(query_db(query, CONFIGPARAMS['couchDBStorageDatabaseName']))['docs']
+    print("download meta:"+ json.dumps(download_meta))
     filename = request.cookies['session_user'] + "-" + time.strftime("%d-%m-%Y") + "-" \
                + time.strftime("%H:%M:%S") + ".zip"
     if len(download_meta) > 0:
@@ -361,10 +369,11 @@ def download():
     storage_metadata = []
     for item in json_data:
         storage_metadata.append(create_storage_data_structure_from_labfolder(user_id, item))
-    download_file_from_labfolder(storage_metadata)
-    package_objects = create_package_for_downloaded_data(user_id, storage_metadata)
-    storage_metadata.append(package_objects)
-    update_storage(storage_metadata)
+    if len(storage_metadata) > 0:
+        download_file_from_labfolder(storage_metadata)
+        package_objects = create_package_for_downloaded_data(user_id, storage_metadata)
+        storage_metadata.append(package_objects)
+        update_storage(storage_metadata)
     return APP.response_class(status=200, mimetype='application/json')    
 
 def create_package_for_downloaded_data(user_id, downloaded_sets):
@@ -375,13 +384,13 @@ def create_package_for_downloaded_data(user_id, downloaded_sets):
     #first get the uniques entry_ids
     tmp_dict = {}
     for obj in downloaded_sets:
-        tmp_dict[obj.entry_id] = obj
-    entry_ids = list(tmp_dict.keys())
+        tmp_dict[obj['origin_metadata']['entry_id']] = obj
+    search_entry_ids = list(tmp_dict.keys())
     #iterate through entry_ids and create package objects
     append = []
-    for entry_id in entry_ids:
+    for search_entry_id in search_entry_ids:
         append.append({
-            "id" : uuid.uuid4(),
+            "id" : str(uuid.uuid4()),
             "type" : "PACKAGE", 
             "owner" : user_id,
             "package_object_metadata" : {
@@ -390,7 +399,8 @@ def create_package_for_downloaded_data(user_id, downloaded_sets):
                 "creator" : user_id
             },
             "child_data_objects" :\
-            [x.id for x in downloaded_sets if x.origin_metadata.entry_id == entry_id]
+            [x['id'] for x in downloaded_sets if\
+             x['origin_metadata']['entry_id'] == search_entry_id]
             })
     return append
 
@@ -412,26 +422,26 @@ def create_storage_data_structure_from_labfolder(user_id, input_set):
         }
     '''
     return {
-        "id" : uuid.uuid4(),
+        "id" : str(uuid.uuid4()),
         "type" : "DATA", 
         "owner" : user_id,
         "data_object_metadata" : {
             "content_origin" : "labfolder",
-            "export_data" : time.strftime('%Y-%m-%dT%T.000+0000'),
+            "export_date" : time.strftime('%Y-%m-%dT%T.000+0000'),
             "export_user" : user_id,
             "is_stored" : False
         },
         "origin_metadata" : {
-            "project_id": input_set.project_id,
-            "project_title" : input_set.project_title,
-            "entry_id": input_set.entry_id,
-            "entry_title": input_set.entry_title,
-            "entry_version_id": input_set.entry_version_id,
-            "entry_version_date" : input_set.entry_version_date,
-            "entry_hidden" :input_set.entry_hidden,
-            "element_id": input_set.element_id,
-            "element_type": input_set.element_type,
-            "element_version_id" : input_set.element_version_id,
+            "project_id": input_set['project_id'],
+            "project_title" : input_set['project_title'],
+            "entry_id": input_set['entry_id'],
+            "entry_title": input_set['entry_title'],
+            "entry_version_id": input_set['entry_version_id'],
+            "entry_version_date" : input_set['entry_version_date'],
+            "entry_hidden" :input_set['entry_hidden'],
+            "element_id": input_set['element_id'],
+            "element_type": input_set['element_type'],
+            "element_version_id" : input_set['element_version_id'],
         }
         }
 
@@ -448,7 +458,7 @@ def download_file_from_labfolder(data_array):
     for element in data_array:
         if element["origin_metadata"]["element_type"] == 'IMAGE':
             file_info_url = CONFIGPARAMS["labFolderBaseURL"] \
-                            + '/elements/file/' + element["elementID"]
+                            + '/elements/file/' + element["origin_metadata"]["element_id"]
             file_url = file_info_url + '/download'
         elif element["origin_metadata"]["element_type"] == 'TABLE':
             file_url = CONFIGPARAMS["labFolderBaseURL"] + '/elements/table/'\
@@ -486,6 +496,7 @@ def download_file_from_labfolder(data_array):
              or element["origin_metadata"]["element_type"] == 'TEXT':
             file_data = ''
             file_info_reponse_jdata = json.loads(file_response.text)
+            print(file_response.text)
             if element["origin_metadata"]["element_type"] == 'TABLE':
                 file_name = file_info_reponse_jdata["title"]
                 sheets = file_info_reponse_jdata["content"]["sheets"]
@@ -493,7 +504,9 @@ def download_file_from_labfolder(data_array):
             else: #text
                 file_data = file_info_reponse_jdata["content"]
                 file_name = json_answer["id"]
-            couchdb_url = couchdb_url + file_name
+            print("filetype" + element["origin_metadata"]["element_type"])
+            print("filename:" + str(file_name))
+            couchdb_url = couchdb_url + str(file_name)
             couch_header["Content-Type"] = "text/plain"
             att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
             element["data_object_metadata"]["is_stored"] = bool(att_create_response)
@@ -615,16 +628,19 @@ def get_storage_file():
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    return get_labfolder_datastructure(user_id, return_as_string=True)
+    out = get_labfolder_datastructure(user_id, return_as_string=False)
+    return json.dumps(out['docs'])
 
 
 def get_labfolder_datastructure(user_id, return_as_string=False):
     '''
     Returns the storage file for @user_id either as (json)string or object.
     '''
-    query = {"owner": user_id, "type" : "DATA", "data_object_metadata.content_origin" : "labfolder"}
+    query = {"selector": {
+        "owner": user_id, "type" : "DATA",
+        "data_object_metadata.content_origin" : "labfolder"}}
     response = query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"])
-    return response.text if return_as_string else json.loads(response.text)
+    return response if return_as_string else json.loads(response)
 
 def update_storage(add_elements):
     '''
@@ -653,17 +669,17 @@ def remove_already_existing_tupel(user_id, check_elements):
     '''
     output = []
     for item in check_elements:
-        query = {"user_id": user_id,
-                 "origin_metadata" : {
-                     "project_id" : item["project_id"],
-                     "entry_id" : item["entry_id"],
-                     "entry_version_id" : item["entry_version_id"],
-                     "element_id" : item["element_id"],
-                     "element_version_id" : item["element_version_id"]
-                 }}
+        query = {"selector": {"owner": user_id,
+                              "origin_metadata" : {
+                                  "project_id" : item["project_id"],
+                                  "entry_id" : item["entry_id"],
+                                  "entry_version_id" : item["entry_version_id"],
+                                  "element_id" : item["element_id"],
+                                  "element_version_id" : item["element_version_id"]
+                }}}
         #if this reponse returns more hits than 1 the database is broken and we have duplicates
-        response = json.loads(query_db(query, CONFIGPARAMS["couchDBIngestReviewDatabaseName"]))
-        if response.execution_stats.results_returned == 0:
+        response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
+        if len(response['docs']) == 0:
             output.append(item)
     return output
 
@@ -831,7 +847,7 @@ def submit_user_ingest_to_review():
         return json.dumps({'Result' : 'Internal Server Error'}), 500,\
                           {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    storage_file = get_labfolder_datastructure(user_id)
+    storage_file = get_labfolder_datastructure(user_id).docs
     ingest = json.loads(request.get_data())
     ingest_review_path = CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"] + "/content/"
     ingest['user_id'] = user_id
@@ -862,7 +878,8 @@ def submit_user_ingest_to_review():
 
 def query_db(query, db_url_suffix):
     '''
-        Query the storage Couch db with given query json object and return the result
+        Query the storage Couch db with given query json object and return the result.
+        Retrns output of couchdb query as text, needs to be parsed by json parser to sue as object
     '''
     token = authenticate_couchdb()
     if not token:
@@ -872,7 +889,7 @@ def query_db(query, db_url_suffix):
                   + db_url_suffix + "/_find"
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
     response = requests.post(couchdb_url, headers=headers, data=json.dumps(query))
-    return response
+    return response.text
 
 @APP.route("/ingest/toreview", methods=['GET'])
 def get_toreview_ingests():
@@ -943,7 +960,7 @@ def download_files_to_path(path, element_name, version):
             elif ele["elementType"] == "IMAGE":
                 tmp_file.write_bytes(response.content)
 
-
+#TODO rework for new storage file structure
 def search_for_version(storage_file, version_id):
     '''
         searched in storage_file for a entry version with id version id. returns the version object.

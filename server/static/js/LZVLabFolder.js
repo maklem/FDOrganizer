@@ -284,18 +284,18 @@ function getProjects() {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 			var parsedData = JSON.parse(xhttp.response);
-			labFolderProjects.projects = new Array();
+			labFolderProjects.projects = [];
 			for (var i=0; i < parsedData.length; i++) {
 				var obj = parsedData[i];
 				var project = {
-					title: obj['title'],
-					id: obj['id'],
-					owner_id: obj['owner_id'],
-					group_id: obj['group_id'],
-					folder_id: obj['folder_id'],
-					hidden: obj['hidden'],
-					creation_date: obj['creation_date'],
-					version_date: obj['version_date']
+					title: obj.title,
+					id: obj.id,
+					owner_id: obj.owner_id,
+					group_id: obj.group_id,
+					folder_id: obj.folder_id,
+					hidden: obj.hidden,
+					creation_date: obj.creation_date,
+					version_date: obj.version_date
 				};
 				labFolderProjects.projects.push(project);
 			}
@@ -319,23 +319,23 @@ function getEntries() {
 					var obj = parsedData[i];
 					var entry = {
 						elements: Array(),
-						title: obj['title'],
-						id: obj['id'],
-						project_id: obj['project_id'],
-						version_id: obj['version_id'],
-						author_id: obj['author_id'],
-						creation_data: obj['creation_date'],
-						version_date: obj['version_date'],
-						entry_number: obj['entry_number'],
-						hidden: obj['hidden'],
-						editable: obj['editable']
+						title: obj.title,
+						id: obj.id,
+						project_id: obj.project_id,
+						version_id: obj.version_id,
+						author_id: obj.author_id,
+						creation_data: obj.creation_date,
+						version_date: obj.version_date,
+						entry_number: obj.entry_number,
+						hidden: obj.hidden,
+						editable: obj.editable
 					};
-					for (var j = 0; j < obj['elements'].length; j++) {
-						var ele = obj['elements'][j];
+					for (var j = 0; j < obj.elements.length; j++) {
+						var ele = obj.elements[j];
 						var element = {
-							element_id: ele['id'],
-							type: ele['type'],
-							version_id: ele['version_id']
+							element_id: ele.id,
+							type: ele.type,
+							version_id: ele.version_id
 						};
 						entry.elements.push(element);
 					}
@@ -404,6 +404,7 @@ function updateLabfolderSelectableElements() {
 	$('form[id=selectableEntries]').empty();
 	var append = '';
 	if (display_project_id != "") {
+		console.log(labFolderStorageFile);
 		let display_objects_storage = labFolderStorageFile.filter(proj=>proj.origin_metadata.project_id == display_project_id);
 		for (var i=0; i<labFolderEntries.entries.length; i++){
 			var obj = labFolderEntries.entries[i];
