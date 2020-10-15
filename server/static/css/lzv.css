@@ -83,6 +83,8 @@ li a:hover {
   font-weight: bold;
   background-color: var(--main_button_color);
   border: 1px solid var(--main_button_hover_color);
+  margin-top: 2px;
+  margin-left: 2px;
 }
 
 .lzvButton:focus {
@@ -459,6 +461,7 @@ img.avatar {
 .metaFormElement {
   border-radius: 1px;
   border: 1px #333333;
+  width: 80%;
   
 }
 .metaFormUIField input {
@@ -485,8 +488,7 @@ select{
 .metaFormCVField {
       position: relative;
 }
-.metaFormCVField::before {
-      /*font-family: fontello;*/
+/*.metaFormCVField::before {
       content: "\f107";
       font-size: 20px;
       position: absolute;
@@ -494,7 +496,7 @@ select{
       top: 10px;
       color: #fff;
       pointer-events: none;
-}
+}*/
 
 .metaFieldDescription {
   font-style: italic;
@@ -503,39 +505,60 @@ select{
   font-style: bold;
 }
 
-.metaFormUIField button {
+.table_form_ui_field button {
   border: none;
   border-radius: 8px;
   color: white;
   /*height: 20px;*/
   width: 30px;
-  /*margin-left: 5px;*/
-  margin-top: 5px;
-  transform: translate(2px, 2px);  
+  margin-left: 8px;
+  margin-top: 7px;
+  transform: translate(-4px, -4px);  
   text-align: center;
   font-weight: bold;
   /*padding-top: -10px;
   padding-left: -10px;*/
 }
 
-
-.metaFormUIField .duplicateMetaButton {
-  background-color: var(--main_button_color);
-  margin-left: 2px;
+.table_form_ui_field select {
+  width: 100%;
 }
 
-.metaFormUIField .openMetaPopup {
+.table_form_ui_field .duplicate_field_button {
   background-color: var(--main_button_color);
-  margin-left: 2px;
+  /*margin-left: 2px;*/
 }
 
-.metaFormUIField .removeMetaFieldButton {
+.table_form_ui_field .open_meta_popup {
+  background-color: var(--main_button_color);
+  /*margin-left: 2px;*/
+}
+
+.table_form_ui_field .remove_field_button {
   background-color: red;
+}
+
+.table_field_select {
+  width: 200px;
+}
+
+.table_field_button {
+  width: 1%;
 }
 
 #metaDataFormFooter {
   margin-top: 20px;
 }
+
+table, th, td {
+  border: 1px solid #bbbbbb;
+  text-align: left;
+  padding: 8px;
+}
+
+/*tr:nth-child(even) {
+  background-color: #dddddd;
+}*/
 
 input:required:invalid, select:required:invalid {
   box-shadow: inset 0px 0px 3px rgba(255, 0, 0, 0.85);
@@ -547,14 +570,4 @@ input:required:invalid, select:required:invalid {
 
 .staticText {
 
-}
-
-table, th, td {
-  border: 1px solid #bbbbbb;
-  text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even) {
-  background-color: #dddddd;
 }

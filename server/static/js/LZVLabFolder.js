@@ -188,8 +188,8 @@ function authenticate(form) {
 			}
 	}
 	};
-	var username = form.elements['username'].value;
-	var password = form.elements['pwd'].value;
+	var username = form.elements.username.value;
+	var password = form.elements.pwd.value;
 	if (username != '' && password != '') {
 		xhttp.open('POST', url, false);
 		xhttp.setRequestHeader("Content-type", "application/json");
@@ -357,23 +357,23 @@ function getMDBCategories() {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				var parsedData = JSON.parse(xhttp.response);
-				labFolderMDB.categories = new Array();
-				for (i=0; i < parsedData.length; i++) {
+				labFolderMDB.categories = [];
+				for (var i=0; i < parsedData.length; i++) {
 					var obj = parsedData[i];
 					var category = {
-						title: obj['title'],
-						id: obj['id'],
-						creator_idID: obj['creator_id'],
-						creation_date: obj['creation_date'],
-						version_id: obj['version_id'],
-						version_date: obj['version_date'],
-						categories: Array()
+						title: obj.title,
+						id: obj.id,
+						creator_idID: obj.creator_id,
+						creation_date: obj.creation_date,
+						version_id: obj.version_id,
+						version_date: obj.version_date,
+						categories: []
 					};
 					labFolderMDB.categories.push(category);
 				}
 			}
 	}
-}
+};
 	xhttp.open('GET', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.setRequestHeader("Token", labFolderToken);
@@ -388,7 +388,7 @@ function updateLabfolderSelectableProjects() {
 		var obj = labFolderProjects.projects[i];
 		if(obj.hidden == false) {
 			displayProjectCount++;
-			append += '<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderProject" id="' + obj.id + '" name="' + obj.id + '"onclick="updateSelectedProject(this);">'
+			append += '<button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionProject labFolderProject" id="' + obj.id + '" name="' + obj.id + '"onclick="updateSelectedProject(this);">';
 			append += obj.title;
 			append += "</button>";
 		}
@@ -533,7 +533,7 @@ function downloadSelectedEntries() {
 
 function downloadSelectedMDBCategories() {
 	//first get ids to download, then do that
-	var categoryIds = new Array(); //ids for categories which will be downloaded
+	var categoryIds = []; //ids for categories which will be downloaded
 	var form = $('form[id=selectableEntries]')[0];
 	for (var i = 0; i < form.elements.length; i++) {
 		if(form.elements[i].checked){

@@ -92,33 +92,35 @@ function logout_lzv() {
   }
 }
 
-function convertStorageFileToFlat() {
-  var storage_file = getLocalStorage("labFolderStorageFile");
-  var flat_storage = [];
-  storage_file = JSON.parse(storage_file);
-  for (var project of storage_file.projects) {
-    for (var entry of project.entries) {
-      for (var entry_version of entry.versions) {
-        for (var element of entry_version.elements) {
-          for (var element_version of element.versions) {
-            var append = {
-              "project_id" : project.projectID,
-              "project_title" : project.projectTitle,
-              "entry_id" : entry.entryID,
-              "entry_title" : entry.entryTitle,
-              "entry_version_id" : entry_version.versionID,
-              "entry_version_date" : entry_version.versionDate,
-              "element_id" : element.elementID,
-              "element_type" : element.elementType,
-              "element_version_id" : element_version.versionID,
-              "element_version_couchdb_doc_id" : element_version.couchdb_doc_id,
-              "element_version_couchdb_doc_item_att_name" : element_version.couchdb_doc_item_att_name
-            };
-            flat_storage.push(append);
-          }
-        }
-      }
-    }
-  }
-  return flat_storage;
-}
+
+
+// function convertStorageFileToFlat() {
+//   var storage_file = getLocalStorage("labFolderStorageFile");
+//   var flat_storage = [];
+//   storage_file = JSON.parse(storage_file);
+//   for (var project of storage_file.projects) {
+//     for (var entry of project.entries) {
+//       for (var entry_version of entry.versions) {
+//         for (var element of entry_version.elements) {
+//           for (var element_version of element.versions) {
+//             var append = {
+//               "project_id" : project.projectID,
+//               "project_title" : project.projectTitle,
+//               "entry_id" : entry.entryID,
+//               "entry_title" : entry.entryTitle,
+//               "entry_version_id" : entry_version.versionID,
+//               "entry_version_date" : entry_version.versionDate,
+//               "element_id" : element.elementID,
+//               "element_type" : element.elementType,
+//               "element_version_id" : element_version.versionID,
+//               "element_version_couchdb_doc_id" : element_version.couchdb_doc_id,
+//               "element_version_couchdb_doc_item_att_name" : element_version.couchdb_doc_item_att_name
+//             };
+//             flat_storage.push(append);
+//           }
+//         }
+//       }
+//     }
+//   }
+//   return flat_storage;
+// }

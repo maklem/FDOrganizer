@@ -4,11 +4,12 @@ $( document ).ready(function() {
 		$('#logout_lzv').show();
 	}
 	getStorageFile();
-	var flat_storage = convertStorageFileToFlat();
-	setLocalStorage("labFolderStorageFileFlat", JSON.stringify(flat_storage));
+	// var flat_storage = convertStorageFileToFlat();
+	// setLocalStorage("labFolderStorageFileFlat", JSON.stringify(flat_storage));
 	getMetaDataStructureInformation(false);
 	getMetaDataUserSets(false);
 	getUserIngests();
+	getUserPackages();
 	getSubmittedIngests();
 });
 
@@ -32,6 +33,23 @@ function getUserIngests() {
 					parsedJSON =  JSON.parse(xhttp.response);
 					setLocalStorage("userIngests", JSON.stringify(parsedJSON));
 					updateSideBarUserIngests(parsedJSON);
+				}
+			}
+		}
+	};
+	xhttp.open('GET', url, false);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send();
+}
+
+function getUserPackages() {
+	var url = baseURL +  '/data/packages';
+	xhttp.onreadystatechange  = function(e) {
+		if(this.readyState == 4) {
+			if(this.status == 200) {
+				if (xhttp.response != "") {
+					parsedJSON =  JSON.parse(xhttp.response);
+					setLocalStorage("user_packages", JSON.stringify(parsedJSON));
 				}
 			}
 		}
@@ -90,7 +108,7 @@ function toggleDisplaySubItems(clicked) {
 	}
 }
 
-function sendUserIngestsToServer() {
+function sendUserIngestsToServer(ingest_data) {
 	var url = baseURL + '/ingest/user';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
@@ -101,7 +119,7 @@ function sendUserIngestsToServer() {
 	};
 	xhttp.open('PUT', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(getLocalStorage("userIngests")));
+	xhttp.send(JSON.stringify(ingest_data));
 }
 
 function updateSideBarSubmittedIngests(submittedIngests)  {
@@ -144,19 +162,21 @@ function deleteIngest(clicked) {
 	// }
 }
 
-function deleteIngestFromStorage(ingest_id) {
-	var c_str = getLocalStorage("userIngests");
-	cookieData = JSON.parse(c_str);
-	var delete_set = cookieData.user_sets.find(set=>set.ingest_id == ingest_id);
-	if(delete_set) {
-		var index = cookieData.user_sets.indexOf(delete_set);
-		if (index > -1) {
-			cookieData.user_sets.splice(index,1);
-		}
-	}
-	setLocalStorage("userIngests", JSON.stringify(cookieData));
-	sendUserIngestsToServer();
-}
+
+//TODO wrong function, needs to be reworked
+// function deleteIngestFromStorage(ingest_id) {
+// 	var c_str = getLocalStorage("userIngests");
+// 	cookieData = JSON.parse(c_str);
+// 	var delete_set = cookieData.user_sets.find(set=>set.ingest_id == ingest_id);
+// 	if(delete_set) {
+// 		var index = cookieData.user_sets.indexOf(delete_set);
+// 		if (index > -1) {
+// 			cookieData.user_sets.splice(index,1);
+// 		}
+// 	}
+// 	setLocalStorage("userIngests", JSON.stringify(cookieData));
+// 	sendUserIngestsToServer();
+// }
 
 function createFormForNewIngest(){
     if(unsaved){
@@ -257,65 +277,64 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	var title = (hasUserInput) ? userInputSet.name : '';
 	if( recreateID) {
 		title = '';
-	}
-	var lfStorage = getLocalStorage("labFolderStorageFileFlat");
-	var mdUserSets = getLocalStorage("metaDataUserSets");
-	var metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
+	}	
 	headerHTML += '<div class="metaFormUIField"><input required name="ingestName" type="text" value="' + title + '"></div>';
+	var mdUserSets = getLocalStorage("metaDataUserSets");
 	var mdUserSetsJSON= JSON.parse(mdUserSets);
-	if(mdUserSets != '') {
-		headerHTML += '<select required name="ingest_header_metadata">\n';
+	console.log(mdUserSets);
+	console.log(mdUserSetsJSON);
+	if(mdUserSetsJSON &&  mdUserSets !== null) {
+		headerHTML += '<select required name="ingest_header_metadata">';
 		headerHTML += '<option selected value=""></option>';
-		for (var j=0; j<mdUserSetsJSON.user_sets.length; j++){
-			headerHTML += '<option value="'+mdUserSetsJSON.user_sets[j].set_id+'">'+mdUserSetsJSON.user_sets[j].name+'</option>';
+		for (var j=0; j<mdUserSetsJSON.length; j++){
+			headerHTML += '<option value="'+mdUserSetsJSON[j].set_id+'">'+mdUserSetsJSON[j].name+'</option>';
 		}
 		headerHTML += '</select>';
 	}
 	headerHTML += '</div><hr>';
 	$('#ingestFormHeader').empty();
 	$(headerHTML).appendTo('#ingestFormHeader');
-	$('#ingestForm').empty();
+	$('#ingestFormMain').empty();
 	var inputHTML = '';
-	inputHTML += '<div class="metaFormElement"><label class="formDescriptor" for="ingest_content">';
-	inputHTML += '<div class="metaFieldName">Data Set</div><div class="metaFieldDescription">Subtext</div></label>';
-	var lfStorageJSON = JSON.parse(lfStorage);
-	if( lfStorage != '' && mdUserSets != '') {
-		inputHTML += '<div class="metaFormUIField metaFormCVField orig">';
-		if (lfStorageJSON.length == 0){
+	inputHTML += '<table id="ingest_main_form_table" class="metaFormElement"><thead><td>Data Set(s)</td><td>Metadata Set (optional per Set)</td><td></td><td></td></thead><tbody>';
+	// inputHTML += '<div class="metaFieldName"></div><div class="metaFieldDescription"></div></label>';
+	var user_packages = getLocalStorage("user_packages");
+	var user_packages_json = JSON.parse(user_packages);
+	console.log(user_packages);
+	console.log(user_packages_json);
+	if( user_packages !== null && mdUserSets !== null) {
+		inputHTML += '<tr class="table_form_ui_field metaFormCVField orig">';
+		if (user_packages_json.length == 0){
 			inputHTML += "No Data Sets have been created yet. Please create data packages before creating a lzv ingest!";
 		}
 		else {
-		inputHTML += '<select class="select_content" name="ingest_content" required>\n';
-		inputHTML += '<option selected value=""></option>';
-		//fill with all data sets here
-		for(var i = 0; i < lfStorageJSON.length; i++){
-			// for (var j=0; j<lfStorageJSON.projects[i].entries.length; j++){
-			// 	for(var k = 0; k < lfStorageJSON.projects[i].entries[j].versions.length; k++) {
-					var date = new Date(lfStorageJSON[i].entry_version_date);
-					var formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-					inputHTML += '<option value="'+lfStorageJSON[i].entry_version_id +'">'+lfStorageJSON[i].entry_title + ' - '+ formatted_date+'</option>';
-			// 	}
-			// }
+			inputHTML += '<td class="table_field_select"><select class="select_content" name="ingest_content" required>\n';
+			inputHTML += '<option selected value=""></option>';
+			//fill with all data sets here
+			for(var i = 0; i < user_packages_json.length; i++){
+				var date = new Date(user_packages_json[i].package_object_metadata.last_change);
+				var formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+				inputHTML += '<option value="'+user_packages_json[i].id +'">'+user_packages_json[i].name + ' - '+ formatted_date+'</option>';
+			}
+			inputHTML += '</select></td>';
 		}
-		inputHTML += '</select>';
-		}
-		if (mdUserSetsJSON.user_sets.length == 0){
-			inputHTML += "No Metadata sets have been created yet. Please create Metadata sets before creating a lzv ingest!";
+		if (mdUserSetsJSON.length == 0){
+			inputHTML += "<p>No Metadata sets have been created yet. Please create Metadata sets before creating a lzv ingest!";
 		}
 		else {
-		inputHTML += '<select name="ingest_metadata">\n';
+		inputHTML += '<td class="table_field_select"><select name="ingest_metadata">';
 		inputHTML += '<option selected value=""></option>';
-		for (var j=0; j<mdUserSetsJSON.user_sets.length; j++){
-			inputHTML += '<option value="'+mdUserSetsJSON.user_sets[j].set_id+'">'+mdUserSetsJSON.user_sets[j].name+'</option>';
+		for (var j=0; j<mdUserSetsJSON.length; j++){
+			inputHTML += '<option value="'+mdUserSetsJSON[j].set_id+'">'+mdUserSetsJSON[j].name+'</option>';
 		}
-		inputHTML += '</select><button type="button" class="openMetaPopup" onclick="openMetaPopup(this);">?</button>';
+		inputHTML += '</select></td><td class="table_field_button"><button type="button" class="open_meta_popup" onclick="openMetaPopup(this);">?</button></td>';
 		}
 	}
-	if (lfStorageJSON.length > 0 && mdUserSetsJSON.user_sets.length > 0){
-		inputHTML += '<button type="button" class="duplicateMetaButton" id="ingest_content" onclick="duplicateIngestField(this);">+</button>';
+	if (user_packages_json.length > 0 && mdUserSetsJSON.length > 0){
+		inputHTML += '<td class="table_field_button"><button type="button" id="duplicate_ingest_field" class="duplicate_field_button" id="ingest_content" onclick="duplicateIngestField(this);">+</button></td></tr>';
 	}
-	inputHTML += '</div>';
-	$(inputHTML).appendTo('#ingestForm');
+	inputHTML += '</tbody></table>';
+	$(inputHTML).appendTo('#ingestFormMain');
 	$('#ingestFormFooter').empty();
 	var footerHTML = '<div id="footerButtonDiv">';
 	footerHTML += '<button type="button" class="btn lzvButton" id="submitIngest" onclick="submitIngest();">Submit</button>';
@@ -361,7 +380,7 @@ function openMetaPopup(clicked){
 	}
 	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
 	userSets= JSON.parse(getLocalStorage("metaDataUserSets"));
-	var user_set = userSets.user_sets.find(set=>set.set_id == meta_id);
+	var user_set = userSets.find(set=>set.set_id == meta_id);
 	var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
 	var html = createPopupFormContent(meta_struc,user_set);
 	$('#popupForm').empty();
@@ -422,7 +441,7 @@ function createPopupFormContent(metaStruc,userInputSet) {
 			returnHTML += '</select>';
 		}
 		if(field.field_multiple) {
-			returnHTML += '<button type="button" class="duplicateMetaButton" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
+			returnHTML += '<button type="button" class="duplicate_field_button" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
 		}
 		returnHTML += '</div></div>';
 	}
@@ -464,12 +483,9 @@ function closeMetaPopup() {
 }
 
 function duplicateIngestField(clicked, prefillValueIngest = null, prefillValueMetadata = null){
-	var tmp = $(clicked).parent('.orig').clone();
-	tmp.children(':button').remove();
-	tmp.removeClass('orig');
-	tmp.addClass('clone');
-	var select_content = tmp.children('select[name=ingest_content]');
-	var select_metadata = tmp.children('select[name=ingest_metadata]');
+	var row = $('#ingest_main_form_table tbody tr').first().clone();
+	var select_content = row.children('select[name=ingest_content]');
+	var select_metadata = row.children('select[name=ingest_metadata]');
 	if (prefillValueIngest !== null) {
 		select_content.children('[selected=true]').removeAttr('selected');
 		select_content.val(prefillValueIngest);
@@ -484,24 +500,21 @@ function duplicateIngestField(clicked, prefillValueIngest = null, prefillValueMe
 	else {
 		select_metadata.val('');
 	}
-	var popup_button = '<button type="button" class="openMetaPopup" onclick="openMetaPopup(this);">?</button>';
-	var removeButton = '<button type="button" class="removeMetaFieldButton" onclick="removeIngestField(this);">-</button>';
-	$(popup_button).appendTo(tmp);
-	$(removeButton).appendTo(tmp);
-	tmp.appendTo($(clicked).parent().parent());
+	row.find('#duplicate_ingest_field').replaceWith('<button type="button" class="remove_field_button" onclick="removeIngestField(this);">-</button>');
+	$('#ingest_main_form_table tbody:last-child').append(row);
 }
 
 function removeIngestField(clicked){
-	if ($(clicked).parent().children('input, select').val() != ''){
+	if ($(clicked).parent().parent().find('input, select').val() != ''){
 		if(confirm("Are you sure you want to delete this field?")){
-			$(clicked).parent().remove();	
+			$(clicked).parent().parent().remove();
 		}
 		else {
 			return;
 		}
 	}
 	else{
-		$(clicked).parent().remove();
+		$(clicked).parent().parent().remove();
 	}
 }
 
@@ -516,19 +529,19 @@ function getActiveIngest() {
 	saveData.ingest_id = formHeaderFields.find('#title').attr('ingest_id');
 	saveData.state = 'NEW';
 	saveData.content = [];
-	var lfStorage = JSON.parse(getLocalStorage("labFolderStorageFileFlat"));
+	var user_packages  = JSON.parse(getLocalStorage("user_packages"));
 	for (var i = 0 ; i < formFieldsInputContent.length; i++) {
 		var content_value = '';
 		var content_data = {};
 		if (formFieldsInputContent[i].value) {
 			content_value = formFieldsInputContent[i].value;
-			content_data = lfStorage.find(set=>set.entry_version_id == content_value);
+			content_data = user_packages.find(set=>set.id == content_value);
 		}
 		var meta_value = '';
 		if (formFieldsInputMeta[i].value) {
 			meta_value = formFieldsInputMeta[i].value;
 		}
-		saveData.content.push({'version_id' : content_value, 'version_data' : content_data, 'content_origin' : "labfolder", 'metadata_userset_id' : meta_value, 'metadata_userset' : searchMetaDataUserSetsByID(meta_value)});
+		saveData.content.push({'package_id' : content_value, 'package_data' : content_data, 'metadata_userset_id' : meta_value, 'metadata_userset' : searchMetaDataUserSetsByID(meta_value)});
 	}
 	return saveData;
 }
@@ -558,8 +571,10 @@ function submitIngest() {
 	payload.ingest_metadata.submit_date = now.toString();
 	payload.ingest_metadata.review_date = undefined;
 	payload.ingest_metadata.ingest_date = undefined;
-	saveInLocalStorage('userIngests', payload);
-	sendUserIngestsToServer();
+	// saveInLocalStorage('userIngests', payload);
+	console.log("payload:");
+	console.log(payload);
+	sendUserIngestsToServer(payload);
 	xhttp.open('PUT', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send(JSON.stringify(payload));
@@ -591,9 +606,9 @@ function saveActiveIngest() {
 		alert('Please entere a name for the data set before saving!');
 		return;
 	}
-	saveInLocalStorage('userIngests', saveData);
+	// saveInLocalStorage('userIngests', saveData);
 	unsaved = false;
-	sendUserIngestsToServer();
+	sendUserIngestsToServer(saveData);
 }
 
 function newLZVIngest(clicked) {

@@ -36,7 +36,21 @@ function getMetaDataUserSets(updateSideBar = true) {
 	xhttp.send();
 }
 
-function sendUserMetaSetsToServer() {
+function deleter_user_metaset(delete_set) {
+	var url = baseURL + '/metadata/user/delete';
+	xhttp.onreadystatechange  = function(e) {
+		if(this.readyState == 4) {
+			if(this.status == 200) {
+				getMetaDataUserSets(true);
+			}
+		}
+	};
+	xhttp.open('PUT', url, false);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send(JSON.stringify(delete_set));
+}
+
+function sendUserMetaSetsToServer(new_set) {
 	var url = baseURL + '/metadata/user';
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
@@ -47,13 +61,13 @@ function sendUserMetaSetsToServer() {
 	};
 	xhttp.open('PUT', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(getLocalStorage("metaDataUserSets")));
+	xhttp.send(JSON.stringify(new_set));
 }
 
 function searchMetaDataUserSetsByID(id) {
 	var c_str = getLocalStorage("metaDataUserSets");
-	cookieData = JSON.parse(c_str);
-	return cookieData.user_sets.find(set=>set.set_id == id);
+	cookie_data = JSON.parse(c_str);
+	return cookie_data.find(set=>set.set_id == id);
 }
 
 function getActiveMetaDataSet() {
@@ -88,33 +102,15 @@ function saveActiveMetaDataSet() {
 		alert('Please entere a name for the data set before saving!');
 		return;
 	}
-	var c_str = getLocalStorage("metaDataUserSets");
-	var cookieData;
-	if (c_str === null || c_str == ''){
-		cookieData = {'user_sets' : []};
-	}
-	else {
-		cookieData = JSON.parse(c_str);
-	}
-	var oldSet = cookieData.user_sets.find(set=>set.set_id == saveData.set_id);
-	if (oldSet) {
-		cookieData.user_sets.splice(cookieData.user_sets.indexOf(oldSet),1);
-		cookieData.user_sets.push(saveData);
-	}
-	else {
-		cookieData.user_sets.push(saveData);
-	}
-	setLocalStorage("metaDataUserSets", JSON.stringify(cookieData));
-	updateSideBarUserSets(cookieData);
 	unsaved = false;
-	sendUserMetaSetsToServer();
+	sendUserMetaSetsToServer(saveData);
 }
 
 function copyActiveMetaDataSet() {
 	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
 	userSets= JSON.parse(getLocalStorage("metaDataUserSets"));
 	clicked_set_id = $('#title').attr('set_id');
-	var user_set = userSets.user_sets.find(set=>set.set_id == clicked_set_id);
+	var user_set = userSets.find(set=>set.set_id == clicked_set_id);
 	if (user_set && user_set !== null){
 		var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
 		fillMetaDataForm(meta_struc,user_set,true);
@@ -126,18 +122,10 @@ function copyActiveMetaDataSet() {
 function deleteMetaDataSet(clicked) {
 	if(confirm("Are you sure that you want to delete this metadata set? This can not be undone!")){
 		var c_str = getLocalStorage("metaDataUserSets");
-		clickedID = $(clicked).attr('set_id');
-		cookieData = JSON.parse(c_str);
-		var delete_set = cookieData.user_sets.find(set=>set.set_id == clickedID);
-		if(delete_set) {
-			var index = cookieData.user_sets.indexOf(delete_set);
-			if (index > -1) {
-				cookieData.user_sets.splice(index,1);
-			}
-		}
-		setLocalStorage("metaDataUserSets", JSON.stringify(cookieData));
-		updateSideBarUserSets(cookieData);
-		sendUserMetaSetsToServer();
+		clicked_id = $(clicked).attr('set_id');
+		cookie_data = JSON.parse(c_str);
+		var delete_set = cookie_data.find(set=>set.set_id == clicked_id);
+		deleter_user_metaset(delete_set);
 	}
 }
 
@@ -193,8 +181,8 @@ function createFormForNewSchemeItem(clicked){
         }
     }
 	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
-	clickedID = $(clicked).attr('id');
-	var clickedStruc = metaStructure.schemes.find(struc=>struc.identifier == clickedID);
+	clicked_id = $(clicked).attr('id');
+	var clickedStruc = metaStructure.schemes.find(struc=>struc.identifier == clicked_id);
 	if(clickedStruc) {
 		fillMetaDataForm(clickedStruc);
 	}
@@ -210,7 +198,7 @@ function createFormForExistingSchemeSet(clicked) {
 	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
 	userSets= JSON.parse(getLocalStorage("metaDataUserSets"));
 	clicked_set_id = $(clicked).attr('id');
-	var user_set = userSets.user_sets.find(set=>set.set_id == clicked_set_id);
+	var user_set = userSets.find(set=>set.set_id == clicked_set_id);
 	var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
 	fillMetaDataForm(meta_struc,user_set);
 }
@@ -235,7 +223,7 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 	if( recreateID) {
 		title = '';
 	}
-	headerHTML += '<div class="metaFormUIField"><input required name="metaSchemeName" type="text" value="' + title + '"></div></div><hr>';
+	headerHTML += '<div class="table_form_ui_field"><input required name="metaSchemeName" type="text" value="' + title + '"></div></div><hr>';
 	$('#metaDataFormHeader').empty();
 	$(headerHTML).appendTo('#metaDataFormHeader');
 	$('#metaDataForm').empty();
@@ -246,10 +234,10 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 		inputHTML += field.field_name + '" ';
 		inputHTML += '><div class="metaFieldName">' + field.field_name.charAt(0).toUpperCase() + field.field_name.slice(1) + '</div><div class="metaFieldDescription">'+ field.field_description +'</div></label>';
 		if (field.field_type != 'cv') {
-			inputHTML += '<div class="metaFormUIField orig"><input ';
+			inputHTML += '<div class="table_form_ui_field orig"><input ';
 		}
 		else {
-			inputHTML += '<div class="metaFormUIField metaFormCVField orig"><select ';
+			inputHTML += '<div class="table_form_ui_field metaFormCVField orig"><select ';
 		}
 		inputHTML += 'name="' + field.field_name + '" ';
 		if (field.field_mandatory){
@@ -284,7 +272,7 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 			inputHTML += '</select>';
 		}
 		if(field.field_multiple) {
-			inputHTML += '<button type="button" class="duplicateMetaButton" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
+			inputHTML += '<button type="button" class="duplicate_field_button" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
 		}
 		inputHTML += '</div></div>';
 		$(inputHTML).appendTo('#metaDataForm');
@@ -296,7 +284,7 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 	footerHTML += '<button type="button" class="btn lzvButton" id="exportToDC" onclick="exportSetToDC();">Export to Dublin Core</button>';
 	// footerHTML += '<button type="button" class="btn lzvButton" id="exportToXML" onclick="exportSetToXML();">Export to XML</button>';
 	footerHTML += '<button type="button" class="btn lzvButton" id="exportToJSON" onclick="exportSetToJSON();">Export to JSON</button>';
-	// function exportSetToXML() {}
+	// function exportSetToXML()
 	footerHTML += '</div>';
 	$(footerHTML).appendTo('#metaDataFormFooter');
 	if (hasUserInput) { //fill fields with values from user field
@@ -345,7 +333,7 @@ function duplicateMetaDataField(clicked,prefillValue = null){
 			select.val('');	
 		}
 	}
-	var removeButton = '<button type="button" class="removeMetaFieldButton" onclick="removeMetaDataField(this);">-</button>';
+	var removeButton = '<button type="button" class="remove_field_button" onclick="removeMetaDataField(this);">-</button>';
 	$(removeButton).appendTo(tmp);
 	tmp.appendTo($(clicked).parent().parent());
 }
@@ -390,7 +378,7 @@ function updateSideBarUserSets(userSets){
 	console.log("updateSideBarUserSets");
 	$('#myItemsSubItems').empty();
 	var append = '';
-	for (var set of userSets.user_sets) {
+	for (var set of userSets) {
 		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + set.set_id + '" onclick="createFormForExistingSchemeSet(this);">' + set.name + '</button><div class="round-button"><button class="btn deleteSetButton" set_id="'+ set.set_id + '" onclick="deleteMetaDataSet(this);"><span>-</span></button></div></div>';
 	}
 	$(append).appendTo('#myItemsSubItems');

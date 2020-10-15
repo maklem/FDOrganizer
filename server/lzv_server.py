@@ -336,16 +336,15 @@ def download_file_to_client():
     entry_version_id = request.args.get('entry_version_id')
 
     query = {"selector": {"owner" : request.cookies['session_user'],
-                "data_object_metadata" : {
-                    "content_origin" : "labfolder"
-                },
-                "origin_metadata" : {
-                    "project_id" : project_id,
-                    "entry_id" : entry_id,
-                    "entry_version_id" : entry_version_id
-                }}}
+                          "data_object_metadata" : {
+                              "content_origin" : "labfolder"
+                              },
+                          "origin_metadata" : {
+                              "project_id" : project_id,
+                              "entry_id" : entry_id,
+                              "entry_version_id" : entry_version_id
+                              }}}
     download_meta = json.loads(query_db(query, CONFIGPARAMS['couchDBStorageDatabaseName']))['docs']
-    print("download meta:"+ json.dumps(download_meta))
     filename = request.cookies['session_user'] + "-" + time.strftime("%d-%m-%Y") + "-" \
                + time.strftime("%H:%M:%S") + ".zip"
     if len(download_meta) > 0:
@@ -358,6 +357,11 @@ def download_file_to_client():
 
 @APP.route('/labfolder/elements/download', methods=['POST'])
 def download():
+    '''
+        Download data provided in request from labfolder. Checks if duplicates already are in db.
+        Only downloads new files from labfolder. Adds documents to doc db and metadata files to
+        storage db. also creates package files for entrys for all elements containing the elements.
+    '''
     if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
@@ -372,7 +376,7 @@ def download():
     if len(storage_metadata) > 0:
         download_file_from_labfolder(storage_metadata)
         package_objects = create_package_for_downloaded_data(user_id, storage_metadata)
-        storage_metadata.append(package_objects)
+        storage_metadata += package_objects
         update_storage(storage_metadata)
     return APP.response_class(status=200, mimetype='application/json')    
 
@@ -393,6 +397,8 @@ def create_package_for_downloaded_data(user_id, downloaded_sets):
             "id" : str(uuid.uuid4()),
             "type" : "PACKAGE", 
             "owner" : user_id,
+            "name" : [x['name'] for x in downloaded_sets\
+                     if x['origin_metadata']['entry_id'] == search_entry_id][0],
             "package_object_metadata" : {
                 "creation_date" : time.strftime('%Y-%m-%dT%T.000+0000'),
                 "last_change" : time.strftime('%Y-%m-%dT%T.000+0000'),
@@ -425,6 +431,7 @@ def create_storage_data_structure_from_labfolder(user_id, input_set):
         "id" : str(uuid.uuid4()),
         "type" : "DATA", 
         "owner" : user_id,
+        "name" : "labfolder - " + input_set['entry_title'],
         "data_object_metadata" : {
             "content_origin" : "labfolder",
             "export_date" : time.strftime('%Y-%m-%dT%T.000+0000'),
@@ -496,7 +503,6 @@ def download_file_from_labfolder(data_array):
              or element["origin_metadata"]["element_type"] == 'TEXT':
             file_data = ''
             file_info_reponse_jdata = json.loads(file_response.text)
-            print(file_response.text)
             if element["origin_metadata"]["element_type"] == 'TABLE':
                 file_name = file_info_reponse_jdata["title"]
                 sheets = file_info_reponse_jdata["content"]["sheets"]
@@ -504,8 +510,6 @@ def download_file_from_labfolder(data_array):
             else: #text
                 file_data = file_info_reponse_jdata["content"]
                 file_name = json_answer["id"]
-            print("filetype" + element["origin_metadata"]["element_type"])
-            print("filename:" + str(file_name))
             couchdb_url = couchdb_url + str(file_name)
             couch_header["Content-Type"] = "text/plain"
             att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
@@ -589,13 +593,10 @@ def download_mdb_items():
                "Authorization" :  "Token " + token,
                "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
               }
-    response_categories = requests.get(url_categories, headers=headers)
-    response_items = requests.get(url_items, headers=headers)
     #now we preprocess the answer to a csv
-    category_response_jdata = json.loads(response_categories.text)
-    item_response_jdata = json.loads(response_items.text)
+    category_response_jdata = json.loads(requests.get(url_categories, headers=headers).text)
+    item_response_jdata = json.loads(requests.get(url_items, headers=headers).text)
     attributes_sorted = category_response_jdata["attributes"]
-    title = category_response_jdata["title"]
     file_data = "Name, "
     for att in attributes_sorted:
         file_data = file_data + att["title"] + ","
@@ -608,7 +609,7 @@ def download_mdb_items():
             file_data = file_data + item["custom_attributes"][satt["id"]] + ","
         file_data.rstrip(",")
         file_data = file_data + "\n"
-    filename = title + ".csv"
+    filename = category_response_jdata["title"] + ".csv"
     filename = filename.replace(">", "_")
     filename = filename.replace(" ", "")
     file = open(CONFIGPARAMS["tempFolder"] + filename, "w")
@@ -617,10 +618,26 @@ def download_mdb_items():
     return send_from_directory(CONFIGPARAMS["tempFolder"], filename, as_attachment=True)
     # return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
 
+@APP.route('/data/packages', methods=['GET'])
+def get_data_packages():
+    '''
+    Routed from /data/packages
+    Requests all data packages for user from database, which can then be added to a 
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    query = {"selector": {
+        "owner": user_id, "type" : "PACKAGE"}}
+    response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
+    return json.dumps(response['docs'])
+
 @APP.route('/labfolder/storage', methods=['GET'])
 def get_storage_file():
     '''
-    Routed from /storage
+    Routed from /labfolder/storage
     Requests the storage file, containg metadata about stored files for the requesting user
     '''
     if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
@@ -628,19 +645,41 @@ def get_storage_file():
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    out = get_labfolder_datastructure(user_id, return_as_string=False)
+    out = get_labfolder_data(user_id, return_as_string=False)
     return json.dumps(out['docs'])
 
-
-def get_labfolder_datastructure(user_id, return_as_string=False):
+def get_labfolder_data(user_id, return_as_string=False):
     '''
-    Returns the storage file for @user_id either as (json)string or object.
+    Returns the labfolder data for @user_id either as (json)string or object.
     '''
     query = {"selector": {
         "owner": user_id, "type" : "DATA",
         "data_object_metadata.content_origin" : "labfolder"}}
     response = query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"])
     return response if return_as_string else json.loads(response)
+
+@APP.route('/storage/packages', methods=['GET'])
+def get_package_objects():
+    '''
+    Routed from /storage/packages
+    Requests all docs from storage with type package for user
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    out = get_packages(user_id, return_as_string=False)
+    return json.dumps(out['docs'])
+
+def get_packages(user_id, return_as_string=False):
+    '''
+        Returns the package docs for @user_id either as (json)string or json-object.
+    '''
+    query = {"selector": {"owner": user_id, "type" : "PACKAGE"}}
+    response = query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"])
+    return response if return_as_string else json.loads(response)
+
 
 def update_storage(add_elements):
     '''
@@ -651,7 +690,7 @@ def update_storage(add_elements):
     token = authenticate_couchdb()
     if not token:
         return
-    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" : token}
     for item in add_elements:
         response = requests.post(url, headers=headers, data=json.dumps(item))
         if DEBUG:
@@ -660,8 +699,6 @@ def update_storage(add_elements):
 #checks if elements to download already exist in database. pops elements which are already
 # existing of the checkArray. Only checks labfolder content....
 #check_elements is a list of dicts: (projectID: str, entryID: str, elementID: str, versionID: str)
-#TODO input file to this function needs to be cleared that variable names are corrected!
-#TODO verify that only "new" entries remain, else duplicates will be added to database
 def remove_already_existing_tupel(user_id, check_elements):
     '''
     Checks if in storage file of @user_id there are already files which are identical to
@@ -676,7 +713,7 @@ def remove_already_existing_tupel(user_id, check_elements):
                                   "entry_version_id" : item["entry_version_id"],
                                   "element_id" : item["element_id"],
                                   "element_version_id" : item["element_version_id"]
-                }}}
+                                  }}}
         #if this reponse returns more hits than 1 the database is broken and we have duplicates
         response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
         if len(response['docs']) == 0:
@@ -743,35 +780,64 @@ def get_user_stored_metadata():
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"] + "/"\
-          + user_id
-    token = authenticate_couchdb()
-    if not token:
-        return ''
-    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return response.text
-    return ''
+    query = {"selector": {"owner": user_id}}
+    response = json.loads(query_db(query, CONFIGPARAMS["couchDBMetaDataDatabaseName"]))
+    return json.dumps(response['docs'])
 
-@APP.route('/metadata/user', methods=['PUT'])
-def store_user_metadata():
+#TODO TEST
+@APP.route('/metadata/user/delete', methods=['PUT'])
+def delete_user_metadata_set():
     '''
-        Routed from /metadata/user PUT
-        Stores an updated metadata set for the user, version managing is done on client side
+        Routed from /metadata/user/delete PUT
+        Delete the meta_set provided in data from database 
     '''
     if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"] + "/"\
-          + user_id
     token = authenticate_couchdb()
     if not token:
         return ''
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
-    response = requests.put(url, headers=headers, data=json.loads(request.get_data()))
+    data = json.loads(request.get_data())
+    query = {"selector": {"owner": user_id, "set_id": data['set_id']}}
+    check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBMetaDataDatabaseName"]))
+    if len(check_response['docs']) > 0: #found the entry to delete
+        url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"]\
+            + "/" + data['set_id']
+        headers['If-Match'] = check_response['docs'][0]["_rev"]
+        response = requests.delete(url, headers=headers, data=data)
+        if response:
+            return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error Deleting metaset'}),\
+                       500, {'Content-Type' : 'application/json'}
+
+#TODO TEST
+@APP.route('/metadata/user', methods=['PUT'])
+def store_user_metadata():
+    '''
+        Routed from /metadata/user PUT
+        Stores the provided metadata entry for user. if en entry with same set_id exists it will be 
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    token = authenticate_couchdb()
+    if not token:
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    data = json.loads(request.get_data())
+    data['owner'] = user_id
+    query = {"selector": {"owner": user_id, "set_id": data['set_id']}}
+    check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBMetaDataDatabaseName"]))
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"] + "/"\
+        + data['set_id']
+    if len(check_response['docs']) > 0: #only one entry with same id should exist at the same time
+        headers['If-Match'] = check_response['docs'][0]["_rev"]
+    response = requests.put(url, headers=headers, data=json.dumps(data))
     if response:
         return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
     return json.dumps({'Result' : 'Error Storing file'}), 500, {'Content-Type' : 'application/json'}
@@ -787,22 +853,12 @@ def get_user_stored_ingests():
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBIngestsDatabaseName"] + "/"\
-          + user_id
-    token = authenticate_couchdb()
-    if not token:
-        return ''
-    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
-    response = requests.get(url, headers=headers)
-    if DEBUG:
-        print("reponse.text")
-        print(response.text)
-    if response.status_code == 200:
-        return response.text
-    return json.dumps({'Result' : 'Internal Error'}), 500, {'Content-Type' : 'application/json'}
+    query = {"selecter" : {"owner" : user_id}}
+    response = json.loads(query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"]))
+    return json.dumps(response['docs'])
 
 @APP.route('/ingest/user', methods=['PUT'])
-def store_user_ingests():
+def store_user_ingest():
     '''
         Routed from /ingest/user PUT
         Stores an updated ingests for the user, version managing is done on client side
@@ -812,25 +868,24 @@ def store_user_ingests():
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBIngestsDatabaseName"] + "/"\
-          + user_id
     token = authenticate_couchdb()
     if not token:
-        if DEBUG:
-            print("Auth to couchDB not successfull. Returning")
         return ''
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
-    if DEBUG:
-        print("trying to put ingests for user with url: " + url)
-        print(headers)
-        print("data:")
-        print(json.loads(request.get_data()))
-    response = requests.put(url, headers=headers, data=json.loads(request.get_data()))
+    data = json.loads(request.get_data())
+    data['owner'] = user_id
+    query = {"selector": {"owner": user_id, "íngest_id": data['ingest_id']}}
+    check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"]))
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBIngestsDatabaseName"] + "/"\
+        + data['ingest_id']
+    if len(check_response['docs']) > 0: #only one entry with same id should exist at the same time
+        headers['If-Match'] = check_response['docs'][0]["_rev"]
+    response = requests.put(url, headers=headers, data=json.dumps(data))
     if response:
         return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
     return json.dumps({'Result' : 'Error Storing file'}), 500, {'Content-Type' : 'application/json'}
 
-#TODO rework get_labfolder_datastructure data output
+#TODO rework get_labfolder_data data output
 @APP.route("/ingest/submit", methods=['PUT'])
 def submit_user_ingest_to_review():
     '''
@@ -847,7 +902,7 @@ def submit_user_ingest_to_review():
         return json.dumps({'Result' : 'Internal Server Error'}), 500,\
                           {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    storage_file = get_labfolder_datastructure(user_id).docs
+    storage_file = get_labfolder_data(user_id).docs
     ingest = json.loads(request.get_data())
     ingest_review_path = CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"] + "/content/"
     ingest['user_id'] = user_id
@@ -919,7 +974,7 @@ def get_submitted_ingests():
     query = {"selector": {"user_id": request.cookies['session_user']}}
     response = query_db(query, CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
     if response:
-        return response.text
+        return response
     return json.dumps({'Result' : 'Error requesting submitted ingests'}), 500,\
                       {'Content-Type' : 'application/json'}
 
