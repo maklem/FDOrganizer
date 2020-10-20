@@ -16,9 +16,13 @@
       "items" : {
         "type" : "object",
         "properties" : {
+          "field_identifier" : {
+            "type" : "string",
+            "description" : "identifier of the field"
+          },
           "field_name" : {
             "type" : "string",
-            "description" : "name of the field"
+            "description" : "spoken of the field"
           },
           "field_type" : {
             "type" : "string",
@@ -49,7 +53,7 @@
             }
           }
         },
-        "required" : ["field_name","field_type","field_mandatory"]
+        "required" : ["field_identifier","field_name","field_type","field_mandatory"]
       }
     }
   }
