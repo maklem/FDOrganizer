@@ -7,6 +7,7 @@
       "active": true,
       "fields": [
         {
+          "field_identifier" : "title",
           "field_name": "title",
           "field_type": "string",
           "field_mandatory": false,
@@ -14,6 +15,7 @@
           "field_description": "Name given to the resource."
         },
         {
+          "field_identifier" : "creator",
           "field_name": "creator",
           "field_type": "string",
           "field_mandatory": false,
@@ -21,6 +23,7 @@
           "field_description": "Entity primarily responsible for making the resource."
         },
         {
+          "field_identifier" : "subject",
           "field_name": "subject",
           "field_type": "string",
           "field_mandatory": false,
@@ -28,6 +31,7 @@
           "field_description": "Topic of the resource. (Keywords)"
         },
         {
+          "field_identifier" : "description",
           "field_name": "description",
           "field_type": "string",
           "field_mandatory": false,
@@ -35,6 +39,7 @@
           "field_description": "Description may include, but is not limited to, an abstract, a table of contents, a graphical representation, or a free-text account of the resource."
         },
         {
+          "field_identifier" : "publisher",
           "field_name": "publisher",
           "field_type": "string",
           "field_mandatory": false,
@@ -42,6 +47,7 @@
           "field_description": "Entity responsible for making the resource available."
         },
         {
+          "field_identifier" : "contributor",
           "field_name": "contributor",
           "field_type": "string",
           "field_mandatory": false,
@@ -49,6 +55,7 @@
           "field_description": "Additional contributors the the resource."
         },
         {
+          "field_identifier" : "date",
           "field_name": "date",
           "field_type": "string",
           "field_mandatory": false,
@@ -56,6 +63,7 @@
           "field_description": "Point of time associated with the creation of the resource. (f.e. date of release)"
         },
         {
+          "field_identifier" : "type",
           "field_name": "type",
           "field_type": "cv",
           "field_mandatory": false,
@@ -77,6 +85,7 @@
           "field_description": "Resource type according to DCMI-Type."
         },
         {
+          "field_identifier" : "format",
           "field_name": "format",
           "field_type": "cv",
           "field_mandatory": false,
@@ -95,6 +104,7 @@
           "field_description": "Resource format according to Internet Media Type."
         },
         {
+          "field_identifier" : "identifier",
           "field_name": "identifier",
           "field_type": "string",
           "field_mandatory": false,
@@ -102,6 +112,7 @@
           "field_description": "Sequence of characters that uniquely identifies this resource (f.e. IBAN, DOI)"
         },
         {
+          "field_identifier" : "source",
           "field_name": "source",
           "field_type": "string",
           "field_mandatory": false,
@@ -109,6 +120,7 @@
           "field_description": "Related resource from which the described resource is derived."
         },
         {
+          "field_identifier" : "language",
           "field_name": "language",
           "field_type": "cv",
           "field_mandatory": false,
@@ -120,6 +132,7 @@
           "field_description": "Language of the resource."
         },
         {
+          "field_identifier" : "relation",
           "field_name": "relation",
           "field_type": "string",
           "field_mandatory": false,
@@ -127,6 +140,7 @@
           "field_description": "Related resource."
         },
         {
+          "field_identifier" : "coverage",
           "field_name": "coverage",
           "field_type": "string",
           "field_mandatory": false,
@@ -134,54 +148,12 @@
           "field_description": "Spatial or temporal topic of the resource, spatial applicability of the resource, or jurisdiction under which the resource is relevant."
         },
         {
+          "field_identifier" : "rights",
           "field_name": "rights",
           "field_type": "string",
           "field_mandatory": false,
           "field_multiple": true,
           "field_description": "Information about rights held in and over the resource."
-        }
-      ]
-    },
-    {
-      "title": "Dublin Core Mini",
-      "version": "1.1",
-      "identifier": "DC1.1Mini",
-      "active": false,
-      "fields": [
-        {
-          "field_name": "title",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Name given to the resource."
-        },
-        {
-          "field_name": "creator",
-          "field_type": "int",
-          "field_mandatory": true,
-          "field_multiple": false,
-          "field_description": "Entity primarily responsible for making the resource."
-        },
-        {
-          "field_name": "type",
-          "field_type": "cv",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_options": [
-            "Collection",
-            "Dataset",
-            "Event",
-            "Image",
-            "InteractiveResource",
-            "MovingImage",
-            "PhysicalObject",
-            "Service",
-            "Software",
-            "Sound",
-            "Still Image",
-            "Text"
-          ],
-          "field_description": "Resource type according to DCMI-Type."
         }
       ]
     },
@@ -192,6 +164,7 @@
       "active": true,
       "fields": [
         {
+          "field_identifier" : "identifier",
           "field_name": "Identifier",
           "field_type": "string",
           "field_mandatory": true,
@@ -199,6 +172,7 @@
           "field_description": "Unique Identifier of the Item (DOI,...)"
         },
         {
+          "field_identifier" : "identifier_type",
           "field_name": "Identifier Type",
           "field_type": "cv",
           "field_mandatory": true,
@@ -209,6 +183,7 @@
           ]
         },
         {
+          "field_identifier" : "creator",
           "field_name": "Creator",
           "field_type": "string",
           "field_mandatory": true,
@@ -216,6 +191,7 @@
           "field_description": "Main Creator of the Item. (Family Name, Given Name)"
         },
         {
+          "field_identifier" : "title",
           "field_name": "Title",
           "field_type": "string",
           "field_mandatory": true,
@@ -223,6 +199,7 @@
           "field_description": "Title of the Item."
         },
         {
+          "field_identifier" : "publisher",
           "field_name": "Publisher",
           "field_type": "string",
           "field_mandatory": true,
@@ -230,6 +207,7 @@
           "field_description": "The name of the publisher of the item."
         },
         {
+          "field_identifier" : "publication_year",
           "field_name": "Publication Year",
           "field_type": "sring",
           "field_mandatory": true,
@@ -238,6 +216,7 @@
           "field_verification" : "^[0-9]{4}$"
         },
         {
+          "field_identifier" : "resource_type_general",
           "field_name": "Resource Type General",
           "field_type": "cv",
           "field_mandatory": true,
@@ -262,6 +241,7 @@
           ]
         },
         {
+          "field_identifier" : "resource_type_specific",
           "field_name": "Resource Type Specific",
           "field_type": "string",
           "field_mandatory": true,
@@ -269,6 +249,7 @@
           "field_description": "A term for a more detailed description of the general resource. (f.e. Conference Abstract)"
         },
         {
+          "field_identifier" : "subject",
           "field_name": "Subject",
           "field_type": "string",
           "field_mandatory": false,
@@ -276,6 +257,7 @@
           "field_description": "The subject of the item. Use subject classification of dfg if possible."
         },
         {
+          "field_identifier" : "language",
           "field_name": "Language",
           "field_type": "string",
           "field_mandatory": false,
@@ -283,6 +265,7 @@
           "field_description": "The language the main part of the work is in."
         },
         {
+          "field_identifier" : "license",
           "field_name": "License",
           "field_type": "string",
           "field_mandatory": false,
