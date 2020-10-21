@@ -1,0 +1,111 @@
+
+//example for datastructure of metadate scheme structure
+{
+  "title": "DataCite",
+  "version": "4.3",
+  "identifier": "DATACITE4.3",
+  "active": true,
+  "fields": [
+    {
+      "type": "GROUP|FIELD",
+      "name": "Identifier",
+      "identifier": "identifier",
+      "mandatory": true, //def false. if field it is required, if field is part of a group it is required for each instance of the group, if group at least one is required
+      "multiple": false, //def false
+      "description": "Unique Identifier of the Item (DOI,...)", //descriptive description of the item
+      //FIELD
+      "field_blank_text": "blank text for the field (if it is a string",
+      "field_type": "string",
+      "field_options": [ //is type == cv
+        "DOI"
+      ],
+      "field_verification": "^[0-9]{4}$",
+      //GROUP
+      "fields" : [
+        //GROUP|FIELD
+      ]
+
+    }
+  ]
+},
+//example for mapping object between scheme and export scheme
+{
+  "identifier" : "unique identifier of the mapping set",
+  "identifier_source_scheme" : "identifier of the source scheme",
+  "identifier_target_export" : "identifier of the target export",
+  "mappings" : [
+    {
+      "source_entity" : "identifier source entity",
+      "target_entity" : "identifier target entity"
+    }
+  ]
+},
+
+//example for datastructure of export scheme  
+{
+    "identifier": "unique_identifier //Identifier of export scheme",
+    "file_prefix": "static_prefic //static prefix of the export scheme",
+    "file_suffix": "static_suffic //static suffic of the export scheme",
+    "export_items": [
+      {
+      "type" : "GROUP|FIELD",
+      "identifier" : "unique identifier for the group|field",
+      "prefix": "prefix before each appearing of the group|field",
+      "suffix": "suffix before each appearing of the group|field",
+      "left_empfy" : "content when no input is available for given identifier. no prefix or suffix is printed, default empty",
+      //GROUP:
+      "export_items" : [
+        {
+          //GROUP|FIELD
+        }
+      ],
+      //FIELD 
+      "skip_if_empty" : "IF True: Skip other output from field on same level in a export item if this is empty (=no field with that name!)"
+      }
+    ]
+  },
+
+//example for export scheme
+
+{"identifier": "datacite_export_4_3",
+ "file_prefix" : "<?xml ...<resources...",
+ "file_suffix" : "</resources",
+ "export_items" : [
+    {
+    "type" : "FIELD",
+    "identifier" : "DOI",
+    "prefix" : "<identifier identifierType=\"DOI\">",
+    "suffix" : "</identifier>",
+    "left_empty" : "<identifier identifierType=\"DOI\"></identifier>"
+    },
+    {
+      "type" : "GROUP",
+      "identifier" : "titles",
+      "prefix" : "<titles>",
+      "suffix" : "</titles>",
+      "export_items" : [{
+        "type" : "FIELD",
+        "identifier" : "title_language",
+        "prefix" : "<title xml_lang=\"",
+        "suffix" : "\" ",
+        "left_empty" : "<title",
+        "skip_if_empty" : false
+        },{
+        "type" : "FIELD",
+        "identifier" : "title_type",
+        "prefix" : "titleType=\"",
+        "suffix" : "\">",
+        "left_empty" : ">",
+        "skip_if_empty" : false
+        },{
+        "type" : "FIELD",
+        "identifier" : "title",
+        "prefix" : "",
+        "suffix" : "</title>",
+        "left_empty" : "</title",
+        "skip_if_empty" : true
+        }   
+      ]
+    }
+ ]
+}

@@ -1,0 +1,99 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "identifier"
+    ],
+    "properties": {
+      "identifier": {
+        "type": "string",
+        "description": "unique identifiying string for the export schem"
+      },
+      "file_prefix": {
+        "type": "string",
+        "description": "prefix being printed as first thing of the file"
+      },
+      "file_suffix": {
+        "type": "string",
+        "description": "suffix which is printed as the last thing of the file."
+      },
+      "export_items": {
+        "type": "array",
+        "$id": "ref_export_items",
+        "minItems": 1,
+        "items": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": [
+                "entity_type",
+                "identifier"
+              ],
+              "properties": {
+                "entity_type": {
+                  "type": "string",
+                  "const": "GROUP",
+                  "description": "type of element, if its a group or field"
+                },
+                "identifier": {
+                  "type": "string",
+                  "description": "unique identifier for the group"
+                },
+                "prefix": {
+                  "type": "string",
+                  "description": "prefix being printed before group"
+                },
+                "suffix": {
+                  "type": "string",
+                  "description": "suffic being printed after group"
+                },
+                "left_empty": {
+                  "type": "string",
+                  "description": "content to be printed when nothing related to this identifer. default empty"
+                },
+                "export_items": {
+                  "$ref": "ref_export_items"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "entity_type",
+                "identifier"
+              ],
+              "properties": {
+                "entity_type": {
+                  "type": "string",
+                  "const": "FIELD",
+                  "description": "type of element, if its a group or field"
+                },
+                "identifier": {
+                  "type": "string",
+                  "description": "unique identifier for the field"
+                },
+                "prefix": {
+                  "type": "string",
+                  "description": "prefix being printed before field"
+                },
+                "suffix": {
+                  "type": "string",
+                  "description": "suffic being printed after field"
+                },
+                "left_empty": {
+                  "type": "string",
+                  "description": "content to be printed when nothing related to this identifer. default empty"
+                },
+                "skip_if_empty": {
+                  "type": "boolean",
+                  "description": "IF True: Skip other output from field on same level in a export item if this is empty (=no field with that name!)"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

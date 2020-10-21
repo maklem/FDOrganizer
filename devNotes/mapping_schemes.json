@@ -1,0 +1,38 @@
+{
+	"type" : "array",
+	"items" : {
+		"type" : "object",
+		"required" : ["identifier", "identifier_source_scheme", "identifier_target_export", "mappings"],
+		"properties" : {
+			"identifier" : {
+				"type" : "string",
+				"description" : "unique identifier for the mapping set"
+			},
+			"identifier_source_scheme" : {
+				"type" : "string",
+				"description" : "identifier for the source scheme"
+			},
+			"identifier_target_export" : {
+				"type" : "string",
+				"description" : "identifier for the target export"
+			},
+			"mappings" : {
+				"type" : "array",
+				"items" : {
+					"type" : "object",
+					"required" : ["source_entity", "target_entity"],
+					"properties" : {
+						"source_entity" : {
+							"type" : "string",
+							"description" : "identifier source entity"
+						},
+						"target_entity" : {
+							"type" : "string",
+							"description" : "identifer target entity"
+						}
+					}
+				}
+			}
+		}
+	}
+}
