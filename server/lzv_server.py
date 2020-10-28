@@ -853,7 +853,7 @@ def get_user_stored_ingests():
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    query = {"selecter" : {"owner" : user_id}}
+    query = {"selector" : {"owner" : user_id}}
     response = json.loads(query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"]))
     return json.dumps(response['docs'])
 

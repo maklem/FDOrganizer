@@ -1,125 +1,133 @@
-  [
-    {
-      "title": "Dublin Core",
-      "version": "1.1",
-      "identifier": "DC1.1",
-      "active": true,
-      "fields": [
-        {
-          "field_identifier" : "title",
-          "field_name": "title",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Name given to the resource."
-        },
-        {
-          "field_identifier" : "creator",
-          "field_name": "creator",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Entity primarily responsible for making the resource."
-        },
-        {
-          "field_identifier" : "subject",
-          "field_name": "subject",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Topic of the resource. (Keywords)"
-        },
-        {
-          "field_identifier" : "description",
-          "field_name": "description",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Description may include, but is not limited to, an abstract, a table of contents, a graphical representation, or a free-text account of the resource."
-        },
-        {
-          "field_identifier" : "publisher",
-          "field_name": "publisher",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Entity responsible for making the resource available."
-        },
-        {
-          "field_identifier" : "contributor",
-          "field_name": "contributor",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Additional contributors the the resource."
-        },
-        {
-          "field_identifier" : "date",
-          "field_name": "date",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Point of time associated with the creation of the resource. (f.e. date of release)"
-        },
-        {
-          "field_identifier" : "type",
-          "field_name": "type",
-          "field_type": "cv",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_options": [
-            "Collection",
-            "Dataset",
-            "Event",
-            "Image",
-            "InteractiveResource",
-            "MovingImage",
-            "PhysicalObject",
-            "Service",
-            "Software",
-            "Sound",
-            "Still Image",
-            "Text"
-          ],
-          "field_description": "Resource type according to DCMI-Type."
-        },
-        {
-          "field_identifier" : "format",
-          "field_name": "format",
-          "field_type": "cv",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_options": [
-            "Application",
-            "Audio",
-            "Example",
-            "Image",
-            "Message",
-            "Model",
-            "Multipart",
-            "Text",
-            "Video"
-          ],
-          "field_description": "Resource format according to Internet Media Type."
-        },
-        {
-          "field_identifier" : "identifier",
-          "field_name": "identifier",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Sequence of characters that uniquely identifies this resource (f.e. IBAN, DOI)"
-        },
-        {
-          "field_identifier" : "source",
-          "field_name": "source",
-          "field_type": "string",
-          "field_mandatory": false,
-          "field_multiple": true,
-          "field_description": "Related resource from which the described resource is derived."
-        },
-        {
-          "field_identifier" : "language",
-          "field_name": "language",
-          "field_type": "cv",
-    
+[
+  {
+    "title": "TestScheme",
+    "version": "1.0",
+    "identifier": "TestScheme1.0",
+    "active": true,
+    "fields": [
+      {
+        "entity_type": "GROUP",
+        "identifier": "identifier_group",
+        "name": "Identifiers",
+        "multiple": true,
+        "mandatory": true,
+        "fields": [
+          {
+            "entity_type": "FIELD",
+            "identifier": "identifier",
+            "name": "Identifier",
+            "field_type": "string",
+            "mandatory": true,
+            "multiple": true,
+            "description": "Unique Identifier of the Item (DOI,...)"
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "identifier_type",
+            "name": "Identifier Type",
+            "field_type": "cv",
+            "mandatory": true,
+            "multiple": true,
+            "description": "The type of the main identifier.",
+            "field_options": [
+              "DOI"
+            ]
+          }
+        ]
+      },
+      {
+        "entity_type": "GROUP",
+        "identifier": "creator_group",
+        "name": "Creator(s)",
+        "multiple": true,
+        "mandatory": true,
+        "fields": [
+          {
+            "entity_type": "FIELD",
+            "identifier": "creator",
+            "name": "Creator",
+            "field_type": "string",
+            "mandatory": true,
+            "multiple": false,
+            "description": "Main Creator of the Item. (Family Name, Given Name)"
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "name_type",
+            "name": "Name Type",
+            "field_type": "cv",
+            "mandatory": true,
+            "multiple": false,
+            "field_options": [
+              "Personal",
+              "Organizational"
+            ]
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "craetor_given_name",
+            "name": "Given Name",
+            "field_type": "string",
+            "mandatory": false,
+            "multiple": false
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "craetor_family_name",
+            "name": "Family Name",
+            "field_type": "string",
+            "mandatory": false,
+            "multiple": false
+          },
+          {
+            "entity_type": "GROUP",
+            "identifier": "creator_identifier_group",
+            "name": "Creator Identifier",
+            "multiple": true,
+            "mandatory": true,
+            "fields": [
+              {
+                "entity_type": "FIELD",
+                "identifier": "creator_name_identifier",
+                "name": "Identifier",
+                "field_type": "string",
+                "mandatory": true,
+                "multiple": false
+              },
+              {
+                "entity_type": "FIELD",
+                "identifier": "creator_name_identifier_scheme",
+                "name": "Identifier Scheme",
+                "field_type": "cv",
+                "mandatory": true,
+                "multiple": false,
+                "field_options": [
+                  "GND",
+                  "ORCID"
+                ]
+              },
+              {
+                "entity_type": "FIELD",
+                "identifier": "creator_name_identifier_scheme_uri",
+                "name": "Identifier Scheme URI",
+                "field_type": "string",
+                "mandatory": true,
+                "multiple": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "entity_type": "FIELD",
+        "identifier": "publication_year",
+        "name": "Publication Year",
+        "field_type": "int",
+        "mandatory": true,
+        "multiple": true,
+        "description": "Publication Year of the Item.",
+        "field_verification": "^[0-9]{4}$"
+      }
+    ]
+  }
+]

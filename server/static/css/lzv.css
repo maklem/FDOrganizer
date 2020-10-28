@@ -397,24 +397,6 @@ img.avatar {
   background-color: var(--detail_button_hover_color);
 }
 
-.sidebarUserSet {
-
-}
-
-/*.deleteSetButton {
-  margin-top: 8px;
-  background-color: red;
-  text-orientation: center;
-  text-align: center;
-  border-radius: 50%;
-  width: 8px;
-  height: 15px;
-}
-*/
-.sidebarSubItemContainer {
-
-}
-
 .round-button {
   /*padding-top: -50%;*/
   /*margin-top: -10%;*/
@@ -456,18 +438,41 @@ img.avatar {
 
 
 
-
+.meta_form_group {
+  margin-left: 4px;
+  margin-top: 4px;
+  border-radius: 3px;
+  border: 2px solid #dddddd;
+  width: 95%;
+}
 
 .metaFormElement {
   border-radius: 1px;
   border: 1px #333333;
-  width: 80%;
+  width: 95%;
+  margin-left: 4px;
   
 }
 .metaFormUIField input {
   border-radius: 3px;
   width: 50%;
   height: 30px;
+}
+
+#right_sidebar {
+  width: 100%;
+  position: relative;
+}
+
+#sidebar_buttons{
+  position: fixed;
+  float: right;
+  width: 20%;
+}
+
+#sidebar_buttons button {
+  float: top;
+  width: 95%;
 }
 
 select{
@@ -485,6 +490,19 @@ select{
   font-size: 16px;
 }
 
+.duplicate_field_button {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 150px;
+  height: 30px;
+  background-color: var(--main_button_color);
+  border-radius: 5px;
+  border: none;
+}
+
+.duplicate_field_button:hover {
+  background-color: var(--main_button_hover_color);
+}
 .metaFormCVField {
       position: relative;
 }

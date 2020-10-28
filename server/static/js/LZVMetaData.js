@@ -70,28 +70,59 @@ function searchMetaDataUserSetsByID(id) {
 	return cookie_data.find(set=>set.set_id == id);
 }
 
+function crawl_meta_group(group) {
+	var output = {"group_identifier" : $(group).attr('id'), "fields" : []};
+	var group_subgroups = $(group).children('.meta_form_group');
+	for (var subgroup of group_subgroups) {
+		output.fields.push(crawl_meta_group(subgroup));
+	}
+	var group_fields = $(group).children('.metaFormElement');
+	for (var gr_field of group_fields) {
+		var fields = $(gr_field).find(':input');
+		for(var field of fields){
+		if(field.value) {
+			var existing_field = output.fields.find(f=>f.field_identifier == field.name);
+			if (existing_field) {
+				existing_field.values.push(field.value);
+			}
+			else {
+				output.fields.push({"field_identifier" : field.name, "values" : [field.value]});
+			}
+		}
+	}
+	}
+	return output;
+}
+
 function getActiveMetaDataSet() {
 	var saveData = {};
 	var formHeaderFields = $('#metaDataFormHeader');
-	var formFieldsInput = $('#metaDataForm').find('input, select'); 
-	console.log(formHeaderFields);
 	saveData.name = formHeaderFields.find('input')[0].value;
 	saveData.identifier = formHeaderFields.find('#title').attr('name');
 	saveData.set_id = formHeaderFields.find('#title').attr('set_id');
 	saveData.fields = [];
-	for (var i = 0; i <formFieldsInput.length; i++) {
-		var field = formFieldsInput[i];
+	var form_field_groups = $('#metaDataForm').children('.meta_form_group');
+	for (var j = 0; j <form_field_groups.length; j++) {
+		saveData.fields.push(crawl_meta_group(form_field_groups[j]));
+	}
+	var form_field_input = $('#metaDataForm').children('.metaFormElement');
+	for (var gr_field of form_field_input) {
+		var fields = $(gr_field).find(':input');
+		for(var field of fields){
 		if(field.value) {
 			var name = field.name;
-			var saveDataField = saveData.fields.find(f=>f.field_name == name);
+			var saveDataField = saveData.fields.find(f=>f.field_identifier == name);
 			if (saveDataField) {
 				saveDataField.values.push(field.value);
+
 			}
 			else {
-				saveData.fields.push({"field_name" : name, "values" : [field.value]});
+				saveData.fields.push({"field_identifier" : field.name, "values" : [field.value]});
 			}
 		}
+		}
 	}
+	console.log(JSON.stringify(saveData));
 	return saveData;
 }
 
@@ -99,7 +130,7 @@ function getActiveMetaDataSet() {
 function saveActiveMetaDataSet() {
 	saveData = getActiveMetaDataSet();
 	if(saveData.name == ''){
-		alert('Please entere a name for the data set before saving!');
+		alert('Please enter a name for the data set before saving!');
 		return;
 	}
 	unsaved = false;
@@ -112,7 +143,7 @@ function copyActiveMetaDataSet() {
 	clicked_set_id = $('#title').attr('set_id');
 	var user_set = userSets.find(set=>set.set_id == clicked_set_id);
 	if (user_set && user_set !== null){
-		var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
+		var meta_struc = metaStructure.find(struc=>struc.identifier == user_set.identifier);
 		fillMetaDataForm(meta_struc,user_set,true);
 	}
 }
@@ -182,7 +213,7 @@ function createFormForNewSchemeItem(clicked){
     }
 	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
 	clicked_id = $(clicked).attr('id');
-	var clickedStruc = metaStructure.schemes.find(struc=>struc.identifier == clicked_id);
+	var clickedStruc = metaStructure.find(struc=>struc.identifier == clicked_id);
 	if(clickedStruc) {
 		fillMetaDataForm(clickedStruc);
 	}
@@ -199,8 +230,157 @@ function createFormForExistingSchemeSet(clicked) {
 	userSets= JSON.parse(getLocalStorage("metaDataUserSets"));
 	clicked_set_id = $(clicked).attr('id');
 	var user_set = userSets.find(set=>set.set_id == clicked_set_id);
-	var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
+	var meta_struc = metaStructure.find(struc=>struc.identifier == user_set.identifier);
 	fillMetaDataForm(meta_struc,user_set);
+}
+
+function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, create_dupe=false) {
+	var output = '';
+	console.log("create dupe:");
+	console.log(create_dupe);
+	console.log("prefill values:");
+	console.log(prefill_values);
+	if (field.entity_type == "GROUP") {
+		if (create_dupe)
+		{
+			output += '<div class="meta_form_group clone" id="' + field.identifier + '"><label for="' + field.identifier + '" >';
+		}
+		else
+		{
+			output += '<div class="meta_form_group orig" id="' + field.identifier + '"><label for="' + field.identifier + '" >';
+		}
+		output += '<div class="meta_group_name">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</div><div class="meta_group_description">'+ field.description +'</div></label>';
+		for(var i=0; i<field.fields.length; i++){
+			if(prefill_values){
+			if (field.fields[i].entity_type == "GROUP")
+			{
+				var prefills = prefill_values.fields.filter(f=>f.group_identifier == field.fields[i].identifier);
+				for(var prefill of prefills){
+					output += createHTMLOutputForMetaSchemeEntity(field.fields[i],prefill);
+				}
+			}
+			else
+			{
+				var prefill = undefined;
+				prefill = prefill_values.fields.find(f=>f.field_identifier == field.fields[i].identifier);
+				output += createHTMLOutputForMetaSchemeEntity(field.fields[i],prefill);
+			}
+			}
+			else {
+				output += createHTMLOutputForMetaSchemeEntity(field.fields[i]);
+			}
+		}
+		if(field.multiple) {
+			if(create_dupe) {
+				output += '<button type="button" class="remove_field_button" onclick="remove_meta_group(this);">delete</button>';
+			}
+			else{
+				output += '<button type="button" class="duplicate_field_button" id="' + field.identifier + '"onclick="duplicate_meta_group(this);">duplicate</button>';
+			}
+		}
+		output += '</div>';
+	}
+	else { //entity_type == FIELD
+		console.log("in create entity:");
+		console.log(prefill_values);
+		if (prefill_values)
+		{
+			for(var j = 0; j < prefill_values.values.length; j++){
+				if (j ==0)
+				{
+					console.log("value[j]");
+					console.log(prefill_values.values[j]);
+					output += create_htmlfield_from_template(field,prefill_values.values[j],false);
+				}
+				else
+				{
+					console.log("value[j]");
+					console.log(prefill_values.values[j]);
+					output += create_htmlfield_from_template(field,prefill_values.values[j],true);
+				}
+			}
+		}
+		else
+		{
+			output += create_htmlfield_from_template(field);
+		}
+	}
+	return output;
+}
+
+function create_htmlfield_from_template(field, value=undefined, dupe=false){
+	console.log("create field");
+	console.log(value);
+	var output = '';
+	output += '<div class="metaFormElement"><label class="formDescriptor" for="';
+		output += field.identifier + '" ';
+		output += '><div class="metaFieldName">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</div>';
+		if (field.identifier !== undefined) {
+			output += '<div class="metaFieldDescription">'+ field.description +'</div></label>';
+		}
+		if (field.field_type != 'cv') {
+			if (value)
+			{output += '<div class="table_form_ui_field orig"><input value="' + value + '"';}
+		else
+			{output += '<div class="table_form_ui_field orig"><input value=""';}
+		}
+		else {
+			output += '<div class="table_form_ui_field metaFormCVField orig"><select ';
+		}
+		output += 'name="' + field.identifier + '" ';
+		if (field.mandatory){
+			output += 'required ';
+		}
+		switch(field.field_type) {
+			case 'string':
+				output += 'type="text" ';
+				break;
+			case 'int':
+				output += 'type="number" ';
+				break;
+			case 'float':
+				output += 'type="number" step="any" ';
+				break;
+			case 'cv':
+				output += '>\n';
+				if(value){
+					output += '<option value=""></option>';
+				}
+				else{
+					output += '<option selected value=""></option>';
+				}
+				for (var option of field.field_options){
+					if(option == value)
+					{
+						output += '<option selected value="'+option+'">'+option+'</option>';
+					}
+					else
+					{
+						output += '<option value="'+option+'">'+option+'</option>';
+					}
+				}
+				break;
+		}
+		if (field.field_type != 'cv') {
+			if(field.field_verification) {
+				output += 'pattern="' + field.field_verification + '" ';
+			}
+			output += '>';
+		}
+		else {
+			output += '</select>';
+		}
+		if(field.multiple) {
+			if (!dupe)
+			{
+				output += '<button type="button" class="duplicate_field_button" id="' + field.name +'" onclick="duplicateMetaDataField(this);">+</button>';
+			}
+			else{
+				output += '<button type="button" class="remove_field_button" onclick="removeMetaDataField(this);">-</button>';
+			}
+		}
+		output += '</div></div>';
+	return output;
 }
 
 //this function creates a form for creation of meta data
@@ -227,58 +407,38 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 	$('#metaDataFormHeader').empty();
 	$(headerHTML).appendTo('#metaDataFormHeader');
 	$('#metaDataForm').empty();
+	console.log("metaStruc");
+	console.log(metaStruc);
+	console.log("userInputSet");
+	console.log(userInputSet);
 	for (var i=0; i<metaStruc.fields.length; i++){
 		var inputHTML = '';
 		var field = metaStruc.fields[i];
-		inputHTML += '<div class="metaFormElement"><label class="formDescriptor" for="';
-		inputHTML += field.field_name + '" ';
-		inputHTML += '><div class="metaFieldName">' + field.field_name.charAt(0).toUpperCase() + field.field_name.slice(1) + '</div><div class="metaFieldDescription">'+ field.field_description +'</div></label>';
-		if (field.field_type != 'cv') {
-			inputHTML += '<div class="table_form_ui_field orig"><input ';
-		}
-		else {
-			inputHTML += '<div class="table_form_ui_field metaFormCVField orig"><select ';
-		}
-		inputHTML += 'name="' + field.field_name + '" ';
-		if (field.field_mandatory){
-			inputHTML += 'required ';
-		}
-		switch(field.field_type) {
-			case 'string':
-				inputHTML += 'type="text" ';
-				break;
-			case 'int':
-				inputHTML += 'type="number" ';
-				break;
-			case 'float':
-				inputHTML += 'type="number" step="any" ';
-				break;
-			case 'cv':
-				inputHTML += '>\n';
-				inputHTML += '<option selected value=""></option>';
-				for (var j=0; j<field.field_options.length; j++){
-					option = field.field_options[j];
-					inputHTML += '<option value="'+option+'">'+option+'</option>';
+		console.log(field.identifier);
+		if(hasUserInput) {
+			if (field.entity_type == "GROUP")
+			{
+				var prefills = userInputSet.fields.filter(f=>f.group_identifier == field.identifier);
+				for(var prefill of prefills){
+					inputHTML += createHTMLOutputForMetaSchemeEntity(field,prefill,false);
 				}
-				break;
-		}
-		if (field.field_type != 'cv') {
-			if(field.field_verification) {
-				inputHTML += 'pattern="' + field.field_verification + '" ';
 			}
-			inputHTML += '>';
+			else
+			{
+				var prefill = undefined;
+				prefill = userInputSet.fields.find(f=>f.field_identifier == field.identifier);
+				console.log("prefill");
+				console.log(prefill);
+				inputHTML += createHTMLOutputForMetaSchemeEntity(field,prefill,false);
+			}
 		}
 		else {
-			inputHTML += '</select>';
+			inputHTML =  createHTMLOutputForMetaSchemeEntity(field, create_dupe=false);
 		}
-		if(field.field_multiple) {
-			inputHTML += '<button type="button" class="duplicate_field_button" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
-		}
-		inputHTML += '</div></div>';
 		$(inputHTML).appendTo('#metaDataForm');
 	}
-	$('#metaDataFormFooter').empty();
-	var footerHTML = '<div id="footerButtonDiv">';
+	$('#right_sidebar').empty();
+	var footerHTML = '<div id="sidebar_buttons">';
 	footerHTML += '<button type="button" class="btn lzvButton" id="saveMetaDataForm" onclick="saveActiveMetaDataSet();">Save</button>';
 	footerHTML += '<button type="button" class="btn lzvButton" id="copyMetaDataSet" onclick="copyActiveMetaDataSet();">Copy Set</button>';
 	footerHTML += '<button type="button" class="btn lzvButton" id="exportToDC" onclick="exportSetToDC();">Export to Dublin Core</button>';
@@ -286,28 +446,81 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 	footerHTML += '<button type="button" class="btn lzvButton" id="exportToJSON" onclick="exportSetToJSON();">Export to JSON</button>';
 	// function exportSetToXML()
 	footerHTML += '</div>';
-	$(footerHTML).appendTo('#metaDataFormFooter');
-	if (hasUserInput) { //fill fields with values from user field
-		for(var k = 0; k < userInputSet.fields.length; k++) {
-			var field = userInputSet.fields[k];
-			var input = $('#metaDataForm').find('input[name=' + field.field_name +  ']');
-			if (input.length>0){
-				input.attr('value',field.values[0]);
+	$(footerHTML).appendTo('#right_sidebar');
+	// if (hasUserInput) { //fill fields with values from user field
+	// 	prefill_form_input(userInputSet);
+	// }
+}
+//expects the user set for input
+function prefill_form_input(content) {
+	console.log("prefill");
+	var done_groups = {};
+	for( var item of content.fields){
+		console.log("A:");
+		console.log(item);
+		console.log(done_groups);
+		if (item.group_identifier && !done_groups.group_identifier) //group
+		{
+			done_groups[item.group_identifier] = true;
+			var groups = content.fields.filter(f=>f.group_identifier == item.group_identifier);
+			console.log(groups);
+			console.log("---");
+			for (var i = 1; i < groups.length; i++){
+				console.log("B");
+				console.log(groups[i]);
+				duplicate_meta_group_by_id(item.group_identifier,groups[i]);
 			}
-			else {
-				var select = $('#metaDataForm').find('select[name=' + field.field_name +  ']');
-				select.val(field.values[0]);
-			}
-			for( var l = 1; l < field.values.length; l++){
-				duplicateMetaDataField($('#metaDataForm').find('input[name=' + field.field_name +  '], select[name=' + field.field_name +  ']').siblings('button'), field.values[l]);
-			}
+		}
+		else //field
+		{
+
 		}
 	}
 }
 
-function checkIfActiveFormHasInput() {
-	var fields = $('#metaDataForm').find('input, select');
+function get_active_scheme_identifier(){
+	return $("#title").attr('name');
 }
+//search for group in meta schemes (struc), and returns strucuture downwoards from this group as json object
+function search_for_group(struc, identifier) {
+	console.log(struc);
+	for (var field of struc.fields) {
+		if(field.entity_type == 'GROUP') {
+			if(field.identifier == identifier){
+				return field;
+			}
+			else
+			{
+				var val = search_for_group(field,identifier);
+				if (typeof val != "boolean") {
+					return val;
+				}
+
+			}
+		}
+		else { //type == Field
+			continue;
+		}
+	}
+	return false;
+}
+
+function duplicate_meta_group(clicked, prefill_values = null) {
+	var identifier = $(clicked).parent('.orig').attr('id');
+	var metaStructures = JSON.parse(getLocalStorage("metaDataStructs"));
+	var meta_struc = metaStructures.find(struc => struc.identifier == get_active_scheme_identifier());
+	console.log("Meta Struc:");
+	console.log(meta_struc);
+	var dupe_group = search_for_group(meta_struc, identifier);
+	if(typeof dupe_group == "boolean") {return;}
+	var html_append = createHTMLOutputForMetaSchemeEntity(dupe_group, prefill_values, true,);
+	$(html_append).insertAfter($(clicked).parent('.orig'));
+}
+
+function remove_meta_group(clicked) {
+	var identifier = $(clicked).parent('.clone').remove();
+}
+
 
 function duplicateMetaDataField(clicked,prefillValue = null){
 	var tmp = $(clicked).parent('.orig').clone();
@@ -330,7 +543,7 @@ function duplicateMetaDataField(clicked,prefillValue = null){
 			select.val(prefillValue);
 		}
 		else{
-			select.val('');	
+			select.val('');
 		}
 	}
 	var removeButton = '<button type="button" class="remove_field_button" onclick="removeMetaDataField(this);">-</button>';
@@ -366,7 +579,7 @@ function updateSideBar() {
 function updateSideBarMetaSchemes(metaStruc) {
 	$('#newItemsSubItems').empty();
 	var append = '';
-	for (var scheme of metaStruc.schemes) {
+	for (var scheme of metaStruc) {
 		if(scheme.active){
 		append += '<button class="sidebarItem sidebarSubItem" id="' + scheme.identifier + '" onclick="createFormForNewSchemeItem(this);">' + scheme.title + ' ' + scheme.version + '</button><br>';
 	}

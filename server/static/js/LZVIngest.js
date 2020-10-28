@@ -400,7 +400,7 @@ function createPopupFormContent(metaStruc,userInputSet) {
 	for (var i=0; i<metaStruc.fields.length; i++){
 		var field = metaStruc.fields[i];
 		returnHTML += '<div class="metaFormElement"><label class="formDescriptor" for="';
-		returnHTML += field.field_name + '" ';
+		returnHTML += field.field_identifier + '" ';
 		returnHTML += '><div class="metaFieldName">' + field.field_name.charAt(0).toUpperCase() + field.field_name.slice(1) + '</div><div class="metaFieldDescription">'+ field.field_description +'</div></label>';
 		if (field.field_type != 'cv') {
 			returnHTML += '<div class="metaFormUIField orig"><input ';
@@ -408,7 +408,7 @@ function createPopupFormContent(metaStruc,userInputSet) {
 		else {
 			returnHTML += '<div class="metaFormUIField metaFormCVField orig"><select ';
 		}
-		returnHTML += 'name="' + field.field_name + '" ';
+		returnHTML += 'name="' + field.field_identifier + '" ';
 		if (field.field_mandatory){
 			returnHTML += 'required ';
 		}
@@ -463,16 +463,16 @@ function saveAndCloseMetaPopup() {
 function prefillWithUserValue(userInputSet) {
 	for(var i = 0; i < userInputSet.fields.length; i++) {
 		var field = userInputSet.fields[i];
-		var input = $('#metaDataForm').find('input[name=' + field.field_name +  ']');
+		var input = $('#metaDataForm').find('input[name=' + field.field_identifier +  ']');
 		if (input.length>0){
 			input.attr('value',field.values[0]);
 		}
 		else {
-			var select = $('#metaDataForm').find('select[name=' + field.field_name +  ']');
+			var select = $('#metaDataForm').find('select[name=' + field.field_identifier +  ']');
 			select.val(field.values[0]);
 		}
 		for( var j = 1; j < field.values.length; j++){
-			duplicateMetaDataField($('#metaDataForm').find('input[name=' + field.field_name +  '], select[name=' + field.field_name +  ']').siblings('button'), field.values[j]);
+			duplicateMetaDataField($('#metaDataForm').find('input[name=' + field.field_identifier +  '], select[name=' + field.field_identifier +  ']').siblings('button'), field.values[j]);
 		}
 	}
 }
