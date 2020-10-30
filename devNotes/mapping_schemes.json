@@ -8,9 +8,12 @@
 				"type" : "string",
 				"description" : "unique identifier for the mapping set"
 			},
-			"identifier_source_scheme" : {
-				"type" : "string",
-				"description" : "identifier for the source scheme"
+			"identifier_source_schemes" : {
+				"type" : "array",
+				"items" : {
+					"type" : "string",
+					"description" : "identifier for the source scheme"
+				}
 			},
 			"identifier_target_export" : {
 				"type" : "string",

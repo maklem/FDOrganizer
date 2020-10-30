@@ -42,15 +42,47 @@
                 },
                 "prefix": {
                   "type": "string",
-                  "description": "prefix being printed before group"
+                  "description": "prefix being printed before group once"
                 },
                 "suffix": {
                   "type": "string",
-                  "description": "suffic being printed after group"
+                  "description": "suffix being printed after group once"
+                },
+                "item_prefix": {
+                  "type": "string",
+                  "description": "prefix being printed before each element of group"
+                },
+                "item_suffix": {
+                  "type": "string",
+                  "description": "suffix being printed after each element of group"
                 },
                 "left_empty": {
                   "type": "string",
                   "description": "content to be printed when nothing related to this identifer. default empty"
+                },
+                "export_items": {
+                  "$ref": "ref_export_items"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "entity_type"
+              ],
+              "properties": {
+                "entity_type": {
+                  "type": "string",
+                  "const": "STRUCTURE",
+                  "description": "type of element, if its a group or field or structure"
+                },
+                "prefix": {
+                  "type": "string",
+                  "description": "prefix being printed before structure once"
+                },
+                "suffix": {
+                  "type": "string",
+                  "description": "suffix being printed after structure once"
                 },
                 "export_items": {
                   "$ref": "ref_export_items"
@@ -87,7 +119,7 @@
                 },
                 "skip_if_empty": {
                   "type": "boolean",
-                  "description": "IF True: Skip other output from field on same level in a export item if this is empty (=no field with that name!)"
+                  "description": "IF True: Skip other output from fields on same level in the same structure/group in a export item, if this is empty (=no field with that name or empty value), Default False"
                 }
               }
             }
