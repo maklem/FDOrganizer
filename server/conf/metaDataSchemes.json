@@ -8,8 +8,8 @@
       {
         "entity_type": "GROUP",
         "identifier": "identifier_group",
-        "name": "Identifiers",
-        "multiple": true,
+        "name": "Identifier",
+        "multiple": false,
         "mandatory": true,
         "fields": [
           {
@@ -18,7 +18,7 @@
             "name": "Identifier",
             "field_type": "string",
             "mandatory": true,
-            "multiple": true,
+            "multiple": false,
             "description": "Unique Identifier of the Item (DOI,...)"
           },
           {
@@ -27,7 +27,7 @@
             "name": "Identifier Type",
             "field_type": "cv",
             "mandatory": true,
-            "multiple": true,
+            "multiple": false,
             "description": "The type of the main identifier.",
             "field_options": [
               "DOI"
@@ -124,7 +124,7 @@
         "name": "Publication Year",
         "field_type": "int",
         "mandatory": true,
-        "multiple": true,
+        "multiple": false,
         "description": "Publication Year of the Item.",
         "field_verification": "^[0-9]{4}$"
       }
