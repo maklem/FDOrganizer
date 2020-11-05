@@ -1,6 +1,6 @@
 [
   {
-    "identifier": "datacite_export_4_3",
+    "identifier": "datacite_xml",
     "file_prefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><resource xmlns=\"https://schema.datacite.org/meta/kernel-4.3/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://schema.datacite.org/meta/kernel-4.3/ https://schema.datacite.org/meta/kernel-4.3/metadata.xsd\">",
     "file_suffix": "</resource>",
     "export_items": [
@@ -92,8 +92,8 @@
       {
         "type": "FIELD",
         "identifier": "publication_year",
-        "prefix": "<publicationYear>",
-        "suffix": "</publicationYear>"
+        "item_prefix": "<publicationYear>",
+        "item_suffix": "</publicationYear>"
       }
     ]
   }
