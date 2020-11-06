@@ -113,7 +113,9 @@ def remove_skip_if_empty_usersets(export_item, userset_locations):
     for us_loc in userset_locations:
         if not check_for_skip_if_empty(export_item, us_loc):
             output.append(us_loc)
-    return output
+    return output;
+
+
 
 def check_for_skip_if_empty(export_item, userset_location):
     for ex_it in export_item['export_items']:
