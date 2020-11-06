@@ -3,12 +3,16 @@
   "items": {
     "type": "object",
     "required": [
-      "identifier"
+      "identifier", "name"
     ],
     "properties": {
       "identifier": {
         "type": "string",
         "description": "unique identifiying string for the export schem"
+      },
+      "name": {
+        "type": "string",
+        "description": "name for the export, will be used in UI"
       },
       "file_prefix": {
         "type": "string",
@@ -113,9 +117,17 @@
                   "type": "string",
                   "description": "suffic being printed after field"
                 },
+                "item_prefix": {
+                  "type": "string",
+                  "description": "prefix being printed before each element of group"
+                },
+                "item_suffix": {
+                  "type": "string",
+                  "description": "suffix being printed after each element of group"
+                },
                 "left_empty": {
                   "type": "string",
-                  "description": "content to be printed when nothing related to this identifer. default empty"
+                  "description": "content to be printed when nothing related to this identifer. default empty. left_empty is not printed if skip_if_empty is true for an element and it has no value"
                 },
                 "skip_if_empty": {
                   "type": "boolean",
