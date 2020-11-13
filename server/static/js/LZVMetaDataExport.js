@@ -1,75 +1,58 @@
-var exports_;
-var mappings;
-var schemes;
-var usersets;
+class metadata_export_handler {
+    //creates an export handler for a combination of export & mapping. can then be called with individual usersets to get exports
 
-
-var export_userset_mapping = {};
-var userset_export_mapping = {};
-var target_export = 'datacite_xml';
-var scheme_identifier = userset['identifier']
-
-function find_export() {
-	var el = exports_.filter(ex=>ex.identifier == target_export);
-	if (el.length > 0) {
-		return el[0];
-	}
+    constructor(export_definition,mapping) {
+        if (mapping['identifier_target_export'] != export_definition['identifier']) {
+            throw 'error, identifiers from mapping and export dont fit.';
+        }
+        this.export_definition = export_definition;
+        this.mapping = mapping;
+        this.export_userset_mapping = {};
+        // this.userset_export_mapping = {};
+        this.create_export_to_userset_identifier_dictionary(mapping);
 }
 
-function find_scheme() {
-	var el = mappings.filter(ex=>ex.identifier == target_export);
-	if (el.length > 0) {
-		return el[0];
-	}
-}
-
-function find_mapping() {
-	var el = mappings.filter(ex=>ex.identifier_target_export == target_export && ex.identifier_source_schemes.includes(scheme_identifier));
-	if (el.length > 0) {
-		return el[0];
-	}
-}
-
-function create_export_to_userset_identifier_dictionary(){
-	for(var mapping_item in mapping.mappings){
-		export_userset_mapping[mapping_item.target_entity] = mapping_item.source_entity;
-		userset_export_mapping[mapping_item.source_entity] = mapping_item.target_entity;
+    create_export_to_userset_identifier_dictionary(mapping){
+	for(var mapping_item of mapping.mappings){
+		this.export_userset_mapping[mapping_item.target_entity] = mapping_item.source_entity;
+		// this.userset_export_mapping[mapping_item.source_entity] = mapping_item.target_entity;
  	}
 }
 
-function check_for_skip_if_empty(export_item, userset_location) {
-	for (var ex_it in export_item.export_items) {
+    check_for_skip_if_empty(export_item, userset_location) {
+	for (var ex_it of export_item.export_items) {
         if (ex_it.type == 'FIELD' && 'skip_if_empty' in ex_it && ex_it.skip_if_empty) {
-            userset_related_fields = userset_location.fields.filter(x=>'field_identifier' in x && x.field_identifier == export_userset_mapping[ex_it.identifier]);
+            var userset_related_fields = userset_location.fields.filter(x=>'field_identifier' in x && x.field_identifier == this.export_userset_mapping[ex_it.identifier]);
             if (userset_related_fields.length == 0) {
                 return true;
             }
+        }
 	}
     return false;
 }
 
-function remove_skip_if_empty_usersets(export_item, userset_locations){
+    remove_skip_if_empty_usersets(export_item, userset_locations){
     var output = [];
-    for (var us_loc in userset_locations) {
-        if (!check_for_skip_if_empty(export_item, us_loc)){
-            output.push(us_loc)
+    for (var us_loc of userset_locations) {
+        if (!this.check_for_skip_if_empty(export_item, us_loc)){
+            output.push(us_loc);
         }
     }
-    return output
+    return output;
 }
 
-function process_export_item(export_item,userset_location){
-    var utput = '';
-   	var userset_related_entitys = [];
+    process_export_item(export_item,userset_location){
+    var output = '';
+   	// var userset_related_entitys = [];
     if (export_item.type == 'STRUCTURE'){
-        if (check_for_skip_if_empty(export_item, userset_location)){
+        if (this.check_for_skip_if_empty(export_item, userset_location)){
             return '';
         }
         if ('prefix' in export_item){
             output += export_item.prefix;
         }
-        for (var ex_it in export_item.export_items){
-            output += process_export_item(ex_it, userset_location);
+        for (var ex_it of export_item.export_items){
+            output += this.process_export_item(ex_it, userset_location);
         }
         if ('suffix' in export_item) {
             output += export_item.suffix;
@@ -77,18 +60,21 @@ function process_export_item(export_item,userset_location){
     }
     if (export_item.type == 'GROUP') {
         var export_identifier = export_item.identifier;
-        var userset_related_entitys = userset_location.fields.filter(x=>'group_identifier' in x && x.group_identifier == export_userset_mapping.export_identifier);
-        userset_related_entitys = remove_skip_if_empty_usersets(export_item, userset_related_entitys);
+        console.log(export_identifier);
+        var userset_related_entitys = userset_location.fields.filter(x=>'group_identifier' in x && x.group_identifier == this.export_userset_mapping[export_identifier]);
+        console.log(JSON.stringify(userset_related_entitys));
+        userset_related_entitys = this.remove_skip_if_empty_usersets(export_item, userset_related_entitys);
+        console.log(JSON.stringify(userset_related_entitys));
         if (userset_related_entitys.length > 0){
             if ('prefix' in export_item){
                 output += export_item.prefix;
             }
-            for (var us_it in userset_related_entitys) {
+            for (var us_it of userset_related_entitys) {
                 if ('item_prefix' in export_item) {
                         output += export_item.item_prefix;
                 }
-                for (var ex_it in export_item.export_items) {
-                    output += process_export_item(ex_it, us_it);
+                for (var ex_it of export_item.export_items) {
+                    output += this.process_export_item(ex_it, us_it);
                 }
                 if ('item_suffix' in export_item) {
                         output += export_item.item_suffix;
@@ -106,13 +92,13 @@ function process_export_item(export_item,userset_location){
     }
     if (export_item.type == 'FIELD'){
         var export_identifier = export_item.identifier;
-        var userset_related_entitys = userset_location.fields.filter(x=>'field_identifier' in x && x.field_identifier == export_userset_mapping[export_identifier]);
+        var userset_related_entitys = userset_location.fields.filter(x=>'field_identifier' in x && x.field_identifier == this.export_userset_mapping[export_identifier]);
         if (userset_related_entitys.length > 0){
             if ('prefix' in export_item){
                 output += export_item.prefix;
             }
-            for (var us_it in userset_related_entitys) {
-                for (var val in us_it.values) {
+            for (var us_it of userset_related_entitys) {
+                for (var val of us_it.values) {
                     if ('item_prefix' in export_item) {
                         output += export_item.item_prefix;
                     }
@@ -126,28 +112,32 @@ function process_export_item(export_item,userset_location){
                 output += export_item.suffix;
             }
         }
-        else:
+        else {
             if ('left_empty' in export_item) {
                 output += export_item.left_empty;
             }
+        }
     }
     return output;
 }
 
-function create_export(scheme,userset,export,mapping){
+
+//Entry Function for export functionality
+    create_export(userset){
     var file_str = '';
-    if (mapping['identifier_target_export'] != export['identifier'] || not userset['identifier'] in mapping['identifier_source_schemes']) {
-        return 'error, identifiers not matching';
+    if (!userset['identifier'] in this.mapping['identifier_source_schemes'] ) {
+        throw 'error, identifier of provided userset does not match with source_identifier in mapping';
     }
-    if ('file_prefix' in export) {
-        file_str += export.file_prefix;
+    if ('file_prefix' in this.export_definition) {
+        file_str += this.export_definition.file_prefix;
     }
-    for (export_item in export.export_items) {
-        file_str += process_export_item(export_item, userset);
+    for (var export_item of this.export_definition.export_items) {
+        file_str += this.process_export_item(export_item, userset);
     }
-    if ('file_suffix' in export) {
-        file_str += export.file_suffix;
+    if ('file_suffix' in this.export_definition) {
+        file_str += this.export_definition.file_suffix;
     }
-    console.log("Created Output:")
-    console.log(file_str)
+    return file_str;
+}
+
 }

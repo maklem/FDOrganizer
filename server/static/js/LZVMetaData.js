@@ -16,6 +16,36 @@ function getMetaDataStructureInformation(updateSideBar = true){
 	xhttp.send();	
 }
 
+function getMetaDataExportDefinitions(){
+	var url = baseURL +  '/metadata/export_definitions';
+	xhttp.onreadystatechange  = function(e) {
+		if(this.readyState == 4) {
+			if(this.status == 200) {
+				parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
+				setLocalStorage("metadata_export_definitions", JSON.stringify(parsedJSON));
+			}
+		}
+	};
+	xhttp.open('GET', url, false);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send();	
+}
+
+function getMetaDataExportMappings(){
+	var url = baseURL +  '/metadata/export_mappings';
+	xhttp.onreadystatechange  = function(e) {
+		if(this.readyState == 4) {
+			if(this.status == 200) {
+				parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
+				setLocalStorage("metadata_export_mappings", JSON.stringify(parsedJSON));
+			}
+		}
+	};
+	xhttp.open('GET', url, false);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send();	
+}
+
 function getMetaDataUserSets(updateSideBar = true) {
 	var url = baseURL +  '/metadata/user';
 	xhttp.onreadystatechange  = function(e) {
@@ -126,7 +156,6 @@ function getActiveMetaDataSet() {
 	return saveData;
 }
 
-//TODO -> Save Active Metadataset on server. Also reload the page sidebar.
 function saveActiveMetaDataSet() {
 	saveData = getActiveMetaDataSet();
 	if(saveData.name == ''){
@@ -160,49 +189,43 @@ function deleteMetaDataSet(clicked) {
 	}
 }
 
-//LATER
-// function exportSetToXML() {
+// function exportSetToJSON() {
+// 	var print_json = {};
+// 	let data = getActiveMetaDataSet();
+// 	if(data.fields.length == 0) {
+// 		return;
+// 	}
+// 	for (var i = 0; i < data.fields.length; i++) {
+// 		var field = data.fields[i];
+// 		if (field.values.length > 1) {
+// 			print_json[field.field_name] = [];
+// 			for(var j = 0; j < field.values.length; j++) {
+// 				var value = field.values[j];
+// 				print_json[field.field_name].push(value);
+// 			}
+// 		}
+// 		else{
+// 			print_json[field.field_name] = field.values[0];
+// 		}
+// 	}
 // 	var new_page = window.open();
-//   new_page.document.write("output");
+//   	new_page.document.write(JSON.stringify(print_json));
 // }
 
-function exportSetToJSON() {
-	var print_json = {};
-	let data = getActiveMetaDataSet();
-	if(data.fields.length == 0) {
-		return;
-	}
-	for (var i = 0; i < data.fields.length; i++) {
-		var field = data.fields[i];
-		if (field.values.length > 1) {
-			print_json[field.field_name] = [];
-			for(var j = 0; j < field.values.length; j++) {
-				var value = field.values[j];
-				print_json[field.field_name].push(value);
-			}
-		}
-		else{
-			print_json[field.field_name] = field.values[0];
-		}
-	}
-	var new_page = window.open();
-  	new_page.document.write(JSON.stringify(print_json));
-}
-
-function exportSetToDC() {
-  let data = getActiveMetaDataSet();
-  if(data.fields.length == 0) {
-		return;
-	}
-  let print_text = '';
-  for(var i = 0; i < data.fields.length; i++){
-  	for(var j = 0; j < data.fields[i].values.length; j++) {
-  		print_text += data.fields[i].field_name + ': ' + data.fields[i].values[j] + "<br>";
-  }
-  }
-  var new_page = window.open();
-  new_page.document.write(print_text);
-}
+// function exportSetToDC() {
+//   let data = getActiveMetaDataSet();
+//   if(data.fields.length == 0) {
+// 		return;
+// 	}
+//   let print_text = '';
+//   for(var i = 0; i < data.fields.length; i++){
+//   	for(var j = 0; j < data.fields[i].values.length; j++) {
+//   		print_text += data.fields[i].field_name + ': ' + data.fields[i].values[j] + "<br>";
+//   }
+//   }
+//   var new_page = window.open();
+//   new_page.document.write(print_text);
+// }
 
 function createFormForNewSchemeItem(clicked){
     if(unsaved){
@@ -236,11 +259,12 @@ function createFormForExistingSchemeSet(clicked) {
 
 function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, create_dupe=false) {
 	var output = '';
-	console.log("create dupe:");
-	console.log(create_dupe);
-	console.log("prefill values:");
-	console.log(prefill_values);
 	if (field.entity_type == "GROUP") {
+		console.log(field.identifier);
+		console.log("Field");
+		console.log(JSON.stringify(field));
+		console.log("prefill:");
+		console.log(JSON.stringify(prefill_values));
 		if (create_dupe)
 		{
 			output += '<div class="meta_form_group clone" id="' + field.identifier + '"><label for="' + field.identifier + '" >';
@@ -254,6 +278,9 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 			if(prefill_values){
 			if (field.fields[i].entity_type == "GROUP")
 			{
+				console.log(field.fields[i].identifier);
+				console.log("field[i]");
+				console.log(JSON.stringify(field.fields[i]));
 				var prefills = prefill_values.fields.filter(f=>f.group_identifier == field.fields[i].identifier);
 				for(var prefill of prefills){
 					output += createHTMLOutputForMetaSchemeEntity(field.fields[i],prefill);
@@ -272,30 +299,24 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 		}
 		if(field.multiple) {
 			if(create_dupe) {
-				output += '<button type="button" class="remove_field_button" onclick="remove_meta_group(this);">delete</button>';
+				output += '<button type="button" class="meta_form_button remove_button" onclick="remove_meta_group(this);">delete</button>';
 			}
 			else{
-				output += '<button type="button" class="duplicate_field_button" id="' + field.identifier + '"onclick="duplicate_meta_group(this);">duplicate</button>';
+				output += '<button type="button" class="meta_form_button duplicate_button" id="' + field.identifier + '"onclick="duplicate_meta_group(this);">duplicate</button>';
 			}
 		}
 		output += '</div>';
 	}
 	else { //entity_type == FIELD
-		console.log("in create entity:");
-		console.log(prefill_values);
 		if (prefill_values)
 		{
 			for(var j = 0; j < prefill_values.values.length; j++){
 				if (j ==0)
 				{
-					console.log("value[j]");
-					console.log(prefill_values.values[j]);
 					output += create_htmlfield_from_template(field,prefill_values.values[j],false);
 				}
 				else
 				{
-					console.log("value[j]");
-					console.log(prefill_values.values[j]);
 					output += create_htmlfield_from_template(field,prefill_values.values[j],true);
 				}
 			}
@@ -309,8 +330,6 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 }
 
 function create_htmlfield_from_template(field, value=undefined, dupe=false){
-	console.log("create field");
-	console.log(value);
 	var output = '';
 	output += '<div class="metaFormElement"><label class="formDescriptor" for="';
 		output += field.identifier + '" ';
@@ -373,10 +392,10 @@ function create_htmlfield_from_template(field, value=undefined, dupe=false){
 		if(field.multiple) {
 			if (!dupe)
 			{
-				output += '<button type="button" class="duplicate_field_button" id="' + field.name +'" onclick="duplicateMetaDataField(this);">+</button>';
+				output += '<button type="button" class="meta_form_button duplicate_button" id="' + field.name +'" onclick="duplicateMetaDataField(this);">+</button>';
 			}
 			else{
-				output += '<button type="button" class="remove_field_button" onclick="removeMetaDataField(this);">-</button>';
+				output += '<button type="button" class="meta_form_button remove_button" onclick="removeMetaDataField(this);">-</button>';
 			}
 		}
 		output += '</div></div>';
@@ -387,7 +406,7 @@ function create_htmlfield_from_template(field, value=undefined, dupe=false){
 //if userInput = NULL a new metaDataSet is created, if not null then an existing scheme is modified and already existing entries are displayed
 //metaStruc a single metaStrucuture JSON object
 //userInput the correlated userMetaSet for that struc, which is required when a existing set should be updated
-function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
+function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false, is_not_popup_form = true){
 	var  hasUserInput = false;
 	var set_id;
 	if(userInputSet !== null) {
@@ -407,14 +426,13 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 	$('#metaDataFormHeader').empty();
 	$(headerHTML).appendTo('#metaDataFormHeader');
 	$('#metaDataForm').empty();
-	console.log("metaStruc");
-	console.log(metaStruc);
-	console.log("userInputSet");
-	console.log(userInputSet);
+	console.log("Meta");
+	console.log(JSON.stringify(metaStruc));
+	console.log("uis");
+	console.log(JSON.stringify(userInputSet));
 	for (var i=0; i<metaStruc.fields.length; i++){
 		var inputHTML = '';
 		var field = metaStruc.fields[i];
-		console.log(field.identifier);
 		if(hasUserInput) {
 			if (field.entity_type == "GROUP")
 			{
@@ -427,8 +445,6 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 			{
 				var prefill = undefined;
 				prefill = userInputSet.fields.find(f=>f.field_identifier == field.identifier);
-				console.log("prefill");
-				console.log(prefill);
 				inputHTML += createHTMLOutputForMetaSchemeEntity(field,prefill,false);
 			}
 		}
@@ -437,37 +453,82 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false){
 		}
 		$(inputHTML).appendTo('#metaDataForm');
 	}
-	$('#right_sidebar').empty();
-	var footerHTML = '<div id="sidebar_buttons">';
-	footerHTML += '<button type="button" class="btn lzvButton" id="saveMetaDataForm" onclick="saveActiveMetaDataSet();">Save</button>';
-	footerHTML += '<button type="button" class="btn lzvButton" id="copyMetaDataSet" onclick="copyActiveMetaDataSet();">Copy Set</button>';
-	footerHTML += '<button type="button" class="btn lzvButton" id="exportToDC" onclick="exportSetToDC();">Export to Dublin Core</button>';
-	// footerHTML += '<button type="button" class="btn lzvButton" id="exportToXML" onclick="exportSetToXML();">Export to XML</button>';
-	footerHTML += '<button type="button" class="btn lzvButton" id="exportToJSON" onclick="exportSetToJSON();">Export to JSON</button>';
-	// function exportSetToXML()
-	footerHTML += '</div>';
-	$(footerHTML).appendTo('#right_sidebar');
-	// if (hasUserInput) { //fill fields with values from user field
-	// 	prefill_form_input(userInputSet);
-	// }
+	if(is_not_popup_form){
+		$('#right_sidebar').empty();
+		var footerHTML = '<div id="sidebar_buttons"><div id="general_metadata_buttons">';
+		footerHTML += '<button type="button" class="btn lzvButton" id="saveMetaDataForm" onclick="saveActiveMetaDataSet();">Save</button>';
+		footerHTML += '<button type="button" class="btn lzvButton" id="copyMetaDataSet" onclick="copyActiveMetaDataSet();">Copy Set</button>';
+		footerHTML += '</div><div id="export_metadata_buttons">';
+		footerHTML += add_export_buttons_to_sidebar();
+		footerHTML += '</div></div>';
+		$(footerHTML).appendTo('#right_sidebar');
+	}
+	else {
+		$('#metaDataFormFooter').empty();
+		var footerHTML = '<div id="general_metadata_buttons">';
+		footerHTML += '<button type="button" class="btn lzvButton" id="saveMetaDataForm" onclick="saveActiveMetaDataSet();">Save</button>';
+		footerHTML += '<button type="button" class="btn lzvButton" id="closeMetaDataForm" onclick="closeMetaPopup();">Close</button>';
+		footerHTML += '</div>';
+		$(footerHTML).appendTo('#metaDataFormFooter');
+	}
 }
+
+function add_export_buttons_to_sidebar() {
+	var output = '';
+	var scheme_identifier = get_active_scheme_identifier();
+	var export_definitions = JSON.parse(getLocalStorage("metadata_export_definitions"));
+	var export_mappings = JSON.parse(getLocalStorage("metadata_export_mappings"));
+	for (var ex of export_definitions) {
+		var map = export_mappings.find(x=>x.identifier_source_schemes.includes(scheme_identifier) && x.identifier_target_export == ex.identifier)
+		if(map) {
+			output += '<button type="button" class="btn lzvButton" map_id="' + map.identifier + '" ex_id="' + ex.identifier + '" onclick="export_set_to_target(this);">Export to '+ ex.name + '</button>';
+		}
+	}
+	return output;
+}
+
+function export_set_to_target(clicked) {
+	var target_export_identifier = $(clicked).attr('ex_id');
+	var target_mapping_identifier = $(clicked).attr('map_id');
+	var source_scheme_identifier = get_active_scheme_identifier();
+	var export_definitions = JSON.parse(getLocalStorage("metadata_export_definitions"));
+	var export_mappings = JSON.parse(getLocalStorage("metadata_export_mappings"));
+	let export_handler = new metadata_export_handler(export_definitions.find(x=>x.identifier == target_export_identifier), export_mappings.find(x=>x.identifier == target_mapping_identifier))
+	var export_text = export_handler.create_export(getActiveMetaDataSet());
+	// var new_page = window.open();
+	// window.open(export_text, "PopUpTextbox",  "width=270,height=300,top=200,left=200,toolbars=no,scrollbars=no,status=no,resizable=no"); 
+	open_export_popup(export_text);
+	// new_page.document.open ('content-type: text/xml');
+	// new_page.document.write(export_text);
+}
+
+function open_export_popup(text) {
+	$('#popupForm').empty();
+	var html_text = '<textarea id="txtXML" readonly="readonly">' + String(text) +' </textarea>';
+	html_text += '<button type="button" class="btn lzvButton" id="closeMetaDataForm" onclick="close_export_popup();">Close</button>';
+	$(html_text).appendTo('#popupForm');
+	$('#metaDataMainForm').hide();
+	$('#right_sidebar').hide();
+
+	$('#popupForm').show();
+}
+
+function close_export_popup() {
+	$('#metaDataMainForm').show();
+	$('#right_sidebar').show();
+	$('#popupForm').hide();
+}
+
 //expects the user set for input
 function prefill_form_input(content) {
 	console.log("prefill");
 	var done_groups = {};
 	for( var item of content.fields){
-		console.log("A:");
-		console.log(item);
-		console.log(done_groups);
 		if (item.group_identifier && !done_groups.group_identifier) //group
 		{
 			done_groups[item.group_identifier] = true;
 			var groups = content.fields.filter(f=>f.group_identifier == item.group_identifier);
-			console.log(groups);
-			console.log("---");
 			for (var i = 1; i < groups.length; i++){
-				console.log("B");
-				console.log(groups[i]);
 				duplicate_meta_group_by_id(item.group_identifier,groups[i]);
 			}
 		}
@@ -479,7 +540,7 @@ function prefill_form_input(content) {
 }
 
 function get_active_scheme_identifier(){
-	return $("#title").attr('name');
+	return $('#metaDataFormHeader').find('#title').attr('name');
 }
 //search for group in meta schemes (struc), and returns strucuture downwoards from this group as json object
 function search_for_group(struc, identifier) {
@@ -546,7 +607,7 @@ function duplicateMetaDataField(clicked,prefillValue = null){
 			select.val('');
 		}
 	}
-	var removeButton = '<button type="button" class="remove_field_button" onclick="removeMetaDataField(this);">-</button>';
+	var removeButton = '<button type="button" class="meta_form_button remove_button" onclick="removeMetaDataField(this);">-</button>';
 	$(removeButton).appendTo(tmp);
 	tmp.appendTo($(clicked).parent().parent());
 }

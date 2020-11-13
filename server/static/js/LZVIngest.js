@@ -374,86 +374,87 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 }
 
 function openMetaPopup(clicked){
-	var meta_id = $(clicked).siblings('select[name="ingest_metadata"]')[0].value;
+	var meta_id = $(clicked).parent().parent().find('select[name="ingest_metadata"]')[0].value;
 	if (!meta_id) { //catch case when no metaset has been selected
 		return;
 	}
 	metaStructure = JSON.parse(getLocalStorage("metaDataStructs"));
 	userSets= JSON.parse(getLocalStorage("metaDataUserSets"));
 	var user_set = userSets.find(set=>set.set_id == meta_id);
-	var meta_struc = metaStructure.schemes.find(struc=>struc.identifier == user_set.identifier);
-	var html = createPopupFormContent(meta_struc,user_set);
-	$('#popupForm').empty();
-	$(html).appendTo('#popupForm');
-	prefillWithUserValue(user_set);
-	$('#metaDataMainForm').hide();
+	var meta_struc = metaStructure.find(struc=>struc.identifier == user_set.identifier);
+	fillMetaDataForm(meta_struc, user_set, false, false);
+	// var html = createPopupFormContent(meta_struc,user_set);
+	// $('#popupForm').empty();
+	// $(html).appendTo('#popupForm');
+	// prefillWithUserValue(user_set);
+	$('#ingestDataMainForm').hide();
 	$('#popupForm').show();
 }
 
-function createPopupFormContent(metaStruc,userInputSet) {
-	var	set_id = userInputSet.set_id;
-	var returnHTML = '<div id="metaDataMainForm"><div id="metaDataFormHeader">';
-	returnHTML += '<div id="title" set_id="'+ set_id +'" name="' + metaStruc.identifier + '">' + metaStruc.title + " v" + metaStruc.version + '</div>';
-	returnHTML += '<div class="metaFormElement"><label class="formDescriptor" for="metaSchemeName">Name of Metadata Set:</label>';
-	returnHTML += '<div class="metaFormUIField"><input required name="metaSchemeName" type="text" value="' + userInputSet.name + '"></div></div><hr></div>';
-	returnHTML += '<form id="metaDataForm">';
-	for (var i=0; i<metaStruc.fields.length; i++){
-		var field = metaStruc.fields[i];
-		returnHTML += '<div class="metaFormElement"><label class="formDescriptor" for="';
-		returnHTML += field.field_identifier + '" ';
-		returnHTML += '><div class="metaFieldName">' + field.field_name.charAt(0).toUpperCase() + field.field_name.slice(1) + '</div><div class="metaFieldDescription">'+ field.field_description +'</div></label>';
-		if (field.field_type != 'cv') {
-			returnHTML += '<div class="metaFormUIField orig"><input ';
-		}
-		else {
-			returnHTML += '<div class="metaFormUIField metaFormCVField orig"><select ';
-		}
-		returnHTML += 'name="' + field.field_identifier + '" ';
-		if (field.field_mandatory){
-			returnHTML += 'required ';
-		}
-		switch(field.field_type) {
-			case 'string':
-				returnHTML += 'type="text" ';
-				break;
-			case 'int':
-				returnHTML += 'type="number" ';
-				break;
-			case 'float':
-				returnHTML += 'type="number" step="any" ';
-				break;
-			case 'cv':
-				returnHTML += '>\n';
-				returnHTML += '<option selected value=""></option>';
-				for (var j=0; j<field.field_options.length; j++){
-					option = field.field_options[j];
-					returnHTML += '<option value="'+option+'">'+option+'</option>';
-				}
-				break;
-		}
-		if (field.field_type != 'cv') {
-			if(field.field_verification) {
-				returnHTML += 'pattern="' + field.field_verification + '" ';
-			}
-			returnHTML += '>';
-		}
-		else {
-			returnHTML += '</select>';
-		}
-		if(field.field_multiple) {
-			returnHTML += '<button type="button" class="duplicate_field_button" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
-		}
-		returnHTML += '</div></div>';
-	}
-	returnHTML += '</form><div id="metaDataFormFooter">';
-	returnHTML += '<div id="footerButtonDiv">';
-	returnHTML += '<button type="button" class="btn lzvButton" id="saveAndCloseMetaDataForm" onclick="saveAndCloseMetaPopup();">Save & Close</button>';
-	returnHTML += '<button type="button" class="btn lzvButton" id="closeMetaDataForm" onclick="closeMetaPopup();">Close</button>';
-	// footerHTML += '<button type="button" class="btn lzvButton" id="exportToXML" onclick="exportSetToXML();">Export to XML</button>';
-	// function exportSetToXML() {}
-	returnHTML += '</div></div>';
-	return returnHTML;
-}
+// function createPopupFormContent(metaStruc,userInputSet) {
+// 	var	set_id = userInputSet.set_id;
+// 	var returnHTML = '<div id="ingestDataMainForm"><div id="metaDataFormHeader">';
+// 	returnHTML += '<div id="title" set_id="'+ set_id +'" name="' + metaStruc.identifier + '">' + metaStruc.title + " v" + metaStruc.version + '</div>';
+// 	returnHTML += '<div class="metaFormElement"><label class="formDescriptor" for="metaSchemeName">Name of Metadata Set:</label>';
+// 	returnHTML += '<div class="metaFormUIField"><input required name="metaSchemeName" type="text" value="' + userInputSet.name + '"></div></div><hr></div>';
+// 	returnHTML += '<form id="metaDataForm">';
+// 	for (var i=0; i<metaStruc.fields.length; i++){
+// 		var field = metaStruc.fields[i];
+// 		returnHTML += '<div class="metaFormElement"><label class="formDescriptor" for="';
+// 		returnHTML += field.field_identifier + '" ';
+// 		returnHTML += '><div class="metaFieldName">' + field.field_name.charAt(0).toUpperCase() + field.field_name.slice(1) + '</div><div class="metaFieldDescription">'+ field.field_description +'</div></label>';
+// 		if (field.field_type != 'cv') {
+// 			returnHTML += '<div class="metaFormUIField orig"><input ';
+// 		}
+// 		else {
+// 			returnHTML += '<div class="metaFormUIField metaFormCVField orig"><select ';
+// 		}
+// 		returnHTML += 'name="' + field.field_identifier + '" ';
+// 		if (field.field_mandatory){
+// 			returnHTML += 'required ';
+// 		}
+// 		switch(field.field_type) {
+// 			case 'string':
+// 				returnHTML += 'type="text" ';
+// 				break;
+// 			case 'int':
+// 				returnHTML += 'type="number" ';
+// 				break;
+// 			case 'float':
+// 				returnHTML += 'type="number" step="any" ';
+// 				break;
+// 			case 'cv':
+// 				returnHTML += '>\n';
+// 				returnHTML += '<option selected value=""></option>';
+// 				for (var j=0; j<field.field_options.length; j++){
+// 					option = field.field_options[j];
+// 					returnHTML += '<option value="'+option+'">'+option+'</option>';
+// 				}
+// 				break;
+// 		}
+// 		if (field.field_type != 'cv') {
+// 			if(field.field_verification) {
+// 				returnHTML += 'pattern="' + field.field_verification + '" ';
+// 			}
+// 			returnHTML += '>';
+// 		}
+// 		else {
+// 			returnHTML += '</select>';
+// 		}
+// 		if(field.field_multiple) {
+// 			returnHTML += '<button type="button" class="duplicate_field_button" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
+// 		}
+// 		returnHTML += '</div></div>';
+// 	}
+// 	returnHTML += '</form><div id="metaDataFormFooter">';
+// 	returnHTML += '<div id="footerButtonDiv">';
+// 	returnHTML += '<button type="button" class="btn lzvButton" id="saveAndCloseMetaDataForm" onclick="saveAndCloseMetaPopup();">Save & Close</button>';
+// 	returnHTML += '<button type="button" class="btn lzvButton" id="closeMetaDataForm" onclick="closeMetaPopup();">Close</button>';
+// 	// footerHTML += '<button type="button" class="btn lzvButton" id="exportToXML" onclick="exportSetToXML();">Export to XML</button>';
+// 	// function exportSetToXML() {}
+// 	returnHTML += '</div></div>';
+// 	return returnHTML;
+// }
 
 function saveAndCloseMetaPopup() {
 	saveActiveMetaDataSet();
@@ -478,7 +479,7 @@ function prefillWithUserValue(userInputSet) {
 }
 
 function closeMetaPopup() {
-	$('#metaDataMainForm').show();
+	$('#ingestDataMainForm').show();
 	$('#popupForm').hide();
 }
 

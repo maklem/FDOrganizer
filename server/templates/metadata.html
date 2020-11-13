@@ -20,6 +20,8 @@
 			<form id="metaDataForm"></form>
 			<div id="metaDataFormFooter"></div>
 		</div>
+		<div id="popupForm">
+		</div>
 	</div>
 	<div class="col-md-2" id="right_sidebar">
 		
@@ -28,6 +30,7 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static',     filename='js/LZVBase.js') }}"></script>
+<script src="{{ url_for('static',     filename='js/LZVMetaDataExport.js') }}"></script>
 <script src="{{ url_for('static',     filename='js/LZVMetaData.js') }}"></script>
 <script src="{{ url_for('static',     filename='js/LZVMetaDataOnLoad.js') }}"></script>
 {% endblock %}

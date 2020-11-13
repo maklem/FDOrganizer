@@ -2,6 +2,8 @@
 $( document ).ready(function() {
 	getMetaDataStructureInformation(true);
 	getMetaDataUserSets(true);
+    getMetaDataExportDefinitions();
+    getMetaDataExportMappings();
 	if(checkLZVLogin())
 	{
 		$('#logout_lzv').show();

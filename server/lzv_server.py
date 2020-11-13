@@ -769,6 +769,34 @@ def get_metadata():
         data = file.read()
     return json.dumps(data)
 
+@APP.route('/metadata/export_definitions', methods=['GET'])
+def get_export_definitions():
+    '''
+        Return Metadata exports file from server, defining exports how it will be exported
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    data = ''
+    with open(CONFIGPARAMS["METADATA_EXPORT_DEFINITIONS"]) as file:
+        data = file.read()
+    return json.dumps(data)
+
+@APP.route('/metadata/export_mappings', methods=['GET'])
+def get_export_mappings():
+    '''
+        Return Metadata structure file from server, providing mapping between schemes and exports
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    data = ''
+    with open(CONFIGPARAMS["METADATA_EXPORT_MAPPINGS"]) as file:
+        data = file.read()
+    return json.dumps(data)
+
 @APP.route('/metadata/user', methods=['GET'])
 def get_user_stored_metadata():
     '''
