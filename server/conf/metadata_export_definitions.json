@@ -1,0 +1,101 @@
+[
+  {
+    "identifier": "datacite_xml",
+    "file_prefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<resource xmlns=\"https://schema.datacite.org/meta/kernel-4.3/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://schema.datacite.org/meta/kernel-4.3/ https://schema.datacite.org/meta/kernel-4.3/metadata.xsd\">\n",
+    "file_suffix": "</resource>",
+    "name" : "Datacite XML",
+    "export_items": [
+      {
+        "type": "GROUP",
+        "identifier": "identifier_group",
+        "prefix": "<identifier",
+        "suffix": "</identifier>\n",
+        "export_items": [
+          {
+            "type": "FIELD",
+            "identifier": "identifier_type",
+            "prefix": " identifierType=\"",
+            "suffix": "\">",
+            "left_empty": ">"
+          },
+          {
+            "type": "FIELD",
+            "identifier": "identifier"
+          }
+        ]
+      },
+      {
+        "type": "GROUP",
+        "identifier": "creator_group",
+        "prefix": "<creators>\n",
+        "suffix": "</creators>\n",
+        "item_prefix": "\t<creator>\n",
+        "item_suffix": "\t</creator>\n",
+        "export_items": [
+          {
+            "type": "STRUCTURE",
+            "export_items": [
+              {
+                "type": "FIELD",
+                "identifier": "name_type",
+                "prefix": "\t\t<creatorName nameType=\"",
+                "suffix": "\">",
+                "left_empty": "\t\t<creatorName>"
+              },
+              {
+                "type": "FIELD",
+                "identifier": "creator",
+                "suffix": "</creatorName>\n",
+                "skip_if_empty": true
+              }
+            ]
+          },
+          {
+            "type": "FIELD",
+            "identifier": "craetor_given_name",
+            "prefix": "\t\t<givenName>",
+            "suffix": "</givenName>\n"
+          },
+          {
+            "type": "FIELD",
+            "identifier": "craetor_family_name",
+            "prefix": "\t\t<familyName>",
+            "suffix": "</familyName>\n"
+          },
+          {
+            "type": "GROUP",
+            "identifier": "creator_identifier_group",
+            "item_prefix": "\t\t<nameIdentifier ",
+            "item_suffix": "</nameIdentifier>\n",
+            "export_items": [
+              {
+                "type": "FIELD",
+                "identifier": "creator_name_identifier_scheme",
+                "prefix": "nameIdentifierScheme=\"",
+                "suffix": "\" "
+              },
+              {
+                "type": "FIELD",
+                "identifier": "creator_name_identifier_scheme_uri",
+                "prefix": "schemeURI=\"",
+                "suffix": "\""
+              },
+              {
+                "type": "FIELD",
+                "identifier": "creator_name_identifier",
+                "prefix": ">",
+                "skip_if_empty": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FIELD",
+        "identifier": "publication_year",
+        "item_prefix": "<publicationYear>",
+        "item_suffix": "</publicationYear>\n"
+      }
+    ]
+  }
+]

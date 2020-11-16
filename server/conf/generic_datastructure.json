@@ -1,0 +1,42 @@
+//Entwurf für ein generisches Datenformat innerhalb von FDOrganize. Dies soll ermöglichen Daten
+// aus verschiedenen Quellen zu beinhalten, dabei allerdigns auch die option bieten Dienstab-
+//hängig Metadaten mit zu speichern. Ein Data Object ist im allgemeinen eine Datei oder ein
+//logisches Package. Ein Package dient als hierarchisches Object zum verwalten von Daten.
+//data_object
+{ 
+    "name" : "name_of_object", //string, optional
+    "description" : "description of the content in this data_object", //string, optional
+    "id" : "id of this data object", //id, required, automatically assigned, unique
+    "type" : "DATA|PACKAGE", //enum [DATA,PACKAGE], required, auto
+    "owner" : "#identifier of owner of this file", //userid(string), required
+    "data_object_metadata" : { //required for DATA this is generic metadata describing surrounding facts around the content
+      "content_origin": "labfolder|...", //enum [labfolder|...], required 
+      "export_date" : "#date",  //date, required, date of export (kind of the "version" date)
+      "export_user" : "identifer for user", //userid(string), required, f.e. user@labfolder.de -> which login was used to download
+      "filename" : "filename",      //string, "filename" of the stored file if exists
+      "file_type" : "filetype",    //enum [PNG|TXT|CSV|...], required 
+      "doc_id" : "doc_id where the document is stored in couchdb", //id, requried, unique
+      "is_stored" : true
+    },
+    "package_object_metadata" : { //required for PACKAGE, this is generic metadata describing surrounding facts around the content
+      "creation_date" : "#date",  //date, required, of creation
+      "last_change" : "#date", //data, required, last change
+      "creator" : "identifer for user", //f.e. user@labfolder.de -> which login was used to download
+    },  
+    "origin_metadata": { //exists if type=data,this is metadata which describes origin specific attributes dependent on repository
+      //This is an example for labfolder specific metadata. Labfolder uses a project hierachical file structure, this is represented in this
+      "project_id": "126747",
+      "project_title": "Beispielprojekt",
+      "entry_id": "5155421",
+      "entry_title": "Drawing",
+      "entry_version_id": "5385114",
+      "entry_version_date": "2020-04-14T13:16:06.000+0000",
+      "entry_hidden": true
+      "element_id": "2654dcaaee1ffa0cd583af30827631f85f28f5d9",
+      "element_type": "IMAGE",
+      "element_version_id": "4475000",
+    },
+    "child_data_objects": [ //exists if type==package, count >=1 min
+        "id","id"
+    ]
+}
