@@ -2,9 +2,11 @@
   {
     "identifier": "testmapping",
     "identifier_source_schemes": [
-      "TestScheme1.0"
+      "TestScheme1.0", "datacite_1_1"
     ],
-    "identifier_target_export": "datacite_xml",
+    "identifier_target_export": [
+      "datacite_xml"
+    ],
     "mappings": [
       {
         "source_entity": "identifier_group",
@@ -27,7 +29,7 @@
         "target_entity": "creator"
       },
       {
-        "source_entity": "name_type",
+        "source_entity": "creator_name_type",
         "target_entity": "name_type"
       },
       {
@@ -57,6 +59,77 @@
       {
         "source_entity": "publication_year",
         "target_entity": "publication_year"
+      }
+    ]
+  },
+  {
+    "identifier": "dublincore_dublincore",
+    "identifier_source_schemes": [
+      "dublin_core_1_1"
+    ],
+    "identifier_target_export": [
+      "dublincore"
+    ],
+    "mappings": [
+      {
+        "source_entity": "identifier",
+        "target_entity": "identifier",
+      },
+      {
+        "source_entity": "format",
+        "target_entity": "format",
+      },
+      {
+        "source_entity": "type",
+        "target_entity": "type",
+      },
+      {
+        "source_entity": "language",
+        "target_entity": "language",
+      },
+      {
+        "source_entity": "title",
+        "target_entity": "title",
+      },
+      {
+        "source_entity": "subject",
+        "target_entity": "subject",
+      },
+      {
+        "source_entity": "coverage",
+        "target_entity": "coverage",
+      },
+      {
+        "source_entity": "description",
+        "target_entity": "description",
+      },
+      {
+        "source_entity": "creator",
+        "target_entity": "creator",
+      },
+      {
+        "source_entity": "publisher",
+        "target_entity": "publisher",
+      },
+      {
+        "source_entity": "contributor",
+        "target_entity": "contributor",
+      },
+      {
+        "source_entity": "rights",
+        "target_entity": "rights",
+      },
+      {
+        "source_entity": "source",
+        "target_entity": "source",
+      },
+      {
+        "source_entity": "relation",
+        "target_entity": "relation",
+      },
+      {
+        "source_entity": "date",
+        "target_entity": "date",
       }
     ]
   }

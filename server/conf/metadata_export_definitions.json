@@ -97,5 +97,131 @@
         "item_suffix": "</publicationYear>\n"
       }
     ]
+  },
+  {
+    "identifier": "dublincore_from_hierachical",
+    "name" : "Dublin Core",
+    "export_items": [
+      {
+        "type": "GROUP",
+        "identifier": "identifier_group",
+        "export_items": [
+          {
+            "type": "FIELD",
+            "identifier": "identifier",
+            "prefix": "identifier:",
+            "suffix": "\n"
+          }
+        ]
+      },
+      {
+        "type": "GROUP",
+        "identifier": "creator_group",
+        "export_items": [
+          {
+                "type": "FIELD",
+                "identifier": "creator",
+                "prefix": "creator: ",
+                "suffix": "\n"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "identifier": "dublincore",
+    "name" : "Dublin Core",
+    "export_items": [
+      {
+        "type": "FIELD",
+        "identifier": "identifier",
+        "prefix": "identifier: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "format",
+        "prefix": "format: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "type",
+        "prefix": "type: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "language",
+        "prefix": "language: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "title",
+        "prefix": "title: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "subject",
+        "prefix": "subject: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "coverage",
+        "prefix": "coverage: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "description",
+        "prefix": "description: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "creator",
+        "prefix": "creator: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "publisher",
+        "prefix": "publisher: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "contributor",
+        "prefix": "contributor: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "rights",
+        "prefix": "rights: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "source",
+        "prefix": "source: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "relation",
+        "prefix": "relation: ",
+        "suffix": "\n"
+      },
+      {
+        "type": "FIELD",
+        "identifier": "date",
+        "prefix": "date: ",
+        "suffix": "\n"
+      }
+    ]
   }
 ]
