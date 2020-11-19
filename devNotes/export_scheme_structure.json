@@ -131,7 +131,7 @@
                 },
                 "skip_if_empty": {
                   "type": "boolean",
-                  "description": "IF True: Skip other output from fields on same level in the same structure/group in a export item, if this is empty (=no field with that name or empty value), Default False"
+                  "description": "IF True: Skip other output from fields on same level in the same structure/group in a export item, if this is empty (=no field with that name or empty value), Default False. If this is true and no content is printed for this subitems, also no prefix or suffix from 'above' group /structure is printed."
                 }
               }
             }

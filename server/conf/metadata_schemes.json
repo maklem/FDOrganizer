@@ -1,136 +1,5 @@
 [
   {
-    "title": "TestScheme",
-    "version": "1.0",
-    "identifier": "TestScheme1.0",
-    "active": true,
-    "fields": [
-      {
-        "entity_type": "GROUP",
-        "identifier": "identifier_group",
-        "name": "Identifier",
-        "multiple": false,
-        "mandatory": true,
-        "fields": [
-          {
-            "entity_type": "FIELD",
-            "identifier": "identifier",
-            "name": "Identifier",
-            "field_type": "string",
-            "mandatory": true,
-            "multiple": false,
-            "description": "Unique Identifier of the Item (DOI,...)"
-          },
-          {
-            "entity_type": "FIELD",
-            "identifier": "identifier_type",
-            "name": "Identifier Type",
-            "field_type": "cv",
-            "mandatory": true,
-            "multiple": false,
-            "description": "The type of the main identifier.",
-            "field_options": [
-              "DOI"
-            ]
-          }
-        ]
-      },
-      {
-        "entity_type": "GROUP",
-        "identifier": "creator_group",
-        "name": "Creator(s)",
-        "multiple": true,
-        "mandatory": true,
-        "fields": [
-          {
-            "entity_type": "FIELD",
-            "identifier": "creator",
-            "name": "Creator",
-            "field_type": "string",
-            "mandatory": true,
-            "multiple": false,
-            "description": "Main Creator of the Item. (Family Name, Given Name)"
-          },
-          {
-            "entity_type": "FIELD",
-            "identifier": "creator_name_type",
-            "name": "Name Type",
-            "field_type": "cv",
-            "mandatory": true,
-            "multiple": false,
-            "field_options": [
-              "Personal",
-              "Organizational"
-            ]
-          },
-          {
-            "entity_type": "FIELD",
-            "identifier": "craetor_given_name",
-            "name": "Given Name",
-            "field_type": "string",
-            "mandatory": false,
-            "multiple": false
-          },
-          {
-            "entity_type": "FIELD",
-            "identifier": "craetor_family_name",
-            "name": "Family Name",
-            "field_type": "string",
-            "mandatory": false,
-            "multiple": false
-          },
-          {
-            "entity_type": "GROUP",
-            "identifier": "creator_identifier_group",
-            "name": "Creator Identifier",
-            "multiple": true,
-            "mandatory": true,
-            "fields": [
-              {
-                "entity_type": "FIELD",
-                "identifier": "creator_name_identifier",
-                "name": "Identifier",
-                "field_type": "string",
-                "mandatory": true,
-                "multiple": false
-              },
-              {
-                "entity_type": "FIELD",
-                "identifier": "creator_name_identifier_scheme",
-                "name": "Identifier Scheme",
-                "field_type": "cv",
-                "mandatory": true,
-                "multiple": false,
-                "field_options": [
-                  "GND",
-                  "ORCID"
-                ]
-              },
-              {
-                "entity_type": "FIELD",
-                "identifier": "creator_name_identifier_scheme_uri",
-                "name": "Identifier Scheme URI",
-                "field_type": "string",
-                "mandatory": true,
-                "multiple": false
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "entity_type": "FIELD",
-        "identifier": "publication_year",
-        "name": "Publication Year",
-        "field_type": "int",
-        "mandatory": true,
-        "multiple": false,
-        "description": "Publication Year of the Item.",
-        "field_verification": "^[0-9]{4}$"
-      }
-    ]
-  },
-  {
     "title": "DataCite 1.1",
     "version": "1.1",
     "identifier": "datacite_1_1",
@@ -168,6 +37,40 @@
       },
       {
         "entity_type": "GROUP",
+        "identifier": "title_group",
+        "name": "Titles",
+        "multiple": true,
+        "mandatory": true,
+        "fields": [
+          {
+            "entity_type": "FIELD",
+            "identifier": "title",
+            "name": "Title",
+            "field_type": "string",
+            "mandatory": true,
+            "multiple": false,
+            "description": "A name or title by which a resource is known. May be the title of a dataset or the name of a piece of software."
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "title_type",
+            "name": "Title Type",
+            "field_type": "cv",
+            "mandatory": false,
+            "multiple": false,
+            "description": "The type of the title.",
+            "field_options": [
+              "Main Title",
+              "Alternativ Title",
+              "Subtitle",
+              "Translated Title",
+              "Other"
+            ]
+          }
+        ]
+      },
+      {
+        "entity_type": "GROUP",
         "identifier": "creator_group",
         "name": "Creator(s)",
         "multiple": true,
@@ -196,7 +99,7 @@
           },
           {
             "entity_type": "FIELD",
-            "identifier": "craetor_given_name",
+            "identifier": "creator_given_name",
             "name": "Given Name",
             "field_type": "string",
             "mandatory": false,
@@ -204,7 +107,7 @@
           },
           {
             "entity_type": "FIELD",
-            "identifier": "craetor_family_name",
+            "identifier": "creator_family_name",
             "name": "Family Name",
             "field_type": "string",
             "mandatory": false,
@@ -290,40 +193,6 @@
                 "mandatory": false,
                 "multiple": false
               }
-            ]
-          }
-        ]
-      },
-      {
-        "entity_type": "GROUP",
-        "identifier": "title_group",
-        "name": "Titles",
-        "multiple": true,
-        "mandatory": true,
-        "fields": [
-          {
-            "entity_type": "FIELD",
-            "identifier": "title",
-            "name": "Title",
-            "field_type": "string",
-            "mandatory": true,
-            "multiple": false,
-            "description": "A name or title by which a resource is known. May be the title of a dataset or the name of a piece of software."
-          },
-          {
-            "entity_type": "FIELD",
-            "identifier": "title_type",
-            "name": "Title Type",
-            "field_type": "cv",
-            "mandatory": false,
-            "multiple": false,
-            "description": "The type of the title.",
-            "field_options": [
-              "Main Title",
-              "Alternativ Title",
-              "Subtitle",
-              "Translated Title",
-              "Other"
             ]
           }
         ]
@@ -1345,6 +1214,137 @@
         "multiple": true,
         "description": "A point or period of time associated with an event in the lifecycle of the resource.",
         "field_verification": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])$"
+      }
+    ]
+  },
+  {
+    "title": "TestScheme",
+    "version": "1.0",
+    "identifier": "TestScheme1.0",
+    "active": true,
+    "fields": [
+      {
+        "entity_type": "GROUP",
+        "identifier": "identifier_group",
+        "name": "Identifier",
+        "multiple": false,
+        "mandatory": true,
+        "fields": [
+          {
+            "entity_type": "FIELD",
+            "identifier": "identifier",
+            "name": "Identifier",
+            "field_type": "string",
+            "mandatory": true,
+            "multiple": false,
+            "description": "Unique Identifier of the Item (DOI,...)"
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "identifier_type",
+            "name": "Identifier Type",
+            "field_type": "cv",
+            "mandatory": true,
+            "multiple": false,
+            "description": "The type of the main identifier.",
+            "field_options": [
+              "DOI"
+            ]
+          }
+        ]
+      },
+      {
+        "entity_type": "GROUP",
+        "identifier": "creator_group",
+        "name": "Creator(s)",
+        "multiple": true,
+        "mandatory": true,
+        "fields": [
+          {
+            "entity_type": "FIELD",
+            "identifier": "creator",
+            "name": "Creator",
+            "field_type": "string",
+            "mandatory": true,
+            "multiple": false,
+            "description": "Main Creator of the Item. (Family Name, Given Name)"
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "creator_name_type",
+            "name": "Name Type",
+            "field_type": "cv",
+            "mandatory": true,
+            "multiple": false,
+            "field_options": [
+              "Personal",
+              "Organizational"
+            ]
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "craetor_given_name",
+            "name": "Given Name",
+            "field_type": "string",
+            "mandatory": false,
+            "multiple": false
+          },
+          {
+            "entity_type": "FIELD",
+            "identifier": "craetor_family_name",
+            "name": "Family Name",
+            "field_type": "string",
+            "mandatory": false,
+            "multiple": false
+          },
+          {
+            "entity_type": "GROUP",
+            "identifier": "creator_identifier_group",
+            "name": "Creator Identifiers",
+            "multiple": true,
+            "mandatory": true,
+            "fields": [
+              {
+                "entity_type": "FIELD",
+                "identifier": "creator_name_identifier",
+                "name": "Identifier",
+                "field_type": "string",
+                "mandatory": true,
+                "multiple": false
+              },
+              {
+                "entity_type": "FIELD",
+                "identifier": "creator_name_identifier_scheme",
+                "name": "Identifier Scheme",
+                "field_type": "cv",
+                "mandatory": true,
+                "multiple": false,
+                "field_options": [
+                  "GND",
+                  "ORCID"
+                ]
+              },
+              {
+                "entity_type": "FIELD",
+                "identifier": "creator_name_identifier_scheme_uri",
+                "name": "Identifier Scheme URI",
+                "field_type": "string",
+                "mandatory": true,
+                "multiple": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "entity_type": "FIELD",
+        "identifier": "publication_year",
+        "name": "Publication Year",
+        "field_type": "int",
+        "mandatory": true,
+        "multiple": false,
+        "description": "Publication Year of the Item.",
+        "field_verification": "^[0-9]{4}$"
       }
     ]
   }
