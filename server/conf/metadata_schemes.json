@@ -11,6 +11,7 @@
         "name": "Identifiers",
         "multiple": true,
         "mandatory": true,
+        "description" : "Unique identifier of the Resource.",
         "fields": [
           {
             "entity_type": "FIELD",

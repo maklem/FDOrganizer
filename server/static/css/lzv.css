@@ -451,12 +451,14 @@ img.avatar {
 
 
 .meta_form_group {
+  display: none;
   margin-left: 4px;
   margin-top: 4px;
   border-radius: 3px;
   border: 2px solid #dddddd;
   width: 95%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
 }
 
 .metaFormElement {

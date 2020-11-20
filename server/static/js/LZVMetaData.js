@@ -131,11 +131,11 @@ function getActiveMetaDataSet() {
 	saveData.identifier = formHeaderFields.find('#title').attr('name');
 	saveData.set_id = formHeaderFields.find('#title').attr('set_id');
 	saveData.fields = [];
-	var form_field_groups = $('#metaDataForm').children('.meta_form_group');
+	var form_field_groups = $('#metaDataForm').children().children('.meta_form_group');
 	for (var j = 0; j <form_field_groups.length; j++) {
 		saveData.fields.push(crawl_meta_group(form_field_groups[j]));
 	}
-	var form_field_input = $('#metaDataForm').children('.metaFormElement');
+	var form_field_input = $('#metaDataForm').children().children('.metaFormElement');
 	for (var gr_field of form_field_input) {
 		var fields = $(gr_field).find(':input');
 		for(var field of fields){
@@ -152,7 +152,7 @@ function getActiveMetaDataSet() {
 		}
 		}
 	}
-	console.log(JSON.stringify(saveData));
+	// console.log(JSON.stringify(saveData));
 	return saveData;
 }
 
@@ -257,30 +257,36 @@ function createFormForExistingSchemeSet(clicked) {
 	fillMetaDataForm(meta_struc,user_set);
 }
 
+function toggle_visibility_meta_form_group(clicked) {
+	$(clicked).parent().children('.meta_form_group').toggle();
+}
+
 function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, create_dupe=false) {
 	var output = '';
 	if (field.entity_type == "GROUP") {
-		console.log(field.identifier);
-		console.log("Field");
-		console.log(JSON.stringify(field));
-		console.log("prefill:");
-		console.log(JSON.stringify(prefill_values));
+		// console.log(field.identifier);
+		// console.log("Field");
+		// console.log(JSON.stringify(field));
+		// console.log("prefill:");
+		// console.log(JSON.stringify(prefill_values));
 		if (create_dupe)
 		{
-			output += '<div class="meta_form_group clone" id="' + field.identifier + '"><label for="' + field.identifier + '" >';
+			output += '<div class="meta_form_group clone" style="display:block;" id="' + field.identifier + '">';
 		}
 		else
 		{
-			output += '<div class="meta_form_group orig" id="' + field.identifier + '"><label for="' + field.identifier + '" >';
+			output += '<div class="meta_form_container">';
+			output += '<button class="meta_form_group_descriptor" onclick="toggle_visibility_meta_form_container(this);">';
+			output += '<p class="meta_group_name">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</p><p class="meta_group_description">'+ field.description +'</p></button>';
+			output += '<div class="meta_form_group orig" id="' + field.identifier + '">';
 		}
-		output += '<div class="meta_group_name">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</div><div class="meta_group_description">'+ field.description +'</div></label>';
 		for(var i=0; i<field.fields.length; i++){
 			if(prefill_values){
 			if (field.fields[i].entity_type == "GROUP")
 			{
-				console.log(field.fields[i].identifier);
-				console.log("field[i]");
-				console.log(JSON.stringify(field.fields[i]));
+				// console.log(field.fields[i].identifier);
+				// console.log("field[i]");
+				// console.log(JSON.stringify(field.fields[i]));
 				var prefills = prefill_values.fields.filter(f=>f.group_identifier == field.fields[i].identifier);
 				for(var prefill of prefills){
 					output += createHTMLOutputForMetaSchemeEntity(field.fields[i],prefill);
@@ -303,6 +309,7 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 			}
 			else{
 				output += '<button type="button" class="meta_form_button duplicate_button" id="' + field.identifier + '"onclick="duplicate_meta_group(this);">duplicate</button>';
+				output += '</div>';
 			}
 		}
 		output += '</div>';
@@ -479,7 +486,7 @@ function add_export_buttons_to_sidebar() {
 	var export_definitions = JSON.parse(getLocalStorage("metadata_export_definitions"));
 	var export_mappings = JSON.parse(getLocalStorage("metadata_export_mappings"));
 	for (var ex of export_definitions) {
-		var map = export_mappings.find(x=>x.identifier_source_schemes.includes(scheme_identifier) && x.identifier_target_export == ex.identifier)
+		var map = export_mappings.find(x=>x.identifier_source_schemes.includes(scheme_identifier) && x.identifier_target_export.includes(ex.identifier));
 		if(map) {
 			output += '<button type="button" class="btn lzvButton" map_id="' + map.identifier + '" ex_id="' + ex.identifier + '" onclick="export_set_to_target(this);">Export to '+ ex.name + '</button>';
 		}
