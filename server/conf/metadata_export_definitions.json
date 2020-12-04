@@ -20,7 +20,8 @@
           },
           {
             "type": "FIELD",
-            "identifier": "identifier"
+            "identifier": "identifier",
+            "skip_if_empty": true
           }
         ]
       },
@@ -74,13 +75,13 @@
           },
           {
             "type": "FIELD",
-            "identifier": "craetor_given_name",
+            "identifier": "creator_given_name",
             "prefix": "\t\t<givenName>",
             "suffix": "</givenName>\n"
           },
           {
             "type": "FIELD",
-            "identifier": "craetor_family_name",
+            "identifier": "creator_family_name",
             "prefix": "\t\t<familyName>",
             "suffix": "</familyName>\n"
           },
@@ -884,92 +885,92 @@
       {
         "type": "FIELD",
         "identifier": "identifier",
-        "prefix": "identifier: ",
-        "suffix": "\n"
+        "item_prefix": "identifier: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "format",
-        "prefix": "format: ",
-        "suffix": "\n"
+        "item_prefix": "format: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "type",
-        "prefix": "type: ",
-        "suffix": "\n"
+        "item_prefix": "type: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "language",
-        "prefix": "language: ",
-        "suffix": "\n"
+        "item_prefix": "language: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "title",
-        "prefix": "title: ",
-        "suffix": "\n"
+        "item_prefix": "title: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "subject",
-        "prefix": "subject: ",
-        "suffix": "\n"
+        "item_prefix": "subject: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "coverage",
-        "prefix": "coverage: ",
-        "suffix": "\n"
+        "item_prefix": "coverage: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "description",
-        "prefix": "description: ",
-        "suffix": "\n"
+        "item_prefix": "description: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "creator",
-        "prefix": "creator: ",
-        "suffix": "\n"
+        "item_prefix": "creator: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "publisher",
-        "prefix": "publisher: ",
-        "suffix": "\n"
+        "item_prefix": "publisher: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "contributor",
-        "prefix": "contributor: ",
-        "suffix": "\n"
+        "item_prefix": "contributor: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "rights",
-        "prefix": "rights: ",
-        "suffix": "\n"
+        "item_prefix": "rights: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "source",
-        "prefix": "source: ",
-        "suffix": "\n"
+        "item_prefix": "source: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "relation",
-        "prefix": "relation: ",
-        "suffix": "\n"
+        "item_prefix": "relation: ",
+        "item_suffix": "\n"
       },
       {
         "type": "FIELD",
         "identifier": "date",
-        "prefix": "date: ",
-        "suffix": "\n"
+        "item_prefix": "date: ",
+        "item_suffix": "\n"
       }
     ]
   }

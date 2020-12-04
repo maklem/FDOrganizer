@@ -60,11 +60,10 @@ class metadata_export_handler {
     }
     if (export_item.type == 'GROUP') {
         var export_identifier = export_item.identifier;
-        console.log(export_identifier);
         var userset_related_entitys = userset_location.fields.filter(x=>'group_identifier' in x && x.group_identifier == this.export_userset_mapping[export_identifier]);
-        console.log(JSON.stringify(userset_related_entitys));
         userset_related_entitys = this.remove_skip_if_empty_usersets(export_item, userset_related_entitys);
-        console.log(JSON.stringify(userset_related_entitys));
+        // console.log("after remove");
+        // console.log(userset_related_entitys);
         if (userset_related_entitys.length > 0){
             if ('prefix' in export_item){
                 output += export_item.prefix;

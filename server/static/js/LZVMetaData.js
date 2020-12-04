@@ -1,97 +1,47 @@
 function getMetaDataStructureInformation(updateSideBar = true){
-	var url = baseURL +  '/metadata/structures';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
-				setLocalStorage("metaDataStructs", JSON.stringify(parsedJSON));
-				if(updateSideBar) {
-					updateSideBarMetaSchemes(parsedJSON);	
-				}
-			}
-		}
-	};
-	xhttp.open('GET', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send();	
+	interface_get_metadata_structure_information(function(xhttp_repsonse){
+		parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
+        setLocalStorage("metaDataStructs", JSON.stringify(parsedJSON));
+        if(updateSideBar) {
+            updateSideBarMetaSchemes(parsedJSON);
+        }
+	});
 }
 
 function getMetaDataExportDefinitions(){
-	var url = baseURL +  '/metadata/export_definitions';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
-				setLocalStorage("metadata_export_definitions", JSON.stringify(parsedJSON));
-			}
-		}
-	};
-	xhttp.open('GET', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send();	
+	interface_get_metadata_export_definitions(function(xhttp_response){
+		parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
+        setLocalStorage("metadata_export_definitions", JSON.stringify(parsedJSON));
+	});
 }
 
 function getMetaDataExportMappings(){
-	var url = baseURL +  '/metadata/export_mappings';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				parsedJSON =  JSON.parse(JSON.parse(xhttp.response));
-				setLocalStorage("metadata_export_mappings", JSON.stringify(parsedJSON));
-			}
-		}
-	};
-	xhttp.open('GET', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send();	
+	interface_get_metadata_export_mappings(function(xhttp_response) {
+		parsedJSON =  JSON.parse(JSON.parse(xhttp_response));
+        setLocalStorage("metadata_export_mappings", JSON.stringify(parsedJSON));
+    });
 }
 
 function getMetaDataUserSets(updateSideBar = true) {
-	var url = baseURL +  '/metadata/user';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				if (xhttp.response != "") {
-					parsedJSON =  JSON.parse(xhttp.response);
-					setLocalStorage("metaDataUserSets", JSON.stringify(parsedJSON));
-					if(updateSideBar) {
-						updateSideBarUserSets(parsedJSON);
-					}
-				}
-			}
-		}
-	};
-	xhttp.open('GET', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send();
+	interface_get_metadata_usersets(function (xhttp_response) {
+		parsedJSON =  JSON.parse(xhttp_response);
+        setLocalStorage("metaDataUserSets", JSON.stringify(parsedJSON));
+        if(updateSideBar) {
+	        updateSideBarUserSets(parsedJSON);
+        }
+	});
 }
 
-function deleter_user_metaset(delete_set) {
-	var url = baseURL + '/metadata/user/delete';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				getMetaDataUserSets(true);
-			}
-		}
-	};
-	xhttp.open('PUT', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(delete_set));
+function delete_user_metaset(delete_set) {
+	interface_delete_metadata_usersets(delete_set, function() {
+		getMetaDataUserSets(true);
+	});
 }
 
 function sendUserMetaSetsToServer(new_set) {
-	var url = baseURL + '/metadata/user';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
-				getMetaDataUserSets(true);
-			}
-		}
-	};
-	xhttp.open('PUT', url, false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(new_set));
+	interface_store_metadata_usersets(new_set, function() {
+		getMetaDataUserSets(true);
+	});
 }
 
 function searchMetaDataUserSetsByID(id) {
@@ -102,9 +52,12 @@ function searchMetaDataUserSetsByID(id) {
 
 function crawl_meta_group(group) {
 	var output = {"group_identifier" : $(group).attr('id'), "fields" : []};
-	var group_subgroups = $(group).children('.meta_form_group');
+	var group_subgroups = $(group).children().children('.meta_form_group');
 	for (var subgroup of group_subgroups) {
-		output.fields.push(crawl_meta_group(subgroup));
+		var sub_output = crawl_meta_group(subgroup);
+		if (sub_output.fields.length > 0){
+			output.fields.push(sub_output);
+		}
 	}
 	var group_fields = $(group).children('.metaFormElement');
 	for (var gr_field of group_fields) {
@@ -121,6 +74,10 @@ function crawl_meta_group(group) {
 		}
 	}
 	}
+	// if (output.fields.length == 0) {
+	// 	return {};
+	// }
+	// console.log(output);
 	return output;
 }
 
@@ -133,9 +90,12 @@ function getActiveMetaDataSet() {
 	saveData.fields = [];
 	var form_field_groups = $('#metaDataForm').children().children('.meta_form_group');
 	for (var j = 0; j <form_field_groups.length; j++) {
-		saveData.fields.push(crawl_meta_group(form_field_groups[j]));
+		var output = crawl_meta_group(form_field_groups[j]);
+		if (output.fields.length > 0) {
+			saveData.fields.push(output);
+		}
 	}
-	var form_field_input = $('#metaDataForm').children().children('.metaFormElement');
+	var form_field_input = $('#metaDataForm').children('.meta_form_container').children('.meta_form_field').children('.metaFormElement');
 	for (var gr_field of form_field_input) {
 		var fields = $(gr_field).find(':input');
 		for(var field of fields){
@@ -152,7 +112,8 @@ function getActiveMetaDataSet() {
 		}
 		}
 	}
-	// console.log(JSON.stringify(saveData));
+	console.log("getActiveMetaDataSet return:");
+	console.log(JSON.stringify(saveData));
 	return saveData;
 }
 
@@ -185,47 +146,9 @@ function deleteMetaDataSet(clicked) {
 		clicked_id = $(clicked).attr('set_id');
 		cookie_data = JSON.parse(c_str);
 		var delete_set = cookie_data.find(set=>set.set_id == clicked_id);
-		deleter_user_metaset(delete_set);
+		delete_user_metaset(delete_set);
 	}
 }
-
-// function exportSetToJSON() {
-// 	var print_json = {};
-// 	let data = getActiveMetaDataSet();
-// 	if(data.fields.length == 0) {
-// 		return;
-// 	}
-// 	for (var i = 0; i < data.fields.length; i++) {
-// 		var field = data.fields[i];
-// 		if (field.values.length > 1) {
-// 			print_json[field.field_name] = [];
-// 			for(var j = 0; j < field.values.length; j++) {
-// 				var value = field.values[j];
-// 				print_json[field.field_name].push(value);
-// 			}
-// 		}
-// 		else{
-// 			print_json[field.field_name] = field.values[0];
-// 		}
-// 	}
-// 	var new_page = window.open();
-//   	new_page.document.write(JSON.stringify(print_json));
-// }
-
-// function exportSetToDC() {
-//   let data = getActiveMetaDataSet();
-//   if(data.fields.length == 0) {
-// 		return;
-// 	}
-//   let print_text = '';
-//   for(var i = 0; i < data.fields.length; i++){
-//   	for(var j = 0; j < data.fields[i].values.length; j++) {
-//   		print_text += data.fields[i].field_name + ': ' + data.fields[i].values[j] + "<br>";
-//   }
-//   }
-//   var new_page = window.open();
-//   new_page.document.write(print_text);
-// }
 
 function createFormForNewSchemeItem(clicked){
     if(unsaved){
@@ -257,18 +180,13 @@ function createFormForExistingSchemeSet(clicked) {
 	fillMetaDataForm(meta_struc,user_set);
 }
 
-function toggle_visibility_meta_form_group(clicked) {
-	$(clicked).parent().children('.meta_form_group').toggle();
+function toggle_visibility_meta_form_container(clicked) {
+	$(clicked).parent().children('.meta_form_entity').toggle();
 }
 
-function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, create_dupe=false) {
+function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, create_dupe=false,create_container=false) {
 	var output = '';
 	if (field.entity_type == "GROUP") {
-		// console.log(field.identifier);
-		// console.log("Field");
-		// console.log(JSON.stringify(field));
-		// console.log("prefill:");
-		// console.log(JSON.stringify(prefill_values));
 		if (create_dupe)
 		{
 			output += '<div class="meta_form_group clone" style="display:block;" id="' + field.identifier + '">';
@@ -276,20 +194,33 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 		else
 		{
 			output += '<div class="meta_form_container">';
-			output += '<button class="meta_form_group_descriptor" onclick="toggle_visibility_meta_form_container(this);">';
-			output += '<p class="meta_group_name">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</p><p class="meta_group_description">'+ field.description +'</p></button>';
-			output += '<div class="meta_form_group orig" id="' + field.identifier + '">';
+			output += '<button type="button" class="meta_form_group_descriptor';
+			if (field.mandatory) {
+				output += ' mandatory_entity';
+			}
+			output += '" onclick="toggle_visibility_meta_form_container(this);">';
+			output += '<span class="meta_group_name">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</span>';
+			if (field.mandatory) {
+				output += '<span class="mandatory_descriptor required_entity_descriptor">required</span>';
+			}
+			else {
+				output += '<span class="mandatory_descriptor optional_entity_descriptor">optional</span>';
+			}
+			output += '<p><span class="meta_group_description">'+ field.description +'</span></button>';
+			output += '<div class="meta_form_group meta_form_entity orig" id="' + field.identifier + '">';
 		}
 		for(var i=0; i<field.fields.length; i++){
 			if(prefill_values){
 			if (field.fields[i].entity_type == "GROUP")
 			{
-				// console.log(field.fields[i].identifier);
-				// console.log("field[i]");
-				// console.log(JSON.stringify(field.fields[i]));
 				var prefills = prefill_values.fields.filter(f=>f.group_identifier == field.fields[i].identifier);
+				if (prefills.length > 0) {
 				for(var prefill of prefills){
 					output += createHTMLOutputForMetaSchemeEntity(field.fields[i],prefill);
+				}
+				}
+				else {
+					output += createHTMLOutputForMetaSchemeEntity(field.fields[i]);
 				}
 			}
 			else
@@ -315,6 +246,23 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 		output += '</div>';
 	}
 	else { //entity_type == FIELD
+		if(create_container){
+			output += '<div class="meta_form_container">';
+			output += '<button type="button" class="meta_form_group_descriptor';
+			if (field.mandatory) {
+				output += ' mandatory_entity';
+			}
+			output += '" onclick="toggle_visibility_meta_form_container(this);">';
+			output += '<span class="meta_group_name">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</span>';
+			if (field.mandatory) {
+				output += '<span class="mandatory_descriptor required_entity_descriptor">required</span>';
+			}
+			else {
+				output += '<span class="mandatory_descriptor optional_entity_descriptor">optional</span>';
+			}
+			output += '<p><span class="meta_group_description">'+ field.description +'</span></button>';
+			output += '<div class="meta_form_field meta_form_entity orig" id="' + field.identifier + '">';
+		}
 		if (prefill_values)
 		{
 			for(var j = 0; j < prefill_values.values.length; j++){
@@ -332,15 +280,25 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 		{
 			output += create_htmlfield_from_template(field);
 		}
+		if(create_container){
+			output += "</div></div>";
+		}
 	}
 	return output;
 }
 
 function create_htmlfield_from_template(field, value=undefined, dupe=false){
 	var output = '';
-	output += '<div class="metaFormElement"><label class="formDescriptor" for="';
+		output += '<div class="metaFormElement"><label class="formDescriptor" for="';
 		output += field.identifier + '" ';
-		output += '><div class="metaFieldName">' + field.name.charAt(0).toUpperCase() + field.name.slice(1) + '</div>';
+		output += '><div class="metaFieldName">' + field.name.charAt(0).toUpperCase() + field.name.slice(1);
+		if (field.mandatory) {
+			output += '<span class="mandatory_descriptor required_entity_descriptor">required</span>';
+		}
+		else {
+			output += '<span class="mandatory_descriptor optional_entity_descriptor">optional</span>';
+		}
+		output +=  '</div>';
 		if (field.identifier !== undefined) {
 			output += '<div class="metaFieldDescription">'+ field.description +'</div></label>';
 		}
@@ -433,10 +391,6 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false, is_
 	$('#metaDataFormHeader').empty();
 	$(headerHTML).appendTo('#metaDataFormHeader');
 	$('#metaDataForm').empty();
-	console.log("Meta");
-	console.log(JSON.stringify(metaStruc));
-	console.log("uis");
-	console.log(JSON.stringify(userInputSet));
 	for (var i=0; i<metaStruc.fields.length; i++){
 		var inputHTML = '';
 		var field = metaStruc.fields[i];
@@ -444,19 +398,24 @@ function fillMetaDataForm(metaStruc,userInputSet = null, recreateID = false, is_
 			if (field.entity_type == "GROUP")
 			{
 				var prefills = userInputSet.fields.filter(f=>f.group_identifier == field.identifier);
+				if (prefills.length > 0){
 				for(var prefill of prefills){
 					inputHTML += createHTMLOutputForMetaSchemeEntity(field,prefill,false);
+				}
+				}
+				else {
+					inputHTML += createHTMLOutputForMetaSchemeEntity(field,undefined,false);
 				}
 			}
 			else
 			{
 				var prefill = undefined;
 				prefill = userInputSet.fields.find(f=>f.field_identifier == field.identifier);
-				inputHTML += createHTMLOutputForMetaSchemeEntity(field,prefill,false);
+				inputHTML += createHTMLOutputForMetaSchemeEntity(field, prefill, false, create_container=true);
 			}
 		}
 		else {
-			inputHTML =  createHTMLOutputForMetaSchemeEntity(field, create_dupe=false);
+			inputHTML =  createHTMLOutputForMetaSchemeEntity(field, undefined, create_dupe=false, create_container=true);
 		}
 		$(inputHTML).appendTo('#metaDataForm');
 	}
@@ -528,7 +487,6 @@ function close_export_popup() {
 
 //expects the user set for input
 function prefill_form_input(content) {
-	console.log("prefill");
 	var done_groups = {};
 	for( var item of content.fields){
 		if (item.group_identifier && !done_groups.group_identifier) //group
@@ -551,7 +509,6 @@ function get_active_scheme_identifier(){
 }
 //search for group in meta schemes (struc), and returns strucuture downwoards from this group as json object
 function search_for_group(struc, identifier) {
-	console.log(struc);
 	for (var field of struc.fields) {
 		if(field.entity_type == 'GROUP') {
 			if(field.identifier == identifier){
@@ -577,12 +534,10 @@ function duplicate_meta_group(clicked, prefill_values = null) {
 	var identifier = $(clicked).parent('.orig').attr('id');
 	var metaStructures = JSON.parse(getLocalStorage("metaDataStructs"));
 	var meta_struc = metaStructures.find(struc => struc.identifier == get_active_scheme_identifier());
-	console.log("Meta Struc:");
-	console.log(meta_struc);
 	var dupe_group = search_for_group(meta_struc, identifier);
 	if(typeof dupe_group == "boolean") {return;}
 	var html_append = createHTMLOutputForMetaSchemeEntity(dupe_group, prefill_values, true,);
-	$(html_append).insertAfter($(clicked).parent('.orig'));
+	$(html_append).insertAfter($(clicked));
 }
 
 function remove_meta_group(clicked) {
@@ -591,11 +546,11 @@ function remove_meta_group(clicked) {
 
 
 function duplicateMetaDataField(clicked,prefillValue = null){
-	var tmp = $(clicked).parent('.orig').clone();
-	tmp.children(':button').remove();
-	tmp.removeClass('orig');
-	tmp.addClass('clone');
-	var input = tmp.children('input');
+	var tmp = $(clicked).parent().parent().clone();
+	tmp.find(':button').remove();
+	// tmp.removeClass('orig');
+	tmp.addClass('dupe');
+	var input = tmp.find('input');
 	if(input.length>0) {
 		if (prefillValue !== null) {
 			input.val(prefillValue);
@@ -615,21 +570,21 @@ function duplicateMetaDataField(clicked,prefillValue = null){
 		}
 	}
 	var removeButton = '<button type="button" class="meta_form_button remove_button" onclick="removeMetaDataField(this);">-</button>';
-	$(removeButton).appendTo(tmp);
-	tmp.appendTo($(clicked).parent().parent());
+	$(removeButton).appendTo(tmp.children('.table_form_ui_field'));
+	tmp.insertAfter($(clicked).parent().parent());
 }
 
 function removeMetaDataField(clicked){
 	if ($(clicked).parent().children('input, select').val() != ''){
 		if(confirm("Are you sure you want to delete this field?")){
-			$(clicked).parent().remove();	
+			$(clicked).parent().parent().remove();
 		}
 		else {
 			return;
 		}
 	}
 	else{
-		$(clicked).parent().remove();
+		$(clicked).parent().parent().remove();
 	}
 }
 
@@ -656,7 +611,6 @@ function updateSideBarMetaSchemes(metaStruc) {
 }
 
 function updateSideBarUserSets(userSets){
-	console.log("updateSideBarUserSets");
 	$('#myItemsSubItems').empty();
 	var append = '';
 	for (var set of userSets) {

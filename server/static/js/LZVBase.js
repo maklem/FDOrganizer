@@ -1,6 +1,7 @@
 //var baseURL = 'btrvx159.rz.uni-bayreuth.de';
 var baseURL = '';
 var labFolderToken = '';
+//TODO remove before prod
 var DEBUGlogin = 'robert.guenther@uni-bayreuth.de';
 var DEBUGpassword = 'krQ3C3LTjIXFmwcpmEaM';
 

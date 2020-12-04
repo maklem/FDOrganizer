@@ -20,7 +20,9 @@
     },
     "package_object_metadata" : { //required for PACKAGE, this is generic metadata describing surrounding facts around the content
       "creation_date" : "#date",  //date, required, of creation
+      "modifiable" : true, //boolean, defines if this object is modifyable. system genearted packages are not modifyable by user. only user created packages can.
       "last_change" : "#date", //data, required, last change
+      "origin" : "USER|LABFOLDER|...", //origin of the package. If user it is manually created by the user. If something different is is the service from which by download the package has been created.
       "creator" : "identifer for user", //f.e. user@labfolder.de -> which login was used to download
     },  
     "origin_metadata": { //exists if type=data,this is metadata which describes origin specific attributes dependent on repository
@@ -31,7 +33,7 @@
       "entry_title": "Drawing",
       "entry_version_id": "5385114",
       "entry_version_date": "2020-04-14T13:16:06.000+0000",
-      "entry_hidden": true
+      "entry_hidden": true,
       "element_id": "2654dcaaee1ffa0cd583af30827631f85f28f5d9",
       "element_type": "IMAGE",
       "element_version_id": "4475000",
