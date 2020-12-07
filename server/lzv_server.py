@@ -122,6 +122,17 @@ def navlzvingest():
         return render_template("login.html")
     return render_template("lzvingest.html")
 
+@APP.route('/package')
+def navlzvpackage():
+    '''
+    Navigation to site ingest
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
+    return render_template("lzvpackage.html")
+
 @APP.route('/review')
 def navlzvreview():
     '''
@@ -374,6 +385,8 @@ def download():
     for item in json_data:
         storage_metadata.append(create_storage_data_structure_from_labfolder(user_id, item))
     if len(storage_metadata) > 0:
+        print("storage_metadata")
+        print(storage_metadata)
         download_file_from_labfolder(storage_metadata)
         package_objects = create_package_for_downloaded_data(user_id, storage_metadata)
         storage_metadata += package_objects
@@ -395,14 +408,15 @@ def create_package_for_downloaded_data(user_id, downloaded_sets):
     for search_entry_id in search_entry_ids:
         append.append({
             "id" : str(uuid.uuid4()),
-            "type" : "PACKAGE", 
+            "type" : "PACKAGE",
             "owner" : user_id,
             "name" : [x['name'] for x in downloaded_sets\
                      if x['origin_metadata']['entry_id'] == search_entry_id][0],
             "package_object_metadata" : {
                 "creation_date" : time.strftime('%Y-%m-%dT%T.000+0000'),
                 "last_change" : time.strftime('%Y-%m-%dT%T.000+0000'),
-                "creator" : user_id
+                "creator" : user_id,
+                "modifiable" : False
             },
             "child_data_objects" :\
             [x['id'] for x in downloaded_sets if\
@@ -431,7 +445,7 @@ def create_storage_data_structure_from_labfolder(user_id, input_set):
         "id" : str(uuid.uuid4()),
         "type" : "DATA", 
         "owner" : user_id,
-        "name" : "labfolder - " + input_set['entry_title'],
+        "name" : input_set['entry_title'],
         "data_object_metadata" : {
             "content_origin" : "labfolder",
             "export_date" : time.strftime('%Y-%m-%dT%T.000+0000'),
@@ -482,7 +496,10 @@ def download_file_from_labfolder(data_array):
         couch_header = {"Accept": "application/json",
                         "Content-Type" : "application/json",
                         "Cookie" :  token}
+        print(file_url)
         file_response = requests.get(file_url, headers=headers)
+        print("file_response")
+        print(file_response)
         couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + \
                       CONFIGPARAMS["couchDBDocumentDatabaseName"]
         json_answer = json.loads(requests.post(couchdb_url, headers=couch_header,\
@@ -492,10 +509,14 @@ def download_file_from_labfolder(data_array):
         couchdb_url = couchdb_url + "/" + json_answer["id"] + "/"
         file_name = ''
         if element["origin_metadata"]["element_type"] == 'IMAGE':
+            print("file infor url")
+            print(file_info_url)
+            print(headers)
             file_info_reponse_jdata = json.loads(requests.get(file_info_url, headers=headers).text)
+            print(json.dumps(file_info_reponse_jdata))
             file_name = file_info_reponse_jdata["file_name"]
             file_data = file_response.content
-            couchdb_url = couchdb_url + file_name
+            couchdb_url = couchdb_url + json_answer["id"]
             couch_header["Content-Type"] = "image/png"
             att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
             element["data_object_metadata"]["is_stored"] = bool(att_create_response)
@@ -510,11 +531,12 @@ def download_file_from_labfolder(data_array):
             else: #text
                 file_data = file_info_reponse_jdata["content"]
                 file_name = json_answer["id"]
-            couchdb_url = couchdb_url + str(file_name)
+            couchdb_url = couchdb_url + json_answer["id"]
             couch_header["Content-Type"] = "text/plain"
             att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
             element["data_object_metadata"]["is_stored"] = bool(att_create_response)
         element["data_object_metadata"]["filename"] = file_name
+        element["data_object_metadata"]["db_filename"] = json_answer["id"]
 
 
 def process_table_data(sheets):
@@ -618,21 +640,21 @@ def download_mdb_items():
     return send_from_directory(CONFIGPARAMS["tempFolder"], filename, as_attachment=True)
     # return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
 
-@APP.route('/data/packages', methods=['GET'])
-def get_data_packages():
-    '''
-    Routed from /data/packages
-    Requests all data packages for user from database, which can then be added to a 
-    '''
-    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
-        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
-        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    user_id = request.cookies['session_user']
-    query = {"selector": {
-        "owner": user_id, "type" : "PACKAGE"}}
-    response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
-    return json.dumps(response['docs'])
+# @APP.route('/data/packages', methods=['GET'])
+# def get_data_packages():
+#     '''
+#     Routed from /data/packages
+#     Requests all data packages for user from database, which can then be added to a 
+#     '''
+#     if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+#         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+#     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+#         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+#     user_id = request.cookies['session_user']
+#     query = {"selector": {
+#         "owner": user_id, "type" : "PACKAGE"}}
+#     response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
+#     return json.dumps(response['docs'])
 
 @APP.route('/labfolder/storage', methods=['GET'])
 def get_storage_file():
@@ -679,6 +701,49 @@ def get_packages(user_id, return_as_string=False):
     query = {"selector": {"owner": user_id, "type" : "PACKAGE"}}
     response = query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"])
     return response if return_as_string else json.loads(response)
+
+@APP.route('/storage/packages', methods=['PUT'])
+def set_package_object():
+    '''
+    Routed from /storage/packages
+    Updates or creates a new package. Metadata is set by this function serverside to prevent mani-
+    pulation.
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    token = authenticate_couchdb()
+    if not token:
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    data = json.loads(request.get_data())
+    query = {"selector": {"owner": user_id, "set_id": data['set_id']}}
+    check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + "/"\
+        + data['set_id']
+    #prepare date to be written to db. if it is an update we only need to change some
+    if len(check_response['docs']) > 0: #only one entry with same id should exist at the same time
+        headers['If-Match'] = check_response['docs'][0]["_rev"]
+        data['package_object_metadata'] = check_response['docs'][0]['package_object_metadata']
+        data['package_object_metadata']['last_change'] = time.strftime('%Y-%m-%dT%T.000+0000')
+    else: #when this is a new package, some additional fields need to be changed
+        data['type'] = 'PACKAGE'
+        data['owner'] = user_id
+        now = time.strftime('%Y-%m-%dT%T.000+0000')
+        data['package_object_metadata'] = {
+            "creration_data" : now,
+            "last_change" : now,
+            "modifiable" : True,
+            "origin" : "USER",
+            "creator" : user_id
+        }
+    response = requests.put(url, headers=headers, data=json.dumps(data))
+    if response:
+        return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error Puting file to database.'}), 500,\
+                      {'Content-Type' : 'application/json'}
 
 
 def update_storage(add_elements):
@@ -728,7 +793,7 @@ def create_zip_from_files(download_meta, filename):
     cdb_doc_url_base = CONFIGPARAMS["couchDBBaseURL"] + "/" + \
                        CONFIGPARAMS["couchDBDocumentDatabaseName"] + "/"
     for ele in download_meta:
-        filename = ele["data_object_metadata"]["filename"]
+        filename = ele["data_object_metadata"]["db_filename"]
         #each element should only have one version, so wen access the first element
         cdb_doc_url = cdb_doc_url_base + ele["data_object_metadata"]["doc_id"] + "/" \
         + filename

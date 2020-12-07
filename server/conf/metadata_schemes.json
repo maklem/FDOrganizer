@@ -843,7 +843,7 @@
           {
             "entity_type": "GROUP",
             "identifier": "geolocation_box_group",
-            "name": "Geolocation Point",
+            "name": "Geolocation Box",
             "multiple": false,
             "mandatory": false,
             "fields": [

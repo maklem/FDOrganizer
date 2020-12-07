@@ -8,8 +8,7 @@ $( document ).ready(function() {
 	{
 		$('#logout_lzv').show();
 	}
-	// metaStruc = getLocalStorage("metaDataStructs");
-	// createFormForNewSchemeItem('DC1.1Mini')
+	metaStruc = getLocalStorage("metaDataStructs");
 });
 
 var unsaved = false;

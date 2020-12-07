@@ -223,6 +223,7 @@ li a:hover {
   padding-top: 2px;
   margin: 0;
   margin-top: 3px;
+  width: 100%;
 }
 
 /*------LZV Login-------*/
@@ -449,15 +450,72 @@ img.avatar {
   resize: none;
 }
 
+.mandatory_descriptor {
+  float: right;
+  border-radius: 2px;
+  border: none;
+  color: white;
+  margin-top: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  font-weight: bold;
+}
 
-.meta_form_group {
+.required_entity_descriptor {
+  background-color: var(--neg_button_color);
+}
+
+.optional_entity_descriptor {
+  background-color: var(--main_button_color);
+}
+
+.meta_form_group_descriptor {
+  width: 90%;
+  size: 10px;
+  margin-top: 2px;
+  margin-left: 2px;
+  background-color: #dddddd;
+  border-radius: 2px;
+  border: none;
+}
+
+.metaFormElement.dupe {
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #dddddd;
+}
+
+.meta_form_group.clone {
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #dddddd;
+}
+
+.table_form_ui_field.clone {
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #dddddd;
+}
+
+.meta_form_group_descriptor .meta_group_name {
+  font-weight: bold;
+}
+.meta_form_group_descriptor .meta_group_description {
+  font-style: italic;
+}
+
+.meta_form_group_descriptor:hover {
+  background-color:  #eeeeeeee;
+}
+
+.meta_form_entity {
   display: none;
-  margin-left: 4px;
-  margin-top: 4px;
+  margin-left: 2px;
+  /*margin-top: 4px;*/
   border-radius: 3px;
   border: 2px solid #dddddd;
-  width: 95%;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  width: 90%;
+  /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
 
 }
 
@@ -531,21 +589,12 @@ select{
 }
 
 .remove_button:hover {
-  background-color: var(--neg_button_hover_color;
+  background-color: var(--neg_button_hover_color);
 }
 
 .metaFormCVField {
       position: relative;
 }
-/*.metaFormCVField::before {
-      content: "\f107";
-      font-size: 20px;
-      position: absolute;
-      right: 15px;
-      top: 10px;
-      color: #fff;
-      pointer-events: none;
-}*/
 
 .metaFieldDescription {
   font-style: italic;
@@ -605,10 +654,6 @@ table, th, td {
   padding: 8px;
 }
 
-/*tr:nth-child(even) {
-  background-color: #dddddd;
-}*/
-
 input:required:invalid, select:required:invalid {
   box-shadow: inset 0px 0px 3px rgba(255, 0, 0, 0.85);
 }
@@ -617,6 +662,115 @@ input:required:invalid, select:required:invalid {
   width: 100%;
 }
 
-.staticText {
 
+/*PACKAGE*/
+.form_multiple_select_descriptor {
+  border: 1px solid #bbbbbb;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: 2em;
+  width: 100%%;
+  text-align: center;
+}
+
+.form_multiple_select_container {
+  width: 100%;
+  height: 100vh;
+  border: 1px solid #bbbbbb;
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+.open_info_button {
+  background: #bbbbbb  url("/static/images/icon_lupe_white.png") no-repeat scroll 50% 50%; 
+  border-radius: 0px 2px 2px 0px;
+  border-color: #bbbbbb;  
+  float: right;
+  display: inline-block;
+  width: 9%;
+  height: 100%;
+  outline: 0;
+  transform: translate(-10%, 0%);
+
+}
+
+.open_info_button:hover {
+  background-color: #ababab;
+}
+
+.container_subitem {
+  display: block;
+  width: 99%;
+  height: 3em;
+  margin-top: 2px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+
+.container_item_select {
+  color: white;
+  background-color: #bbbbbb;
+  border-radius: 2px 0px 0px 2px;
+  border-color: #bbbbbb;
+  width: 90%;
+  float: left;
+  outline: 0;
+  height: 100%;
+}
+
+.container_item_select.selected {
+  background-color: var(--main_button_color);
+  /*-webkit-box-shadow: inset 1px 1px 10px 4px rgba(20,20,20,0.38); */
+  box-shadow: inset 1px 1px 10px 4px rgba(20,20,20,0.38);
+}
+
+.container_item_select:hover {
+  color: white;
+  background-color: #ababab;
+}
+
+.container_item_select.selected:hover {
+  background-color: var(--main_button_hover_color);
+}
+
+
+.package_button {
+  background: #eeeeee;
+  border-radius: 5px;
+  border-color: #cccccc;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.package_button:hover {
+  background: #dedede;
+}
+
+.package_button_div {
+  margin: auto;
+  width: 90%;
+  transform: translate(0vh , 50vh);
+}
+
+#package_manager_form_body_left {
+  width: 40%;
+  height: 100vh;
+  display: inline-block;
+}
+
+#package_manager_form_body_right {
+  width: 40%;
+  height: 100vh;
+  display: inline-block;
+}
+
+#package_manager_form_body_middle {
+  vertical-align: top;
+  width: 10%;
+  height: 100vh;
+  display: inline-block;
+}
+
+#package_manager_form_body {
+  height: 100vh;
 }
