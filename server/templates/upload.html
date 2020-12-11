@@ -1,0 +1,36 @@
+{% extends "template.html" %}
+{% block content %}
+<div class="col-md-2" id="sidebar">
+    <div id="newItems">
+    </div>
+    <div id="myItems">
+    </div>
+</div>
+<div class="col-md-8" id="mainpage">
+    <div id="metaDataMainForm">
+        <p>Es wird ein Eingabefeld erzeugt, das Attribut multiple sorgt dafür, dass im Auswahldialog
+        mehrere Dateien ausgewählt werden können </p>
+    <p>
+<form id="formElem">
+  <input type="text" name="firstName" value="John">
+  Picture: <input type="file" name="picture" accept="image/*">
+  <input type="submit">
+</form>
+    </p>
+    <p>Ein Ausgabefeld zur Anzeige der ausgewählten Dateien:</p>
+    <output id="dateiListe"></output>
+    </div>
+    <div id="popupForm">
+    </div>
+</div>
+<div class="col-md-2" id="right_sidebar">
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static',     filename='js/LZVBase.js') }}">
+</script>
+<script src="{{ url_for('static',     filename='js/LZVInterface.js') }}">
+</script>
+<script src="{{ url_for('static',     filename='js/LZVUpload.js') }}">
+</script>
+{% endblock %}

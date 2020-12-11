@@ -13,16 +13,22 @@
 	<div class="container-fluid">
 		<div class ="row">
 			<div class="col-md-12" id="topBanner">
-				<p>FDOrganize</p>
+				<div class="col-md-10">
+					<p>FDOrganize</p>
+				</div>
+				<div class="col-md-2" id="toplogo">
+					<img class="logo-img" height="90" src="static/images/Logo-Uni-BT_UNIVERSITÄTSBIBLIOTHEK_gruen-sw-9.jpg" id="top_logo">
+				</div>
 			</div>
 			<div data-role="navbar" id="navbarTop">
 				<ul>
 					<li> <a href="{{ url_for('navhome') }}" class="ui-btn-active">HOME</a></li>
 					<li> <a href="{{ url_for('navlabfolder') }}" class="ui-btn-active">LABFOLDER</a></li>
-					<li> <a href="{{ url_for('navlzvingest') }}" class="ui-btn-active">LZV</a></li>
-					<li> <a href="{{ url_for('navmetadata') }}" class="ui-btn-active">METADATA</a></li>
-					<li> <a href="{{ url_for('navlzvreview') }}" class="ui-btn-active">REVIEW</a></li>
 					<li> <a href="{{ url_for('navlzvpackage') }}" class="ui-btn-active">PACKAGE</a></li>
+					<li> <a href="{{ url_for('navupload') }}" class="ui-btn-active">UPLOAD</a></li>
+					<li> <a href="{{ url_for('navmetadata') }}" class="ui-btn-active">METADATA</a></li>
+					<li> <a href="{{ url_for('navlzvingest') }}" class="ui-btn-active">LZV</a></li>
+					<li> <a href="{{ url_for('navlzvreview') }}" class="ui-btn-active">REVIEW</a></li>
 					<li> <a href="{{ url_for('navhistory') }}" >HISTORY</a></li>
 					<li> <a href="{{ url_for('navimpressum') }}" >IMPRESSUM</a></li>
 					<li id="logout_lzv"> <button class="lzvButton lzvLogoutbutton" onclick="logout_lzv();"> LOGOUT</button>

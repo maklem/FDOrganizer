@@ -41,6 +41,7 @@ function delete_user_metaset(delete_set) {
 function sendUserMetaSetsToServer(new_set) {
 	interface_store_metadata_usersets(new_set, function() {
 		getMetaDataUserSets(true);
+		unsaved = false;
 	});
 }
 
@@ -123,7 +124,6 @@ function saveActiveMetaDataSet() {
 		alert('Please enter a name for the data set before saving!');
 		return;
 	}
-	unsaved = false;
 	sendUserMetaSetsToServer(saveData);
 }
 
@@ -206,7 +206,14 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 			else {
 				output += '<span class="mandatory_descriptor optional_entity_descriptor">optional</span>';
 			}
-			output += '<p><span class="meta_group_description">'+ field.description +'</span></button>';
+			output += '<p><span class="meta_group_description">';
+			if('description' in field) {
+				output += field.description;
+			}
+			else {
+				output += '&nbsp';
+			}
+			output += '</span></button>';
 			output += '<div class="meta_form_group meta_form_entity orig" id="' + field.identifier + '">';
 		}
 		for(var i=0; i<field.fields.length; i++){
@@ -260,7 +267,14 @@ function createHTMLOutputForMetaSchemeEntity(field, prefill_values = undefined, 
 			else {
 				output += '<span class="mandatory_descriptor optional_entity_descriptor">optional</span>';
 			}
-			output += '<p><span class="meta_group_description">'+ field.description +'</span></button>';
+			output += '<p><span class="meta_group_description">';
+			if('description' in field) {
+				output += field.description;
+			}
+			else {
+				output += '&nbsp';
+			}
+			output += '</span></button>';
 			output += '<div class="meta_form_field meta_form_entity orig" id="' + field.identifier + '">';
 		}
 		if (prefill_values)
@@ -300,7 +314,14 @@ function create_htmlfield_from_template(field, value=undefined, dupe=false){
 		}
 		output +=  '</div>';
 		if (field.identifier !== undefined) {
-			output += '<div class="metaFieldDescription">'+ field.description +'</div></label>';
+			output += '<div class="metaFieldDescription">';
+			if('description' in field) {
+				output += field.description;
+			}
+			else {
+				output += '&nbsp';
+			}
+			output += '</div></label>';
 		}
 		if (field.field_type != 'cv') {
 			if (value)
@@ -604,7 +625,7 @@ function updateSideBarMetaSchemes(metaStruc) {
 	var append = '';
 	for (var scheme of metaStruc) {
 		if(scheme.active){
-		append += '<button class="sidebarItem sidebarSubItem" id="' + scheme.identifier + '" onclick="createFormForNewSchemeItem(this);">' + scheme.title + ' ' + scheme.version + '</button><br>';
+		append += '<button class="sidebarItem sidebarSubItem" id="' + scheme.identifier + '" onclick="createFormForNewSchemeItem(this);">' + scheme.title + ' ' + scheme.version + '</button>';
 	}
 	}
 	$(append).appendTo('#newItemsSubItems');
@@ -617,15 +638,5 @@ function updateSideBarUserSets(userSets){
 		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + set.set_id + '" onclick="createFormForExistingSchemeSet(this);">' + set.name + '</button><div class="round-button"><button class="btn deleteSetButton" set_id="'+ set.set_id + '" onclick="deleteMetaDataSet(this);"><span>-</span></button></div></div>';
 	}
 	$(append).appendTo('#myItemsSubItems');
-}
-
-function toggleDisplaySubItems(clicked) {
-	$(clicked).parent().children('#newItemsSubItems, #myItemsSubItems').toggle();
-	if($(clicked).children(".arrow").html() == "v") {
-		$(clicked).children(".arrow").text("x");
-	}
-	else {
-		$(clicked).children(".arrow").text("v");
-	}
 }
 

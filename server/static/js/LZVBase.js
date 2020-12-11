@@ -93,6 +93,15 @@ function logout_lzv() {
   }
 }
 
+function toggleDisplaySubItems(clicked) {
+  $(clicked).parent().children('#newItemsSubItems, #myItemsSubItems').toggle();
+  if($(clicked).children(".arrow").html() == "v") {
+    $(clicked).children(".arrow").text("x");
+  }
+  else {
+    $(clicked).children(".arrow").text("v");
+  }
+}
 
 
 // function convertStorageFileToFlat() {

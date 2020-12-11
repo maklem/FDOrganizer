@@ -4,6 +4,7 @@ Software for LZV Server.
 import time
 from pathlib import Path
 from zipfile import ZipFile
+import os
 import uuid
 import json
 import secrets
@@ -40,6 +41,7 @@ APP.secret_key = 'any random string'
 APP.config['SESSION_TYPE'] = 'filesystem'
 APP.config['PERMANENT_SESSION_LIFETIME'] = 43200
 APP.config['SESSION_PERMANENT'] = False
+APP.config['UPLOAD_FOLDER'] = CONFIGPARAMS['USR_UPLOAD_TMP_FOLDER']
 CORS(APP)
 Session(APP)
 
@@ -133,6 +135,18 @@ def navlzvpackage():
         return render_template("login.html")
     return render_template("lzvpackage.html")
 
+@APP.route('/upload')
+def navupload():
+    '''
+    Navigation to site ingest
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return render_template("login.html")
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return render_template("login.html")
+    return render_template("upload.html")
+
+
 @APP.route('/review')
 def navlzvreview():
     '''
@@ -145,6 +159,7 @@ def navlzvreview():
     if not check_user_permission_review(request.cookies['session_user']):
         return render_template("index.html")
     return render_template("lzvreview.html")
+
 
 @APP.route('/login', methods=['GET'])
 def navlogin():
@@ -407,7 +422,7 @@ def create_package_for_downloaded_data(user_id, downloaded_sets):
     append = []
     for search_entry_id in search_entry_ids:
         append.append({
-            "id" : str(uuid.uuid4()),
+            "package_id" : str(uuid.uuid4()),
             "type" : "PACKAGE",
             "owner" : user_id,
             "name" : [x['name'] for x in downloaded_sets\
@@ -419,7 +434,7 @@ def create_package_for_downloaded_data(user_id, downloaded_sets):
                 "modifiable" : False
             },
             "child_data_objects" :\
-            [x['id'] for x in downloaded_sets if\
+            [x['package_id'] for x in downloaded_sets if\
              x['origin_metadata']['entry_id'] == search_entry_id]
             })
     return append
@@ -442,7 +457,7 @@ def create_storage_data_structure_from_labfolder(user_id, input_set):
         }
     '''
     return {
-        "id" : str(uuid.uuid4()),
+        "package_id" : str(uuid.uuid4()),
         "type" : "DATA", 
         "owner" : user_id,
         "name" : input_set['entry_title'],
@@ -719,10 +734,10 @@ def set_package_object():
         return ''
     headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
     data = json.loads(request.get_data())
-    query = {"selector": {"owner": user_id, "set_id": data['set_id']}}
+    query = {"selector": {"owner": user_id, "package_id": data['package_id']}}
     check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
     url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + "/"\
-        + data['set_id']
+        + data['package_id']
     #prepare date to be written to db. if it is an update we only need to change some
     if len(check_response['docs']) > 0: #only one entry with same id should exist at the same time
         headers['If-Match'] = check_response['docs'][0]["_rev"]
@@ -744,6 +759,35 @@ def set_package_object():
         return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
     return json.dumps({'Result' : 'Error Puting file to database.'}), 500,\
                       {'Content-Type' : 'application/json'}
+
+#TODO TEST
+@APP.route('/storage/packages/delete', methods=['PUT'])
+def delete_package_object():
+    '''
+        Routed from /storage/packages/delete PUT
+        Delete the package provided in data from database 
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    user_id = request.cookies['session_user']
+    token = authenticate_couchdb()
+    if not token:
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    data = json.loads(request.get_data())
+    query = {"selector": {"owner": user_id, "package_id": data['package_id']}}
+    check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBMetaDataDatabaseName"]))
+    if len(check_response['docs']) > 0: #found the entry to delete
+        url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"]\
+            + "/" + data['package_id']
+        headers['If-Match'] = check_response['docs'][0]["_rev"]
+        response = requests.delete(url, headers=headers, data=data)
+        if response:
+            return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error deleting package'}),\
+                       500, {'Content-Type' : 'application/json'}
 
 
 def update_storage(add_elements):
@@ -1120,6 +1164,28 @@ def search_for_version(storage_file, version_id):
                     return {'version': version, 'entry_title': entry['entryTitle'],\
                             'entry_id' : entry['entryID'], 'project_id' : project['projectID']}
     return None
+
+@APP.route("/test/upload", methods=['POST'])
+def test_upload():
+    # print(request.get_data())
+            # check if the post request has the file part
+    if 'picture' not in request.files:
+        print('No file part')
+        return json.dumps({'Result' : 'Error: No files provided'}), 500,\
+                      {'Content-Type' : 'application/json'}
+    file = request.files['picture']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+    if file.filename == '':
+        print('No selected file')
+        return json.dumps({'Result' : 'Error: No files provided'}), 500,\
+                      {'Content-Type' : 'application/json'}
+    if file:
+        filename = file.filename
+        file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+        print("Succesfully saved files")
+    return json.dumps({'Result' : 'Succesfully saved files'}), 200,\
+                      {'Content-Type' : 'application/json'}
 
 if __name__ == '__main__':
     #authenticate_couchdb()

@@ -16,5 +16,6 @@
   "METADATA_INFO_FILE": "/server/lzv/server/conf/metadata_schemes.json",
   "METADATA_EXPORT_DEFINITIONS" : "/server/lzv/server/conf/metadata_export_definitions.json",
   "METADATA_EXPORT_MAPPINGS" : "/server/lzv/server/conf/metadata_export_mappings.json",
-  "REVIEW_PERMITTED_USERS": ["bt303343", "btxxxxxx"]
+  "REVIEW_PERMITTED_USERS": ["bt303343", "btxxxxxx"],
+  "USR_UPLOAD_TMP_FOLDER" : "/server/lzv/server/tmp/usr_uploads/"
 }
