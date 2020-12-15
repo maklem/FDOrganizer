@@ -8,17 +8,27 @@
 </div>
 <div class="col-md-8" id="mainpage">
     <div id="metaDataMainForm">
-        <p>Es wird ein Eingabefeld erzeugt, das Attribut multiple sorgt dafür, dass im Auswahldialog
-        mehrere Dateien ausgewählt werden können </p>
-    <p>
-<form id="formElem">
-  <input type="text" name="firstName" value="John">
-  Picture: <input type="file" name="picture" accept="image/*">
-  <input type="submit">
-</form>
-    </p>
-    <p>Ein Ausgabefeld zur Anzeige der ausgewählten Dateien:</p>
-    <output id="dateiListe"></output>
+        <p>Name for File Package:</p>
+            <form id="formElem">
+                <div class="table_form_ui_field">
+                    <input name="upload_package_name" required="" type="text" value=""/>
+                </div>
+                <hr>
+                    <input id="upload_choose_files_hidden_input" multiple="" name="uploaded_files" type="file">
+                        <button class="btn lzvButton" id="upload_choose_files" type="button">
+                            Choose Files
+                        </button>
+                        <input class="btn lzvButton" type="submit">
+                        </input>
+                    </input>
+                </hr>
+            </form>
+            <br>
+        <p>
+            Selected Files:
+        </p>
+        <div id="upload_list">
+        </div>
     </div>
     <div id="popupForm">
     </div>

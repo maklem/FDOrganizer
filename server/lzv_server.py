@@ -1169,21 +1169,25 @@ def search_for_version(storage_file, version_id):
 def test_upload():
     # print(request.get_data())
             # check if the post request has the file part
-    if 'picture' not in request.files:
+    if 'uploaded_files' not in request.files:
         print('No file part')
         return json.dumps({'Result' : 'Error: No files provided'}), 500,\
                       {'Content-Type' : 'application/json'}
-    file = request.files['picture']
+    files = request.files.getlist('uploaded_files')
+    print(files)
+    # print(json.dumps(file))
         # if user does not select file, browser also
         # submit an empty part without filename
-    if file.filename == '':
-        print('No selected file')
-        return json.dumps({'Result' : 'Error: No files provided'}), 500,\
+    for file in files:
+        if file.filename == '':
+            print('No selected file')
+            return json.dumps({'Result' : 'Error: No files provided'}), 500,\
                       {'Content-Type' : 'application/json'}
-    if file:
-        filename = file.filename
-        file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-        print("Succesfully saved files")
+        if file:
+            filename = file.filename
+            print(filename)
+            file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+            print("Succesfully saved files")
     return json.dumps({'Result' : 'Succesfully saved files'}), 200,\
                       {'Content-Type' : 'application/json'}
 
