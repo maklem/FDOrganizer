@@ -838,15 +838,19 @@ input:required:invalid, select:required:invalid {
 }
 
 .remove_upload_item {
-  background: #bbbbbb  url("/static/images/icon_lupe_white.png") no-repeat scroll 50% 50%; 
+  background: var(--neg_button_color)  url("/static/images/icon_trash_white.png") no-repeat scroll 50% 50%; 
   border-radius: 0px 2px 2px 0px;
-  border-color: #bbbbbb;  
   float: right;
   display: inline-block;
   width: 9%;
   height: 100%;
   outline: 0;
   transform: translate(-10%, 0%);
+}
+
+.remove_upload_item:hover {
+   background: var(--neg_button_hover_color)  url("/static/images/icon_trash_white.png") no-repeat scroll 50% 50%; 
+   border-color: var(--neg_button_hover_color);  
 }
 
 .upload_container_subitem {

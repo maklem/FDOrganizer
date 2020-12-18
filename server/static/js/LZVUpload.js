@@ -1,43 +1,30 @@
-function dateiauswahl(evt) {
-    // FileList-Objekt des input-Elements auslesen, auf dem 
-    // das change-Event ausgelöst wurde (event.target)
-    var files = evt.target.files;
-    // Deklarierung eines Array Objekts mit Namen "fragmente". Hier werden die Bausteine
-    // für die erzeugte Listenausgabe gesammelt.
-    var fragmente = [];
-    // Zählschleife; bei jedem Durchgang den Namen, Typ und 
-    // die Dateigröße der ausgewählten Dateien zum Array hinzufügen
-    for (let f of files) {
-        fragmente.push('<li><strong>', f.name, '</strong> (', f.type || 'n/a', ') - ', f.size, ' bytes</li>');
-    }
-    console.log(files);
-    // Alle Fragmente im fragmente Array aneinanderhängen, in eine unsortierte Liste einbetten
-    // und das alles als HTML-Inhalt in das output-Elements mit id='dateiListe' einsetzen.
-    console.log(fragmente);
-    document.getElementById('dateiListe').innerHTML = '<ul>' + fragmente.join('') + '</ul>';
-}
-// UI-Events erst registrieren wenn das DOM bereit ist!
-document.addEventListener("DOMContentLoaded", function() {
-    // Falls neue Eingabe, neuer Aufruf der Auswahlfunktion
-});
-const form = document.querySelector('form');
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    // const formData = new FormData(formElem);
-    upload_files(formData);
-});
-
-function upload_files(data) {
+function upload_file(data, package_id, on_success_callback) {
     // console.log($('formElem').serialize());
-    var url = baseURL + '/test/upload';
+    var url = baseURL + '/upload/file?package_id=' + package_id;
     xhttp.onreadystatechange = function(e) {
         if (this.readyState == 4) {
-            if (this.status == 200) {}
+            if (this.status == 200) {
+                on_success_callback();
+            }
         }
     };
     xhttp.open('POST', url, false);
     xhttp.send(data);
 }
+
+function query_new_package(name, on_success_callback) {
+    var url = baseURL + '/upload/package?name=' + name;
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                on_success_callback(xhttp.response);
+            }
+        }
+    };
+    xhttp.open('POST', url, false);
+    xhttp.send(data);
+}
+
 $('#upload_choose_files_hidden_input').change(function() {
     append_to_upload_list(this);
     update_upload_file_list();
@@ -84,10 +71,10 @@ function create_html_for_upload_indicator(upload_file) {
         size = String(size) + 'B';
     }
     else if(size < 1048576) { //kB
-        size = String(size/1024) + 'kB';
+        size = (size/1024).toFixed(2) + 'kB';
     }
     else { //mB
-        size = String(size/1048576) + 'MB';
+        size = (size/1048576).toFixed(2) + 'MB';
     }
     output += '<span class="upload_item_sub_description">' + upload_file.type + ' - ' + size + '</span>';
     output += '</div>';
@@ -102,3 +89,44 @@ $('#upload_choose_files').click(function() {
     $('#upload_choose_files_hidden_input').click();
     console.log("test");
 });
+
+
+function ask_for_consent(){
+    $('#metaDataMainForm').toggle();
+    $('#popupForm').toggle();
+}
+
+function trigger_package_creation() {
+    //visually display"upload" progres. (grey out delete button, show "circle" for pending upload)
+    //disable namefield and buttons for item selection and uploadtrigger
+    package_name = $('#input_package_name').val();
+    // query_new_package(package_name, function(response) {
+    //     answer = JSON.parse(response);
+    //     package_id = answer.package_id;
+    //     upload_files(package_id);
+    // });
+}
+
+function upload_files(package_id) {
+    for (let file of form_upload_data) {
+        upload_file(file, package_id, function() {
+            //graphical info about the progress (green checkmark above trashcan)
+        });
+    }
+    //when finished show a success message and clear the form
+}
+
+function upload_package_agree() {
+    $('#metaDataMainForm').toggle();
+    $('#popupForm').toggle();
+    $('#upload_choose_files').prop('disabled', true);
+    $('#button_save_package_object').prop('disabled', true);
+    $('#input_package_name').prop('disabled', true);
+    $('#upload_list').find('.remove_upload_item').prop('disabled', true);
+    trigger_package_creation();
+}
+
+function upload_package_disagree() {
+    $('#metaDataMainForm').toggle();
+    $('#popupForm').toggle();
+}

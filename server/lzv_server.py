@@ -1165,31 +1165,57 @@ def search_for_version(storage_file, version_id):
                             'entry_id' : entry['entryID'], 'project_id' : project['projectID']}
     return None
 
-@APP.route("/test/upload", methods=['POST'])
-def test_upload():
+@APP.route("/upload/file", methods=['POST'])
+def receive_file():
+    '''
+        Receive files belonging to a package. This is definied by package_id in parameteres. It 
+        needs to check if the package is manually created AND belonging to the right user.
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    #TODO Fill with function
     # print(request.get_data())
             # check if the post request has the file part
-    if 'uploaded_files' not in request.files:
-        print('No file part')
-        return json.dumps({'Result' : 'Error: No files provided'}), 500,\
-                      {'Content-Type' : 'application/json'}
-    files = request.files.getlist('uploaded_files')
-    print(files)
-    # print(json.dumps(file))
-        # if user does not select file, browser also
-        # submit an empty part without filename
-    for file in files:
-        if file.filename == '':
-            print('No selected file')
-            return json.dumps({'Result' : 'Error: No files provided'}), 500,\
-                      {'Content-Type' : 'application/json'}
-        if file:
-            filename = file.filename
-            print(filename)
-            file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-            print("Succesfully saved files")
+    # if 'uploaded_files' not in request.files:
+    #     print('No file part')
+    #     return json.dumps({'Result' : 'Error: No files provided'}), 500,\
+    #                   {'Content-Type' : 'application/json'}
+    # files = request.files.getlist('uploaded_files')
+    # print(files)
+    # # print(json.dumps(file))
+    #     # if user does not select file, browser also
+    #     # submit an empty part without filename
+    # for file in files:
+    #     if file.filename == '':
+    #         print('No selected file')
+    #         return json.dumps({'Result' : 'Error: No files provided'}), 500,\
+    #                   {'Content-Type' : 'application/json'}
+    #     if file:
+    #         filename = file.filename
+    #         print(filename)
+    #         file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+    #         print("Succesfully saved files")
     return json.dumps({'Result' : 'Succesfully saved files'}), 200,\
                       {'Content-Type' : 'application/json'}
+
+@APP.route("/upload/package", methods=['POST'])
+def receive_package():
+    '''
+        Receive a package from Client. Packge id is created on server and returned to sender. He \
+        then can send fiels to this package with the package_id. The metadata for package creation
+        is only the name of package, everything else is set serverside
+    '''
+    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
+        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
+    #TODO fill with function
+    package_id = uuid4();
+    return json.dumps({'Result' : 'Succesfully saved files', 'package_id': package_id}), 200,\
+                      {'Content-Type' : 'application/json'}
+
 
 if __name__ == '__main__':
     #authenticate_couchdb()
