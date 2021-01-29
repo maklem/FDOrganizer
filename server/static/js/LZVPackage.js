@@ -78,6 +78,7 @@ function fill_package_form(clicked_id, user_packages) {
     $('#package_name').val(user_package.name);
     $('#package_description').val(user_package.description);
     var output = '';
+    console.log(user_packages);
     for (let search_id of user_package.child_data_objects) {
         app_package = user_packages.find(set=>set.package_id == search_id);
         output += create_html_for_container_content(app_package);
@@ -104,7 +105,7 @@ function create_html_for_container_content(user_package) {
 }
 
 function open_item_info(clicked) {
-
+    //TODO!!!
 }
 
 function select_deselect_item(clicked) {

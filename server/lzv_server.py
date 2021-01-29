@@ -14,6 +14,7 @@ import requests
 from flask import Flask, request, render_template, send_from_directory, session
 from flask_session import Session
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 
 import ldap
 # from flask import send_from_directory
@@ -193,6 +194,14 @@ def check_user_permission_review(user_id):
         if val == user_id:
             return True
     return False
+
+def secure_username(user_id):
+    '''
+        This should verify that the user_id is a secure string. This needs to be adapted dependent 
+        on the possible user_ids that exist in the system. Prevent malicious usernames, since this 
+        is user regularly to query the db. f.e. user_id = '{ "selector" : ...}' could be harmfull!
+    '''
+    #TODO fill this function and every appearance of user_id which if taken from a cookies needs to be secured
 
 def create_sessionid():
     '''
@@ -402,13 +411,13 @@ def download():
     if len(storage_metadata) > 0:
         print("storage_metadata")
         print(storage_metadata)
-        download_file_from_labfolder(storage_metadata)
-        package_objects = create_package_for_downloaded_data(user_id, storage_metadata)
+        download_files_from_labfolder(storage_metadata)
+        package_objects = create_package_for_downloaded_labfolder_data(user_id, storage_metadata)
         storage_metadata += package_objects
-        update_storage(storage_metadata)
+        add_to_storage(storage_metadata)
     return APP.response_class(status=200, mimetype='application/json')    
 
-def create_package_for_downloaded_data(user_id, downloaded_sets):
+def create_package_for_downloaded_labfolder_data(user_id, downloaded_sets):
     '''
         finds all unique origin_metadata.entry_id in downloaded_sets. for each entry it creates one 
         package generic_datastructure which contains all elements of that entry that were downlaoded
@@ -482,8 +491,41 @@ def create_storage_data_structure_from_labfolder(user_id, input_set):
         }
 
 
+def create_storage_data_structure_from_upload(user_id, file):
+    '''
+        creates the storage generic:data_structure for metadata. expects a input file from upload
+        metadata:
+        {
+            entry_id
+            entry_title
+            project_id
+            element_id
+            element_type
+            element_version_id
+            entry_version_id
+            version_date
+            project_title
+        }
+    '''
+    return {
+        "package_id" : str(uuid.uuid4()),
+        "type" : "DATA", 
+        "owner" : user_id,
+        "name" : secure_filename(file.filename),
+        "data_object_metadata" : {
+            "content_origin" : "upload",
+            "export_date" : time.strftime('%Y-%m-%dT%T.000+0000'),
+            "export_user" : user_id,
+            "is_stored" : False
+        },
+        "origin_metadata" : {
+            #TODO think about metadata useful for upload data (IP? -> DSGVO?)
+        }
+        }
+
+
 #@APP.route('/elements/file' , methods=['GET'])
-def download_file_from_labfolder(data_array):
+def download_files_from_labfolder(data_array):
     '''
     Function is called for File Download from LabFolder. This Function downloads the files and
     stored it in the database.
@@ -509,7 +551,7 @@ def download_file_from_labfolder(data_array):
                    "User-Agent": CONFIGPARAMS["labFolderDefaultUserAgentHeader"]
                   }
         couch_header = {"Accept": "application/json",
-                        "Content-Type" : "application/json",
+                        "Content-Type" : "application/json", 
                         "Cookie" :  token}
         print(file_url)
         file_response = requests.get(file_url, headers=headers)
@@ -717,6 +759,14 @@ def get_packages(user_id, return_as_string=False):
     response = query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"])
     return response if return_as_string else json.loads(response)
 
+def get_storage_for_user(user_id, return_as_string=False):
+    '''
+        Returns the package and data docs for @user_id either as (json)string or json-object.
+    '''
+    query = {"selector": {"owner": user_id}}
+    response = query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"])
+    return response if return_as_string else json.loads(response)
+
 @APP.route('/storage/packages', methods=['PUT'])
 def set_package_object():
     '''
@@ -780,20 +830,23 @@ def delete_package_object():
     query = {"selector": {"owner": user_id, "package_id": data['package_id']}}
     check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBMetaDataDatabaseName"]))
     if len(check_response['docs']) > 0: #found the entry to delete
+        print("found entryx to delete in db")
         url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBMetaDataDatabaseName"]\
             + "/" + data['package_id']
         headers['If-Match'] = check_response['docs'][0]["_rev"]
         response = requests.delete(url, headers=headers, data=data)
         if response:
+            print("suc delete")
             return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+        print("error delete")
     return json.dumps({'Result' : 'Error deleting package'}),\
                        500, {'Content-Type' : 'application/json'}
 
 
-def update_storage(add_elements):
+def add_to_storage(add_elements):
     '''
-    updated the storage file for @user_id with new Elements @add_elements. Integrity is checked, so
-    heritage is correctly considered.
+        adds new elements to storage database. does not check for integrity, or if files already 
+        exist. if files could already exist use updata_storage()
     '''
     url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"]
     token = authenticate_couchdb()
@@ -804,6 +857,28 @@ def update_storage(add_elements):
         response = requests.post(url, headers=headers, data=json.dumps(item))
         if DEBUG:
             print(response.text)
+
+def update_storage(add_elements):
+    '''
+        updates documents in the storage database. If a package already exists with the id, it is 
+        updated to the new revision. if it does not exist yet, it is only added to db.
+    '''
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"]
+    token = authenticate_couchdb()
+    if not token:
+        return
+    for item in add_elements:
+        headers = {"Accept": "application/json", "Content-Type" : "application/json",\
+                    "Cookie" : token}
+        query = {"selector" : {"owner" : item["owner"],
+                               "package_id" : item["package_id"]}}
+        response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
+        if len(response['docs']) >= 0:
+            headers['If-Match'] = response['docs'][0]["_rev"]
+            t_url = url + "/" + response['docs'][0]["_id"]
+            requests.put(t_url, headers=headers, data=json.dumps(item))
+        else:
+            requests.post(url, headers=headers, data=json.dumps(item))
 
 #checks if elements to download already exist in database. pops elements which are already
 # existing of the checkArray. Only checks labfolder content....
@@ -1039,19 +1114,23 @@ def submit_user_ingest_to_review():
         return json.dumps({'Result' : 'Internal Server Error'}), 500,\
                           {'Content-Type' : 'application/json'}
     user_id = request.cookies['session_user']
-    storage_file = get_labfolder_data(user_id).docs
+    packages = get_packages(user_id, return_as_string=False)['docs']# returns only type == package
     ingest = json.loads(request.get_data())
-    ingest_review_path = CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"] + "/content/"
+    ingest_review_path = CONFIGPARAMS["LZV_REVIEW"] + "/" + ingest["ingest_id"] + "/content/"
     ingest['user_id'] = user_id
     for ingest_element in ingest['content']:
-        version = search_for_version(storage_file, ingest_element['version_id'])
-        if version is not None:
-            filename = version['entry_title'] + '-' + version['version']['versionID']
-            download_files_to_path(ingest_review_path, filename, version['version'])
-            ingest_element['path'] = ingest_review_path + filename
-        else:
-            if DEBUG:
-                print("didnt find version in storage File")
+        package_id = ingest_element['package_id']
+        #this should be only be done, when the review is finished and storing in hotfolder is done
+        #TODO recursive progression through child elements. if child type == data, create fies for review 
+        #TODO also create Metadata info files. Should result in a hierachical folder structure 
+        #TODO need a query to query for data objects in storage db. doc db can then be accesed with doc_id
+        #TODO get package, get all childs. create files for each obj on file system. after approval delete local files.
+        # filename = version['entry_title'] + '-' + version['version']['versionID']
+            # download_files_to_path(ingest_review_path, filename, version['version'])
+            # ingest_element['path'] = ingest_review_path + filename
+        # else:
+            # if DEBUG:
+                # print("didnt find version in storage File")
     #store a file in the database for review
     couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/"\
                   + CONFIGPARAMS["couchDBIngestReviewDatabaseName"] + "/" + ingest['ingest_id']
@@ -1175,32 +1254,123 @@ def receive_file():
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    #TODO Fill with function
-    # print(request.get_data())
-            # check if the post request has the file part
-    # if 'uploaded_files' not in request.files:
-    #     print('No file part')
-    #     return json.dumps({'Result' : 'Error: No files provided'}), 500,\
-    #                   {'Content-Type' : 'application/json'}
-    # files = request.files.getlist('uploaded_files')
-    # print(files)
-    # # print(json.dumps(file))
-    #     # if user does not select file, browser also
-    #     # submit an empty part without filename
-    # for file in files:
-    #     if file.filename == '':
-    #         print('No selected file')
-    #         return json.dumps({'Result' : 'Error: No files provided'}), 500,\
-    #                   {'Content-Type' : 'application/json'}
-    #     if file:
-    #         filename = file.filename
-    #         print(filename)
-    #         file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-    #         print("Succesfully saved files")
-    return json.dumps({'Result' : 'Succesfully saved files'}), 200,\
+    package_id = request.args.get('package_id')
+    user_id = request.cookies['session_user']
+    query = {"selector" : {"package_id" : package_id,
+                           "owner" : user_id}}
+    check_response = json.loads(query_db(query, CONFIGPARAMS['couchDBStorageDatabaseName']))['docs']
+    if len(check_response) == 0:
+        return json.dumps({'Result' : 'Error: Invalid Package ID oder Package does not belong\
+                         to user'}), 200, {'Content-Type' : 'application/json'}
+    # check if the post request has the file part
+    if 'uploaded_file' not in request.files:
+        print('No file part')
+        return json.dumps({'Result' : 'Error: No files provided'}), 500,\
+                      {'Content-Type' : 'application/json'}
+    files = request.files.getlist('uploaded_file')
+    print("files keys")
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    storage_metadata = []
+    for file in files:
+        if file.filename == '':
+            print('No selected file')
+            continue
+        if file:
+            # filename = file.filename
+            print(file.filename)
+            # file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+            # print("Succesfully saved files")
+            metadata_obj = create_storage_data_structure_from_upload(user_id, file)
+            print("created storage for file:")
+            print("uploading to db")
+            response = upload_file_to_couchdb_document_db(file, metadata_obj)
+            if response:
+                print("successfull")
+                storage_metadata.append(metadata_obj)
+    if len(storage_metadata) > 0:
+        print("storage_metadata")
+        print(storage_metadata)
+        add_to_storage(storage_metadata)
+        package_response = append_children_to_package(user_id, package_id, storage_metadata)
+        if package_response: #should be true, else there is a inconsistency in db.
+            return json.dumps({'Result' : 'Succesfully saved files'}), 200,\
+                              {'Content-Type' : 'application/json'}
+        return json.dumps({'Result' : 'Error: Saving Package File'}), 500,\
+                      {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error: No files provided'}), 500,\
                       {'Content-Type' : 'application/json'}
 
-@APP.route("/upload/package", methods=['POST'])
+def append_children_to_package(user_id, package_id, append_children):
+    '''
+        adds the uploaded files to the package which has previously created by the user. Also
+        uploads the modifies package to the database.
+    '''
+    token = authenticate_couchdb()
+    if not token:
+        return json.dumps({'Result' : 'Error Authenticating couch DB'}), 500,\
+                      {'Content-Type' : 'application/json'}
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    query = {"selector": {"owner": user_id, "package_id": package_id}}
+    check_response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + "/"\
+        + package_id
+    #prepare date to be written to db. if it is an update we only need to change some
+    if len(check_response['docs']) > 0: #only one entry with same id should exist at the same time
+        data = check_response['docs'][0]
+        headers['If-Match'] = check_response['docs'][0]["_rev"]
+        data['package_object_metadata']['last_change'] = time.strftime('%Y-%m-%dT%T.000+0000')
+        if not hasattr(data, 'child_data_objects'):
+            data['child_data_objects'] = []
+        for item in append_children:
+            data['child_data_objects'].append(item['package_id'])
+    else: #when this is a new package, some additional fields need to be changed
+        return json.dumps({'Result' : 'Error adding children to package. No Package found  with\
+                            package_id'}), 500, {'Content-Type' : 'application/json'}
+    response = requests.put(url, headers=headers, data=json.dumps(data))
+    if response:
+        return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error updating file to database.'}), 500,\
+                      {'Content-Type' : 'application/json'}
+
+
+def upload_file_to_couchdb_document_db(file, metadata_obj):
+    '''
+        Uploads a file to the document db. Also updated the metadata_obj with the doc_id, file_type,
+        filename and is_stored flag
+    '''
+    token = authenticate_couchdb()
+    if not token:
+        return json.dumps({'Result' : 'Error Authenticating couch DB'}), 500,\
+                      {'Content-Type' : 'application/json'}
+    couch_header = {"Accept": "application/json",
+                    "Content-Type" : "application/json",
+                    "Cookie" :  token}
+    couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + \
+                      CONFIGPARAMS["couchDBDocumentDatabaseName"]
+    print("touched doc")
+    json_answer = json.loads(requests.post(couchdb_url, headers=couch_header,\
+                                               data=json.dumps({})).text)
+    couch_header["If-Match"] = json_answer["rev"]
+    couchdb_url = couchdb_url + "/" + json_answer["id"] + "/"
+    filename = secure_filename(file.filename)
+    couch_header["Content-Type"] = file.mimetype
+    file_data = file.read()
+    couchdb_url = couchdb_url + json_answer["id"]
+    att_create_response = requests.put(couchdb_url, headers=couch_header, data=file_data)
+    if att_create_response:
+        metadata_obj["data_object_metadata"]["file_type"] = file.mimetype
+        metadata_obj["data_object_metadata"]["is_stored"] = bool(att_create_response)
+        metadata_obj["data_object_metadata"]["filename"] = filename
+        metadata_obj["data_object_metadata"]["doc_id"] = json_answer["id"]
+    else:
+        return json.dumps({'Result' : 'Error Uploading File to Database.'}), 500,\
+                      {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Successfully uploaded file to doc DB.'}), 200,\
+                      {'Content-Type' : 'application/json'}
+
+
+@APP.route("/upload/package", methods=['GET'])
 def receive_package():
     '''
         Receive a package from Client. Packge id is created on server and returned to sender. He \
@@ -1211,12 +1381,39 @@ def receive_package():
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
     if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
         return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    #TODO fill with function
-    package_id = uuid4();
-    return json.dumps({'Result' : 'Succesfully saved files', 'package_id': package_id}), 200,\
-                      {'Content-Type' : 'application/json'}
+    print("creating new package")
+    user_id = request.cookies['session_user']
+    data = {}
+    data['package_id'] = str(uuid.uuid4())
+    data['name'] = request.args.get('name')
+    token = authenticate_couchdb()
+    if not token:
+        return ''
+    headers = {"Accept": "application/json", "Content-Type" : "application/json", "Cookie" :  token}
+    print("package_name: " + data['name'])
+    url = CONFIGPARAMS["couchDBBaseURL"] + "/" + CONFIGPARAMS["couchDBStorageDatabaseName"] + "/"\
+        + data['package_id']
+    data['type'] = 'PACKAGE'
+    data['owner'] = user_id
+    now = time.strftime('%Y-%m-%dT%T.000+0000')
+    data['package_object_metadata'] = {
+        "creration_data" : now,
+        "last_change" : now,
+        "modifiable" : False,
+        "origin" : "UPLOAD",
+        "creator" : user_id
+    }
+    print("package to put:")
+    print(json.dumps(data))
+    response = requests.put(url, headers=headers, data=json.dumps(data))
+    if response:
+        return json.dumps({'Result' : 'Succesfully saved files', 'package_id': data['package_id']})\
+                , 200, {'Content-Type' : 'application/json'}
+    return json.dumps({'Result' : 'Error saving new package file', \
+             'package_id': data['package_id']}), 500, {'Content-Type' : 'application/json'}
 
 
 if __name__ == '__main__':
+    # print(get_storage_for_user('bt303343', return_as_string=True))
     #authenticate_couchdb()
     APP.run(debug=True)

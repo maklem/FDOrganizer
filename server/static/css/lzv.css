@@ -837,8 +837,7 @@ input:required:invalid, select:required:invalid {
   height: 45%;
 }
 
-.remove_upload_item {
-  background: var(--neg_button_color)  url("/static/images/icon_trash_white.png") no-repeat scroll 50% 50%; 
+.upload_item_button {
   border-radius: 0px 2px 2px 0px;
   float: right;
   display: inline-block;
@@ -848,10 +847,21 @@ input:required:invalid, select:required:invalid {
   transform: translate(-10%, 0%);
 }
 
+.remove_upload_item {
+  background: var(--neg_button_color)  url("/static/images/icon_trash_white.png") no-repeat scroll 50% 50%; 
+}
+
 .remove_upload_item:hover {
    background: var(--neg_button_hover_color)  url("/static/images/icon_trash_white.png") no-repeat scroll 50% 50%; 
    border-color: var(--neg_button_hover_color);  
 }
+
+.success_upload_item {
+  background: var(--main_button_color)  url("/static/images/icon_check_white.png") no-repeat scroll 50% 50%; 
+  border-color: var(--main_button_color);  
+}
+
+
 
 .upload_container_subitem {
   display: block;

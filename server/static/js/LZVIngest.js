@@ -286,7 +286,7 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	if(mdUserSetsJSON &&  mdUserSets !== null) {
 		headerHTML += '<select required name="ingest_header_metadata">';
 		headerHTML += '<option selected value=""></option>';
-		for (var j=0; j<mdUserSetsJSON.length; j++){
+		for (let j=0; j<mdUserSetsJSON.length; j++){
 			headerHTML += '<option value="'+mdUserSetsJSON[j].set_id+'">'+mdUserSetsJSON[j].name+'</option>';
 		}
 		headerHTML += '</select>';
@@ -311,10 +311,10 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 			inputHTML += '<td class="table_field_select"><select class="select_content" name="ingest_content" required>\n';
 			inputHTML += '<option selected value=""></option>';
 			//fill with all data sets here
-			for(var i = 0; i < user_packages_json.length; i++){
-				var date = new Date(user_packages_json[i].package_object_metadata.last_change);
-				var formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-				inputHTML += '<option value="'+user_packages_json[i].id +'">'+user_packages_json[i].name + ' - '+ formatted_date+'</option>';
+			for(let i = 0; i < user_packages_json.length; i++){
+				let date = new Date(user_packages_json[i].package_object_metadata.last_change);
+				let formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+				inputHTML += '<option value="'+user_packages_json[i].package_id +'">'+user_packages_json[i].name + ' - '+ formatted_date+'</option>';
 			}
 			inputHTML += '</select></td>';
 		}
@@ -324,7 +324,7 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 		else {
 		inputHTML += '<td class="table_field_select"><select name="ingest_metadata">';
 		inputHTML += '<option selected value=""></option>';
-		for (var j=0; j<mdUserSetsJSON.length; j++){
+		for (let j=0; j<mdUserSetsJSON.length; j++){
 			inputHTML += '<option value="'+mdUserSetsJSON[j].set_id+'">'+mdUserSetsJSON[j].name+'</option>';
 		}
 		inputHTML += '</select></td><td class="table_field_button"><button type="button" class="open_meta_popup" onclick="openMetaPopup(this);">?</button></td>';
@@ -344,15 +344,15 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	$(footerHTML).appendTo('#ingestFormFooter');
 	if (userInputSet) { //fill fields with values from user field
 		if (userInputSet.metadata_userset_id!= '') {
-			var header_metadata = $('#ingestFormHeader').find('select[name=ingest_header_metadata]');
+			let header_metadata = $('#ingestFormHeader').find('select[name=ingest_header_metadata]');
 			header_metadata.val(userInputSet.metadata_userset_id);
 		}
-		for(var i = 0; i < userInputSet.content.length; i++) {
-			var field = userInputSet.content[i];
+		for(let i = 0; i < userInputSet.content.length; i++) {
+			let field = userInputSet.content[i];
 			if (i==0){
-				var select_content = $('#ingestForm').find('select[name=ingest_content]');
+				let select_content = $('#ingestForm').find('select[name=ingest_content]');
 				select_content.val(field.version_id);
-				var select_metadata = $('#ingestForm').find('select[name=ingest_metadata]');
+				let select_metadata = $('#ingestForm').find('select[name=ingest_metadata]');
 				select_metadata.val(field.metadata_userset_id);
 			}
 			else {
@@ -522,8 +522,8 @@ function removeIngestField(clicked){
 function getActiveIngest() {
 	var saveData = {};
 	var formHeaderFields = $('#ingestFormHeader');
-	var formFieldsInputContent = $('#ingestForm').find('select[name="ingest_content"]'); 
-	var formFieldsInputMeta = $('#ingestForm').find('select[name="ingest_metadata"]'); 
+	var formFieldsInputContent = $('#ingestFormMain').find('select[name="ingest_content"]'); 
+	var formFieldsInputMeta = $('#ingestFormMain').find('select[name="ingest_metadata"]'); 
 	saveData.name = formHeaderFields.find('input')[0].value;
 	saveData.metadata_userset_id = formHeaderFields.find('select[name="ingest_header_metadata"]')[0].value;
 	saveData.metadata = searchMetaDataUserSetsByID(saveData.metadata_userset_id);
@@ -536,7 +536,7 @@ function getActiveIngest() {
 		var content_data = {};
 		if (formFieldsInputContent[i].value) {
 			content_value = formFieldsInputContent[i].value;
-			content_data = user_packages.find(set=>set.id == content_value);
+			content_data = user_packages.find(set=>set.package_id == content_value);
 		}
 		var meta_value = '';
 		if (formFieldsInputMeta[i].value) {

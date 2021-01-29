@@ -1,4 +1,4 @@
-//Entwurf für ein generisches Datenformat innerhalb von FDOrganize. Dies soll ermöglichen Daten
+ //Entwurf für ein generisches Datenformat innerhalb von FDOrganize. Dies soll ermöglichen Daten
 // aus verschiedenen Quellen zu beinhalten, dabei allerdigns auch die option bieten Dienstab-
 //hängig Metadaten mit zu speichern. Ein Data Object ist im allgemeinen eine Datei oder ein
 //logisches Package. Ein Package dient als hierarchisches Object zum verwalten von Daten.
@@ -14,7 +14,7 @@
       "export_date" : "#date",  //date, required, date of export (kind of the "version" date)
       "export_user" : "identifer for user", //userid(string), required, f.e. user@labfolder.de -> which login was used to download
       "filename" : "filename",      //string, "filename" of the stored file if exists
-      "file_type" : "filetype",    //enum [PNG|TXT|CSV|...], required 
+      "file_type" : "filetype",    //mimetype of uplaoded data
       "doc_id" : "doc_id where the document is stored in couchdb", //id, requried, unique
       "is_stored" : true
     },
@@ -22,7 +22,7 @@
       "creation_date" : "#date",  //date, required, of creation
       "modifiable" : true, //boolean, defines if this object is modifyable. system genearted packages are not modifyable by user. only user created packages can.
       "last_change" : "#date", //data, required, last change
-      "origin" : "USER|LABFOLDER|...", //origin of the package. If user it is manually created by the user. If something different is is the service from which by download the package has been created.
+      "origin" : "USER|LABFOLDER|UPLOAD...", //origin of the package. If user it is manually created by the user. If something different is is the service from which by download the package has been created.
       "creator" : "identifer for user", //f.e. user@labfolder.de -> which login was used to download
     },  
     "origin_metadata": { //exists if type=data,this is metadata which describes origin specific attributes dependent on repository
@@ -38,7 +38,7 @@
       "element_type": "IMAGE",
       "element_version_id": "4475000",
     },
-    "child_data_objects": [ //exists if type==package, count >=1 min
+    "child_data_objects": [ //exists if type==package, count >=1 min, childs can be packages or data
         "id","id"
     ]
 }

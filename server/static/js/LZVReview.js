@@ -22,11 +22,11 @@ function fillSidebar() {
 	var appendToSubmitted = '';
 	for (var ingest of submittedIngests) {
 		if (ingest.state == "REVIEW") {
-			appendToReview += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForToReviewIngest(' + ingest.ingest_id + ');">' + ingest.name + '</button><div class="round-button">';
+			appendToReview += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForToReviewIngest(this);">' + ingest.name + '</button><div class="round-button">';
 			appendToReview += '</div></div>';
 		}
 		if (ingest.state == "INGESTED") {
-			appendToSubmitted += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(' + ingest.ingest_id + ');">' + ingest.name + '</button><div class="round-button">';
+			appendToSubmitted += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(this);">' + ingest.name + '</button><div class="round-button">';
 			appendToSubmitted += '</div></div>';
 		}
 	}
@@ -52,14 +52,17 @@ function getIngestsToReview() {
 	xhttp.send();
 }
 
-function createFormForToReviewIngest(clicked_id) {
+function createFormForToReviewIngest(clicked) {
 	var submittedIngests = JSON.parse(getLocalStorage("submittedIngests"));
+	let clicked_id = $(clicked).attr('id');
+	console.log(clicked_id);
 	var display_ingest = submittedIngests.find(set=>set.ingest_id == clicked_id);
 	fillToReviewIngestForm(display_ingest);
 }
 
-function createFormForSubmittedIngest(clicked_id) {
+function createFormForSubmittedIngest(clicked) {
 	var submittedIngests = JSON.parse(getLocalStorage("submittedIngests"));
+	let clicked_id = $(clicked).attr('id');
 	var display_ingest = submittedIngests.find(set=>set.ingest_id == clicked_id);
 }
 
@@ -90,12 +93,12 @@ function fillToReviewIngestForm(userInputSet) {
 	var inputHTML = '';
 	inputHTML += '<div class="staticFormContent orig"><table><tr><th>Content</th><th>Metadata</th></tr>';
 	for (var i = 0; i < userInputSet.content.length; i++) {
-		var con = userInputSet.content[i];
-		date = new Date(con.version_data.entry_version_date);
+		let con = userInputSet.content[i];
+		date = new Date(con.package_data.package_object_metadata.last_change);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		inputHTML += '<tr><td>' + con.version_data.entry_title+' - ' + formatted_date +'</td>';
+		inputHTML += '<tr><td>' + con.package_data.name+' - ' + formatted_date +'<button class="open_info_button" package_id="' + con.package_data.package_id + '" onclick="open_package_info(this);"></button></td>';
 		if (con.metadata_userset !== undefined) {
-			inputHTML += '<td>' + con.metadata_userset.name + '</td>';
+			inputHTML += '<td>' + con.metadata_userset.name + '<button class="open_info_button" package_id="' + con.metadata_userset.set_id + '" onclick="open_metadata_info(this);"></button></td>';
 		}
 		inputHTML += '</tr>';
 	}
@@ -103,8 +106,9 @@ function fillToReviewIngestForm(userInputSet) {
 	$(inputHTML).appendTo('#ingestForm');
 	$('#ingestFormFooter').empty();
 	var footerHTML = '<div id="footerButtonDiv">';
-	// footerHTML += '<button type="button" class="btn lzvButton" id="submitIngest" onclick="submitIngest();">Submit</button>';
-	// footerHTML += '<button type="button" class="btn lzvButton" id="saveIngest" onclick="saveActiveIngest();">Save</button>';
+	footerHTML += '<button type="button" class="btn lzvButton" id="approveIngest" onclick="approve_ingest();">APPROVE</button>';
+	footerHTML += '<button type="button" class="btn lzvButton" id="returnIngest" onclick="return_ingest();">RETURN</button>';
+	footerHTML += '<button type="button" class="btn lzvButton" id="revokeIngest" onclick="revoke_ingest();">REVOKE</button>';
 	//footerHTML += '<button type="button" class="btn lzvButton" id="copyMetaDataSet" onclick="copyActiveMetaDataSet();">Copy Set</button>';
 	footerHTML += '</div>';
 	$(footerHTML).appendTo('#ingestFormFooter');
@@ -173,4 +177,34 @@ function createReviewPopupFormContent(metaStruc,userInputSet) {
 	// function exportSetToXML() {}
 	returnHTML += '</div></div>';
 	return returnHTML;
+}
+
+function open_package_info(clicked) {
+	$('#popupForm').empty();
+
+	display_popup();
+}
+
+function open_metadata_info(clicked) {
+	$('#popupForm').empty();
+
+	display_popup();
+}
+
+function hide_popup() {
+	$('#ingestMainForm').show();
+	$('#popupForm').hide();
+}
+
+function display_popup() {
+	$('#ingestMainForm').hide();
+	$('#popupForm').show();
+}
+
+function approve_ingest() {
+
+}
+
+function revoke_ingest() {
+
 }
