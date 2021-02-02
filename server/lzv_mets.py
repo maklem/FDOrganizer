@@ -3,6 +3,8 @@ Module for creation of mets files.
 '''
 import json
 
+allowed_metadata_identifer = ['dublin_core_1_1']
+
 ingest_data = {}
 storage_data = {}
 with open('/server/lzv/server/testdata/test_ingest.json') as f:
@@ -96,41 +98,83 @@ def rec_gen_smap(package):
 
 
 
-def generate_dmd_for_meta(file_meta, id):
+def generate_dmd_for_meta(file_meta, identifier):
     '''
     generate a dmd for each file. only required if package containing file has additional 
     metadata set to in ingest.
     return this as xml string.
     '''
+    if not file_meta['identifier'] in allowed_metadata_identifer:
+        return {"successfull" : False, "content" : "Invalid metadata scheme for dmd Data"}
     dmd = ''
-    dmd += '<mets:dmdSec ID="' + id + '">'
+    dmd += '<mets:dmdSec ID="' + identifier + '">'
     dmd += '<mets:mdWrap MDTYPE="DC">'
     dmd += '<mets:xmlData>'
-    dmd += '<dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
-    for item in file_meta:
+    dmd += '<dc:record xmlns:dc="http://purl.org/dc/elements/1.1/"' +\
+            ' xmlns:dcterms="http://purl.org/dc/terms/"'+\
+            ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+    for item in file_meta['fields']:
         for val in item['values']:
-            dmd += '<dc:' + item['field_identifier'] + '>' + val + '</dc:' + item['field_identifier'] + '>'
+            dmd += '<dc:' + item['field_identifier'] + '>' + val +\
+            '</dc:' + item['field_identifier'] + '>'
     dmd += '</dc:record>'
     dmd += '</mets:xmlData>'
     dmd += '</mets:mdWrap>'
     dmd += '</mets:dmdSec>'
-    return dmd
+    return {"successfull" : True, "content" : dmd}
 
-def generate_dmd_for_ingest(ingest_meta):
-    '''
-    generate a dmd for the ingest. based on the metadata set in the root ingest.
-    return this as xml string.
-    '''
-    dmd = ''
-    return dmd
+# def generate_dmd_for_ingest(ingest_meta):
+#     '''
+#     generate a dmd for the ingest. based on the metadata set in the root ingest.
+#     return this as xml string. This is basically the same as the function above, resuse that.
+#     '''
+#     dmd = ''
+#     dmd += '<mets:dmdSec ID="ie-dmd">'
+#     dmd += '<mets:mdWrap MDTYPE="DC">'
+#     dmd += '<mets:xmlData>'
+#     dmd += '<dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+#     dmd += <dc:creator>Exlibris</dc:creator>
+#     dmd += <dc:identifier>ISBN 1-56389-016-X</dc:identifier>
+#     dmd += <dc:title>SDK - TEST DC</dc:title>
+#     dmd += '</dc:record>'
+#     dmd += '</mets:xmlData>'
+#     dmd += '</mets:mdWrap>'
+#     dmd += '</mets:dmdSec>'
+#     return dmd
 
-def generate_amd_for_file(file):
+def generate_amd_for_file(amd_meta, techmd_identifier):
     '''
     generate a techMD section with repository specific metadata:
-    generic_datastructure:origin_metadata
+    amd_meta in structure: 
+    {"section1" : {"metafield" : "metavalue"}, "section2":{"metafield": "value"}, ...}
     return this as xml string.
     '''
     amd = ''
+    amd += '<mets:techMD ID="'+ techmd_identifier +'">'
+    amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
+    amd += '<mets:xmlData>'
+    amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx">'
+    print("-----")
+    print(json.dumps(amd_meta))
+    print("-----")
+    for sec_key, sec_value in amd_meta:
+        amd += '<section id="'+sec_key+'">'
+        amd += '<record>'
+        for key, value in sec_value:
+            amd += '<key id="' + key + '">'+value+'</key>'
+        amd += '</record>'
+        amd += '</section>'
+            # <section id="fileFixity">
+            #   <record>
+            #     <key id="fixityType">MD5</key>
+            #     <key id="fixityValue">69c8102dd64aef7f66a722ef65648b59</key>
+            #   </record>
+            # </section>
+    amd += '</dnx>'
+    amd += '</mets:xmlData>'
+    amd += '</mets:mdWrap>'
+    amd += '</mets:techMD>'
+
     return amd
 
 def export_as_xml_string():
@@ -155,4 +199,17 @@ if __name__ == '__main__':
     print(json.dumps(t_flat_data))
     t_smap = generate_structmap(t_enriched)
     print(t_smap)
+    ie_dmd = generate_dmd_for_meta(t_enriched['metadata'], "ie_dmd")
+    print("ie_dmd:")
+    print(ie_dmd)
+    file_dmd = ''
+    for item in t_flat_data:
+        package = [package for package in t_enriched['content'] if package['package_id'] == item['root_package']][0]
+        if package['metadata_userset_id'] != '':
+            for f in item['flat_data']:
+                result = generate_dmd_for_meta(package['metadata_userset'], "f_dmd_"+ f['package_id'])
+                if result['successfull']:
+                    file_dmd += result['content']
+    print("file_dmd:")
+    print(file_dmd)
     #authenticate_couchdb()
