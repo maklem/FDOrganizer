@@ -80,6 +80,7 @@ function getSubmittedIngests() {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				if (xhttp.response != "") {
+					console.log(xhttp.response);
 					parsedJSON =  JSON.parse(xhttp.response);
 					setLocalStorage("submittedIngests", JSON.stringify(parsedJSON.docs));
 					updateSideBarSubmittedIngests(parsedJSON.docs);
@@ -127,7 +128,6 @@ function updateSideBarSubmittedIngests(submittedIngests)  {
 	var append = '';
 	if (submittedIngests) {
 	for (var ingest of submittedIngests) {
-		console.log(ingest.ingest_id)
 		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet sideBarSubmittedItems" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(this);">' + ingest.name + '</button></div>';
 
 	}
@@ -138,8 +138,10 @@ function updateSideBarSubmittedIngests(submittedIngests)  {
 function updateSideBarUserIngests(userIngests) {
 	$('#myItemsSubItems').empty();
 	var append = '';
+	var append_submitted = '';
 	if (userIngests.user_sets) {
 	for (var ingest of userIngests.user_sets) {
+			console.log(ingest);
 		if (ingest.state == "NEW") {
 		append += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForExistingIngest(this);">' + ingest.name + '</button><div class="round-button">';
 		append += '<button class="btn deleteSetButton" id="' + ingest.ingest_id + '" onclick="deleteIngest(this);"><span>-</span></button>';
@@ -147,10 +149,11 @@ function updateSideBarUserIngests(userIngests) {
 		}
 	}
 	$(append).appendTo('#myItemsSubItems');
+	$(append).appendTo('#submittedItemsSubItems');
 	}
 }
 
-//TODO This function is probably an entry for unwanted manipulation. This need to be checked: Users should only be able to delete ingests 
+//TODO This function is probably an entry for unwanted manipulation. This need to be checked: Users should only be able to delete ingests
 //which are not submitted yet (or else we would lose data). alternatively we dont "store" submitted user ingests on the same place, but in
 //a seperate database and gather data for the sidebar from 2 playes (one which is modifyable, one which is fixed)
 function deleteIngest(clicked) {
@@ -225,8 +228,8 @@ function fillSubmittedIngestForm(userInputSet) {
 	var date = new Date(userInputSet.ingest_metadata.submit_date);
 	var formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 	headerHTML += '<div class="staticText">Submission Date: '+ formatted_date +'</div>';
-	if(userInputSet.ingest_metadata.review_date !== undefined) {
-		date = new Date(userInputSet.ingest_metadata.review_date);
+	if(userInputSet.ingest_metadata.approve_date !== undefined) {
+		date = new Date(userInputSet.ingest_metadata.approve_date);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 		headerHTML += '<div class="staticText">Review Date: '+ formatted_date +'</div>';
 	}
@@ -277,7 +280,7 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	var title = (hasUserInput) ? userInputSet.name : '';
 	if( recreateID) {
 		title = '';
-	}	
+	}
 	headerHTML += '<div class="metaFormUIField"><input required name="ingestName" type="text" value="' + title + '"></div>';
 	var mdUserSets = getLocalStorage("metaDataUserSets");
 	var mdUserSetsJSON= JSON.parse(mdUserSets);
@@ -522,8 +525,8 @@ function removeIngestField(clicked){
 function getActiveIngest() {
 	var saveData = {};
 	var formHeaderFields = $('#ingestFormHeader');
-	var formFieldsInputContent = $('#ingestFormMain').find('select[name="ingest_content"]'); 
-	var formFieldsInputMeta = $('#ingestFormMain').find('select[name="ingest_metadata"]'); 
+	var formFieldsInputContent = $('#ingestFormMain').find('select[name="ingest_content"]');
+	var formFieldsInputMeta = $('#ingestFormMain').find('select[name="ingest_metadata"]');
 	saveData.name = formHeaderFields.find('input')[0].value;
 	saveData.metadata_userset_id = formHeaderFields.find('select[name="ingest_header_metadata"]')[0].value;
 	saveData.metadata = searchMetaDataUserSetsByID(saveData.metadata_userset_id);
@@ -542,7 +545,13 @@ function getActiveIngest() {
 		if (formFieldsInputMeta[i].value) {
 			meta_value = formFieldsInputMeta[i].value;
 		}
-		saveData.content.push({'package_id' : content_value, 'package_data' : content_data, 'metadata_userset_id' : meta_value, 'metadata_userset' : searchMetaDataUserSetsByID(meta_value)});
+		if (meta_value != ''){
+			saveData.content.push({'package_id' : content_value, 'package_data' : content_data, 'metadata_userset_id' : meta_value, 'metadata_userset' : searchMetaDataUserSetsByID(meta_value)});
+		}
+		else {
+			saveData.content.push({'package_id' : content_value, 'package_data' : content_data});
+		}
+
 	}
 	return saveData;
 }

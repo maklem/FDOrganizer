@@ -10,12 +10,12 @@
 		<div id="reviewedIngests">
 			<button class="sidebarItem sidebarMainItem" id="reviewedIngestsToggle" onclick="toggleDisplayToReview(this);">Reviewed Ingests <span class="arrow">v</span></button><br>
 		<div id="reviewedIngestsSubItems">
-			
+
 		</div>
 	</div>
 	</div>
 	<div class="col-md-8" id="mainpage">
-		<div id="ingestMainForm"> 
+		<div id="ingestMainForm">
 			<div id="ingestFormHeader"></div>
 			<form id="ingestForm">
 
@@ -23,7 +23,7 @@
 			<div id="ingestFormFooter"></div>
 		</div>
 		<div id="popupForm">
-		<div id="metaDataMainForm"> 
+		<div id="metaDataMainForm">
 			<div id="metaDataFormHeader"></div>
 			<form id="metaDataForm"></form>
 			<div id="metaDataFormFooter"></div>
@@ -35,6 +35,6 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static',     filename='js/LZVBase.js') }}"></script>
+<script src="{{ url_for('static',     filename='js/LZVInterface.js') }}"></script>
 <script src="{{ url_for('static',     filename='js/LZVReview.js') }}"></script>
 {% endblock %}
-	

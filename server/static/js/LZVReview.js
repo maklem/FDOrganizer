@@ -25,7 +25,7 @@ function fillSidebar() {
 			appendToReview += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForToReviewIngest(this);">' + ingest.name + '</button><div class="round-button">';
 			appendToReview += '</div></div>';
 		}
-		if (ingest.state == "INGESTED") {
+		if (ingest.state == "APPROVED") {
 			appendToSubmitted += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(this);">' + ingest.name + '</button><div class="round-button">';
 			appendToSubmitted += '</div></div>';
 		}
@@ -202,7 +202,11 @@ function display_popup() {
 }
 
 function approve_ingest() {
-
+	var ingest_id = $('#title').attr('ingest_id')
+	interface_ingest_approve(ingest_id, function() {
+		//TODO:on success make this ingest not again clickable. reload the page. give succes message
+		console.log("approve call returned successfull");
+	});
 }
 
 function revoke_ingest() {

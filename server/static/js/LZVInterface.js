@@ -231,8 +231,6 @@ function interface_packages_put(data, on_success_callback) {
     };
     xhttp.open('PUT', url, false);
     xhttp.setRequestHeader("Content-type", "application/json");
-    console.log("data");
-    console.log(data);
     var payload = JSON.stringify(data);
     xhttp.send(payload);
 }
@@ -248,8 +246,34 @@ function interface_packages_delete(data, on_success_callback) {
     };
     xhttp.open('PUT', url, false);
     xhttp.setRequestHeader("Content-type", "application/json");
-    console.log("data");
-    console.log(data);
     var payload = JSON.stringify(data);
     xhttp.send(payload);
+}
+
+function interface_ingest_approve(id, on_success_callback) {
+    var url = baseURL + '/ingest/approve?ingest_id=' + id;
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                on_success_callback();
+            }
+        }
+    };
+    xhttp.open('PUT', url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+}
+
+function interface_ingest_revoke(id, on_success_callback) {
+    var url = baseURL + '/ingest/revoke?ingest_id=' + id;
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                on_success_callback();
+            }
+        }
+    };
+    xhttp.open('PUT', url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
 }
