@@ -204,11 +204,15 @@ function display_popup() {
 function approve_ingest() {
 	var ingest_id = $('#title').attr('ingest_id')
 	interface_ingest_approve(ingest_id, function() {
-		//TODO:on success make this ingest not again clickable. reload the page. give succes message
-		console.log("approve call returned successfull");
+		alert("Ingest successfully submitted for ingest!");
+		location.reload();
 	});
 }
 
 function revoke_ingest() {
-
+	var ingest_id = $('#title').attr('ingest_id')
+	interface_ingest_approve(ingest_id, function() {
+		alert("Ingest successfully submitted for ingest!");
+		location.reload();
+	});
 }

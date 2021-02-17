@@ -930,21 +930,30 @@ def download_mdb_items():
     # return json.dumps({'Result' : 'All good'}), 200, {'Content-Type' : 'application/json'}
 
 
-@APP.route('/data/packages', methods=['GET'])
+@APP.route("/data/packages", methods=["GET"])
 def get_data_packages():
-    '''
+    """
     Routed from /data/packages
     Requests all data packages for user from database, which can then be added to a
-    '''
-    if not 'session_user' in request.cookies or not 'session_auth' in request.cookies:
-        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    if not check_session(request.cookies['session_user'], request.cookies['session_auth']):
-        return {'Error' : FAILED_AUTHENTICATION}, 401, {'Content-Type' : 'application/json'}
-    user_id = request.cookies['session_user']
-    query = {"selector": {
-        "owner": user_id, "type" : "PACKAGE"}}
+    """
+    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
+        return (
+            {"Error": FAILED_AUTHENTICATION},
+            401,
+            {"Content-Type": "application/json"},
+        )
+    if not check_session(
+        request.cookies["session_user"], request.cookies["session_auth"]
+    ):
+        return (
+            {"Error": FAILED_AUTHENTICATION},
+            401,
+            {"Content-Type": "application/json"},
+        )
+    user_id = request.cookies["session_user"]
+    query = {"selector": {"owner": user_id, "type": "PACKAGE"}}
     response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
-    return json.dumps(response['docs'])
+    return json.dumps(response["docs"])
 
 
 @APP.route("/labfolder/storage", methods=["GET"])
@@ -1026,7 +1035,9 @@ def get_storage_for_user(user_id, return_as_string=False):
     Returns the package and data docs for @user_id either as (json)string or json-object.
     """
     query = {"selector": {"owner": user_id}}
-    response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))['docs']
+    response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))[
+        "docs"
+    ]
     return json.dumps(response) if return_as_string else response
 
 
@@ -1460,7 +1471,6 @@ def delete_user_metadata_set():
     )
 
 
-# TODO TEST
 @APP.route("/metadata/user", methods=["PUT"])
 def store_user_metadata():
     """
@@ -1553,8 +1563,10 @@ def get_ingest_by_user_and_id_in_review_db(user_id, ingest_id):
     """
     query = {"selector": {"owner": user_id, "ingest_id": ingest_id}}
     # query = {"selector": {"owner": user_id}}
-    response = json.loads(query_db(query, CONFIGPARAMS["couchDBIngestReviewDatabaseName"]))
-    return response["docs"][0]
+    response = json.loads(
+        query_db(query, CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
+    )
+    return response["docs"]
 
 
 @APP.route("/ingest/user", methods=["PUT"])
@@ -1584,10 +1596,10 @@ def store_user_ingest():
 
 
 def update_or_create_user_ingest(user_id, ingest):
-    '''
+    """
     send the ingest for user_id to database. updates existing or creates a new one if none with same
     id is found in db
-    '''
+    """
     print("in update or create")
     query = {"selector": {"owner": user_id, "ingest_id": ingest["ingest_id"]}}
     check_response = json.loads(
@@ -1602,22 +1614,26 @@ def update_or_create_user_ingest(user_id, ingest):
     )
     token = authenticate_couchdb()
     if not token:
-        return ({"Result": "Error Authenticating couchDB"},
-        500,
-        {"Content-Type": "application/json"})
+        return (
+            {"Result": "Error Authenticating couchDB"},
+            500,
+            {"Content-Type": "application/json"},
+        )
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    if len(check_response["docs"]) > 0:  # only one entry with same id should exist at the same time
+    if (
+        len(check_response["docs"]) > 0
+    ):  # only one entry with same id should exist at the same time
         print("check_response")
         print(check_response)
         headers["If-Match"] = check_response["docs"][0]["_rev"]
-        if '_id' in ingest:
-            del ingest['_id']
-        if '_rev' in ingest:
-            del ingest['_rev']
+        if "_id" in ingest:
+            del ingest["_id"]
+        if "_rev" in ingest:
+            del ingest["_rev"]
     print(url)
     print(headers)
     print(ingest)
@@ -1635,11 +1651,12 @@ def update_or_create_user_ingest(user_id, ingest):
         {"Content-Type": "application/json"},
     )
 
+
 def remove_user_ingest(user_id, ingest):
-    '''
+    """
     send the ingest for user_id to database. updates existing or creates a new one if none with same
     id is found in db
-    '''
+    """
     query = {"selector": {"owner": user_id, "ingest_id": ingest["ingest_id"]}}
     check_response = json.loads(
         query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"])
@@ -1653,15 +1670,19 @@ def remove_user_ingest(user_id, ingest):
     )
     token = authenticate_couchdb()
     if not token:
-        return ({"Result": "Error Authenticating couchDB"},
-        500,
-        {"Content-Type": "application/json"})
+        return (
+            {"Result": "Error Authenticating couchDB"},
+            500,
+            {"Content-Type": "application/json"},
+        )
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    if len(check_response["docs"]) > 0:  # only one entry with same id should exist at the same time
+    if (
+        len(check_response["docs"]) > 0
+    ):  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         response = requests.delete(url, headers=headers, data=json.dumps(ingest))
         print(response.text)
@@ -1677,11 +1698,12 @@ def remove_user_ingest(user_id, ingest):
         {"Content-Type": "application/json"},
     )
 
+
 def update_or_create_reviewdb_ingest(user_id, ingest):
-    '''
+    """
     send the ingest for user_id to database. updates existing or creates a new one if none with same
     id is found in db
-    '''
+    """
     print("in update or create")
     query = {"selector": {"owner": user_id, "ingest_id": ingest["ingest_id"]}}
     check_response = json.loads(
@@ -1696,23 +1718,27 @@ def update_or_create_reviewdb_ingest(user_id, ingest):
     )
     token = authenticate_couchdb()
     if not token:
-        return ({"Result": "Error Authenticating couchDB"},
-        500,
-        {"Content-Type": "application/json"})
+        return (
+            {"Result": "Error Authenticating couchDB"},
+            500,
+            {"Content-Type": "application/json"},
+        )
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    if len(check_response["docs"]) > 0:  # only one entry with same id should exist at the same time
+    if (
+        len(check_response["docs"]) > 0
+    ):  # only one entry with same id should exist at the same time
         print("check_response")
         print(check_response)
         headers["If-Match"] = check_response["docs"][0]["_rev"]
     print(url)
     print(headers)
     print(ingest)
-    del ingest['_id']
-    del ingest['_rev']
+    del ingest["_id"]
+    del ingest["_rev"]
     print(ingest)
     response = requests.put(url, headers=headers, data=json.dumps(ingest))
     print(response.text)
@@ -1728,7 +1754,7 @@ def update_or_create_reviewdb_ingest(user_id, ingest):
         {"Content-Type": "application/json"},
     )
 
-# TODO rework get_labfolder_data data output
+
 @APP.route("/ingest/submit", methods=["PUT"])
 def submit_user_ingest_to_review():
     """
@@ -1766,20 +1792,15 @@ def submit_user_ingest_to_review():
         CONFIGPARAMS["LZV_REVIEW"] + "/" + ingest["ingest_id"] + "/content/"
     )
     ingest["owner"] = user_id
-    for ingest_element in ingest["content"]:
-        package_id = ingest_element["package_id"]
-        # this should be only be done, when the review is finished and storing in hotfolder is done
-        # TODO recursive progression through child elements. if child type == data, create fies for review
-        # TODO also create Metadata info files. Should result in a hierachical folder structure
-        # TODO need a query to query for data objects in storage db. doc db can then be accesed with doc_id
-        # TODO get package, get all childs. create files for each obj on file system. after approval delete local files.
-        # filename = version['entry_title'] + '-' + version['version']['versionID']
-        # download_files_to_path(ingest_review_path, filename, version['version'])
-        # ingest_element['path'] = ingest_review_path + filename
-        # else:
-        # if DEBUG:
-        # print("didnt find version in storage File")
-    # store a file in the database for review
+    success = create_ingest_on_filesystem(
+        user_id, ingest_id["ingest_id"], CONFIGPARAMS["LZV_REVIEW"]
+    )
+    if not success:
+        return (
+            json.dumps({"Result": "Error dumping ingest on filesystem"}),
+            500,
+            {"Content-Type": "application/json"},
+        )
     couchdb_url = (
         CONFIGPARAMS["couchDBBaseURL"]
         + "/"
@@ -1810,6 +1831,7 @@ def submit_user_ingest_to_review():
         500,
         {"Content-Type": "application/json"},
     )
+
 
 @APP.route("/ingest/revoke", methods=["PUT"])
 def revoke_ingest():
@@ -1847,19 +1869,24 @@ def approve_ingest():
         )
     user_id = request.cookies["session_user"]
     ingest_id = request.args.get("ingest_id")
-    ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)
-    storage_file = get_storage_for_user(user_id)
-    success = create_ingest_on_filesystem(ingest, storage_file)
+    success = create_ingest_on_filesystem(
+        user_id, ingest_id, CONFIGPARAMS["LZV_HOTFOLDER"]
+    )
     if success:
         ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)
         ingest["state"] = "APPROVED"
-        ingest["ingest_metadata"]["approve_date"] = time.strftime("%Y-%m-%dT%T.000+0000")
-        #TODO check here what happens if ingest cant be stored in database. eventually the data will
-        #be corrupted. this needs to be checked what the behaviour should be.
+        ingest["ingest_metadata"]["approve_date"] = time.strftime(
+            "%Y-%m-%dT%T.000+0000"
+        )
+        # TODO check here what happens if ingest cant be stored in database. eventually the data will
+        # be corrupted. this needs to be checked what the behaviour should be.
         resp = update_or_create_reviewdb_ingest(user_id, ingest)
         print("update in reviewdb after ingest:")
         print(resp)
         if resp:
+            # remove the review files from file system
+            review_path = CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"]
+            shutil.rmtree(review_path)
             return remove_user_ingest(user_id, ingest)
     return (
         json.dumps({"Result": "Error Approving and Moving Ingest"}),
@@ -1871,13 +1898,18 @@ def approve_ingest():
     # store the modified ingst in database.
 
 
-def create_ingest_on_filesystem(ingest, storage_file):
+def create_ingest_on_filesystem(user_id, ingest_id, base_folder):
     """
     create the files for the ingest on the defined folder. folder should be thofolder to rosetta
     system. also created the mets files basedo n the data provided in the ingest.
     """
+    ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)
+    if len(ingest) == 0:
+        print("ERROR: cant find ingest requests to dump on filesystem")
+        return False
+    storage_file = get_storage_for_user(user_id)
     print("TRYING TO WRITE INGEST TO HOTFOLDER")
-    path = CONFIGPARAMS["LZV_HOTFOLDER"]
+    path = base_folder
     folder = Path(path)
     if not folder.is_dir():
         print("Error: Hotfolder is not a directory")
@@ -1914,11 +1946,8 @@ def create_ingest_on_filesystem(ingest, storage_file):
             )
             token = authenticate_couchdb()
             if not token:
-                return (
-                    json.dumps({"Result": "Internal Server Error"}),
-                    500,
-                    {"Content-Type": "application/json"},
-                    )
+                print("ERROR: authenticating couchdb")
+                return False
             headers = {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
@@ -1927,17 +1956,10 @@ def create_ingest_on_filesystem(ingest, storage_file):
             response = requests.get(cdb_doc_url, headers=headers)
             if response:
                 try:
-                    print("1")
                     tmp_path = path + f["data_object_metadata"]["filename"]
-                    print("tmp_path: " + tmp_path)
-                    tmp_file = Path(
-                        tmp_path
-                    )
-                    print("2")
+                    tmp_file = Path(tmp_path)
                     tmp_file.touch(mode=0o770, exist_ok=True)
-                    print("3")
                     tmp_file.write_bytes(response.content)
-                    print("4")
                 except:
                     print("error printing file")
                     success = False
@@ -2035,75 +2057,6 @@ def get_submitted_ingests():
         500,
         {"Content-Type": "application/json"},
     )
-
-
-# TODO rework this, to be independent from labfolder structure. this can then be used to download
-# the files required for ingest in the hotfolder
-def download_files_to_path(path, element_name, version):
-    """
-    downlaods the file provided in version from couchdb and saves it in element_name. filename
-    should contain the path from root
-    """
-    # cdb_doc_url_base = (
-    #     CONFIGPARAMS["couchDBBaseURL"]
-    #     + "/"
-    #     + CONFIGPARAMS["couchDBDocumentDatabaseName"]
-    #     + "/"
-    # )
-    # token = authenticate_couchdb()
-    # if not token:
-    #     return
-    # tmp_path_file = Path(path)
-    # tmp_path_file.mkdir(mode=0o770, parents=True, exist_ok=True)
-    # for ele in version["elements"]:
-    #     # each element should only have one version, so wen access the first element
-    #     cdb_doc_url = (
-    #         cdb_doc_url_base
-    #         + ele["versions"][0]["couchdb_doc_id"]
-    #         + "/"
-    #         + ele["versions"][0]["couchdb_doc_item_att_name"]
-    #     )
-    #     if ele["elementType"] == "TEXT":
-    #         filetype = ".txt"
-    #     elif ele["elementType"] == "TABLE":
-    #         filetype = ".csv"
-    #     elif ele["elementType"] == "IMAGE":
-    #         filetype = ".png"
-    #     tmp_file = Path(
-    #         path + element_name + "-" + ele["versions"][0]["versionID"] + filetype
-    #     )
-    #     # print(tmp_file)
-    #     # print(path)
-    #     tmp_file.touch(mode=0o770, exist_ok=True)
-    #     headers = {
-    #         "Accept": "application/json",
-    #         "Content-Type": "application/json",
-    #         "Cookie": token,
-    #     }
-    #     response = requests.get(cdb_doc_url, headers=headers)
-    #     if response:
-    #         if ele["elementType"] == "TEXT" or ele["elementType"] == "TABLE":
-    #             tmp_file.write_text(response.text)
-    #         elif ele["elementType"] == "IMAGE":
-    #             tmp_file.write_bytes(response.content)
-
-
-# TODO rework for new storage file structure
-def search_for_version(storage_file, version_id):
-    """
-    searched in storage_file for a entry version with id version id. returns the version object.
-    """
-    for project in storage_file["projects"]:
-        for entry in project["entries"]:
-            for version in entry["versions"]:
-                if version["versionID"] == version_id:
-                    return {
-                        "version": version,
-                        "entry_title": entry["entryTitle"],
-                        "entry_id": entry["entryID"],
-                        "project_id": project["projectID"],
-                    }
-    return None
 
 
 @APP.route("/upload/file", methods=["POST"])

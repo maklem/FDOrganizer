@@ -565,6 +565,8 @@ function submitIngest() {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
 				getSubmittedIngests();
+				alert("Ingest successfully submitted for review!");
+				location.reload();
 			}
 		}
 	};
