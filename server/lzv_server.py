@@ -1568,6 +1568,17 @@ def get_ingest_by_user_and_id_in_review_db(user_id, ingest_id):
     )
     return response["docs"]
 
+def get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id):
+    """
+    returns the ingest for ingest_id and user_id as json object
+    """
+    query = {"selector": {"owner": user_id, "ingest_id": ingest_id}}
+    # query = {"selector": {"owner": user_id}}
+    response = json.loads(
+        query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"])
+    )
+    return response["docs"]
+
 
 @APP.route("/ingest/user", methods=["PUT"])
 def store_user_ingest():
@@ -1793,7 +1804,7 @@ def submit_user_ingest_to_review():
     )
     ingest["owner"] = user_id
     success = create_ingest_on_filesystem(
-        user_id, ingest_id["ingest_id"], CONFIGPARAMS["LZV_REVIEW"]
+        user_id, ingest["ingest_id"], CONFIGPARAMS["LZV_REVIEW"],review_db=False
     )
     if not success:
         return (
@@ -1873,7 +1884,7 @@ def approve_ingest():
         user_id, ingest_id, CONFIGPARAMS["LZV_HOTFOLDER"]
     )
     if success:
-        ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)
+        ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)[0]
         ingest["state"] = "APPROVED"
         ingest["ingest_metadata"]["approve_date"] = time.strftime(
             "%Y-%m-%dT%T.000+0000"
@@ -1898,21 +1909,26 @@ def approve_ingest():
     # store the modified ingst in database.
 
 
-def create_ingest_on_filesystem(user_id, ingest_id, base_folder):
+def create_ingest_on_filesystem(user_id, ingest_id, base_folder, review_db=True):
     """
     create the files for the ingest on the defined folder. folder should be thofolder to rosetta
     system. also created the mets files basedo n the data provided in the ingest.
     """
-    ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)
+    ingest = {}
+    if review_db:
+        ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)
+    else:
+        ingest = get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id)
     if len(ingest) == 0:
         print("ERROR: cant find ingest requests to dump on filesystem")
         return False
+    ingest = ingest[0]
     storage_file = get_storage_for_user(user_id)
     print("TRYING TO WRITE INGEST TO HOTFOLDER")
     path = base_folder
     folder = Path(path)
     if not folder.is_dir():
-        print("Error: Hotfolder is not a directory")
+        print("Error: " + base_folder + " is not a directory")
         return False
     print(ingest)
     path += ingest["ingest_id"] + "/content/"
