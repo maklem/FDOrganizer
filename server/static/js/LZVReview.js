@@ -211,8 +211,8 @@ function approve_ingest() {
 
 function revoke_ingest() {
 	var ingest_id = $('#title').attr('ingest_id')
-	interface_ingest_approve(ingest_id, function() {
-		alert("Ingest successfully submitted for ingest!");
+	interface_ingest_revoke(ingest_id, function() {
+		alert("Ingest revoked!");
 		location.reload();
 	});
 }

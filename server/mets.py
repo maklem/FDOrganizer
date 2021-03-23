@@ -4,8 +4,7 @@ Module for creation of mets files.
 import json
 
 allowed_metadata_identifer = ["dublin_core_1_1"]
-
-
+ctr_id_map = {}
 
 
 def enrich_ingest_with_package_data(ingest, storage_file):
@@ -15,10 +14,6 @@ def enrich_ingest_with_package_data(ingest, storage_file):
     before creating the export xml string to simplify processing. expects the ingest, returns
     json object.
     """
-    print("storage file")
-    print(storage_file)
-    print("base ingest:")
-    print(ingest)
     new_con = []
     for item in ingest["content"]:
         recursive_enrich_package_content(item["package_data"], storage_file)
@@ -33,8 +28,6 @@ def recursive_enrich_package_content(package, storage_file):
     """
     new_con = []
     for content in package["child_data_objects"]:
-        print("content:")
-        print(content)
         append = [item for item in storage_file if content == item["package_id"]][0]
         if append["type"] == "PACKAGE":
             recursive_enrich_package_content(append, storage_file)
@@ -76,39 +69,53 @@ def generate_structmap(ingest):
     based on package structure, create a mets:structmap.
     return this as xml string.
     """
-    smap = '<structMap Type="Logical">'
-    smap += '<div ID="' + ingest["ingest_id"] + '" LABEL="' + ingest["name"] + '">'
+    ctr = 1
+    smap = '<mets:structMap TYPE="Logical" ID="rep1-2">'
+    smap += '<mets:div ID="id_' + ingest["ingest_id"] + '" LABEL="' + ingest["name"] + '">'
     for con in ingest["content"]:
         smap += (
-            '<div ID="'
+            '<mets:div ID="id_'
             + con["package_id"]
             + '" LABEL="'
             + con["package_data"]["name"]
             + '">'
         )
         for item in con["package_data"]["child_data_objects"]:
-            smap += rec_gen_smap(item)
-        smap += "</div>"
-    smap += "</div>"
-    smap += "</structMap>"
+            add, ctr = rec_gen_smap(item, ctr)
+            smap += add
+        smap += "</mets:div>"
+    smap += "</mets:div>"
+    smap += "</mets:structMap>"
     return smap
 
 
-def rec_gen_smap(package):
+def rec_gen_smap(package, ctr):
     """
     recursively generates the structmap data
     """
     smap = ""
     if package["type"] == "DATA":
-        smap += '<fptr FILEID="' + package["package_id"] + '"/>'
+        smap += '<mets:div LABEL="FILE_TUPLE">'
+        smap += '<mets:div LABEL="FILE">'
+        smap += '<mets:fptr FILEID="fid' + str(ctr) + '-1"/>'
+        ctr_id_map[package["package_id"]] = str(ctr)
+        ctr = ctr + 1
+        smap += '</mets:div>'
+        smap += '<mets:div LABEL="METADATA">'
+        smap += '<mets:fptr FILEID="fid' + str(ctr) + '-1"/>'
+        ctr_id_map[package["package_id"]+"_meta"] = str(ctr)
+        ctr = ctr + 1
+        smap += '</mets:div>'
+        smap += '</mets:div>'
     else:
         smap += (
-            '<div ID="' + package["package_id"] + '" LABEL="' + package["name"] + '">'
+            '<mets:div ID="id_' + package["package_id"] + '" LABEL="' + package["name"] + '">'
         )
         for item in package["child_data_objects"]:
-            smap += rec_gen_smap(item)
-        smap += "</div>"
-    return smap
+            add, ctr = rec_gen_smap(item, ctr)
+            smap += add
+        smap += "</mets:div>"
+    return smap, ctr
 
 
 def generate_dmd_for_meta(file_meta, identifier):
@@ -166,7 +173,7 @@ def generate_dmd_for_meta(file_meta, identifier):
 #     return dmd
 
 
-def generate_amd_for_file(amd_meta, identifier):
+def generate_amd_for_file(amd_meta, counter):
     """
     generate a techMD section with repository specific metadata:
     amd_meta in structure:
@@ -174,37 +181,47 @@ def generate_amd_for_file(amd_meta, identifier):
     return this as xml string.
     """
     amd = ""
-    amd += '<mets:amdSec ID="f_amd_' + identifier + '">'
-    amd += '<mets:techMD ID="f_techmd_' + identifier + '">'
+    amd += '<mets:amdSec ID="fid'+counter+'-1-amd">'
+    amd += '<mets:techMD ID="fid'+counter+'-1-amd-tech">'
     amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
     amd += "<mets:xmlData>"
     amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx">'
-    for sec_key in amd_meta:
-        amd += '<section id="' + sec_key + '">'
-        amd += "<record>"
-        for key in amd_meta[sec_key]:
-            amd += '<key id="' + key + '">' + str(amd_meta[sec_key][key]) + "</key>"
-        amd += "</record>"
-        amd += "</section>"
+    amd += '<section id="generalFileCharacteristics">'
+    amd += '<record>'
+    amd += '<key id="fileMIMEType">' + str(amd_meta['file_type']) + '</key>'
+    amd += '<key id="fileOriginalName">' + str(amd_meta['filename']) + '</key>'
+    # amd += '<key id="FILEMIMTYPE">' + str(amd_meta['data_object_metadata'][file_type]) + '</key'>
+    # amd += '<key id="FILEMIMTYPE">' + str(amd_meta['data_object_metadata'][file_type]) + '</key'>
+    # amd += '<key id="FILEMIMTYPE">' + str(amd_meta['data_object_metadata'][file_type]) + '</key'>
+    amd += "</record>"
+    amd += "</section>"
+    '''
+    rework with a mapping from metadata to rosetta dnx fields. this should map metadata from
+    Step1: fill dnx metadata with data_object_metadata for file objects.
+    Step2: Create an additional json file, containing the origin_metadata for each object. This needs to be handled in mets file too.
+    '''
+    # for sec_key in amd_meta:
+    #     for key in amd_meta[sec_key]:
+    #         amd += '<key id="' + sec_key + '_' + key + '">' + str(amd_meta[sec_key][key]) + "</key>"
     amd += "</dnx>"
     amd += "</mets:xmlData>"
     amd += "</mets:mdWrap>"
     amd += "</mets:techMD>"
-    amd += '<mets:rightsMD ID="f_rightsmd_' + identifier + '">'
+    amd += '<mets:rightsMD ID="fid'+counter+'-1-amd-rights">'
     amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
     amd += "<mets:xmlData>"
     amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>'
     amd += "</mets:xmlData>"
     amd += "</mets:mdWrap>"
     amd += "</mets:rightsMD>"
-    amd += '<mets:sourceMD ID="f_sourcemd_' + identifier + '">'
+    amd += '<mets:sourceMD ID="fid'+counter+'-1-amd-source">'
     amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
     amd += "<mets:xmlData>"
     amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>'
     amd += "</mets:xmlData>"
     amd += "</mets:mdWrap>"
     amd += "</mets:sourceMD>"
-    amd += '<mets:digiprovMD ID="f_digiprovmd_' + identifier + '">'
+    amd += '<mets:digiprovMD ID="fid'+counter+'-1-amd-digiprov">'
     amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
     amd += "<mets:xmlData>"
     amd += "<dnx xmlns='http://www.exlibrisgroup.com/dps/dnx'/>"
@@ -215,6 +232,51 @@ def generate_amd_for_file(amd_meta, identifier):
     return amd
 
 
+def generate_amd_for_rep():
+    '''
+    generate the administrative metadata for a representation. in out system, rep equals the package
+    level.
+    '''
+    amd = ""
+    amd += '<mets:amdSec ID="rep1-amd">'
+    amd += '<mets:techMD ID="rep_techmd_master">'
+    amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
+    amd += "<mets:xmlData>"
+    amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx">'
+    amd += '<section id="generalRepCharacteristics">'
+    amd += '<record>'
+    amd += '<key id="preservationType">PRESERVATION_MASTER</key>'
+    amd += '<key id="usageType">VIEW</key>'
+    amd += '<key id="RevisionNumber">1</key>'
+    amd += "</record>"
+    amd += "</section>"
+    amd += "</dnx>"
+    amd += "</mets:xmlData>"
+    amd += "</mets:mdWrap>"
+    amd += "</mets:techMD>"
+    amd += '<mets:rightsMD ID="rep1-amd-rights">'
+    amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
+    amd += "<mets:xmlData>"
+    amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>'
+    amd += "</mets:xmlData>"
+    amd += "</mets:mdWrap>"
+    amd += "</mets:rightsMD>"
+    amd += '<mets:sourceMD ID="rep1-amd-source">'
+    amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
+    amd += "<mets:xmlData>"
+    amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>'
+    amd += "</mets:xmlData>"
+    amd += "</mets:mdWrap>"
+    amd += "</mets:sourceMD>"
+    amd += '<mets:digiprovMD ID="rep1-amd-digiprov">'
+    amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
+    amd += "<mets:xmlData>"
+    amd += "<dnx xmlns='http://www.exlibrisgroup.com/dps/dnx'/>"
+    amd += "</mets:xmlData>"
+    amd += "</mets:mdWrap>"
+    amd += "</mets:digiprovMD>"
+    amd += "</mets:amdSec>"
+    return amd
 
 def generate_mets_xml(ingest_data, storage_data):
     """
@@ -225,10 +287,11 @@ def generate_mets_xml(ingest_data, storage_data):
     t_flat_data = get_ingest_data_files(t_enriched)
     t_smap = generate_structmap(t_enriched)
     ie_dmd = generate_dmd_for_meta(t_enriched["metadata"], "ie_dmd")
-    mets_file = '<mets:mets xmlns:mets="http://www.loc.gov/METS/">'
+    mets_file = '<mets:mets xmlns:mets="http://www.exlibrisgroup.com/xsd/dps/rosettaMets">'
     file_dmd = ""
-    file_amd = ""
+    file_amd = generate_amd_for_rep()
     file_sec = "<mets:fileSec>"
+    file_sec += '<mets:fileGrp USE="VIEW" ID="f_grp_master" ADMID="rep1-amd">'
     for item in t_flat_data:
         package = [
             package
@@ -236,31 +299,30 @@ def generate_mets_xml(ingest_data, storage_data):
             if package["package_id"] == item["root_package"]
         ][0]
         for f in item["flat_data"]:
-            file_sec += '<mets:fileGrp USE="VIEW">'
+            file_ctr = ctr_id_map[f["package_id"]]
             file_sec += (
-                '<mets:file ID="'
-                + f["package_id"]
-                + '" MIMETYPE="'
+                '<mets:file ID="fid'
+                + file_ctr
+                + '-1" MIMETYPE="'
                 + f["data_object_metadata"]["file_type"]
-                + '" ADMID="f_amd_'
-                + f["package_id"]
-                + '" DMDID="f_dmd_'
-                + f["package_id"]
-                + '">'
+                + '" ADMID="fid' + file_ctr + '-1-amd"'
+
             )
-            if "metadata_userset_id" in package:
+            if "metadata_userset_id" in package and package["metadata_userset_id"] != "":
                 result = generate_dmd_for_meta(
                     package["metadata_userset"], "f_dmd_" + f["package_id"]
                 )
                 if result["successfull"]:
                     file_dmd += result["content"]
-            section_data = {"export_metadata": f["data_object_metadata"]}
-            if bool(f["origin_metadata"]):
-                section_data[
-                    f["data_object_metadata"]["content_origin"] + "_metadata"
-                ] = f["origin_metadata"]
+                    file_sec += ' DMDID="f_dmd_' + f["package_id"] + '"'
+            file_sec += '>'
+            # section_data = {"export_metadata": f["data_object_metadata"]}
+            # if bool(f["origin_metadata"]):
+            #     section_data[
+            #         f["data_object_metadata"]["content_origin"] + "_metadata"
+            #     ] = f["origin_metadata"]
             file_amd += generate_amd_for_file(
-                section_data, f["package_id"]
+                f["data_object_metadata"], file_ctr
             )
             file_sec += (
                 '<mets:FLocat LOCTYPE="URL" xlin:href="file://'
@@ -268,7 +330,35 @@ def generate_mets_xml(ingest_data, storage_data):
                 + '" xmlns:xlin="http://www.w3.org/1999/xlink"/>'
             )
             file_sec += "</mets:file>"
-            file_sec += "</mets:fileGrp>"
+            #---
+            #create the same for the json_meta file
+            #---
+            file_ctr = ctr_id_map[f["package_id"]+"_meta"]
+            file_sec += (
+                '<mets:file ID="fid'
+                + file_ctr
+                + '-1" MIMETYPE="'
+                + f["data_object_metadata"]["file_type"]
+                + '" ADMID="fid' + file_ctr + '-1-amd"'
+
+            )
+            file_sec += '>'
+            # section_data = {"export_metadata": f["data_object_metadata"]}
+            # if bool(f["origin_metadata"]):
+            #     section_data[
+            #         f["data_object_metadata"]["content_origin"] + "_metadata"
+            #     ] = f["origin_metadata"]
+            meta = { 'filename' : f["data_object_metadata"]["filename"] + '.json' , 'file_type' : 'application/json'}
+            file_amd += generate_amd_for_file(
+                meta, file_ctr
+            )
+            file_sec += (
+                '<mets:FLocat LOCTYPE="URL" xlin:href="file://'
+                + f["data_object_metadata"]["filename"] + '.json'
+                + '" xmlns:xlin="http://www.w3.org/1999/xlink"/>'
+            )
+            file_sec += "</mets:file>"
+    file_sec += "</mets:fileGrp>"
     file_sec += "</mets:fileSec>"
     mets_file += ie_dmd["content"]
     mets_file += file_dmd
@@ -286,3 +376,4 @@ if __name__ == "__main__":
     with open("/server/lzv/server/testdata/test_storage.json") as f:
         storage_data = json.load(f)
     mets = generate_mets_xml(ingest_data, storage_data)
+    print(mets)

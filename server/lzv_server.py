@@ -1030,6 +1030,31 @@ def get_packages(user_id, return_as_string=False):
     return response if return_as_string else json.loads(response)
 
 
+@APP.route("/storage/all", methods=["GET"])
+def get_storage_objects():
+    """
+    Routed from /storage/all
+    Requests all docs from storage for user
+    """
+    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
+        return (
+            {"Error": FAILED_AUTHENTICATION},
+            401,
+            {"Content-Type": "application/json"},
+        )
+    if not check_session(
+        request.cookies["session_user"], request.cookies["session_auth"]
+    ):
+        return (
+            {"Error": FAILED_AUTHENTICATION},
+            401,
+            {"Content-Type": "application/json"},
+        )
+    user_id = request.cookies["session_user"]
+    out = get_storage_for_user(user_id, return_as_string=False)
+    return json.dumps(out["docs"])
+
+
 def get_storage_for_user(user_id, return_as_string=False):
     """
     Returns the package and data docs for @user_id either as (json)string or json-object.
@@ -1568,15 +1593,14 @@ def get_ingest_by_user_and_id_in_review_db(user_id, ingest_id):
     )
     return response["docs"]
 
+
 def get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id):
     """
     returns the ingest for ingest_id and user_id as json object
     """
     query = {"selector": {"owner": user_id, "ingest_id": ingest_id}}
     # query = {"selector": {"owner": user_id}}
-    response = json.loads(
-        query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"])
-    )
+    response = json.loads(query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"]))
     return response["docs"]
 
 
@@ -1804,7 +1828,7 @@ def submit_user_ingest_to_review():
     )
     ingest["owner"] = user_id
     success = create_ingest_on_filesystem(
-        user_id, ingest["ingest_id"], CONFIGPARAMS["LZV_REVIEW"],review_db=False
+        user_id, ingest["ingest_id"], CONFIGPARAMS["LZV_REVIEW"], review_db=False
     )
     if not success:
         return (
@@ -1911,7 +1935,7 @@ def approve_ingest():
 
 def create_ingest_on_filesystem(user_id, ingest_id, base_folder, review_db=True):
     """
-    create the files for the ingest on the defined folder. folder should be thofolder to rosetta
+    create the files for the ingest on the defined folder. folder should be hotfolder to rosetta
     system. also created the mets files basedo n the data provided in the ingest.
     """
     ingest = {}
@@ -1973,9 +1997,28 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, review_db=True)
             if response:
                 try:
                     tmp_path = path + f["data_object_metadata"]["filename"]
+                    tmp_json_path = (
+                        path + f["data_object_metadata"]["filename"] + ".json"
+                    )
                     tmp_file = Path(tmp_path)
+                    tmp_json_file = Path(tmp_json_path)
                     tmp_file.touch(mode=0o770, exist_ok=True)
+                    tmp_json_file.touch(mode=0o770, exist_ok=True)
                     tmp_file.write_bytes(response.content)
+                    tmp = [
+                            item
+                            for item in storage_file
+                            if f["package_id"] == item["package_id"]
+                        ][0]
+                    print("tmp:")
+                    print(tmp)
+                    tmp_json_file.write_text(
+                        json.dumps([
+                            item
+                            for item in storage_file
+                            if f["package_id"] == item["package_id"]
+                        ][0])
+                    )
                 except:
                     print("error printing file")
                     success = False

@@ -206,6 +206,20 @@ function interface_labfolder_download_mdbcategories(id, token, on_success_callba
     xhttp.send();
 }
 
+function interface_storage_get(on_success_callback) {
+    var url = baseURL + '/storage/all';
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                on_success_callback(xhttp.response);
+            }
+        }
+    };
+    xhttp.open('GET', url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+}
+
 function interface_packages_get(on_success_callback) {
     var url = baseURL + '/storage/packages';
     xhttp.onreadystatechange = function(e) {

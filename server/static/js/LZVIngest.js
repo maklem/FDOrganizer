@@ -564,7 +564,7 @@ function submitIngest() {
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
-				getSubmittedIngests();
+				console.log("test");
 				alert("Ingest successfully submitted for review!");
 				location.reload();
 			}

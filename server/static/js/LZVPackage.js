@@ -1,5 +1,6 @@
 $( document ).ready(function() {
     get_user_packages();
+    get_user_storage();
     update_sidebar_user_packages();
     create_empty_package_form();
 });
@@ -19,9 +20,16 @@ function get_user_packages() {
     interface_packages_get(function(xhttp_response){
         parsedJSON =  JSON.parse(xhttp_response);
         setLocalStorage("user_packages", JSON.stringify(parsedJSON));
-        console.log(parsedJSON);
     });
 }
+
+function get_user_storage() {
+    interface_storage_get(function(xhttp_response){
+        parsedJSON =  JSON.parse(xhttp_response);
+        setLocalStorage("user_storage", JSON.stringify(parsedJSON));
+    });
+}
+
 
 function update_sidebar_user_packages(){
     $('#myItemsSubItems').empty();
@@ -43,7 +51,7 @@ function create_form_for_existing_package(clicked) {
     }
     user_packages = JSON.parse(getLocalStorage("user_packages"));
     clicked_id = $(clicked).attr('package_id');
-    
+
     fill_package_form(clicked_id, user_packages);
 }
 
@@ -104,9 +112,62 @@ function create_html_for_container_content(user_package) {
     return output;
 }
 
+//TODO!
 function open_item_info(clicked) {
-    //TODO!!!
+    $('#popupForm').empty();
+
+    var user_packages = JSON.parse(getLocalStorage("user_packages"));
+    clicked_id = $(clicked).attr('package_id');
+    var display_package = user_packages.find(set=>set.package_id == clicked_id);
+    if (display_package) {
+        var html = create_html_for_item_info(display_package);
+        $(html).appendTo('#popupForm');
+        display_popup();
+    }
+
 }
+
+function create_html_for_item_info(clicked_package) {
+    var html = '';
+    html += '<div id="popup_form_content">';
+    html += '<div id="popup_form_header">';
+    html += '<div id="popup_header_name" class="popup_form_header_field">' + clicked_package.name + '</div>';
+    html += '<div id="popup_header_creation_date" class="popup_form_header_field">' + clicked_package.package_object_metadata.creation_date + '</div>';
+    html += '<div id="popup_header_last_change" class="popup_form_header_field">' + clicked_package.package_object_metadata.last_change + '</div>';
+    html += '<div id="popup_header_description" class="popup_form_header_field">' + clicked_package.description + '</div>';
+    html += '</div>';
+    html += '<div id="popup_form_mainpage">';
+    html += '</div>';
+    html += '<div id="popup_form_footer"><button class="btn close_info_button" id="close_popup_form" onclick="hide_popup();">Close</button></div>';
+    html += '</div>';
+    return html;
+}
+//TODO TEST and finish
+function recursive_create_item_info_content_item(item_id) {
+    var html = ''
+    var user_packages = JSON.parse(getLocalStorage("user_storage"));
+    var item = user_packages.find(set=>set.package_id == item_id);
+    if(item.type == 'PACKAGE'){
+        html += '<div class="content_element package_info_package"><div class="package_info_package_icon"/><span>'+ item.name +'</span><button class="btn expand_package_info_button" id="'+item.package_id+'" onclick="expand_content_children">+</button></div>';
+        for (let c of item.child_data_objects){
+            html += recursive_create_item_info_content_item(c.package_id);
+        }
+    }
+    else { //type == 'DATA'
+        html += '<div class="content_element package_info_data"><div class="package_info_data_icon"/><span>' + item.name + '</span><span class="package_info_data_info">'+ item.data_object_metadata.file_type+'</span';
+    }
+}
+
+function hide_popup() {
+    $('#package_manager_main_form').show();
+    $('#popupForm').hide();
+}
+
+function display_popup() {
+    $('#package_manager_main_form').hide();
+    $('#popupForm').show();
+}
+
 
 function select_deselect_item(clicked) {
     if($(clicked).hasClass('selected')){
@@ -157,7 +218,7 @@ function get_active_package() {
     var content = $('#package_content_container').children('.container_subitem');
     for (let c of content) {
         output.child_data_objects.push($(c).attr('package_id'));
-    
+
     }
     console.log("output");
     console.log(output);
