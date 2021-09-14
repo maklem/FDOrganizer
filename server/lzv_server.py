@@ -738,9 +738,10 @@ def download_files_from_labfolder(data_array):
             "Cookie": token,
         }
         print(file_url)
+        print(json.dumps(headers))
         file_response = requests.get(file_url, headers=headers)
         print("file_response")
-        print(file_response)
+        print(file_response.text)
         couchdb_url = (
             CONFIGPARAMS["couchDBBaseURL"]
             + "/"
@@ -1052,7 +1053,7 @@ def get_storage_objects():
         )
     user_id = request.cookies["session_user"]
     out = get_storage_for_user(user_id, return_as_string=False)
-    return json.dumps(out["docs"])
+    return json.dumps(out)
 
 
 def get_storage_for_user(user_id, return_as_string=False):
