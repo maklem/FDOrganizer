@@ -408,8 +408,6 @@ def authenticate_couchdb():
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = requests.post(url, data=data, headers=headers)
     if response.status_code == 200:
-        if DEBUG:
-            print("Succesfully Authenticated, extracting Cookie!")
         cookie = response.headers["Set-Cookie"]
         couchdb_token = cookie[: cookie.find(";")]
         return couchdb_token
