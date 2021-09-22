@@ -3,6 +3,10 @@ $( document ).ready(function() {
     get_user_storage();
     update_sidebar_user_packages();
     create_empty_package_form();
+    if(checkLZVLogin())
+    {
+        $('#logout_lzv').show();
+    }
 });
 
 var unsaved = false;
@@ -160,11 +164,13 @@ function recursive_create_item_info_content_item(item_id) {
 
 function hide_popup() {
     $('#package_manager_main_form').show();
+    $('#right_sidebar').show();
     $('#popupForm').hide();
 }
 
 function display_popup() {
     $('#package_manager_main_form').hide();
+    $('#right_sidebar').hide();
     $('#popupForm').show();
 }
 

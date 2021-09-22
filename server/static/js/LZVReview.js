@@ -1,6 +1,10 @@
 $( document ).ready(function() {
 	getIngestsToReview();
 	fillSidebar();
+	if(checkLZVLogin())
+	{
+		$('#logout_lzv').show();
+	}
 });
 
 function toggleDisplayToReview(clicked) {

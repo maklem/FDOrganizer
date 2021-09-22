@@ -113,8 +113,6 @@ function getActiveMetaDataSet() {
 		}
 		}
 	}
-	console.log("getActiveMetaDataSet return:");
-	console.log(JSON.stringify(saveData));
 	return saveData;
 }
 

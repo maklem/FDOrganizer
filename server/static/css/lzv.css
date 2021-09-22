@@ -746,6 +746,17 @@ input:required:invalid, select:required:invalid {
   height: 100%;
 }
 
+.close_info_button {
+  background-color: var(--main_button_color);
+  color: white;
+  border-radius: 2px 0px 0px 2px;
+  border-color: #bbbbbb;
+  width: 20%;
+  float: left;
+  outline: 0;
+  height: 100%;
+}
+
 .container_item_select.selected {
   background-color: var(--main_button_color);
   /*-webkit-box-shadow: inset 1px 1px 10px 4px rgba(20,20,20,0.38); */

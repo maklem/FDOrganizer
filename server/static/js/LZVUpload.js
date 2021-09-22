@@ -1,3 +1,9 @@
+$(document).ready(function() {
+    if (checkLZVLogin()) {
+        $('#logout_lzv').show();
+    }
+});
+
 function upload_file(data, package_id, on_success_callback) {
     // console.log($('formElem').serialize());
     var url = baseURL + '/upload/file?package_id=' + package_id;
