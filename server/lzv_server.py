@@ -1858,13 +1858,17 @@ def submit_user_ingest_to_review():
         return (
             json.dumps({"Result": "All good"}),
             200,
-            {"Content-Type": "application/json"},
+            {"Content-Type": " application/json"},
         )
+    #if not successfull, review data is deleted form file system since input to review database was
+    #not successfull
+    review_path = CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"]
+    shutil.rmtree(review_path)
     return (
         json.dumps({"Result": "Error Storing ingest"}),
         500,
         {"Content-Type": "application/json"},
-    )
+        )
 
 
 @APP.route("/ingest/revoke", methods=["PUT"])
