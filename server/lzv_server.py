@@ -273,6 +273,27 @@ def logout_session(userid):
     session.pop(userid)
 
 
+def validate_user_session(request):
+    '''
+        checks request for session_user and session_auth object. validates these against local
+        session files. returns {"success": TRUE/FALSE, "return_error": {
+            {"Error": FAILED_AUTHENTICATION},
+            401,
+            {"Content-Type": "application/json"}
+        }}
+    '''
+    if "session_user" in request.cookies and "session_auth" in request.cookies:
+        if check_session(request.cookies["session_user"], request.cookies["session_auth"]):
+            return {"success" : True}
+    return {
+        "success" : False,
+        "return_error" :{
+            {"Error": FAILED_AUTHENTICATION},
+            401,
+            {"Content-Type": "application/json"}
+        }
+    }
+
 @APP.route("/login", methods=["POST"])
 def login_lzv():
     """
@@ -314,20 +335,9 @@ def logout_lzv():
     """
     Logout User from lzv System. Deletes local stored session id.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     logout_session(request.cookies["session_user"])
     return (
         json.dumps({"Message": "All good!"}),
@@ -342,20 +352,9 @@ def authenticate_labfolder():
     """
     Authenticate to LabFolder and returns the login answer
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     url = CONFIGPARAMS["labFolderBaseURL"] + "/auth/login"
     data = request.get_data()
     headers = {"Content-Type": "application/json"}
@@ -368,20 +367,9 @@ def logout_labfolder():
     """
     Kills the Session associated to the provided token
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     url = CONFIGPARAMS["labFolderBaseURL"] + "/auth/logout"
     headers = {
         "Content-Type": "application/json",
@@ -425,20 +413,9 @@ def get_projects():
     """
     Accesses LabFolder by Token and retreives the Projects from User. Answer is returned by REST.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     url = CONFIGPARAMS["labFolderBaseURL"] + "/projects"
     headers = {
         "Content-Type": "application/json",
@@ -457,20 +434,9 @@ def get_notebook_entries():
     """
     Accesses LabFolder by Token and retreives the Entries from User. Answer is returned by REST.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     url = CONFIGPARAMS["labFolderBaseURL"] + "/entries"
     headers = {
         "Content-Type": "application/json",
@@ -487,20 +453,9 @@ def download_file_to_client():
     Creates a zip File with the Entry requested by the user, and transfers the zip by HTTP.
     Receives only a list of ids of dataobjects. querys these from database
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     project_id = request.args.get("project_id")
     entry_id = request.args.get("entry_id")
     entry_version_id = request.args.get("entry_version_id")
@@ -545,20 +500,9 @@ def download():
     Only downloads new files from labfolder. Adds documents to doc db and metadata files to
     storage db. also creates package files for entrys for all elements containing the elements.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     data = request.get_data()
     json_data = json.loads(data)
@@ -829,20 +773,9 @@ def get_mdb_categories():
     Routed from /mdb/categories.
     Retreives the category information about Material Databse from labfolder and returns this.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     url = CONFIGPARAMS["labFolderBaseURL"] + "/mdb/categories"
     # prepare header
     headers = {
@@ -863,20 +796,9 @@ def download_mdb_items():
     routed from /mdb/items
     Download the Material Database Items to Server.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     url_items = CONFIGPARAMS["labFolderBaseURL"] + "/mdb/items"
     url_categories = CONFIGPARAMS["labFolderBaseURL"] + "/mdb/categories"
     category_id = request.args.get("category_id", default="", type=str)
@@ -935,20 +857,9 @@ def get_data_packages():
     Routed from /data/packages
     Requests all data packages for user from database, which can then be added to a
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id, "type": "PACKAGE"}}
     response = json.loads(query_db(query, CONFIGPARAMS["couchDBStorageDatabaseName"]))
@@ -961,20 +872,9 @@ def get_labfolder_storage_data():
     Routed from /labfolder/storage
     Requests the storage file, containg metadata about stored files for the requesting user
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     out = get_labfolder_data(user_id, return_as_string=False)
     return json.dumps(out["docs"])
@@ -1001,20 +901,9 @@ def get_package_objects():
     Routed from /storage/packages
     Requests all docs from storage with type package for user
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     out = get_packages(user_id, return_as_string=False)
     return json.dumps(out["docs"])
@@ -1035,20 +924,9 @@ def get_storage_objects():
     Routed from /storage/all
     Requests all docs from storage for user
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     out = get_storage_for_user(user_id, return_as_string=False)
     return json.dumps(out)
@@ -1072,20 +950,9 @@ def set_package_object():
     Updates or creates a new package. Metadata is set by this function serverside to prevent mani-
     pulation.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = authenticate_couchdb()
     if not token:
@@ -1150,20 +1017,9 @@ def delete_package_object():
     Routed from /storage/packages/delete PUT
     Delete the package provided in data from database
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = authenticate_couchdb()
     if not token:
@@ -1341,20 +1197,9 @@ def get_metadata():
     """
     Return Metadata structure file from server, providing information about supported meta data
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     data = ""
     with open(CONFIGPARAMS["METADATA_INFO_FILE"]) as file:
         data = file.read()
@@ -1366,20 +1211,9 @@ def get_export_definitions():
     """
     Return Metadata exports file from server, defining exports how it will be exported
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     data = ""
     with open(CONFIGPARAMS["METADATA_EXPORT_DEFINITIONS"]) as file:
         data = file.read()
@@ -1391,20 +1225,9 @@ def get_export_mappings():
     """
     Return Metadata structure file from server, providing mapping between schemes and exports
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     data = ""
     with open(CONFIGPARAMS["METADATA_EXPORT_MAPPINGS"]) as file:
         data = file.read()
@@ -1417,20 +1240,9 @@ def get_user_stored_metadata():
     Routed from /metadata/user GET
     Gets the stored metadata sets for the requesting user
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
     response = json.loads(query_db(query, CONFIGPARAMS["couchDBMetaDataDatabaseName"]))
@@ -1444,20 +1256,9 @@ def delete_user_metadata_set():
     Routed from /metadata/user/delete PUT
     Delete the meta_set provided in data from database
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = authenticate_couchdb()
     if not token:
@@ -1501,20 +1302,9 @@ def store_user_metadata():
     Routed from /metadata/user PUT
     Stores the provided metadata entry for user. if en entry with same set_id exists it will be
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = authenticate_couchdb()
     if not token:
@@ -1561,20 +1351,9 @@ def get_user_stored_ingests():
     Routed from /ingest/user GET
     Gets the stored ingests for the requesting user
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
     response = json.loads(query_db(query, CONFIGPARAMS["couchDBIngestsDatabaseName"]))
@@ -1609,20 +1388,9 @@ def store_user_ingest():
     Routed from /ingest/user PUT
     Stores an updated ingests for the user, version managing is done on client side
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     user_id = request.cookies["session_user"]
     data = json.loads(request.get_data())
     data["owner"] = user_id
@@ -1796,20 +1564,9 @@ def submit_user_ingest_to_review():
     ingest in a seperate db so it cant be deleted since we need to verify to always have access
     to the provided data. Ingests are first stored in a review database. after review
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     token = authenticate_couchdb()
     if not token:
         return (
@@ -1877,6 +1634,16 @@ def revoke_ingest():
     triggered when the reviewer revokes an ingest. either ingest is revoked completely or is
     returned to sender with a note what need to be changes.
     """
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
+    if not check_user_permission_review(request.cookies["session_user"]):
+        return ({"Error": "NOT PERMITTED"},
+            401,
+            {"Content-Type": "application/json"},
+            )
+    token = authenticate_couchdb()
+
 
 
 @APP.route("/ingest/approve", methods=["PUT"])
@@ -1885,20 +1652,9 @@ def approve_ingest():
     called when the reviewer approves the ingest. the process of deploying the ingest to rosetta is
     then started.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     if not check_user_permission_review(request.cookies["session_user"]):
         return (
             {"Error": "NOT AUTHORIZED FOR REVIEW"},
@@ -2066,20 +1822,9 @@ def get_toreview_ingests():
     get Ingests which need to be reviewed. Review permission is checked before returning
      information. if no permission is available for review 401 is returned.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     if not check_user_permission_review(request.cookies["session_user"]):
         return (
             {"Error": "NOT AUTHORIZED FOR REVIEW"},
@@ -2127,20 +1872,9 @@ def receive_file():
     Receive files belonging to a package. This is definied by package_id in parameteres. It
     needs to check if the package is manually created AND belonging to the right user.
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     package_id = request.args.get("package_id")
     user_id = request.cookies["session_user"]
     query = {"selector": {"package_id": package_id, "owner": user_id}}
@@ -2338,20 +2072,9 @@ def receive_package():
         then can send fiels to this package with the package_id. The metadata for package creation
         is only the name of package, everything else is set serverside
     """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
-    if not check_session(
-        request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return (
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"},
-        )
+    result = validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
     print("creating new package")
     user_id = request.cookies["session_user"]
     data = {}
