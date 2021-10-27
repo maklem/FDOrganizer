@@ -17,6 +17,7 @@ from flask import Flask, request, render_template, send_from_directory, session
 from flask_session import Session
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+from repoman_labfolder import rep_labfolder
 
 import ldap
 
@@ -48,7 +49,8 @@ APP.config["SESSION_PERMANENT"] = False
 APP.config["UPLOAD_FOLDER"] = CONFIGPARAMS["USR_UPLOAD_TMP_FOLDER"]
 CORS(APP)
 Session(APP)
-
+APP.register_blueprint(rep_labfolder, url_prefix='/labfolder')
+print(APP.url_map)
 
 # ----------------------Page Navigation-----------------------------------------
 @APP.route("/")
@@ -648,7 +650,8 @@ def download_files_from_labfolder(data_array):
     if not token:
         return
     for element in data_array:
-        if element["origin_metadata"]["element_type"] == "IMAGE":
+        if (element["origin_metadata"]["element_type"] == "IMAGE"
+            or element["origin_metadata"]["element_type"] == "FILE"):
             file_info_url = (
                 CONFIGPARAMS["labFolderBaseURL"]
                 + "/elements/file/"
@@ -697,7 +700,10 @@ def download_files_from_labfolder(data_array):
         couchdb_url = couchdb_url + "/" + json_answer["id"] + "/"
         file_name = ""
         file_suffix = ""
-        if element["origin_metadata"]["element_type"] == "IMAGE":
+        if (
+            element["origin_metadata"]["element_type"] == "IMAGE"
+            or element["origin_metadata"]["element_type"] == "FILE"
+        ):
             print("file infor url")
             print(file_info_url)
             print(headers)
@@ -708,8 +714,8 @@ def download_files_from_labfolder(data_array):
             file_name = file_info_reponse_jdata["file_name"]
             file_data = file_response.content
             couchdb_url = couchdb_url + json_answer["id"]
-            couch_header["Content-Type"] = "image/png"
-            file_suffix = ".png"
+            couch_header["Content-Type"] = file_info_reponse_jdata["content_type"]
+            file_suffix = ""
             att_create_response = requests.put(
                 couchdb_url, headers=couch_header, data=file_data
             )
@@ -1158,10 +1164,11 @@ def create_zip_from_files(download_meta, filename):
         + "/"
     )
     for ele in download_meta:
-        filename = ele["data_object_metadata"]["db_filename"]
+        print(json.dumps(ele))
+        couch_db_id = ele["data_object_metadata"]["db_filename"]
         # each element should only have one version, so wen access the first element
         cdb_doc_url = (
-            cdb_doc_url_base + ele["data_object_metadata"]["doc_id"] + "/" + filename
+            cdb_doc_url_base + ele["data_object_metadata"]["doc_id"] + "/" + couch_db_id
         )
         tmp_path_file = Path(
             CONFIGPARAMS["tempFolder"] + ele["origin_metadata"]["element_id"]
@@ -1181,10 +1188,17 @@ def create_zip_from_files(download_meta, filename):
                 or ele["origin_metadata"]["element_type"] == "TABLE"
             ):
                 tmp_path_file.write_text(response.text)
-            elif ele["origin_metadata"]["element_type"] == "IMAGE":
+            elif (
+                ele["origin_metadata"]["element_type"] == "IMAGE"
+                or ele["origin_metadata"]["element_type"] == "FILE"
+                ):
                 tmp_path_file.write_bytes(response.content)
             absname = str(tmp_path_file.resolve())
-            zip_file.write(absname, arcname=filename)
+            print("absname")
+            print(absname)
+            print("filename")
+            print(filename)
+            zip_file.write(absname, arcname=ele["data_object_metadata"]["filename"])
             try:
                 tmp_path_file.unlink()
             except FileNotFoundError:
@@ -1642,8 +1656,26 @@ def revoke_ingest():
             401,
             {"Content-Type": "application/json"},
             )
-    token = authenticate_couchdb()
-
+    # token = authenticate_couchdb()
+    user_id = request.cookies["session_user"]
+    ingest_id = request.args.get("ingest_id")
+    ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)[0]
+    ingest["state"] = "REJECTED"
+    ingest["ingest_metadata"]["reject_data"] = time.strftime(
+            "%Y-%m-%dT%T.000+0000"
+        )
+    resp = update_or_create_reviewdb_ingest(user_id, ingest)
+    if resp:
+        return (
+            json.dumps({"Result": "All good"}),
+            200,
+            {"Content-Type": " application/json"},
+        )
+    return (
+        json.dumps({"Result": "Error Storing ingest"}),
+        500,
+        {"Content-Type": "application/json"},
+        )
 
 
 @APP.route("/ingest/approve", methods=["PUT"])
