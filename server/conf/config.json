@@ -12,7 +12,7 @@
   "couchDBIngestsDatabaseName": "ingests",
   "couchDBIngestReviewDatabaseName": "ingest_review",
   "LZV_REVIEW": "/lzv_ingest_review/",
-  "LZV_HOTFOLDER": "/lzv_hotfolder/",
+  "LZV_HOTFOLDER": "/lzv_hotfolder/SIP/",
   "METADATA_INFO_FILE": "/server/lzv/server/conf/metadata_schemes.json",
   "METADATA_EXPORT_DEFINITIONS" : "/server/lzv/server/conf/metadata_export_definitions.json",
   "METADATA_EXPORT_MAPPINGS" : "/server/lzv/server/conf/metadata_export_mappings.json",
