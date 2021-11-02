@@ -572,6 +572,7 @@ function submitIngest() {
 	};
 	// var metaSets = JSON.parse(getLocalStorage("metaDataUserSets"));
 	// var data = JSON.parse(getLocalStorage("labFolderStorageFile"));
+
 	var payload = getActiveIngest();
 	if(payload.name == '' || payload.metadata == "") {
 		alert("Ingest Name and Metadata required for submission!");

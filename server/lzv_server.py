@@ -654,6 +654,8 @@ def get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id):
     # query = {"selector": {"owner": user_id}}
     response = json.loads(lzv_util.query_db(query,\
                 lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"]))
+    print("resp")
+    print(json.dumps(response))
     return response["docs"]
 
 
@@ -701,18 +703,13 @@ def update_or_create_user_ingest(user_id, ingest):
         "Cookie": token,
     }
     if check_response["docs"]:  # only one entry with same id should exist at the same time
-        print("check_response")
-        print(check_response)
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         if "_id" in ingest:
             del ingest["_id"]
         if "_rev" in ingest:
             del ingest["_rev"]
-    print(url)
-    print(headers)
     print(ingest)
     response = requests.put(url, headers=headers, data=json.dumps(ingest))
-    print(response.text)
     if response:
         return (
             {"Result": "All good"},
@@ -846,7 +843,7 @@ def submit_user_ingest_to_review():
     ingest = json.loads(request.get_data())
     ingest["owner"] = user_id
     success = create_ingest_on_filesystem(
-        user_id, ingest["ingest_id"], lzv_util.CONFIGPARAMS["LZV_REVIEW"], review_db=False
+        user_id, ingest["ingest_id"], lzv_util.CONFIGPARAMS["LZV_REVIEW"], search_in_review_db=False
     )
     if not success:
         return (
@@ -967,17 +964,17 @@ def approve_ingest():
     # store the modified ingst in database.
 
 
-def create_ingest_on_filesystem(user_id, ingest_id, base_folder, review_db=True):
+def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_review_db=True):
     """
     create the files for the ingest on the defined folder. folder should be hotfolder to rosetta
     system. also created the mets files basedo n the data provided in the ingest.
     """
     ingest = {}
-    if review_db:
+    if search_in_review_db:
         ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)
     else:
         ingest = get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id)
-    if ingest:
+    if not ingest:
         print("ERROR: cant find ingest requests to dump on filesystem")
         return False
     ingest = ingest[0]
