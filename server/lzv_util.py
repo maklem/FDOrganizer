@@ -5,7 +5,7 @@ LZVUTIL module. general functions for usage in lzv application. no anchors are h
 import json
 import requests
 from flask import session
-# import secrets
+import secrets
 
 DEBUG = 1
 
