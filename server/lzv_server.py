@@ -1030,10 +1030,8 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
                 try:
                     tmp_path = path + f["data_object_metadata"]["filename"]
                     test = f["data_object_metadata"]["filename"]
-                    print(test)
-                    print(os.path.splitext(test)[0])
                     tmp_json_path = (
-                        path + os.path.splitext(f["data_object_metadata"]["filename"])[0] + ".json"
+                        path + f["data_object_metadata"]["filename"] + ".json"
                     )
                     tmp_file = Path(tmp_path)
                     tmp_json_file = Path(tmp_json_path)

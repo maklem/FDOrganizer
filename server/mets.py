@@ -349,14 +349,14 @@ def generate_mets_xml(ingest_data, storage_data):
             #     section_data[
             #         f["data_object_metadata"]["content_origin"] + "_metadata"
             #     ] = f["origin_metadata"]
-            meta = { 'filename' : os.path.splitext(f["data_object_metadata"]["filename"])[0]\
+            meta = { 'filename' : f["data_object_metadata"]["filename"] \
                     + '.json' , 'file_type' : 'application/json'}
             file_amd += generate_amd_for_file(
                 meta, file_ctr
             )
             file_sec += (
                 '<mets:FLocat LOCTYPE="URL" xlin:href="file://'
-                + os.path.splitext(f["data_object_metadata"]["filename"])[0]+ '.json'
+                + f["data_object_metadata"]["filename"] + '.json'
                 + '" xmlns:xlin="http://www.w3.org/1999/xlink"/>'
             )
             file_sec += "</mets:file>"
