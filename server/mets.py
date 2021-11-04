@@ -2,6 +2,7 @@
 Module for creation of mets files.
 """
 import json
+import os
 
 allowed_metadata_identifer = ["dublin_core_1_1"]
 ctr_id_map = {}
@@ -348,7 +349,8 @@ def generate_mets_xml(ingest_data, storage_data):
             #     section_data[
             #         f["data_object_metadata"]["content_origin"] + "_metadata"
             #     ] = f["origin_metadata"]
-            meta = { 'filename' : f["data_object_metadata"]["filename"] + '.json' , 'file_type' : 'application/json'}
+            meta = { 'filename' : os.path.splitext(f["data_object_metadata"]["filename"])[0]\
+                    + '.json' , 'file_type' : 'application/json'}
             file_amd += generate_amd_for_file(
                 meta, file_ctr
             )
