@@ -356,7 +356,7 @@ def generate_mets_xml(ingest_data, storage_data):
             )
             file_sec += (
                 '<mets:FLocat LOCTYPE="URL" xlin:href="file://'
-                + f["data_object_metadata"]["filename"] + '.json'
+                + os.path.splitext(f["data_object_metadata"]["filename"])[0]+ '.json'
                 + '" xmlns:xlin="http://www.w3.org/1999/xlink"/>'
             )
             file_sec += "</mets:file>"
