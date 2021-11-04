@@ -4,7 +4,7 @@ Software for LZV Server.
 import time
 from pathlib import Path
 import shutil
-# import os
+import os
 import uuid
 import json
 import secrets
@@ -842,6 +842,8 @@ def submit_user_ingest_to_review():
     user_id = request.cookies["session_user"]
     ingest = json.loads(request.get_data())
     ingest["owner"] = user_id
+    ingest["state"] = 'REVIEW'
+    ingest["ingest_metadata"]["submit_date"] = time.strftime("%Y-%m-%dT%T.000+0000")
     success = create_ingest_on_filesystem(
         user_id, ingest["ingest_id"], lzv_util.CONFIGPARAMS["LZV_REVIEW"], search_in_review_db=False
     )
@@ -1027,8 +1029,11 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
             if response:
                 try:
                     tmp_path = path + f["data_object_metadata"]["filename"]
+                    test = f["data_object_metadata"]["filename"]
+                    print(test)
+                    print(os.path.splitext(test)[0])
                     tmp_json_path = (
-                        path + f["data_object_metadata"]["filename"] + ".json"
+                        path + os.path.splitext(f["data_object_metadata"]["filename"])[0] + ".json"
                     )
                     tmp_file = Path(tmp_path)
                     tmp_json_file = Path(tmp_json_path)
