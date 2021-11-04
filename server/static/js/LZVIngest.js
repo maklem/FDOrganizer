@@ -580,7 +580,6 @@ function submitIngest() {
 	}
 	var now = new Date();
 	payload.ingest_metadata = {};
-	payload.state = 'REVIEW';
 	payload.ingest_metadata.submit_date = now.toString();
 	payload.ingest_metadata.review_date = undefined;
 	payload.ingest_metadata.ingest_date = undefined;
