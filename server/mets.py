@@ -240,7 +240,7 @@ def generate_amd_for_rep():
     '''
     amd = ""
     amd += '<mets:amdSec ID="rep1-amd">'
-    amd += '<mets:techMD ID="rep_techmd_master">'
+    amd += '<mets:techMD ID="rep1-amd-tech">'
     amd += '<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">'
     amd += "<mets:xmlData>"
     amd += '<dnx xmlns="http://www.exlibrisgroup.com/dps/dnx">'
@@ -287,7 +287,7 @@ def generate_mets_xml(ingest_data, storage_data):
     t_enriched = enrich_ingest_with_package_data(ingest_data, storage_data)
     t_flat_data = get_ingest_data_files(t_enriched)
     t_smap = generate_structmap(t_enriched)
-    ie_dmd = generate_dmd_for_meta(t_enriched["metadata"], "ie_dmd")
+    ie_dmd = generate_dmd_for_meta(t_enriched["metadata"], "ie-dmd")
     mets_file = '<mets:mets xmlns:mets="http://www.exlibrisgroup.com/xsd/dps/rosettaMets">'
     file_dmd = ""
     file_amd = generate_amd_for_rep()
