@@ -1,13 +1,105 @@
 {% extends "template.html" %}
 {% block content %}
-<div class="col-md-8" id="mainPage">
-	<div class="col-md-8">
-		<p id="zusatzText"></p>
-	</div>
+<div class="col-md-8" id="mainpage">
+    <div id="easyDBEntrySelectionHeader">
+        <div>
+            <button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop easyDBCollection" disabled="true" id="easyDBSelectProject" onclick="updateSelectionCollectionPool(this);">
+                Collections
+            </button>
+            <!-- <button class="btn lzvButton btnEntrySelectionHeader btnEntrySelectionHeaderTop easyDBPool" disabled="true" id="easyDBSelectMDB" onclick="updateSelectionCollectionPool(this);">
+                Pools
+            </button> -->
+        </div>
+        <div id="easyDBProjectSelect">
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="selections" id="dynamic">
+            <form id="selectableEntries">
+            </form>
+        </div>
+    </div>
 </div>
-<div class="col-md-4">
+<div class="col-md-4" id="right_sidebar">
+    <div id="repositoryLogin">
+        <div id="repositoryLoginform">
+            <form action="#" onsubmit="return false">
+                <div id="repositoryLoginFormHeader">
+                    <label>
+                        <strong>
+                            <h1>
+                                <b>
+                                    easyDB
+                                </b>
+                            </h1>
+                        </strong>
+                    </label>
+                    <br>
+                    </br>
+                </div>
+                <label class="formDescriptor" for="username">
+                    <h3>
+                        <b>
+                            Username
+                        </b>
+                    </h3>
+                </label>
+                <input name="username" placeholder="Enter Username" required="" type="text" value="test_user">
+                    <label class="formDescriptor" for="pwd">
+                        <h3>
+                            <b>
+                                Password
+                            </b>
+                        </h3>
+                    </label>
+                    <input name="pwd" placeholder="Enter Password" required="" type="password" value="1234567890">
+                        <div id="repositoryFailedLogin">
+                            <label>
+                                Wrong Username or password!
+                            </label>
+                            <br>
+                            </br>
+                        </div>
+                        <button class="btn lzvButton" id="submiteasyDBButtonLogin" onclick="authenticate(this.form);" type="submit">
+                            Login
+                        </button>
+                    </input>
+                </input>
+            </form>
+        </div>
+        <div id="repositoryLoginSuccesful">
+            <label>
+                easyDB Login Successfull
+            </label>
+            <br>
+                <button class="btn lzvButton" id="submitRepositoryButtonLogout" onclick="logout();">
+                    Logout
+                </button>
+            </br>
+        </div>
+    </div>
+    <div id="easyDBDownloadButton">
+<!--         <button class="btn lzvButton lzvSideBarRight" id="downloadSelectedElements" type="button">
+            Download selected Elements
+        </button>
+        <button class="btn lzvButton lzvSideBarRight" id="updateContent" type="button">
+            Reload Content
+        </button>
+        <button class="btn lzvButton lzvSideBarRight" id="selectAllElements" type="button">
+            Select all
+        </button>
+        <button class="btn lzvButton lzvSideBarRight" id="deSelectAllElements" type="button">
+            Deselect all
+        </button> -->
+    </div>
 </div>
 {% endblock %}
-{% block script %}
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static',filename='js/LZVBase.js')}}">
+</script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/LZVInterface.js')}}">
+</script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/LZVEasyDB.js')}}">
+</script>
 {% endblock %}
 	

@@ -176,6 +176,26 @@ li a:hover {
   float: right;
 
 }
+
+.collectionDetail {
+  background-color: var(--detail_button_color);
+  color: white;
+  font-weight: bold;
+  /*margin-left: 20px;*/
+  margin-top: 2px;
+  margin-bottom: -1px;
+  margin-right: -45px;
+  white-space: nowrap;
+  width: 97%;
+  padding: 5px;
+  padding-left: 10px;
+}
+
+.collectionDetail span{
+  display: block;
+}
+
+
 /*----dynamicLabFolderContent----*/
 
 .btnEntrySelectionHeader {
@@ -198,9 +218,9 @@ li a:hover {
   margin-right: 10px;
 }
 
-/*----LabFolderLoginBox-----*/
+/*----repositoryLoginBox-----*/
 
-#labFolderLogin {
+#repositoryLogin {
   background-color: white;
   border-radius: 2px;
   border: 2px solid #606060;
@@ -208,25 +228,25 @@ li a:hover {
   transform: translate(-10px, 0px);
 }
 
-#labFolderFailedLogin {
+#repositoryFailedLogin {
   display: none;
   color: red;
 }
 
-#labFolderLoginSuccesful {
+#repositoryLoginSuccesful {
   display: none;
   height: 100px;
   max-height: 100px; 
 }
 
-#labFolderLoginFormHeader {
+#repositoryLoginFormHeader {
   text-align: center;
   background-color: rgba(40,167,69,0.4);
   padding-top: 12px;
   border-radius: 2px;
 }
 
-#labFolderLogin .lzvButton {
+#repositoryLogin .lzvButton {
   display: block;
   padding: 10px;
   width: 100%;

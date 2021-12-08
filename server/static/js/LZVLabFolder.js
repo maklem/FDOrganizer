@@ -162,10 +162,9 @@ function authenticate(form) {
         if (!("error" in data)) {
             labFolderToken = data.token;
             setLocalStorage("labFolderToken", labFolderToken);
-            $("#labFolderDownloadButton").show();
             updateContentAfterLogin();
         } else {
-            $("#labFolderFailedLogin").show();
+            $("#repository").show();
         }
     });
 }
@@ -173,9 +172,9 @@ function authenticate(form) {
 function logout() {
     interface_labfolder_logout(labFolderToken, function() {
         $('form[id=selectableEntries]').empty();
-        $("#labfolderLoginform").show();
-        $("#labFolderLoginSuccesful").hide();
-        $("#labFolderFailedLogin").hide();
+        $("#repositoryLoginform").show();
+        $("#repositoryLoginSuccesful").hide();
+        $("#repositoryFailedLogin").hide();
         clearCookies();
         clearLocalStorage();
         $("#labFolderDownloadButton").hide();
@@ -183,9 +182,10 @@ function logout() {
 }
 
 function updateContentAfterLogin() {
-    $("#labFolderFailedLogin").hide();
-    $("#labfolderLoginform").hide();
-    $("#labFolderLoginSuccesful").show();
+    $("#labFolderDownloadButton").show();
+    $("#repositoryFailedLogin").hide();
+    $("#repositoryLoginform").hide();
+    $("#repositoryLoginSuccesful").show();
     var lfp = getLocalStorage("labFolderProjects");
     if (lfp === null || lfp == "") {
         getProjects();

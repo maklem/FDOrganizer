@@ -11,6 +11,7 @@ import secrets
 import ldap
 import requests
 import mets
+import sys
 
 # from flask import Flask, session
 from flask import Flask, request, render_template
@@ -18,6 +19,7 @@ from flask_session import Session
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from repoman_labfolder import rep_labfolder
+from repoman_easydb import rep_easydb
 import lzv_util
 
 DEBUG = 1
@@ -32,6 +34,7 @@ APP.config["UPLOAD_FOLDER"] = lzv_util.CONFIGPARAMS["USR_UPLOAD_TMP_FOLDER"]
 CORS(APP)
 Session(APP)
 APP.register_blueprint(rep_labfolder, url_prefix='/labfolder')
+APP.register_blueprint(rep_easydb, url_prefix='/easydb')
 # print(APP.url_map)
 
 # ----------------------Page Navigation-----------------------------------------
@@ -185,24 +188,6 @@ def navlogin():
     return render_template("login.html")
 
 
-# ----------------------Authenticate LDAP --------------------------------------
-def authenticate_ldap(uname, pword):
-    """
-    Authenticate against LDAP Server, return true if uname,pword is correct, false else
-    """
-    ldap_server = "ldaps://proxy-ubtrz.uni-bayreuth.de:636"
-    ldap_base = "ou=users,ou=rz-ad,o=uni-bayreuth"
-    user_dn = "cn=" + uname + "," + ldap_base
-    try:
-        connect = ldap.initialize(ldap_server)
-        connect.bind_s(user_dn, pword)
-        connect.unbind_s()
-        return True
-    except ldap.LDAPError:
-        connect.unbind_s()
-        return False
-
-
 @APP.route("/login", methods=["POST"])
 def login_lzv():
     """
@@ -224,7 +209,7 @@ def login_lzv():
                 {"Content-Type": "application/json"},
             )
     data = json.loads(request.get_data())
-    if authenticate_ldap(data["username"], data["password"]):
+    if lzv_util.authenticate_ldap(data["username"], data["password"]):
         lzv_util.create_user_session(data["username"])
         return (
             json.dumps(
@@ -654,8 +639,6 @@ def get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id):
     # query = {"selector": {"owner": user_id}}
     response = json.loads(lzv_util.query_db(query,\
                 lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"]))
-    print("resp")
-    print(json.dumps(response))
     return response["docs"]
 
 
@@ -708,7 +691,6 @@ def update_or_create_user_ingest(user_id, ingest):
             del ingest["_id"]
         if "_rev" in ingest:
             del ingest["_rev"]
-    print(ingest)
     response = requests.put(url, headers=headers, data=json.dumps(ingest))
     if response:
         return (
@@ -754,7 +736,6 @@ def remove_user_ingest(user_id, ingest):
     if check_response["docs"]:  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         response = requests.delete(url, headers=headers, data=json.dumps(ingest))
-        print(response.text)
         if response:
             return (
                 {"Result": "All good"},
@@ -773,7 +754,6 @@ def update_or_create_reviewdb_ingest(user_id, ingest):
     send the ingest for user_id to database. updates existing or creates a new one if none with same
     id is found in db
     """
-    print("in update or create")
     query = {"selector": {"owner": user_id, "ingest_id": ingest["ingest_id"]}}
     check_response = json.loads(
         lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
@@ -798,17 +778,10 @@ def update_or_create_reviewdb_ingest(user_id, ingest):
         "Cookie": token,
     }
     if check_response["docs"]:  # only one entry with same id should exist at the same time
-        print("check_response")
-        print(check_response)
         headers["If-Match"] = check_response["docs"][0]["_rev"]
-    print(url)
-    print(headers)
-    print(ingest)
     del ingest["_id"]
     del ingest["_rev"]
-    print(ingest)
     response = requests.put(url, headers=headers, data=json.dumps(ingest))
-    print(response.text)
     if response:
         return (
             {"Result": "All good"},
@@ -865,13 +838,7 @@ def submit_user_ingest_to_review():
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    if DEBUG:
-        print("trying to submit ingest for user with url: " + couchdb_url)
-        print(headers)
-        print("ingest:")
-        print(json.dumps(ingest))
     response = requests.put(couchdb_url, headers=headers, data=json.dumps(ingest))
-    print(response.text)
     if response:
         return (
             json.dumps({"Result": "All good"}),
@@ -949,8 +916,6 @@ def approve_ingest():
         # TODO check here what happens if ingest cant be stored in database. eventually the data will
         # be corrupted. this needs to be checked what the behaviour should be.
         resp = update_or_create_reviewdb_ingest(user_id, ingest)
-        print("update in reviewdb after ingest:")
-        print(resp)
         if resp:
             # remove the review files from file system
             review_path = lzv_util.CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"]
@@ -977,16 +942,12 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
     else:
         ingest = get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id)
     if not ingest:
-        print("ERROR: cant find ingest requests to dump on filesystem")
         return False
     ingest = ingest[0]
     storage_file = get_storage_for_user(user_id)
-    print("TRYING TO WRITE INGEST TO HOTFOLDER")
     path = base_folder
     if not Path(path).is_dir():
-        print("Error: " + base_folder + " is not a directory")
         return False
-    print(ingest)
     path += ingest["ingest_id"] + "/content/"
 
     mets_xml = mets.generate_mets_xml(ingest, storage_file)
@@ -997,7 +958,6 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
         mets_file.touch(mode=0o770, exist_ok=True)
         mets_file.write_text(mets_xml)
     except:
-        print("error creating mets file")
         return False
 
     flat_data = mets.get_ingest_data_files(ingest)
@@ -1018,7 +978,6 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
             )
             token = lzv_util.authenticate_couchdb()
             if not token:
-                print("ERROR: authenticating couchdb")
                 return False
             headers = {
                 "Accept": "application/json",
@@ -1040,22 +999,16 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
                     tmp_file.write_bytes(response.content)
                     tmp = [item for item in storage_file \
                             if f["package_id"] == item["package_id"]][0]
-                    print("tmp:")
-                    print(tmp)
                     tmp_json_file.write_text(
                         json.dumps([item for item in storage_file \
                             if f["package_id"] == item["package_id"]][0])
                     )
                 except:
-                    print("error printing file")
                     success = False
             else:
-                print("error getting file from cdb")
                 success = False
     if not success:  # remove all files eventually created bythe method
-        print("error appeared, rm all files")
         shutil.rmtree(ingest_hotfolder_path)
-    print(success)
     return success
 
 
@@ -1074,6 +1027,7 @@ def get_toreview_ingests():
     if not result["success"]:
         return result["return_error"]
     if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
+        sys.stderr.write("get_toreview_ingests: Error user not authorized for review.\n")
         return (
             {"Error": "NOT AUTHORIZED FOR REVIEW"},
             401,
@@ -1096,6 +1050,7 @@ def get_submitted_ingests():
     response = lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
     if response:
         return response
+    sys.stderr.write("get_submitted_ingests: Error requesting submitted ingests\n")
     return (
         json.dumps({"Result": "Error requesting submitted ingests"}),
         500,
@@ -1119,6 +1074,8 @@ def receive_file():
         lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
     )["docs"]
     if not check_response:
+        sys.stderr.write("receive_file: Error: Invalid Package ID oder Package does not belong\
+                         to user\n")
         return (
             json.dumps(
                 {
@@ -1126,41 +1083,33 @@ def receive_file():
                          to user"
                 }
             ),
-            200,
+            500,
             {"Content-Type": "application/json"},
         )
     # check if the post request has the file part
     if "uploaded_file" not in request.files:
-        print("No file part")
+        sys.stderr.write("receive_file: Error No files provided.\n")
         return (
             json.dumps({"Result": "Error: No files provided"}),
             500,
             {"Content-Type": "application/json"},
         )
     files = request.files.getlist("uploaded_file")
-    print("files keys")
     # if user does not select file, browser also
     # submit an empty part without filename
     storage_metadata = []
     for f in files:
         if f.filename == "":
-            print("No selected file")
             continue
         if f:
             # filename = file.filename
-            print(f.filename)
             # file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
             # print("Succesfully saved files")
             metadata_obj = create_storage_data_structure_from_upload(user_id, f)
-            print("created storage for file:")
-            print("uploading to db")
             response = upload_file_to_couchdb_document_db(f, metadata_obj)
             if response:
-                print("successfull")
                 storage_metadata.append(metadata_obj)
     if storage_metadata:
-        print("storage_metadata")
-        print(storage_metadata)
         lzv_util.add_to_storage(storage_metadata)
         package_response = append_children_to_package(
             user_id, package_id, storage_metadata
@@ -1171,11 +1120,13 @@ def receive_file():
                 200,
                 {"Content-Type": "application/json"},
             )
+        sys.stderr.write("receive_file: Error: Saving Package File.\n")
         return (
             json.dumps({"Result": "Error: Saving Package File"}),
             500,
             {"Content-Type": "application/json"},
         )
+    sys.stderr.write("receive_file: Error: No files provided.\n")
     return (
         json.dumps({"Result": "Error: No files provided"}),
         500,
@@ -1190,6 +1141,7 @@ def append_children_to_package(user_id, package_id, append_children):
     """
     token = lzv_util.authenticate_couchdb()
     if not token:
+        sys.stderr.write("append_children_to_package: Error Authenticating couch DB.\n")
         return (
             json.dumps({"Result": "Error Authenticating couch DB"}),
             500,
@@ -1223,6 +1175,8 @@ def append_children_to_package(user_id, package_id, append_children):
         for item in append_children:
             data["child_data_objects"].append(item["package_id"])
     else:  # when this is a new package, some additional fields need to be changed
+        sys.stderr.write("append_children_to_package: Error adding children to package. \
+            No Package found  with package_id.\n")
         return (
             json.dumps(
                 {
@@ -1240,6 +1194,7 @@ def append_children_to_package(user_id, package_id, append_children):
             200,
             {"Content-Type": "application/json"},
         )
+    sys.stderr.write("append_children_to_package: Error updating file to database.\n")
     return (
         json.dumps({"Result": "Error updating file to database."}),
         500,
@@ -1269,7 +1224,6 @@ def upload_file_to_couchdb_document_db(f, metadata_obj):
         + "/"
         + lzv_util.CONFIGPARAMS["couchDBDocumentDatabaseName"]
     )
-    print("touched doc")
     json_answer = json.loads(
         requests.post(couchdb_url, headers=couch_header, data=json.dumps({})).text
     )
@@ -1288,6 +1242,7 @@ def upload_file_to_couchdb_document_db(f, metadata_obj):
         metadata_obj["data_object_metadata"]["filename"] = filename
         metadata_obj["data_object_metadata"]["doc_id"] = json_answer["id"]
     else:
+        sys.stderr.write("upload_file_to_couchdb_document_db: Error Uploading File to Database.\n")
         return (
             json.dumps({"Result": "Error Uploading File to Database."}),
             500,
@@ -1310,7 +1265,6 @@ def receive_package():
     result = lzv_util.validate_user_session(request)
     if not result["success"]:
         return result["return_error"]
-    print("creating new package")
     user_id = request.cookies["session_user"]
     data = {}
     data["package_id"] = str(uuid.uuid4())
@@ -1323,7 +1277,6 @@ def receive_package():
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    print("package_name: " + data["name"])
     url = (
         lzv_util.CONFIGPARAMS["couchDBBaseURL"]
         + "/"
@@ -1341,8 +1294,6 @@ def receive_package():
         "origin": "UPLOAD",
         "creator": user_id,
     }
-    print("package to put:")
-    print(json.dumps(data))
     response = requests.put(url, headers=headers, data=json.dumps(data))
     if response:
         return (
@@ -1352,6 +1303,7 @@ def receive_package():
             200,
             {"Content-Type": "application/json"},
         )
+    sys.stderr.write("receive_package: Error saving new package file.\n")
     return (
         json.dumps(
             {

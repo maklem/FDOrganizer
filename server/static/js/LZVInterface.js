@@ -291,3 +291,69 @@ function interface_ingest_revoke(id, on_success_callback) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
 }
+
+function interface_easydb_authenticate(username, password, on_success_callback) {
+    var url = baseURL + '/easydb/auth/login';
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                on_success_callback(xhttp.response);
+            }
+        }
+    };
+    if (username != '' && password != '') {
+        xhttp.open('POST', url, false);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var payload = '{\"password\": \"' + password + '\", \"user\": \"' + username + '\"}';
+        xhttp.send(payload);
+    }
+}
+
+function interface_easydb_logout(token, on_success_callback) {
+    if (token != '') {
+        var url = baseURL + '/easydb/auth/logout';
+        xhttp.onreadystatechange = function(e) {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    on_success_callback();
+                }
+            }
+        };
+        xhttp.open('POST', url, false);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.setRequestHeader("Token", token);
+        xhttp.send();
+    }
+}
+
+function interface_easydb_get_collections(token, on_success_callback) {
+    if (token != '') {
+        var url = baseURL + '/easydb/collections';
+        xhttp.onreadystatechange = function(e) {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    on_success_callback(xhttp.response);
+                }
+            }
+        };
+        xhttp.open('GET', url, false);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.setRequestHeader("Token", token);
+        xhttp.send();
+    }
+}
+
+function interface_easydb_get_collection_content_info(token, collection_id, on_success_callback) {
+    url = baseURL + "/easydb/collections/info?collection_id=" + collection_id;
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                on_success_callback(xhttp.response);
+            }
+        }
+    };
+    xhttp.open('GET', url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.setRequestHeader("Token", token);
+    xhttp.send();
+}
