@@ -156,11 +156,11 @@ def add_to_storage(add_elements):
     exist. if files could already exist use updata_storage()
     """
     url = (
-        lzv_util.CONFIGPARAMS["couchDBBaseURL"]
+        CONFIGPARAMS["couchDBBaseURL"]
         + "/"
-        + lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"]
+        + CONFIGPARAMS["couchDBStorageDatabaseName"]
     )
-    token = lzv_util.authenticate_couchdb()
+    token = authenticate_couchdb()
     if not token:
         return
     headers = {

@@ -186,7 +186,7 @@ def download():
         )
         storage_metadata += package_objects
         lzv_util.add_to_storage(storage_metadata)
-    return APP.response_class(status=200, mimetype="application/json")
+    return rep_labfolder.response_class(status=200, mimetype="application/json")
 
 
 def create_package_for_downloaded_labfolder_data(user_id, downloaded_sets):

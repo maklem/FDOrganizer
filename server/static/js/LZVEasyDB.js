@@ -2,14 +2,12 @@
 $(document).ready(function() {
     var ct = getLocalStorage('easyDBToken');
     if (ct && ct != '') {
-        easyDBToken = ct;
         updateContentAfterLogin();
     }
     if (checkLZVLogin()) {
         $('#logout_lzv').show();
     }
 });
-
 
 var easyDBCollections = {
     collections: Array()
@@ -32,14 +30,49 @@ function authenticate(form) {
     interface_easydb_authenticate(username, password, function(xhttp_repsonse) {
         data = JSON.parse(xhttp_repsonse);
         if(!("error" in data)) {
-            easyDBToken = data.token;
+            var easyDBToken = data.token;
             setLocalStorage("easyDBToken",  easyDBToken);
-            alert("login successfull")
             updateContentAfterLogin();
         }
 
     });
 }
+
+function clearLocalStorage() {
+    easyDBCollections = Array();
+    easyDBPools = Array();
+}
+
+function clearCookies() {
+    deleteLocalStorage("easyDBToken");
+    deleteLocalStorage("easyDBCollections");
+    deleteLocalStorage("easyDBToken");
+}
+
+
+
+function logout() {
+    interface_easydb_logout(getLocalStorage("easyDBToken"), function() {
+        $('form[id=selectableEntries]').empty();
+        $("#repositoryLoginform").show();
+        $("#repositoryLoginSuccesful").hide();
+        $("#repositoryFailedLogin").hide();
+        $("#easyDBDownloadButton").hide();
+    });
+}
+
+
+$("#downloadSelectedElements").click(function() {
+    downloadSelectedElements();
+});
+
+
+function downloadSelectedElements() {
+        downloadSelectedCollections();
+/*        getStorageFile();*/
+}
+
+
 
 function updateSelectionCollectionPool(clicked) {
     var collections = getLocalStorage("easyDBCollections");
@@ -65,6 +98,7 @@ function updateContentAfterLogin() {
     $("#repositoryFailedLogin").hide();
     $("#repositoryLoginform").hide();
     $("#repositoryLoginSuccesful").show();
+    $("#easyDBDownloadButton").show();
     getCollections();
     /*getCollectionContentInfo();*/
 }
@@ -182,4 +216,22 @@ function toggleDisplayCollectionInfo(clicked) {
         console.log($(clicked).parent().parent().parent().children('.versionList'));
         $(append).appendTo($(clicked).parent().parent().parent().children('.versionList'));
     });
+}
+
+function downloadSelectedCollections() {
+    //first get ids to download, then do that
+    var ids = []; //ids for entry which will be downloaded
+    var form = $('form[id=selectableEntries]')[0];
+    for (var i = 0; i < form.elements.length; i++) {
+        if (form.elements[i].checked) {
+            ids.push(form.elements[i].name);
+        }
+    }
+    console.log(ids);
+    if (ids.length > 0) {
+        for(const id of ids)
+        {
+            interface_easydb_download_collection(getLocalStorage('easyDBToken'), id, function() {});
+        }
+    }
 }

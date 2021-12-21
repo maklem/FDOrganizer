@@ -357,3 +357,18 @@ function interface_easydb_get_collection_content_info(token, collection_id, on_s
     xhttp.setRequestHeader("Token", token);
     xhttp.send();
 }
+
+function interface_easydb_download_collection(token, collection_id, on_success_callback) {
+    url = baseURL + "/easydb/collections/download?collection_id=" + collection_id;
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                on_success_callback(xhttp.response);
+            }
+        }
+    };
+    xhttp.open('GET', url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.setRequestHeader("Token", token);
+    xhttp.send();
+}

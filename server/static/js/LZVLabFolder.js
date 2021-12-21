@@ -64,6 +64,7 @@ function downloadSelectedElements() {
         downloadSelectedMDBCategories();
     }
 }
+
 $("#selectAllElements").click(function() {
     var childrenDiv = $('form[id=selectableEntries]').children();
     for (var i = 0; i < childrenDiv.length; i++) {
