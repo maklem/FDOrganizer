@@ -220,7 +220,7 @@ def download_collection():
                 file_mimetype = mimetypes.types_map['.' + obj['object']['file'][0]['extension']]
                 print(file_mimetype)
                 couch_header["Content-Type"] = file_mimetype
-                couchdb_url = couchdb_url + "/" + json_answer["id"] + "/"
+                couchdb_url = couchdb_url + "/" + json_answer["id"] + "/" + json_answer["id"]
                 att_create_response = requests.put(
                 couchdb_url, headers=couch_header, data=file_data
                 )
@@ -284,3 +284,32 @@ def create_storage_data_structure_from_easydb(user_id, file_info):
         },
         "origin_metadata": file_info#TODO define the origin_metadata for easydb. This needs to be analyzed from available metadata
     }
+
+
+@rep_easydb.route("/storage", methods=["GET"])
+def get_easydb_storage_data():
+    """
+    Routed from /easydb/storage
+    Requests the storage file, containg metadata about stored files for the requesting user
+    """
+    result = lzv_util.validate_user_session(request)
+    if not result["success"]:
+        return result["return_error"]
+    user_id = request.cookies["session_user"]
+    out = get_easydb_data(user_id, return_as_string=False)
+    return json.dumps(out["docs"])
+
+
+def get_easydb_data(user_id, return_as_string=False):
+    """
+    Returns the easydb data for @user_id either as (json)string or object.
+    """
+    query = {
+        "selector": {
+            "owner": user_id,
+            "type": "DATA",
+            "data_object_metadata.content_origin": "easydb",
+        }
+    }
+    response = lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+    return response if return_as_string else json.loads(response)

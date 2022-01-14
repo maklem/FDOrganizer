@@ -7,6 +7,7 @@ $(document).ready(function() {
     if (checkLZVLogin()) {
         $('#logout_lzv').show();
     }
+    getEasyDBStorage();
 });
 
 var easyDBCollections = {
@@ -59,6 +60,21 @@ function logout() {
         $("#repositoryFailedLogin").hide();
         $("#easyDBDownloadButton").hide();
     });
+}
+
+
+function getEasyDBStorage () {
+    var url = baseURL + '/easydb/storage';
+    xhttp.onreadystatechange = function(e) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                console.log(xhttp.response);
+            }
+        }
+    };
+    xhttp.open('GET', url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
 }
 
 
@@ -126,7 +142,7 @@ function updateEasyDBSelectableElements() {
             var obj = easyDBCollections[i];
             append += '<div><div class="entrySelect lzvButton easyDBCollection"><input type="checkbox" value="" id="' + obj.collection._id + '" name="' + obj.collection._id + '">';
             append += '<label for="' + obj.collection._id + '" class="selectLabel">' + Object.values(obj.collection.displayname)[0];
-            append += '<button type="button" class="expandVersionButton" id="'+ obj.collection._id +'"onclick="toggleDisplayCollectionInfo(this)">Details</button>';
+            append += '<div class="versionCounter"><button type="button" class="expandVersionButton" id="'+ obj.collection._id +'"onclick="toggleDisplayCollectionInfo(this)">Details</button></div>';
             /*if (display_objects_storage && storage_entry && unique_entry_versions > 0) {
                 append += '<span class="versionCounter"><button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);">';
                 append += unique_entry_versions + ' version';

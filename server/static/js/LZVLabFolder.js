@@ -334,14 +334,14 @@ function updateLabfolderSelectableElements() {
                 append += '<div><div class="entrySelect lzvButton labFolderProject"><input type="checkbox" value="" id="' + obj.id + '" name="' + obj.id + '">';
                 append += '<label for="' + obj.id + '" class="selectLabel">' + obj.title;
                 if (display_objects_storage && storage_entry && unique_entry_versions > 0) {
-                    append += '<span class="versionCounter"><button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);">';
+                    append += '<div class="versionCounter"><button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);">';
                     append += unique_entry_versions + ' version';
                     if (unique_entry_versions > 1) {
                         append += 's ';
                     } else {
                         append += ' ';
                     }
-                    append += '<span class="arrow">v</span></button></span>';
+                    append += '<span class="arrow">v</span></button></div>';
                 }
                 append += '</label>';
                 append += '</div>\n';

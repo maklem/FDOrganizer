@@ -11,13 +11,23 @@ $( document ).ready(function() {
 
 var unsaved = false;
 
-$(":input").change(function(){ //triggers change in all input fields including text type
+function set_form_modified(){
     unsaved = true;
+   $('#button_save_package_object').prop("disabled", false); // Element(s) are now enabled.
+}
+
+function reset_form_modified(){
+    unsaved = false;
+   $('#button_save_package_object').prop("disabled", true); // Element(s) are now enabled.
+}
+
+$(":input").change(function(){ //triggers change in all input fields including text type
+    set_form_modified();
 });
 
 // Monitor dynamic inputs
 $(document).on('change', 'input, select', function(){ //triggers change in all input fields including text type
-    unsaved = true;
+    set_form_modified();
 });
 
 function get_user_packages() {
@@ -189,7 +199,7 @@ function move_selected_to_package() {
     $(selected).parent().appendTo('#package_content_container');
     $(selected).removeClass('selected');
     if(selected.length > 0) {
-        unsaved = true;
+        set_form_modified();
     }
 }
 
@@ -198,7 +208,7 @@ function remove_selected_from_package() {
     $(selected).parent().appendTo('#package_options_container');
     $(selected).removeClass('selected');
     if(selected.length > 0) {
-        unsaved = true;
+        set_form_modified();
     }
 }
 
@@ -209,14 +219,13 @@ function save_package_object() {
     interface_packages_put(package_data, function(){
         get_user_packages();
         update_sidebar_user_packages();
-        unsaved = false;
+        reset_form_modified();
     });
 }
 
 function get_active_package() {
     var output = {};
     output.name = $('#package_manager_form_header').find('#package_name').val();
-    console.log($('#package_manager_form_header').find('#package_name').val());
     output.package_id = $('#package_manager_form_header').attr('package_id');
     output.type = "PACKAGE";
     output.description = $('#package_manager_form_header').find('#package_description').val();
@@ -226,8 +235,6 @@ function get_active_package() {
         output.child_data_objects.push($(c).attr('package_id'));
 
     }
-    console.log("output");
-    console.log(output);
     return output;
 }
 

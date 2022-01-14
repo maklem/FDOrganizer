@@ -3,6 +3,7 @@
   box-sizing: border-box;
   --main_button_color: #28a745;
   --main_button_hover_color: #169932;
+  --main_button_disabled_color: #35b288;
   --detail_button_color: #b6e109;
   --detail_button_hover_color: #a6d101;
   --neg_button_color: #e60000;
@@ -111,6 +112,10 @@ li a:hover {
 .lzvButton:hover {
   background-color: var(--main_button_hover_color);
   color: white;
+}
+
+#button_save_package_object[disabled=disabled], #button_save_package_object:disabled {
+ background-color: var(--main_button_disabled_color);
 }
 
 .lzvSideBarRight {

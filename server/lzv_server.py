@@ -820,6 +820,7 @@ def submit_user_ingest_to_review():
     success = create_ingest_on_filesystem(
         user_id, ingest["ingest_id"], lzv_util.CONFIGPARAMS["LZV_REVIEW"], search_in_review_db=False
     )
+    print(success)
     if not success:
         return (
             json.dumps({"Result": "Error dumping ingest on filesystem"}),
@@ -839,6 +840,7 @@ def submit_user_ingest_to_review():
         "Cookie": token,
     }
     response = requests.put(couchdb_url, headers=headers, data=json.dumps(ingest))
+    print(response.text)
     if response:
         return (
             json.dumps({"Result": "All good"}),
@@ -985,6 +987,7 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
                 "Cookie": token,
             }
             response = requests.get(cdb_doc_url, headers=headers)
+            print(response.text)
             if response:
                 try:
                     tmp_path = path + f["data_object_metadata"]["filename"]
@@ -1006,6 +1009,7 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
                 except:
                     success = False
             else:
+                print("3")
                 success = False
     if not success:  # remove all files eventually created bythe method
         shutil.rmtree(ingest_hotfolder_path)
