@@ -178,8 +178,8 @@ function updateEasyDBSelectableElements() {
 }
 
 function toggleDisplayCollectionInfo(clicked) {
-    if($(clicked).parent().parent().parent().find('.collectionDetail').length){
-        $(clicked).parent().parent().parent().children('.versionList').empty();
+    if($(clicked).parents('.collectionEntry').find('.collectionDetail').length){
+        $(clicked).parents('.collectionEntry').children('.versionList').empty();
         return;
     }
     interface_easydb_get_collection_content_info(getLocalStorage("easyDBToken"), $(clicked).attr('id'), function(xhttp_response){
