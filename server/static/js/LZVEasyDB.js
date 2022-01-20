@@ -140,7 +140,7 @@ function updateEasyDBSelectableElements() {
     var append = '';
         for (var i = 0; i < easyDBCollections.length; i++) {
             var obj = easyDBCollections[i];
-            append += '<div><div class="entrySelect lzvButton easyDBCollection"><input type="checkbox" value="" id="' + obj.collection._id + '" name="' + obj.collection._id + '">';
+            append += '<div class="collectionEntry"><div class="entrySelect lzvButton easyDBCollection"><input type="checkbox" value="" id="' + obj.collection._id + '" name="' + obj.collection._id + '">';
             append += '<label for="' + obj.collection._id + '" class="selectLabel">' + Object.values(obj.collection.displayname)[0];
             append += '<div class="versionCounter"><button type="button" class="expandVersionButton" id="'+ obj.collection._id +'"onclick="toggleDisplayCollectionInfo(this)">Details</button></div>';
             /*if (display_objects_storage && storage_entry && unique_entry_versions > 0) {
@@ -229,8 +229,7 @@ function toggleDisplayCollectionInfo(clicked) {
         append += '<span id="collectionTotalSize">Total File Size: ' + total_filesize + '</span>';
         append += '<span id="collectionFileTypes">File Types: ' + str_filetypes + '</span>';
         append += '</div>';
-        console.log($(clicked).parent().parent().parent().children('.versionList'));
-        $(append).appendTo($(clicked).parent().parent().parent().children('.versionList'));
+        $(append).appendTo($(clicked).parents('.collectionEntry').children('.versionList'));
     });
 }
 
