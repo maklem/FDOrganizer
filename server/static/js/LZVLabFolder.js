@@ -2,9 +2,9 @@
 $(document).ready(function() {
     var ct = getLocalStorage('labFolderToken');
     if (ct && ct != '') {
-        $("#labFolderDownloadButton").show();
+        $("#repositoryDownloadButton").show();
         labFolderToken = ct;
-        updateContentAfterLogin();
+        updateontentAfterLogin();
     }
     if (checkLZVLogin()) {
         $('#logout_lzv').show();
@@ -171,19 +171,19 @@ function authenticate(form) {
 }
 
 function logout() {
-    interface_labfolder_logout(labFolderToken, function() {
+    interface_labfolder_logout(getLocalStorage('labFolderToken'), function() {
         $('form[id=selectableEntries]').empty();
         $("#repositoryLoginform").show();
         $("#repositoryLoginSuccesful").hide();
         $("#repositoryFailedLogin").hide();
         clearCookies();
         clearLocalStorage();
-        $("#labFolderDownloadButton").hide();
+        $("#repositoryDownloadButton").hide();
     });
 }
 
 function updateContentAfterLogin() {
-    $("#labFolderDownloadButton").show();
+    $("#repositoryDownloadButton").show();
     $("#repositoryFailedLogin").hide();
     $("#repositoryLoginform").hide();
     $("#repositoryLoginSuccesful").show();
@@ -226,7 +226,7 @@ function getStorageFile() {
 }
 
 function getProjects() {
-    interface_labfolder_get_projects(labFolderToken, function(xhttp_response) {
+    interface_labfolder_get_projects(getLocalStorage('labFolderToken'), function(xhttp_response) {
         var parsedData = JSON.parse(xhttp_response);
         labFolderProjects.projects = [];
         for (var i = 0; i < parsedData.length; i++) {
@@ -247,7 +247,7 @@ function getProjects() {
 }
 
 function getEntries() {
-    interface_labfolder_get_entries(labFolderToken, function(xhttp_response) {
+    interface_labfolder_get_entries(getLocalStorage('labFolderToken'), function(xhttp_response) {
         var parsedData = JSON.parse(xhttp.response);
         labFolderEntries.entries = [];
         for (var i = 0; i < parsedData.length; i++) {
@@ -280,7 +280,7 @@ function getEntries() {
 }
 
 function getMDBCategories() {
-    interface_labfolder_get_mdbcategories(labFolderToken, function(xhttp_response) {
+    interface_labfolder_get_mdbcategories(getLocalStorage('labFolderToken'), function(xhttp_response) {
         var parsedData = JSON.parse(xhttp.response);
         labFolderMDB.categories = [];
         for (var i = 0; i < parsedData.length; i++) {
@@ -422,7 +422,7 @@ function downloadSelectedEntries() {
         }
         //elements contains the set of id, entryTitle, elementID. These should now be downloaded from server and saved in  a folder structure
         if (elements.length > 0) {
-            interface_labfolder_download_elements(elements, labFolderToken, function() {});
+            interface_labfolder_download_elements(elements, getLocalStorage('labFolderToken'), function() {});
         }
     }
 }
@@ -448,6 +448,6 @@ function downloadSelectedMDBCategories() {
                 }
             }
         };
-        interface_labfolder_download_mdbcategories(categoryIds[i], labFolderToken, function() {});
+        interface_labfolder_download_mdbcategories(categoryIds[i], getLocalStorage('labFolderToken'), function() {});
     }
 }

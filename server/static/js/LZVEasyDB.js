@@ -58,7 +58,7 @@ function logout() {
         $("#repositoryLoginform").show();
         $("#repositoryLoginSuccesful").hide();
         $("#repositoryFailedLogin").hide();
-        $("#easyDBDownloadButton").hide();
+        $("#repositoryDownloadButton").hide();
     });
 }
 
@@ -114,7 +114,7 @@ function updateContentAfterLogin() {
     $("#repositoryFailedLogin").hide();
     $("#repositoryLoginform").hide();
     $("#repositoryLoginSuccesful").show();
-    $("#easyDBDownloadButton").show();
+    $("#repositoryDownloadButton").show();
     getCollections();
     /*getCollectionContentInfo();*/
 }
