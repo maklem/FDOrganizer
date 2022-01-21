@@ -214,6 +214,11 @@ function remove_selected_from_package() {
 
 function save_package_object() {
     var package_data = get_active_package();
+    if (package_data.name == '')
+    {
+        alert("Please provide a name for the package!");
+        return;
+    }
     console.log("package_data");
     console.log(package_data);
     interface_packages_put(package_data, function(){

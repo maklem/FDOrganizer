@@ -4,7 +4,7 @@ $(document).ready(function() {
     if (ct && ct != '') {
         $("#repositoryDownloadButton").show();
         labFolderToken = ct;
-        updateontentAfterLogin();
+        updateContentAfterLogin();
     }
     if (checkLZVLogin()) {
         $('#logout_lzv').show();

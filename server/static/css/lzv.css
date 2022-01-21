@@ -277,7 +277,7 @@ li a:hover {
 }
 /*Download buttons*/
 
-#labFolderDownloadButton {
+#repositoryDownloadButton {
   display: none;
 }
 
@@ -465,7 +465,7 @@ img.avatar {
   transform: translate(0.1em, 0.2em);  
   padding-bottom: 100%;
   padding-left: 100%;
-  border-radius: 50%;
+  /*border-radius: 50%;*/
   /*border:10px solid #cfdcec;*/
   overflow:hidden;
   display: inline-block;        

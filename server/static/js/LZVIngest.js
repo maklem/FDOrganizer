@@ -243,12 +243,13 @@ function fillSubmittedIngestForm(userInputSet) {
 	$(headerHTML).appendTo('#ingestFormHeader');
 	$('#ingestForm').empty();
 	var inputHTML = '';
-	inputHTML += '<div class="staticFormContent orig"><table><tr><th>Content</th><th>Metadata</th></tr>';
+	inputHTML += '<div class="staticFormContent orig"><table><tr><th>Package</th><th>Metadata</th></tr>';
+	console.log(userInputSet.content);
 	for (var i = 0; i < userInputSet.content.length; i++) {
 		var con = userInputSet.content[i];
-		date = new Date(con.version_data.entry_version_date);
+		date = new Date(con.package_data.package_object_metadata.last_change);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		inputHTML += '<tr><td>' + con.version_data.entry_title +' - ' + formatted_date +'</td>';
+		inputHTML += '<tr><td>' + con.package_data.name +' - ' + formatted_date +'</td>';
 		if (con.metadata_userset !== undefined) {
 			inputHTML += '<td>' + con.metadata_userset.name + '</td>';
 		}
