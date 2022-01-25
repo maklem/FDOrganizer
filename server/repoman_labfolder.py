@@ -251,6 +251,7 @@ def create_storage_data_structure_from_labfolder(user_id, input_set):
         "name": input_set["entry_title"],
         "data_object_metadata": {
             "content_origin": "labfolder",
+            "origin_uuid" : input_set["element_id"],
             "export_date": time.strftime("%Y-%m-%dT%T.000+0000"),
             "export_user": user_id,
             "is_stored": False,

@@ -278,6 +278,7 @@ def create_storage_data_structure_from_easydb(user_id, file_info):
         "name": file_info['object']['file'][0]['original_filename'],
         "data_object_metadata": {
             "content_origin": "easydb",
+            "origin_uuid": file_info["_uuid"],
             "export_date": time.strftime("%Y-%m-%dT%T.000+0000"),
             "export_user": user_id,
             "is_stored": False,
