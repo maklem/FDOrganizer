@@ -394,7 +394,6 @@ function downloadSelectedEntries() {
             ids.push(form.elements[i].name);
         }
     }
-    console.log(labFolderEntries);
     if (ids.length > 0) {
         var elements = []; //these are to single elements to be downloaded later
         for (var j = 0; j < labFolderEntries.entries.length; j++) {

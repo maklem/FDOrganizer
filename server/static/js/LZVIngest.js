@@ -244,7 +244,6 @@ function fillSubmittedIngestForm(userInputSet) {
 	$('#ingestForm').empty();
 	var inputHTML = '';
 	inputHTML += '<div class="staticFormContent orig"><table><tr><th>Package</th><th>Metadata</th></tr>';
-	console.log(userInputSet.content);
 	for (var i = 0; i < userInputSet.content.length; i++) {
 		var con = userInputSet.content[i];
 		date = new Date(con.package_data.package_object_metadata.last_change);
@@ -285,8 +284,6 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	headerHTML += '<div class="metaFormUIField"><input required name="ingestName" type="text" value="' + title + '"></div>';
 	var mdUserSets = getLocalStorage("metaDataUserSets");
 	var mdUserSetsJSON= JSON.parse(mdUserSets);
-	console.log(mdUserSets);
-	console.log(mdUserSetsJSON);
 	if(mdUserSetsJSON &&  mdUserSets !== null) {
 		headerHTML += '<select required name="ingest_header_metadata">';
 		headerHTML += '<option selected value=""></option>';
@@ -304,8 +301,6 @@ function fillIngestForm(userInputSet = null, recreateID = false){
 	// inputHTML += '<div class="metaFieldName"></div><div class="metaFieldDescription"></div></label>';
 	var user_packages = getLocalStorage("user_packages");
 	var user_packages_json = JSON.parse(user_packages);
-	console.log(user_packages);
-	console.log(user_packages_json);
 	if( user_packages !== null && mdUserSets !== null) {
 		inputHTML += '<tr class="table_form_ui_field metaFormCVField orig">';
 		if (user_packages_json.length == 0){
@@ -565,7 +560,6 @@ function submitIngest() {
 	xhttp.onreadystatechange  = function(e) {
 		if(this.readyState == 4) {
 			if(this.status == 200) {
-				console.log("test");
 				alert("Ingest successfully submitted for review!");
 				location.reload();
 			}
@@ -585,8 +579,6 @@ function submitIngest() {
 	payload.ingest_metadata.review_date = undefined;
 	payload.ingest_metadata.ingest_date = undefined;
 	// saveInLocalStorage('userIngests', payload);
-	console.log("payload:");
-	console.log(payload);
 	sendUserIngestsToServer(payload);
 	xhttp.open('PUT', url, false);
 	xhttp.setRequestHeader("Content-type", "application/json");

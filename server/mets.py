@@ -119,7 +119,8 @@ def rec_gen_smap(package, ctr):
     return smap, ctr
 
 
-def generate_dmd_for_meta(file_meta, identifier):
+def generate_dmd_for_meta(file_meta, identifier, create_origin_uuid_metadata=False,\
+                            content_origin="", origin_uuid=""):
     """
     generate a dmd for each file. only required if package containing file has additional
     metadata set to in ingest.
@@ -147,6 +148,9 @@ def generate_dmd_for_meta(file_meta, identifier):
                 + item["field_identifier"]
                 + ">"
             )
+    if create_origin_uuid_metadata:
+        dmd += "<dc:identifier>" + origin_uuid +"</dc:identifier>"
+        dmd += "<dc:source>" + content_origin +"</dc:source>"
     dmd += "</dc:record>"
     dmd += "</mets:xmlData>"
     dmd += "</mets:mdWrap>"
@@ -287,7 +291,7 @@ def generate_mets_xml(ingest_data, storage_data):
     t_enriched = enrich_ingest_with_package_data(ingest_data, storage_data)
     t_flat_data = get_ingest_data_files(t_enriched)
     t_smap = generate_structmap(t_enriched)
-    ie_dmd = generate_dmd_for_meta(t_enriched["metadata"], "ie-dmd")
+    ie_dmd = generate_dmd_for_meta(t_enriched["metadata"], "ie-dmd", create_origin_uuid_metadata=False)
     mets_file = '<mets:mets xmlns:mets="http://www.exlibrisgroup.com/xsd/dps/rosettaMets">'
     file_dmd = ""
     file_amd = generate_amd_for_rep()
@@ -309,10 +313,21 @@ def generate_mets_xml(ingest_data, storage_data):
                 + '" ADMID="fid' + file_ctr + '-1-amd"'
 
             )
+            print("file_data")
+            print(json.dumps(f))
+            print("package")
+            print(json.dumps(package))
             if "metadata_userset_id" in package and package["metadata_userset_id"] != "":
-                result = generate_dmd_for_meta(
-                    package["metadata_userset"], "f_dmd_" + f["package_id"]
-                )
+                #in case of upload it is nonsense to add a identifier, since it's not a managed repo
+                result = {}
+                if(f["data_object_metadata"]["content_origin"] == "upload"):
+                    result = generate_dmd_for_meta(
+                        package["metadata_userset"], "f_dmd_" + f["package_id"])
+                else:
+                    result = generate_dmd_for_meta(
+                        package["metadata_userset"], "f_dmd_" + f["package_id"],True,\
+                        f["data_object_metadata"]["content_origin"],\
+                        f["data_object_metadata"]["origin_uuid"])
                 if result["successfull"]:
                     file_dmd += result["content"]
                     file_sec += ' DMDID="f_dmd_' + f["package_id"] + '"'

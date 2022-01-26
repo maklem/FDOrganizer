@@ -121,7 +121,6 @@ function updateContentAfterLogin() {
 
 function getCollections() {
     interface_easydb_get_collections(getLocalStorage("easyDBToken"), function(xhttp_response){
-        console.log(xhttp_response);
         easyDBCollections = JSON.parse(xhttp_response);
         setLocalStorage("easyDBCollections", xhttp_response);
         updateEasyDBSelectableElements();
@@ -130,7 +129,6 @@ function getCollections() {
 
 function getCollectionContentInfo(id) {
     interface_easydb_get_collection_content_info(getLocalStorage("easyDBToken"), id, function(xhttp_response){
-        console.log(xhttp_response);
         return JSON.parse(xhttp_response);
     });
 }
@@ -184,15 +182,12 @@ function toggleDisplayCollectionInfo(clicked) {
     }
     interface_easydb_get_collection_content_info(getLocalStorage("easyDBToken"), $(clicked).attr('id'), function(xhttp_response){
         var collection_info = JSON.parse(xhttp_response);
-        console.log(collection_info);
         let total_filesize = 0;
         let filecount = 0;
         let filetypes = {};
 
         let num_obj = collection_info.objects.length;
         for (const ele of collection_info.objects) {
-            console.log("ele");
-            console.log(ele);
             if(ele.object.file){
                 filecount++;
                 total_filesize += ele.object.file[0].filesize; //filesize if in Byte
@@ -220,9 +215,6 @@ function toggleDisplayCollectionInfo(clicked) {
             str_filetypes += key + ","
         }
         str_filetypes = str_filetypes.slice(0, -1);
-        console.log(filecount);
-        console.log(total_filesize);
-        console.log(str_filetypes);
         var append = '<div class="collectionDetail">';
         append += '<span id="collectionInfoHeader">Collection Info:</span>';
         append += '<span id="collectionFileCount">Number of files: ' + filecount + '</span>';
@@ -242,7 +234,6 @@ function downloadSelectedCollections() {
             ids.push(form.elements[i].name);
         }
     }
-    console.log(ids);
     if (ids.length > 0) {
         for(const id of ids)
         {

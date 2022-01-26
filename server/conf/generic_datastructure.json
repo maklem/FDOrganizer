@@ -11,7 +11,7 @@
     "owner" : "#identifier of owner of this file", //userid(string), required
     "data_object_metadata" : { //required for DATA this is generic metadata describing surrounding facts around the content
       "content_origin": "labfolder|...", //enum [labfolder|...], required 
-      "origin_uuid" : "xxxx-xxxxxxxxxx-xxxxxx" //uuid in the origin repository. is used for version tracking in rosetta. the tupel of origin_repo, insitution, and uuid in origin repository is stored in seperate field during ingest. this is to be able to do kind of version tracking by being able to search for all versions of a specific file in rosetta using this metadata. version tracking if possible in rosetta, but it is way too complex to implement in our usecase (f.e. it is only doable with java api of rosetta, and even there very complex)
+      "origin_uuid" : "xxxx-xxxxxxxxxx-xxxxxx", //uuid in the origin repository. is used for version tracking in rosetta. the tupel of origin_repo, insitution, and uuid in origin repository is stored in seperate field during ingest. this is to be able to do kind of version tracking by being able to search for all versions of a specific file in rosetta using this metadata. version tracking if possible in rosetta, but it is way too complex to implement in our usecase (f.e. it is only doable with java api of rosetta, and even there very complex)
       "export_date" : "#date",  //date, required, date of export (kind of the "version" date)
       "export_user" : "identifer for user", //userid(string), required, f.e. user@labfolder.de -> which login was used to download
       "filename" : "filename",      //string, "filename" of the stored file if exists
