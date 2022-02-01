@@ -282,6 +282,10 @@ def create_storage_data_structure_from_easydb(user_id, file_info):
             "export_date": time.strftime("%Y-%m-%dT%T.000+0000"),
             "export_user": user_id,
             "is_stored": False,
+            "checksums" : [{
+                "type" : "SHA224",
+                "hash" : file_info["object"]["file"]["technical_metadata"]["file_sha224_checksum"]
+            }]
         },
         "origin_metadata": file_info#TODO define the origin_metadata for easydb. This needs to be analyzed from available metadata
     }

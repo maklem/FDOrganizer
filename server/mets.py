@@ -122,8 +122,7 @@ def rec_gen_smap(package, ctr):
 def generate_dmd_for_meta(file_meta, identifier, create_origin_uuid_metadata=False,\
                             content_origin="", origin_uuid=""):
     """
-    generate a dmd for each file. only required if package containing file has additional
-    metadata set to in ingest.
+    generate a dmd for each file. always required at least for the origin_uuid
     return this as xml string.
     """
     if not file_meta["identifier"] in allowed_metadata_identifer:
@@ -200,6 +199,14 @@ def generate_amd_for_file(amd_meta, counter):
     # amd += '<key id="FILEMIMTYPE">' + str(amd_meta['data_object_metadata'][file_type]) + '</key'>
     amd += "</record>"
     amd += "</section>"
+    amd += '<section id="fileFixity">'
+    for fixity in amd_meta["checksums"]:
+        amd += '<record>'
+        amd += '<key id="fixityType">' + fixity["type"] + '</key>'
+        amd += '<key id="fixityValue">' + fixity["hash"] + '</key>'
+        amd += '</record>'
+
+    amd += '</section>'
     '''
     rework with a mapping from metadata to rosetta dnx fields. this should map metadata from
     Step1: fill dnx metadata with data_object_metadata for file objects.

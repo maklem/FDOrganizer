@@ -7,6 +7,7 @@ import requests
 from flask import session
 import secrets
 import ldap
+import hashlib
 
 DEBUG = 1
 
@@ -201,3 +202,55 @@ def update_storage(add_elements):
             requests.put(t_url, headers=headers, data=json.dumps(item))
         else:
             requests.post(url, headers=headers, data=json.dumps(item))
+
+
+def calculate_sha224_from_file(filename):
+    '''
+    calculate the sha224 of a file in a memory-efficient way. returns hexdigest of hash
+    '''
+    BLOCK_SIZE = 65536  #64kB
+
+    sha224 = hashlib.sha224()
+
+    with open(filename, 'rb') as f:
+        while True:
+            data = f.read(BLOCK_SIZE)
+            if not data:
+                break
+            sha224.update(data)
+    return sha224.hexdigest()
+
+
+def calculate_sha224_from_data(data):
+    '''
+    calculate the sha224 of binary data. returns hexdigest of hash
+    '''
+    sha224 = hashlib.sha224()
+    sha224.update(data)
+    return sha224.hexdigest()
+
+
+def calculate_md5_from_file(filename):
+    '''
+    calculate the sha256 of a file in a memory-efficient way. returns hexdigest of hash
+    '''
+    BLOCK_SIZE = 65536  #64kB
+
+    md5 = hashlib.sha256()
+
+    with open(filename, 'rb') as f:
+        while True:
+            data = f.read(BLOCK_SIZE)
+            if not data:
+                break
+            md5.update(data)
+    return md5.hexdigest()
+
+
+def calculate_md5_from_data(data):
+    '''
+    calculate the sha256 of binary data. returns hexdigest of hash
+    '''
+    md5 = hashlib.sha256()
+    md5.update(data)
+    return md5.hexdigest()

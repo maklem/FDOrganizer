@@ -17,7 +17,12 @@
       "filename" : "filename",      //string, "filename" of the stored file if exists
       "file_type" : "filetype",    //mimetype of uplaoded data
       "doc_id" : "doc_id where the document is stored in couchdb", //id, requried, unique
-      "is_stored" : true
+      "is_stored" : true,
+      "checksums" : [{
+          "type" : "MD5|SHA226|...",
+          "hash" : "",
+
+      }]
     },
     "package_object_metadata" : { //required for PACKAGE, this is generic metadata describing surrounding facts around the content
       "creation_date" : "#date",  //date, required, of creation

@@ -178,8 +178,6 @@ def download():
             create_storage_data_structure_from_labfolder(user_id, item)
         )
     if storage_metadata:
-        print("storage_metadata")
-        print(storage_metadata)
         download_files_from_labfolder(storage_metadata)
         package_objects = create_package_for_downloaded_labfolder_data(
             user_id, storage_metadata
@@ -314,7 +312,6 @@ def create_zip_from_files(download_meta, filename):
         + "/"
     )
     for ele in download_meta:
-        print(json.dumps(ele))
         couch_db_id = ele["data_object_metadata"]["db_filename"]
         # each element should only have one version, so wen access the first element
         cdb_doc_url = (
@@ -344,10 +341,6 @@ def create_zip_from_files(download_meta, filename):
                 ):
                 tmp_path_file.write_bytes(response.content)
             absname = str(tmp_path_file.resolve())
-            print("absname")
-            print(absname)
-            print("filename")
-            print(filename)
             zip_file.write(absname, arcname=ele["data_object_metadata"]["filename"])
             try:
                 tmp_path_file.unlink()
@@ -397,11 +390,7 @@ def download_files_from_labfolder(data_array):
             "Content-Type": "application/json",
             "Cookie": token,
         }
-        print(file_url)
-        print(json.dumps(headers))
         file_response = requests.get(file_url, headers=headers)
-        print("file_response")
-        print(file_response.text)
         couchdb_url = (
             lzv_util.CONFIGPARAMS["couchDBBaseURL"]
             + "/"
@@ -415,16 +404,13 @@ def download_files_from_labfolder(data_array):
         couchdb_url = couchdb_url + "/" + json_answer["id"] + "/"
         file_name = ""
         file_suffix = ""
+        file_data = ""
         if (element["origin_metadata"]["element_type"] == "IMAGE"
             or element["origin_metadata"]["element_type"] == "FILE"
         ):
-            print("file infor url")
-            print(file_info_url)
-            print(headers)
             file_info_reponse_jdata = json.loads(
                 requests.get(file_info_url, headers=headers).text
             )
-            print(json.dumps(file_info_reponse_jdata))
             file_name = file_info_reponse_jdata["file_name"]
             file_data = file_response.content
             couchdb_url = couchdb_url + json_answer["id"]
@@ -455,7 +441,15 @@ def download_files_from_labfolder(data_array):
                 couchdb_url, headers=couch_header, data=file_data
             )
             element["data_object_metadata"]["is_stored"] = bool(att_create_response)
-
+        element["data_object_metadata"]["checksums"] = [{
+            "type" : "SHA224",
+            "hash" : lzv_util.calculate_sha224_from_data(file_data)
+        },
+        {
+            "type" : "MD5",
+            "hash" : lzv_util.calculate_md5_from_data(file_data)
+        }
+        ]
         element["data_object_metadata"]["filename"] = file_name + file_suffix
         element["data_object_metadata"]["db_filename"] = json_answer["id"]
         element["data_object_metadata"]["file_type"] = couch_header["Content-Type"]
