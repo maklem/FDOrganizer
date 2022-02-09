@@ -149,7 +149,9 @@ def generate_dmd_for_meta(file_meta, identifier, create_origin_uuid_metadata=Fal
             )
     if create_origin_uuid_metadata:
         dmd += "<dc:identifier>" + origin_uuid +"</dc:identifier>"
-        dmd += "<dc:source>" + content_origin +"</dc:source>"
+        #TODO this @UBT needs to be changed to a variable based on users institution as soon as user
+        #management is implemented
+        dmd += "<dc:source>" + content_origin +"@UBT</dc:source>"
     dmd += "</dc:record>"
     dmd += "</mets:xmlData>"
     dmd += "</mets:mdWrap>"
@@ -157,27 +159,7 @@ def generate_dmd_for_meta(file_meta, identifier, create_origin_uuid_metadata=Fal
     return {"successfull": True, "content": dmd}
 
 
-# def generate_dmd_for_ingest(ingest_meta):
-#     '''
-#     generate a dmd for the ingest. based on the metadata set in the root ingest.
-#     return this as xml string. This is basically the same as the function above, resuse that.
-#     '''
-#     dmd = ''
-#     dmd += '<mets:dmdSec ID="ie-dmd">'
-#     dmd += '<mets:mdWrap MDTYPE="DC">'
-#     dmd += '<mets:xmlData>'
-#     dmd += '<dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
-#     dmd += <dc:creator>Exlibris</dc:creator>
-#     dmd += <dc:identifier>ISBN 1-56389-016-X</dc:identifier>
-#     dmd += <dc:title>SDK - TEST DC</dc:title>
-#     dmd += '</dc:record>'
-#     dmd += '</mets:xmlData>'
-#     dmd += '</mets:mdWrap>'
-#     dmd += '</mets:dmdSec>'
-#     return dmd
-
-
-def generate_amd_for_file(amd_meta, counter):
+def generate_amd_for_file(amd_meta, counter, generate_checksums=True):
     """
     generate a techMD section with repository specific metadata:
     amd_meta in structure:
@@ -194,19 +176,18 @@ def generate_amd_for_file(amd_meta, counter):
     amd += '<record>'
     amd += '<key id="fileMIMEType">' + str(amd_meta['file_type']) + '</key>'
     amd += '<key id="fileOriginalName">' + str(amd_meta['filename']) + '</key>'
-    # amd += '<key id="FILEMIMTYPE">' + str(amd_meta['data_object_metadata'][file_type]) + '</key'>
-    # amd += '<key id="FILEMIMTYPE">' + str(amd_meta['data_object_metadata'][file_type]) + '</key'>
-    # amd += '<key id="FILEMIMTYPE">' + str(amd_meta['data_object_metadata'][file_type]) + '</key'>
     amd += "</record>"
     amd += "</section>"
-    amd += '<section id="fileFixity">'
-    for fixity in amd_meta["checksums"]:
-        amd += '<record>'
-        amd += '<key id="fixityType">' + fixity["type"] + '</key>'
-        amd += '<key id="fixityValue">' + fixity["hash"] + '</key>'
-        amd += '</record>'
-
-    amd += '</section>'
+    print("amd_meta")
+    print(json.dumps(amd_meta))
+    if generate_checksums:
+        amd += '<section id="fileFixity">'
+        for fixity in amd_meta["checksums"]:
+            amd += '<record>'
+            amd += '<key id="fixityType">' + fixity["type"] + '</key>'
+            amd += '<key id="fixityValue">' + fixity["hash"] + '</key>'
+            amd += '</record>'
+        amd += '</section>'
     '''
     rework with a mapping from metadata to rosetta dnx fields. this should map metadata from
     Step1: fill dnx metadata with data_object_metadata for file objects.
@@ -339,11 +320,6 @@ def generate_mets_xml(ingest_data, storage_data):
                     file_dmd += result["content"]
                     file_sec += ' DMDID="f_dmd_' + f["package_id"] + '"'
             file_sec += '>'
-            # section_data = {"export_metadata": f["data_object_metadata"]}
-            # if bool(f["origin_metadata"]):
-            #     section_data[
-            #         f["data_object_metadata"]["content_origin"] + "_metadata"
-            #     ] = f["origin_metadata"]
             file_amd += generate_amd_for_file(
                 f["data_object_metadata"], file_ctr
             )
@@ -366,15 +342,10 @@ def generate_mets_xml(ingest_data, storage_data):
 
             )
             file_sec += '>'
-            # section_data = {"export_metadata": f["data_object_metadata"]}
-            # if bool(f["origin_metadata"]):
-            #     section_data[
-            #         f["data_object_metadata"]["content_origin"] + "_metadata"
-            #     ] = f["origin_metadata"]
             meta = { 'filename' : f["data_object_metadata"]["filename"] \
                     + '.json' , 'file_type' : 'application/json'}
             file_amd += generate_amd_for_file(
-                meta, file_ctr
+                meta, file_ctr, generate_checksums=False
             )
             file_sec += (
                 '<mets:FLocat LOCTYPE="URL" xlin:href="file://'
