@@ -271,6 +271,7 @@ def create_storage_data_structure_from_easydb(user_id, file_info):
     '''
         created the storage generic:data_scructure for each file. expects a single file from easydb
     '''
+    print(json.dumps(file_info))
     return {
         "package_id": str(uuid.uuid4()),
         "type": "DATA",
@@ -284,7 +285,7 @@ def create_storage_data_structure_from_easydb(user_id, file_info):
             "is_stored": False,
             "checksums" : [{
                 "type" : "SHA224",
-                "hash" : file_info["object"]["file"]["technical_metadata"]["file_sha224_checksum"]
+                "hash" : file_info["object"]["file"][0]["technical_metadata"]["file_sha224_checksum"]
             }]
         },
         "origin_metadata": file_info#TODO define the origin_metadata for easydb. This needs to be analyzed from available metadata

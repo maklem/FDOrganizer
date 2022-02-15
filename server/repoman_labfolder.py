@@ -124,8 +124,8 @@ def download_file_to_client():
     if download_meta:
         create_zip_from_files(download_meta, lzv_util.CONFIGPARAMS["tempFolder"] + filename)
     else:
-        return json.dumps({"Error": "Missing Parameter id"}), \
-                200,{"Content-Type": "application/json"}
+        return (json.dumps({"Error": "Missing Parameter id"}), \
+                500,{"Content-Type": "application/json"})
     return send_from_directory(lzv_util.CONFIGPARAMS["tempFolder"], filename, as_attachment=True)
 
 
@@ -184,7 +184,7 @@ def download():
         )
         storage_metadata += package_objects
         lzv_util.add_to_storage(storage_metadata)
-    return rep_labfolder.response_class(status=200, mimetype="application/json")
+    return (json.dumps({"Message":"All good!"}), 200,{"Content-Type": "application/json"})
 
 
 def create_package_for_downloaded_labfolder_data(user_id, downloaded_sets):
@@ -411,6 +411,8 @@ def download_files_from_labfolder(data_array):
             file_info_reponse_jdata = json.loads(
                 requests.get(file_info_url, headers=headers).text
             )
+            print("fileinforesponse:")
+            print(json.dumps(file_info_reponse_jdata))
             file_name = file_info_reponse_jdata["file_name"]
             file_data = file_response.content
             couchdb_url = couchdb_url + json_answer["id"]
@@ -443,13 +445,14 @@ def download_files_from_labfolder(data_array):
             element["data_object_metadata"]["is_stored"] = bool(att_create_response)
         element["data_object_metadata"]["checksums"] = [{
             "type" : "SHA224",
-            "hash" : lzv_util.calculate_sha224_from_data(file_data)
+            "hash" : lzv_util.calculate_sha224_from_data(file_data.encode('utf-8'))
         },
         {
             "type" : "MD5",
-            "hash" : lzv_util.calculate_md5_from_data(file_data)
+            "hash" : lzv_util.calculate_md5_from_data(file_data.encode('utf-8'))
         }
         ]
+        print(json.dumps(element["data_object_metadata"]["checksums"]))
         element["data_object_metadata"]["filename"] = file_name + file_suffix
         element["data_object_metadata"]["db_filename"] = json_answer["id"]
         element["data_object_metadata"]["file_type"] = couch_header["Content-Type"]

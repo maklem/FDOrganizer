@@ -237,7 +237,11 @@ function downloadSelectedCollections() {
     if (ids.length > 0) {
         for(const id of ids)
         {
-            interface_easydb_download_collection(getLocalStorage('easyDBToken'), id, function() {});
+            interface_easydb_download_collection(getLocalStorage('easyDBToken'), id,
+                function() {
+                    $( "form[id=selectableEntries]" ).find("input:checkbox").prop( "checked", false );
+                    alert("Collection successfully downloaded!");
+                });
         }
     }
 }
