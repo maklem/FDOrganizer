@@ -103,9 +103,9 @@ def validate_user_session(request):
     return {
         "success" : False,
         "return_error" :{
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"}
+            "Error": FAILED_AUTHENTICATION,
+            "code" : "401",
+            "Content-Type": "application/json"
         }
     }
 

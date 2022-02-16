@@ -1211,7 +1211,7 @@ def upload_file_to_couchdb_document_db(f, metadata_obj):
     Uploads a file to the document db. Also updated the metadata_obj with the doc_id, file_type,
     filename and is_stored flag
     """
-    token = authenticate_couchdb()
+    token = lzv_util.authenticate_couchdb()
     if not token:
         return (
             json.dumps({"Result": "Error Authenticating couch DB"}),
