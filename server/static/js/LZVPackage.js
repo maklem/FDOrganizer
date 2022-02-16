@@ -221,6 +221,7 @@ function save_package_object() {
         get_user_packages();
         update_sidebar_user_packages();
         reset_form_modified();
+        alert("Package saved successfully!");
     });
 }
 

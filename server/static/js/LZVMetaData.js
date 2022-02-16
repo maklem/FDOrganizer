@@ -42,6 +42,7 @@ function sendUserMetaSetsToServer(new_set) {
 	interface_store_metadata_usersets(new_set, function() {
 		getMetaDataUserSets(true);
 		unsaved = false;
+		alert("Metadata saved successfully!");
 	});
 }
 
