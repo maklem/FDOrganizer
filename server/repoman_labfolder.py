@@ -358,8 +358,14 @@ def download_files_from_labfolder(data_array):
     if not token:
         return
     for element in data_array:
-        if (element["origin_metadata"]["element_type"] == "IMAGE"
-            or element["origin_metadata"]["element_type"] == "FILE"):
+        if element["origin_metadata"]["element_type"] == "IMAGE":
+            file_info_url = (
+                lzv_util.CONFIGPARAMS["labFolderBaseURL"]
+                + "/elements/image/"
+                + element["origin_metadata"]["element_id"]
+            )
+            file_url = file_info_url + "/original-data"
+        elif element["origin_metadata"]["element_type"] == "FILE":
             file_info_url = (
                 lzv_util.CONFIGPARAMS["labFolderBaseURL"]
                 + "/elements/file/"
@@ -413,10 +419,14 @@ def download_files_from_labfolder(data_array):
             )
             print("fileinforesponse:")
             print(json.dumps(file_info_reponse_jdata))
-            file_name = file_info_reponse_jdata["file_name"]
+            if element["origin_metadata"]["element_type"] == "IMAGE":
+                file_name = file_info_reponse_jdata["title"]
+                couch_header["Content-Type"] = file_info_reponse_jdata["original_file_content_type"]
+            else:
+                file_name = file_info_reponse_jdata["file_name"]
+                couch_header["Content-Type"] = file_info_reponse_jdata["content_type"]
             file_data = file_response.content
             couchdb_url = couchdb_url + json_answer["id"]
-            couch_header["Content-Type"] = file_info_reponse_jdata["content_type"]
             file_suffix = ""
             att_create_response = requests.put(
                 couchdb_url, headers=couch_header, data=file_data
@@ -443,13 +453,16 @@ def download_files_from_labfolder(data_array):
                 couchdb_url, headers=couch_header, data=file_data
             )
             element["data_object_metadata"]["is_stored"] = bool(att_create_response)
+        if type(file_data) is not bytes:
+            print("in encode")
+            file_data = file_data.encode('utf-8')
         element["data_object_metadata"]["checksums"] = [{
             "type" : "SHA224",
-            "hash" : lzv_util.calculate_sha224_from_data(file_data.encode('utf-8'))
+            "hash" : lzv_util.calculate_sha224_from_data(file_data)
         },
         {
             "type" : "MD5",
-            "hash" : lzv_util.calculate_md5_from_data(file_data.encode('utf-8'))
+            "hash" : lzv_util.calculate_md5_from_data(file_data)
         }
         ]
         print(json.dumps(element["data_object_metadata"]["checksums"]))
