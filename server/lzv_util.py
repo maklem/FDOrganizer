@@ -232,11 +232,11 @@ def calculate_sha224_from_data(data):
 
 def calculate_md5_from_file(filename):
     '''
-    calculate the sha256 of a file in a memory-efficient way. returns hexdigest of hash
+    calculate the md5 of a file in a memory-efficient way. returns hexdigest of hash
     '''
     BLOCK_SIZE = 65536  #64kB
 
-    md5 = hashlib.sha256()
+    md5 = hashlib.md5()
 
     with open(filename, 'rb') as f:
         while True:
@@ -249,8 +249,8 @@ def calculate_md5_from_file(filename):
 
 def calculate_md5_from_data(data):
     '''
-    calculate the sha256 of binary data. returns hexdigest of hash
+    calculate the md5 of binary data. returns hexdigest of hash
     '''
-    md5 = hashlib.sha256()
+    md5 = hashlib.md5()
     md5.update(data)
     return md5.hexdigest()
