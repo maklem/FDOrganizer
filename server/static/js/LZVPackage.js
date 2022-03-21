@@ -113,12 +113,27 @@ function fill_package_form(clicked_id, user_packages) {
     $(output).appendTo('#package_options_container');
 }
 
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+
+function drop(ev, el) {
+    ev.preventDefault();
+    let id = ev.dataTransfer.getData("text");
+    el.appendChild(document.getElementById(id));
+}
+
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
 function create_html_for_container_content(user_package) {
     var output = '';
-    output += '<div class="container_subitem" package_id="'+user_package.package_id+'">';
-    output += '<button type="button" class="btn container_item_select" package_id="'+user_package.package_id+'" onclick="select_deselect_item(this)">';
+    output += '<div id="'+user_package.package_id+'" class="container_subitem" ondrop="return false" draggable="true" ondragstart="drag(event)" package_id="'+user_package.package_id+'">';
+    output += '<div type="button" class="btn container_item_select" package_id="'+user_package.package_id+'">';
     output += user_package.name;
-    output += '</button>';
+    output += '</div>';
     output += '<button type="button" class="btn open_info_button" package_id="'+user_package.package_id+'" onclick="open_item_info(this);"> </button>';
     output += '</div>';
     return output;
@@ -182,33 +197,6 @@ function display_popup() {
     $('#popupForm').show();
 }
 
-
-function select_deselect_item(clicked) {
-    if($(clicked).hasClass('selected')){
-        $(clicked).removeClass('selected');
-    }
-    else {
-        $(clicked).addClass('selected');
-    }
-}
-
-function move_selected_to_package() {
-    var selected = $('#package_options_container').find('.selected');
-    $(selected).parent().appendTo('#package_content_container');
-    $(selected).removeClass('selected');
-    if(selected.length > 0) {
-        set_form_modified();
-    }
-}
-
-function remove_selected_from_package() {
-    var selected = $('#package_content_container').find('.selected');
-    $(selected).parent().appendTo('#package_options_container');
-    $(selected).removeClass('selected');
-    if(selected.length > 0) {
-        set_form_modified();
-    }
-}
 
 function save_package_object() {
     var package_data = get_active_package();

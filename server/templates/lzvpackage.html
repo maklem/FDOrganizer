@@ -48,24 +48,14 @@
                 <div class="form_multiple_select_descriptor" id="package_content_container_descriptor">
                     Package Content:
                 </div>
-                <div class="form_multiple_select_container" id="package_content_container">
-                </div>
-            </div>
-            <div id="package_manager_form_body_middle">
-                <div class="btn package_button_div" id="package_middle_control_buttons">
-                    <button class="btn lzvbutton package_button" id="package_put_in_package" onclick="move_selected_to_package();" type="button">
-                        <
-                    </button>
-                    <button class="btn lzvbutton package_button" id="package_remove_from_package" onclick="remove_selected_from_package();" type="button">
-                        >
-                    </button>
+                <div class="form_multiple_select_container" id="package_content_container" ondrop="drop(event, this)" ondragover="allowDrop(event)">
                 </div>
             </div>
             <div id="package_manager_form_body_right">
                 <div class="form_multiple_select_descriptor" id="package_options_container_descriptor">
                     Available Content:
                 </div>
-                <div class="form_multiple_select_container" id="package_options_container">
+                <div class="form_multiple_select_container" id="package_options_container" ondrop="drop(event, this)" ondragover="allowDrop(event)">
                 </div>
             </div>
         </div>
