@@ -155,35 +155,53 @@ function open_item_info(clicked) {
 }
 
 function create_html_for_item_info(clicked_package) {
+    console.log(clicked_package);
     var html = '';
     html += '<div id="popup_form_content">';
     html += '<div id="popup_form_header">';
-    html += '<div id="popup_header_name" class="popup_form_header_field">' + clicked_package.name + '</div>';
-    html += '<div id="popup_header_creation_date" class="popup_form_header_field">' + clicked_package.package_object_metadata.creation_date + '</div>';
-    html += '<div id="popup_header_last_change" class="popup_form_header_field">' + clicked_package.package_object_metadata.last_change + '</div>';
-    html += '<div id="popup_header_description" class="popup_form_header_field">' + clicked_package.description + '</div>';
+    html += '<div id="popup_header_name" class="popup_form_header_field">Package name: ' + clicked_package.name + '</div>';
+    html += '<div id="popup_header_creation_date" class="popup_form_header_field">Package creation date: ' + clicked_package.package_object_metadata.creation_date + '</div>';
+    html += '<div id="popup_header_last_change" class="popup_form_header_field">Package last changed: ' + clicked_package.package_object_metadata.last_change + '</div>';
+    if(clicked_package.description)
+    {
+        html += '<div id="popup_header_description" class="popup_form_header_field">Package Description:' + clicked_package.description + '</div>';
+    }
     html += '</div>';
     html += '<div id="popup_form_mainpage">';
+    for (let item_id of clicked_package.child_data_objects){
+            console.log(item_id);
+            var user_packages = JSON.parse(getLocalStorage("user_storage"));
+            console.log(user_packages);
+            var item = user_packages.find(set=>set.package_id == item_id);
+            console.log(item);
+            html += '<div class="content_element package_info_data"><div class="package_info_data_icon"/><span>Filename: ' + item.data_object_metadata.filename + '</span><br><span>Filetype: '+ item.data_object_metadata.file_type+'</span><br><span>Origin Repository: '+ item.data_object_metadata.content_origin+'</span></div>';
+    }
     html += '</div>';
     html += '<div id="popup_form_footer"><button class="btn close_info_button" id="close_popup_form" onclick="hide_popup();">Close</button></div>';
     html += '</div>';
     return html;
 }
-//TODO TEST and finish
-function recursive_create_item_info_content_item(item_id) {
+
+//Probably dont need this for now
+/*function recursive_create_item_info_content_item(item_id, skip_item_info=false) {
     var html = ''
     var user_packages = JSON.parse(getLocalStorage("user_storage"));
     var item = user_packages.find(set=>set.package_id == item_id);
+    console.log(item_id);
+    console.log(item);
     if(item.type == 'PACKAGE'){
-        html += '<div class="content_element package_info_package"><div class="package_info_package_icon"/><span>'+ item.name +'</span><button class="btn expand_package_info_button" id="'+item.package_id+'" onclick="expand_content_children">+</button></div>';
+        if(!skip_item_info){
+            html += '<div class="content_element package_info_package"><div class="package_info_package_icon"/><span>Package name: '+ item.name +'</span></div>';//<button class="btn expand_package_info_button" id="'+item.package_id+'" onclick="expand_content_children">+</button></div>';
+        }
         for (let c of item.child_data_objects){
-            html += recursive_create_item_info_content_item(c.package_id);
+            html += recursive_create_item_info_content_item(c);
         }
     }
     else { //type == 'DATA'
-        html += '<div class="content_element package_info_data"><div class="package_info_data_icon"/><span>' + item.name + '</span><span class="package_info_data_info">'+ item.data_object_metadata.file_type+'</span';
+        html += '<div class="content_element package_info_data"><div class="package_info_data_icon"/><span>Filename: ' + item.data_object_metadata.filename + '</span><br><span>Filetype: '+ item.data_object_metadata.file_type+'</span><br><span>Origin Repository: '+ item.data_object_metadata.content_origin+'</span></div>';
     }
-}
+    return html;
+}*/
 
 function hide_popup() {
     $('#package_manager_main_form').show();

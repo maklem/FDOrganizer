@@ -453,6 +453,7 @@ def download_files_from_labfolder(data_array):
                 couchdb_url, headers=couch_header, data=file_data
             )
             element["data_object_metadata"]["is_stored"] = bool(att_create_response)
+        print(type(file_data))
         if type(file_data) is not bytes:
             print("in encode")
             file_data = file_data.encode('utf-8')

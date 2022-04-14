@@ -274,20 +274,20 @@ def create_storage_data_structure_from_upload(user_id, _file):
     }
 
 
-@APP.route("/data/packages", methods=["GET"])
-def get_data_packages():
-    """
-    Routed from /data/packages
-    Requests all data packages for user from database, which can then be added to a
-    """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
-    user_id = request.cookies["session_user"]
-    query = {"selector": {"owner": user_id, "type": "PACKAGE"}}
-    response = json.loads(lzv_util.query_db(query,\
-                lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"]))
-    return json.dumps(response["docs"])
+# @APP.route("/data/packages", methods=["GET"])
+# def get_data_packages():
+#     """
+#     Routed from /data/packages
+#     Requests all data packages for user from database, which can then be added to a
+#     """
+#     result = lzv_util.validate_user_session(request)
+#     if not result["success"]:
+#         return result["return_error"]
+#     user_id = request.cookies["session_user"]
+#     query = {"selector": {"owner": user_id, "type": "PACKAGE"}}
+#     response = json.loads(lzv_util.query_db(query,\
+#                 lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"]))
+#     return json.dumps(response["docs"])
 
 
 @APP.route("/storage/packages", methods=["GET"])
@@ -840,7 +840,6 @@ def submit_user_ingest_to_review():
         "Cookie": token,
     }
     response = requests.put(couchdb_url, headers=headers, data=json.dumps(ingest))
-    print(response.text)
     if response:
         return (
             json.dumps({"Result": "All good"}),
@@ -987,7 +986,6 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
                 "Cookie": token,
             }
             response = requests.get(cdb_doc_url, headers=headers)
-            print(response.text)
             if response:
                 try:
                     tmp_path = path + f["data_object_metadata"]["filename"]
@@ -1167,14 +1165,15 @@ def append_children_to_package(user_id, package_id, append_children):
         + "/"
         + package_id
     )
-    # prepare date to be written to db. if it is an update we only need to change some
+    data = {}
+    # prepare data to be written to db. if it is an update we only need to change some
     if check_response["docs"]:  # only one entry with same id should exist at the same time
         data = check_response["docs"][0]
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         data["package_object_metadata"]["last_change"] = time.strftime(
             "%Y-%m-%dT%T.000+0000"
         )
-        if not hasattr(data, "child_data_objects"):
+        if not 'child_data_objects' in data:
             data["child_data_objects"] = []
         for item in append_children:
             data["child_data_objects"].append(item["package_id"])

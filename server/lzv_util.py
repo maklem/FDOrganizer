@@ -156,6 +156,8 @@ def add_to_storage(add_elements):
     adds new elements to storage database. does not check for integrity, or if files already
     exist. if files could already exist use updata_storage()
     """
+
+    print("in add elements")
     url = (
         CONFIGPARAMS["couchDBBaseURL"]
         + "/"
@@ -169,8 +171,12 @@ def add_to_storage(add_elements):
         "Content-Type": "application/json",
         "Cookie": token,
     }
+
     for item in add_elements:
+        print("adding item:")
+        print(json.dumps(item))
         response = requests.post(url, headers=headers, data=json.dumps(item))
+        print(response.text)
 
 
 def update_storage(add_elements):

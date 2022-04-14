@@ -839,6 +839,30 @@ input:required:invalid, select:required:invalid {
   height: 100vh;
 }
 
+#popup_form_header {
+  border-bottom-style: solid;
+  border-color: #bbbbbb;
+
+}
+
+.content_element {
+  margin:  2px;
+  border-style: solid;
+  display:  inline-block;
+  border-color: #bbbbbb;
+  border-radius: 1px;
+}
+
+.package_info_data {
+
+}
+
+.package_info_package {
+  font-weight: bold;
+}
+
+/*UPLOAD*/
+
 #upload_choose_files_hidden_input {
   display: block;
   visibility: hidden;
