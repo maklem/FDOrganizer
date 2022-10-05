@@ -1,3 +1,2 @@
 # LZV 
-
-DFG Projekt LZV
+Projekt LZV des Bibliotheksverbund Bayern
