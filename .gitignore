@@ -1,0 +1,7 @@
+# venv dir
+/env
+
+# Server config and caches
+/server/__pycache__
+/server/conf/config.json
+/server/flask_session
