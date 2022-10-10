@@ -2,7 +2,6 @@
 Module for creation of mets files.
 """
 import json
-import os
 
 allowed_metadata_identifer = ["dublin_core_1_1"]
 ctr_id_map = {}

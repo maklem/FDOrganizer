@@ -14,7 +14,7 @@ DEBUG = 1
 FAILED_AUTHENTICATION = "Failed Authentication, please login to use this service!"
 
 CONFIGPARAMS = {}
-with open("/server/lzv/server/conf/config.json") as f:
+with open("./conf/config.json") as f:
     CONFIGPARAMS = json.load(f)
 
 def check_user_permission_review(user_id):

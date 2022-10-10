@@ -4,11 +4,8 @@ Software for LZV Server.
 import time
 from pathlib import Path
 import shutil
-import os
 import uuid
 import json
-import secrets
-import ldap
 import requests
 import mets
 import sys

@@ -7,12 +7,9 @@ import json
 import time
 import uuid
 import requests
-import urllib.request
 from flask import Blueprint, request
 import lzv_util
 import mimetypes
-from pathlib import Path
-
 
 rep_easydb = Blueprint('easydb', __name__)
 

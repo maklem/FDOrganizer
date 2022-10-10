@@ -8,7 +8,7 @@ import time
 from zipfile import ZipFile
 import requests
 from pathlib import Path
-from flask import Blueprint, render_template, request, send_from_directory
+from flask import Blueprint, request, send_from_directory
 import lzv_util
 
 rep_labfolder = Blueprint('labfolder', __name__)
