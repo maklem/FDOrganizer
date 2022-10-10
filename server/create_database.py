@@ -4,74 +4,68 @@
 import json
 import sys
 import requests
-#baseURL of labFolder
-# CONFIGPARAMS["labFolderBaseURL"] = 'https://eln.labfolder.com/api/v2'
-#storage base url - here the downlaoded data is stored, should terminate with a '/'
-# storageBaseURL = './LabFolderData/'
-# storage_fileName = 'storage.json'
-# CONFIGPARAMS["tempFolder"] = "./tmp/"
 
-#couchDBConfiguration Parameters
-# CONFIGPARAMS["couchDBBaseURL"] = "http://127.0.0.1:5984"
-# CONFIGPARAMS["couchDBAdmin"] = "admin"
-# CONFIGPARAMS["couchDBPassword"] = "aodqfyUQqA"
-# couchDBToken = ""
-# CONFIGPARAMS["couchDBStorageDatabaseName"] = "storage"
-# CONFIGPARAMS["couchDBDocumentDatabaseName"] = "documents"
-# CONFIGPARAMS["couchDBStaticDatabaseName"] = "static"
+#Reading Config
+def getConfig():
+    with open('./conf/config.json') as f:
+        return json.load(f)
 
+def getCredentials():
+    config = getConfig()
+    return {
+        "username": f'{config["couchDBAdmin"]}',
+        "password": f'{config["couchDBPassword"]}',
+    }
 
-#DELETE AFTER DEV
-DEVUSER_ID = "bt303343"
-#----------------------global Parameters-------------------------------------------
+def getBaseURL():
+    return getConfig()["couchDBBaseURL"]
 
-CONFIGPARAMS = {}
-
-#----------------------initialization------------------------------------------
-
-with open('./conf/config.json') as f:
-    CONFIGPARAMS = json.load(f)
-
-
-
-
-def authenticate_couchdb():
-    '''
-    Authenticate to CouchDB and return login token
-    '''
-    url = CONFIGPARAMS["couchDBBaseURL"] + '/_session'
-    data = "name=" + CONFIGPARAMS["couchDBAdmin"] + "&password=" + CONFIGPARAMS["couchDBPassword"]
-    # data =  {"name":  CONFIGPARAMS["couchDBAdmin"], "password": CONFIGPARAMS["couchDBPassword"]}
+#Authentication
+def authenticate(url: str, username: str, password: str):
+    data = f'name={username}&password={password}'
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    response = requests.post(url, data=data, headers=headers)
-    if response.status_code == 200:
-        cookie = response.headers["Set-Cookie"]
-        couchdb_token = cookie[:cookie.find(";")]
-        return couchdb_token
-    return False
+    return requests.post(url, data=data, headers=headers)
 
 
-def create_database(name):
-    token = authenticate_couchdb()
-    if not token:
-        return
-    create_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + name 
+def getAuthenticationToken(username: str, password: str):
+    url = f'{getBaseURL()}/_session'
+    response = authenticate(url, username, password)
+    print(url)
+    if not response.status_code == 200:
+        print(f'User Authentication not sucessful! Check configured username and password')
+        return False
+    cookie = response.headers["Set-Cookie"]
+    return cookie[:cookie.find(";")]
+
+
+#Creating Database
+def getDatabaseName():
+    if len(sys.argv) == 2:
+        return str(sys.argv[1])
+    return input("Wählen Sie einen Namen für die Datenbank:\n")
+
+def create(url: str, token: str):
     couch_header = {"Accept": "application/json",
                     "Content-Type" : "application/json",
                     "Cookie" :  token}
-    print(create_url)
-    response = requests.put(create_url, headers=couch_header)
-    if response:
-        print("successfully created new database " + name)
-        print(response.text)
-    else:
-        print("error creating database " + name)
-        print(response.text)
+    return requests.put(url, headers=couch_header)
 
+def create_database(name: str, token: str):
+    print(f'Creating Database "{name}"')
+    url = f'{getBaseURL()}/{name}'
+    response = create(url, token)
+    if response.status_code != 201:
+        print(f'Error creating Database "{name}":')
+        print(f'{response.json()["reason"]}')
+        return
+    print("Successfully created new database " + name)
 
+#Run
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        create_database(str(sys.argv[1]))
-    else:
-        print("usage: create_database.py <database_name>")
-
+    username, password = getCredentials().values()
+    print(username, password)
+    token = getAuthenticationToken(username, password)
+    if not token:
+        sys.exit()
+    databaseName = getDatabaseName()
+    create_database(databaseName, token)
