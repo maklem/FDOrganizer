@@ -20,9 +20,6 @@ def authenticate_easydb():
         authenticate to easydb. first get a session token, then authenticate this session token via
         user login
     '''
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     url = lzv_util.CONFIGPARAMS["easydbBaseUrl"] + "/session"
     response = requests.get(url)
     if not response:
@@ -47,9 +44,6 @@ def deauthenticate_easydb():
     '''
         deauthenticate from easydb. get token from header and then deauthenticate it. expects a "token" parameter
     '''
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     token = request.headers["Token"]
     if not token:
         return json.dumps({"Error": "Missing token parameter"}), \
@@ -69,9 +63,6 @@ def get_collections():
         Get all collections for the authenticated user. Only deliver collections which are owned by
         the user. Expects token for easydb to be part of the request header
     '''
-    result = lzv_util.validate_user_session(request)
-    if not result:
-        return result["return_error"]
     token = request.headers["Token"]
     if not token or token == "":
         return json.dumps({"Error": "Missing or no valid token parameter"}), \
@@ -99,9 +90,6 @@ def get_collection_info():
         required collection_id as arg.
         Returns:
     '''
-    result = lzv_util.validate_user_session(request)
-    if not result:
-        return result["return_error"]
     token = request.headers["Token"]
     if not token or token == "":
         return json.dumps({"Error": "Missing or no valid token parameter"}), \
@@ -172,9 +160,6 @@ def download_collection():
         the collection_id. All files are downloaded to the local file_server and storage entries are
         created. also creates a package, containing all files from the collection.
     '''
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = request.headers["Token"]
     if not token or token == "":
@@ -295,9 +280,6 @@ def get_easydb_storage_data():
     Routed from /easydb/storage
     Requests the storage file, containg metadata about stored files for the requesting user
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     out = get_easydb_data(user_id, return_as_string=False)
     return json.dumps(out["docs"])

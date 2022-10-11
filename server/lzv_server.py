@@ -11,7 +11,7 @@ import mets
 import sys
 
 # from flask import Flask, session
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 from flask_session import Session
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -32,146 +32,72 @@ CORS(APP)
 Session(APP)
 APP.register_blueprint(rep_labfolder, url_prefix='/labfolder')
 APP.register_blueprint(rep_easydb, url_prefix='/easydb')
-# print(APP.url_map)
 
 # ----------------------Page Navigation-----------------------------------------
+
+# TODO: Navigation auf SPA umstellen
+# TODO: Redirect auf Seite vor dem erzwungenen Login
+
+def needs_authentication():
+    return request.path != url_for("navlogin") and "static" not in request.path
+
+@APP.before_request
+def auth_guard():
+    if not needs_authentication():
+        return None
+    if not lzv_util.validate_user_session(request):
+        return redirect(url_for("navlogin"))
+    return None
+
 @APP.route("/")
 def navhome():
-    """
-    Navigation to site Home
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     return render_template("index.html")
 
 
 @APP.route("/impressum")
 def navimpressum():
-    """
-    Navigation to site Impressum
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
+
     return render_template("impressum.html")
 
 
 @APP.route("/history")
 def navhistory():
-    """
-    Navigation to site History
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     return render_template("history.html")
 
 
 @APP.route("/labfolder")
 def navlabfolder():
-    """
-    Navigation to site Labfolder
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     return render_template("labfolder.html")
 
 
 @APP.route("/easydb")
 def naveasydb():
-    """
-    Navigation to site easyDB
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
+
     return render_template("easydb.html")
 
 
 @APP.route("/metadata")
 def navmetadata():
-    """
-    Navigation to site metadata
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     return render_template("metadata.html")
 
 
 @APP.route("/lzv")
 def navlzvingest():
-    """
-    Navigation to site ingest
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     return render_template("lzvingest.html")
 
 
 @APP.route("/package")
 def navlzvpackage():
-    """
-    Navigation to site ingest
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     return render_template("lzvpackage.html")
 
 
 @APP.route("/upload")
 def navupload():
-    """
-    Navigation to site ingest
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     return render_template("upload.html")
 
 
 @APP.route("/review")
 def navlzvreview():
-    """
-    Navigation to site review. Need to check auth for reviewer
-    """
-    if not "session_user" in request.cookies or not "session_auth" in request.cookies:
-        return render_template("login.html")
-    if not lzv_util.check_session(
-            request.cookies["session_user"], request.cookies["session_auth"]
-    ):
-        return render_template("login.html")
     if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
         return render_template("index.html")
     return render_template("lzvreview.html")
@@ -179,32 +105,24 @@ def navlzvreview():
 
 @APP.route("/login", methods=["GET"])
 def navlogin():
-    """
-    Navigation to login site
-    """
+    if lzv_util.validate_user_session(request):
+        return redirect(url_for('navhome'))
     return render_template("login.html")
 
 
 @APP.route("/login", methods=["POST"])
 def login_lzv():
-    """
-    Login to lzv site. Performs a lookup to ldap server to verify credentials.
-    Returns a session token to user, to authenticate your session against.
-    """
-    if "session_user" in request.cookies and "session_auth" in request.cookies:
-        if lzv_util.check_session(
-                request.cookies["session_user"], request.cookies["session_auth"]
-        ):
-            return (
-                json.dumps(
-                    {
-                        "session_id": request.cookies["session_auth"],
-                        "username": request.cookies["session_user"],
-                    }
-                ),
-                200,
-                {"Content-Type": "application/json"},
-            )
+    if lzv_util.validate_user_session(request):
+        return (
+            json.dumps(
+                {
+                    "session_id": request.cookies["session_auth"],
+                    "username": request.cookies["session_user"],
+                }
+            ),
+            200,
+            {"Content-Type": "application/json"},
+        )
     data = json.loads(request.get_data())
     if lzv_util.authenticate_ldap(data["username"], data["password"]):
         lzv_util.create_user_session(data["username"])
@@ -226,9 +144,6 @@ def logout_lzv():
     """
     Logout User from lzv System. Deletes local stored session id.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     lzv_util.logout_session(request.cookies["session_user"])
     return (
         json.dumps({"Message": "All good!"}),
@@ -293,9 +208,6 @@ def get_package_objects():
     Routed from /storage/packages
     Requests all docs from storage with type package for user
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     out = get_packages(user_id, return_as_string=False)
     return json.dumps(out["docs"])
@@ -316,9 +228,6 @@ def get_storage_objects():
     Routed from /storage/all
     Requests all docs from storage for user
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     out = get_storage_for_user(user_id, return_as_string=False)
     return json.dumps(out)
@@ -343,9 +252,6 @@ def set_package_object():
     Updates or creates a new package. Metadata is set by this function serverside to prevent mani-
     pulation.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = lzv_util.authenticate_couchdb()
     if not token:
@@ -408,9 +314,6 @@ def delete_package_object():
     Routed from /storage/packages/delete PUT
     Delete the package provided in data from database
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = lzv_util.authenticate_couchdb()
     if not token:
@@ -453,9 +356,6 @@ def get_metadata():
     """
     Return Metadata structure file from server, providing information about supported meta data
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     data = ""
     with open(lzv_util.CONFIGPARAMS["METADATA_INFO_FILE"]) as f:
         data = f.read()
@@ -467,9 +367,6 @@ def get_export_definitions():
     """
     Return Metadata exports file from server, defining exports how it will be exported
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     data = ""
     with open(lzv_util.CONFIGPARAMS["METADATA_EXPORT_DEFINITIONS"]) as f:
         data = f.read()
@@ -481,9 +378,6 @@ def get_export_mappings():
     """
     Return Metadata structure file from server, providing mapping between schemes and exports
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     data = ""
     with open(lzv_util.CONFIGPARAMS["METADATA_EXPORT_MAPPINGS"]) as f:
         data = f.read()
@@ -496,9 +390,6 @@ def get_user_stored_metadata():
     Routed from /metadata/user GET
     Gets the stored metadata sets for the requesting user
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
     response = json.loads(lzv_util.query_db(query,\
@@ -513,9 +404,6 @@ def delete_user_metadata_set():
     Routed from /metadata/user/delete PUT
     Delete the meta_set provided in data from database
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = lzv_util.authenticate_couchdb()
     if not token:
@@ -559,9 +447,6 @@ def store_user_metadata():
     Routed from /metadata/user PUT
     Stores the provided metadata entry for user. if en entry with same set_id exists it will be
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     token = lzv_util.authenticate_couchdb()
     if not token:
@@ -606,9 +491,6 @@ def get_user_stored_ingests():
     Routed from /ingest/user GET
     Gets the stored ingests for the requesting user
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
     response = json.loads(lzv_util.query_db(query,\
@@ -645,9 +527,6 @@ def store_user_ingest():
     Routed from /ingest/user PUT
     Stores an updated ingests for the user, version managing is done on client side
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     data = json.loads(request.get_data())
     data["owner"] = user_id
@@ -799,9 +678,6 @@ def submit_user_ingest_to_review():
     ingest in a seperate db so it cant be deleted since we need to verify to always have access
     to the provided data. Ingests are first stored in a review database. after review
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     token = lzv_util.authenticate_couchdb()
     if not token:
         return (
@@ -860,9 +736,6 @@ def revoke_ingest():
     triggered when the reviewer revokes an ingest. either ingest is revoked completely or is
     returned to sender with a note what need to be changes.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
         return ({"Error": "NOT PERMITTED"},401,{"Content-Type": "application/json"})
     # token = authenticate_couchdb()
@@ -891,9 +764,6 @@ def approve_ingest():
     called when the reviewer approves the ingest. the process of deploying the ingest to rosetta is
     then started.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
         return (
             {"Error": "NOT AUTHORIZED FOR REVIEW"},
@@ -1022,9 +892,6 @@ def get_toreview_ingests():
     get Ingests which need to be reviewed. Review permission is checked before returning
      information. if no permission is available for review 401 is returned.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
         sys.stderr.write("get_toreview_ingests: Error user not authorized for review.\n")
         return (
@@ -1042,9 +909,6 @@ def get_submitted_ingests():
     """
     Get the submitted ingests for user from database
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     query = {"selector": {"owner": request.cookies["session_user"]}}
     response = lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
     if response:
@@ -1063,9 +927,6 @@ def receive_file():
     Receive files belonging to a package. This is definied by package_id in parameteres. It
     needs to check if the package is manually created AND belonging to the right user.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     package_id = request.args.get("package_id")
     user_id = request.cookies["session_user"]
     query = {"selector": {"package_id": package_id, "owner": user_id}}
@@ -1262,9 +1123,6 @@ def receive_package():
         then can send fiels to this package with the package_id. The metadata for package creation
         is only the name of package, everything else is set serverside
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     data = {}
     data["package_id"] = str(uuid.uuid4())

@@ -1,6 +1,12 @@
 '''
 LZVUTIL module. general functions for usage in lzv application. no anchors are handled in this file
 '''
+# TODO: Extract auth methods into separate module
+# TODO: Change authentication to serverless sessions (e.g. JWT)
+
+# With Review Process:
+# TODO: Put permissions for users into Database
+# TODO: Create Admin-Panel to manage user permissions
 
 import json
 import requests
@@ -90,24 +96,15 @@ def authenticate_ldap(uname, pword):
 
 def validate_user_session(request):
     '''
-        checks request for session_user and session_auth object. validates these against local
-        session files. returns {"success": TRUE/FALSE, "return_error": {
-            {"Error": FAILED_AUTHENTICATION},
-            401,
-            {"Content-Type": "application/json"}
-        }}
+        checks request for session_user and session_auth object and validates these against local
+        session files. 
+        Returns a boolean indicating the validity of the session.
     '''
-    if "session_user" in request.cookies and "session_auth" in request.cookies:
-        if check_session(request.cookies["session_user"], request.cookies["session_auth"]):
-            return {"success" : True}
-    return {
-        "success" : False,
-        "return_error" :{
-            "Error": FAILED_AUTHENTICATION,
-            "code" : "401",
-            "Content-Type": "application/json"
-        }
-    }
+    if not "session_user" in request.cookies and not "session_auth" in request.cookies:
+        return False
+    if not check_session(request.cookies["session_user"], request.cookies["session_auth"]):
+        return False
+    return True
 
 
 def authenticate_couchdb():

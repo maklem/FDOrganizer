@@ -21,9 +21,6 @@ def authenticate_labfolder():
     """
     Authenticate to LabFolder and returns the login answer
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     url = lzv_util.CONFIGPARAMS["labFolderBaseURL"] + "/auth/login"
     data = request.get_data()
     headers = {"Content-Type": "application/json"}
@@ -36,9 +33,6 @@ def logout_labfolder():
     """
     Kills the Session associated to the provided token
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     url = lzv_util.CONFIGPARAMS["labFolderBaseURL"] + "/auth/logout"
     headers = {
         "Content-Type": "application/json",
@@ -55,9 +49,6 @@ def get_projects():
     """
     Accesses LabFolder by Token and retreives the Projects from User. Answer is returned by REST.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     url = lzv_util.CONFIGPARAMS["labFolderBaseURL"] + "/projects"
     headers = {
         "Content-Type": "application/json",
@@ -73,9 +64,6 @@ def get_notebook_entries():
     """
     Accesses LabFolder by Token and retreives the Entries from User. Answer is returned by REST.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     url = lzv_util.CONFIGPARAMS["labFolderBaseURL"] + "/entries"
     headers = {
         "Content-Type": "application/json",
@@ -92,9 +80,6 @@ def download_file_to_client():
     Creates a zip File with the Entry requested by the user, and transfers the zip by HTTP.
     Receives only a list of ids of dataobjects. querys these from database
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     project_id = request.args.get("project_id")
     entry_id = request.args.get("entry_id")
     entry_version_id = request.args.get("entry_version_id")
@@ -135,9 +120,6 @@ def get_labfolder_storage_data():
     Routed from /labfolder/storage
     Requests the storage file, containg metadata about stored files for the requesting user
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     out = get_labfolder_data(user_id, return_as_string=False)
     return json.dumps(out["docs"])
@@ -165,9 +147,6 @@ def download():
     Only downloads new files from labfolder. Adds documents to doc db and metadata files to
     storage db. also creates package files for entrys for all elements containing the elements.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     user_id = request.cookies["session_user"]
     data = request.get_data()
     json_data = json.loads(data)
@@ -503,9 +482,6 @@ def get_mdb_categories():
     Routed from /mdb/categories.
     Retreives the category information about Material Databse from labfolder and returns this.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     url = lzv_util.CONFIGPARAMS["labFolderBaseURL"] + "/mdb/categories"
     # prepare header
     headers = {
@@ -524,9 +500,6 @@ def download_mdb_items():
     routed from /mdb/items
     Download the Material Database Items to Server.
     """
-    result = lzv_util.validate_user_session(request)
-    if not result["success"]:
-        return result["return_error"]
     url_items = lzv_util.CONFIGPARAMS["labFolderBaseURL"] + "/mdb/items"
     url_categories = lzv_util.CONFIGPARAMS["labFolderBaseURL"] + "/mdb/categories"
     category_id = request.args.get("category_id", default="", type=str)
