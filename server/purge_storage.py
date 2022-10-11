@@ -1,88 +1,44 @@
 '''
     Script for purging the storageFile couchDB for testing purposes
 '''
-import json
 import sys
 import requests
-#baseURL of labFolder
-# CONFIGPARAMS["labFolderBaseURL"] = 'https://eln.labfolder.com/api/v2'
-#storage base url - here the downlaoded data is stored, should terminate with a '/'
-# storageBaseURL = './LabFolderData/'
-# storage_fileName = 'storage.json'
-# CONFIGPARAMS["tempFolder"] = "./tmp/"
+import create_database
 
-#couchDBConfiguration Parameters
-# CONFIGPARAMS["couchDBBaseURL"] = "http://127.0.0.1:5984"
-# CONFIGPARAMS["couchDBAdmin"] = "admin"
-# CONFIGPARAMS["couchDBPassword"] = "aodqfyUQqA"
-# couchDBToken = ""
-# CONFIGPARAMS["couchDBStorageDatabaseName"] = "storage"
-# CONFIGPARAMS["couchDBDocumentDatabaseName"] = "documents"
-# CONFIGPARAMS["couchDBStaticDatabaseName"] = "static"
+def getDatabaseName():
+    if len(sys.argv) == 2:
+        return str(sys.argv[1])
+    return input("Welche Datenbank möchten Sie zurücksetze:\n")
 
+def delete(url: str, token: str):
+    couch_header = {
+        "Accept": "application/json",
+        "Content-Type" : "application/json",
+        "Cookie" :  token
+    }
+    return requests.delete(url, headers=couch_header)
 
-#DELETE AFTER DEV
-DEVUSER_ID = "bt303343"
-#----------------------global Parameters-------------------------------------------
+def print_reset_error(name: str, response: requests.Response):
+    print(f'Error resetting Database "{name}":')
+    print(f'{response.json()["reason"]}')
 
-CONFIGPARAMS = {}
-
-#----------------------initialization------------------------------------------
-
-with open('/server/lzv/server/conf/config.json') as f:
-    CONFIGPARAMS = json.load(f)
-
-
-def authenticate_couchdb():
-    '''
-    Authenticate to CouchDB and return login token
-    '''
-    url = CONFIGPARAMS["couchDBBaseURL"] + '/_session'
-    data = "name=" + CONFIGPARAMS["couchDBAdmin"] + "&password=" + CONFIGPARAMS["couchDBPassword"]
-    # data =  {"name":  CONFIGPARAMS["couchDBAdmin"], "password": CONFIGPARAMS["couchDBPassword"]}
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    response = requests.post(url, data=data, headers=headers)
-    if response.status_code == 200:
-        cookie = response.headers["Set-Cookie"]
-        couchdb_token = cookie[:cookie.find(";")]
-        return couchdb_token
-    return False
-
-
-def purge_database(database_name):
-    '''
-        Purges the storage file
-    '''
-    token = authenticate_couchdb()
-    if not token:
+def reset_database(name: str, token: str):
+    print(f'Resetting Database "{name}"')
+    url = f'{create_database.getBaseURL()}/{name}'
+    deletion = delete(url, token)
+    if deletion.status_code != 201:
+        print_reset_error(name, creation)
         return
-    purge_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + database_name + "/" + "_purge"
-    print(purge_url)
-    get_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + database_name + "/_all_docs"
-    print(get_url)
-    couch_header = {"Accept": "application/json",
-                    "Content-Type" : "application/json",
-                    "Cookie" :  token}
-    rev_response = json.loads(requests.get(get_url, headers=couch_header).text)
-    print(json.dumps(rev_response))
-    if not rev_response:
-        print("Error geting revision info")
-    data = {}
-    for doc in rev_response['rows']:
-        data[doc['id']] = []
-        data[doc['id']].append(doc['value']['rev'])
-    print(json.dumps(data))
-    response = requests.post(purge_url, headers=couch_header, data=json.dumps(data))
-    if response:
-        print("succesfully purged with message: ")
-        print(response.text)
-    else:
-        print("error purging!")
-        print(response.text)
-
+    creation = create_database.create(url, token)
+    if creation.status_code != 201:
+        print_reset_error(name, creation)
+        return
+    print("Successfully reset database" + name)
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        purge_database(str(sys.argv[1]))
-    else:
-        print("usage: purge_storage.py <database_name>")
+    username, password = create_database.getCredentials().values()
+    token = create_database.getAuthenticationToken(username, password)
+    if not token:
+        sys.exit()
+    databaseName = getDatabaseName()
+    reset_database(databaseName, token)

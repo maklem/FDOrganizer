@@ -63,7 +63,6 @@ def create_database(name: str, token: str):
 #Run
 if __name__ == '__main__':
     username, password = getCredentials().values()
-    print(username, password)
     token = getAuthenticationToken(username, password)
     if not token:
         sys.exit()
