@@ -5,3 +5,6 @@
 /server/__pycache__
 /server/conf/config.json
 /server/flask_session
+
+# IDE settings
+/.vscode
