@@ -7,7 +7,7 @@ import requests
 
 #Reading Config
 def getConfig():
-    with open('./conf/config.json') as f:
+    with open('./server/conf/config.json') as f:
         return json.load(f)
 
 def getCredentials():
