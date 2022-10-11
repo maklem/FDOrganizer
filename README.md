@@ -61,7 +61,7 @@ Projekt LZV des Bibliotheksverbund Bayern
 
 1. Konfiguration der Datenbanken
 
-    Nach dem Erstellen muss das Matching zwischen Datenbank <-> und gespeicherter Entität in der Konfiguration hinterlegt werden
+    Nach dem Erstellen muss das Matching Datenbank <-> gespeicherte Entität in der Konfiguration hinterlegt werden
 
     ```json
     {
@@ -73,3 +73,18 @@ Projekt LZV des Bibliotheksverbund Bayern
         "couchDBIngestReviewDatabaseName": "ingest_review"
     }
     ```
+
+## Wartung
+
+### Datenbanken verwalten
+
+* Zurücksetzen von Datenbanken
+
+    Während der Entwicklung in einer Testinstanz kann es Sinn machen, die Datenbanken des FDOrganizer zu leeren um keine überholten Daten zu nutzen.
+    Dazu kann das Skript zum zurücksetzen der Datenbanken genutzt werden.
+
+    ```python
+        python reset_database.py <database_name>
+    ```
+
+    Wird der Name beim Start des Skripts nicht übergeben, wird dieser nachträglich abgefragt.
