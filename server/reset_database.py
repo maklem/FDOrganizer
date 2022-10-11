@@ -27,7 +27,7 @@ def reset_database(name: str, token: str):
     url = f'{create_database.getBaseURL()}/{name}'
     deletion = delete(url, token)
     if deletion.status_code != 201:
-        print_reset_error(name, creation)
+        print_reset_error(name, deletion)
         return
     creation = create_database.create(url, token)
     if creation.status_code != 201:
