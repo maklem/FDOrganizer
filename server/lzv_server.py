@@ -1177,4 +1177,4 @@ def receive_package():
 if __name__ == "__main__":
     # print(get_storage_for_user("bt303343", return_as_string=True))
     # authenticate_couchdb()
-    APP.run(debug=True)
+    APP.run(debug=True, ssl_context=('./ssl/ca.crt', './ssl/ca.key'))
