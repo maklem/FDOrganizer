@@ -3,12 +3,14 @@ Module for labfolder integration. implements the api calls to access labfolde re
 '''
 
 import json
-import uuid
 import time
-from zipfile import ZipFile
-import requests
+import uuid
 from pathlib import Path
+from zipfile import ZipFile
+
+import requests
 from flask import Blueprint, request, send_from_directory
+
 import lzv_util
 
 rep_labfolder = Blueprint('labfolder', __name__)

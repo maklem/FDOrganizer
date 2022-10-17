@@ -1,9 +1,10 @@
 '''
     module for easy interface to smtplib for sending emails
 '''
-import smtplib, ssl
-from email.mime.text import MIMEText
+import smtplib
+import ssl
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 def send_mail(server_adress, server_port, cred_login, cred_pw, sender_email, receiver_email, subject, content):

@@ -1,23 +1,25 @@
 """
 Software for LZV Server.
 """
-import time
-from pathlib import Path
-import shutil
-import uuid
 import json
-import requests
-import mets
+import shutil
 import sys
+import time
+import uuid
+from pathlib import Path
+
+import requests
 
 # from flask import Flask, session
-from flask import Flask, request, render_template, redirect, url_for
-from flask_session import Session
+from flask import Flask, redirect, render_template, request, url_for
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-from repoman_labfolder import rep_labfolder
-from repoman_easydb import rep_easydb
+
 import lzv_util
+import mets
+from flask_session import Session
+from repoman_easydb import rep_easydb
+from repoman_labfolder import rep_labfolder
 
 DEBUG = 1
 # ----------------------initialization------------------------------------------
@@ -30,16 +32,18 @@ APP.config["SESSION_PERMANENT"] = False
 APP.config["UPLOAD_FOLDER"] = lzv_util.CONFIGPARAMS["USR_UPLOAD_TMP_FOLDER"]
 CORS(APP)
 Session(APP)
-APP.register_blueprint(rep_labfolder, url_prefix='/labfolder')
-APP.register_blueprint(rep_easydb, url_prefix='/easydb')
+APP.register_blueprint(rep_labfolder, url_prefix="/labfolder")
+APP.register_blueprint(rep_easydb, url_prefix="/easydb")
 
 # ----------------------Page Navigation-----------------------------------------
 
 # TODO: Navigation auf SPA umstellen
 # TODO: Redirect auf Seite vor dem erzwungenen Login
 
+
 def needs_authentication():
     return request.path != url_for("navlogin") and "static" not in request.path
+
 
 @APP.before_request
 def auth_guard():
@@ -48,6 +52,7 @@ def auth_guard():
     if not lzv_util.validate_user_session(request):
         return redirect(url_for("navlogin"))
     return None
+
 
 @APP.route("/")
 def navhome():
@@ -106,7 +111,7 @@ def navlzvreview():
 @APP.route("/login", methods=["GET"])
 def navlogin():
     if lzv_util.validate_user_session(request):
-        return redirect(url_for('navhome'))
+        return redirect(url_for("navhome"))
     return render_template("login.html")
 
 
@@ -150,7 +155,6 @@ def logout_lzv():
         200,
         {"Content-Type": "application/json"},
     )
-
 
 
 def create_storage_data_structure_from_upload(user_id, _file):
@@ -218,7 +222,9 @@ def get_packages(user_id, return_as_string=False):
     Returns the package docs for @user_id either as (json)string or json-object.
     """
     query = {"selector": {"owner": user_id, "type": "PACKAGE"}}
-    response = lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+    response = lzv_util.query_db(
+        query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"]
+    )
     return response if return_as_string else json.loads(response)
 
 
@@ -238,10 +244,9 @@ def get_storage_for_user(user_id, return_as_string=False):
     Returns the package and data docs for @user_id either as (json)string or json-object.
     """
     query = {"selector": {"owner": user_id}}
-    response = json.loads(lzv_util.query_db(query,\
-                lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"]))[
-        "docs"
-    ]
+    response = json.loads(
+        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+    )["docs"]
     return json.dumps(response) if return_as_string else response
 
 
@@ -274,7 +279,9 @@ def set_package_object():
         + data["package_id"]
     )
     # prepare date to be written to db. if it is an update we only need to change some
-    if check_response["docs"]:  # only one entry with same id should exist at the same time
+    if check_response[
+        "docs"
+    ]:  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         data["package_object_metadata"] = check_response["docs"][0][
             "package_object_metadata"
@@ -392,8 +399,9 @@ def get_user_stored_metadata():
     """
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
-    response = json.loads(lzv_util.query_db(query,\
-                lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"]))
+    response = json.loads(
+        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
+    )
     return json.dumps(response["docs"])
 
 
@@ -469,7 +477,9 @@ def store_user_metadata():
         + "/"
         + data["set_id"]
     )
-    if check_response["docs"]:  # only one entry with same id should exist at the same time
+    if check_response[
+        "docs"
+    ]:  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
     response = requests.put(url, headers=headers, data=json.dumps(data))
     if response:
@@ -493,8 +503,9 @@ def get_user_stored_ingests():
     """
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
-    response = json.loads(lzv_util.query_db(query,\
-                lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"]))
+    response = json.loads(
+        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
+    )
     return json.dumps(response["docs"])
 
 
@@ -505,7 +516,9 @@ def get_ingest_by_user_and_id_in_review_db(user_id, ingest_id):
     query = {"selector": {"owner": user_id, "ingest_id": ingest_id}}
     # query = {"selector": {"owner": user_id}}
     response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"]
+        )
     )
     return response["docs"]
 
@@ -516,8 +529,9 @@ def get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id):
     """
     query = {"selector": {"owner": user_id, "ingest_id": ingest_id}}
     # query = {"selector": {"owner": user_id}}
-    response = json.loads(lzv_util.query_db(query,\
-                lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"]))
+    response = json.loads(
+        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
+    )
     return response["docs"]
 
 
@@ -561,7 +575,9 @@ def update_or_create_user_ingest(user_id, ingest):
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    if check_response["docs"]:  # only one entry with same id should exist at the same time
+    if check_response[
+        "docs"
+    ]:  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         if "_id" in ingest:
             del ingest["_id"]
@@ -609,7 +625,9 @@ def remove_user_ingest(user_id, ingest):
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    if check_response["docs"]:  # only one entry with same id should exist at the same time
+    if check_response[
+        "docs"
+    ]:  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         response = requests.delete(url, headers=headers, data=json.dumps(ingest))
         if response:
@@ -632,7 +650,9 @@ def update_or_create_reviewdb_ingest(user_id, ingest):
     """
     query = {"selector": {"owner": user_id, "ingest_id": ingest["ingest_id"]}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"]
+        )
     )
     url = (
         lzv_util.CONFIGPARAMS["couchDBBaseURL"]
@@ -653,7 +673,9 @@ def update_or_create_reviewdb_ingest(user_id, ingest):
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    if check_response["docs"]:  # only one entry with same id should exist at the same time
+    if check_response[
+        "docs"
+    ]:  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
     del ingest["_id"]
     del ingest["_rev"]
@@ -688,10 +710,13 @@ def submit_user_ingest_to_review():
     user_id = request.cookies["session_user"]
     ingest = json.loads(request.get_data())
     ingest["owner"] = user_id
-    ingest["state"] = 'REVIEW'
+    ingest["state"] = "REVIEW"
     ingest["ingest_metadata"]["submit_date"] = time.strftime("%Y-%m-%dT%T.000+0000")
     success = create_ingest_on_filesystem(
-        user_id, ingest["ingest_id"], lzv_util.CONFIGPARAMS["LZV_REVIEW"], search_in_review_db=False
+        user_id,
+        ingest["ingest_id"],
+        lzv_util.CONFIGPARAMS["LZV_REVIEW"],
+        search_in_review_db=False,
     )
     print(success)
     if not success:
@@ -719,15 +744,15 @@ def submit_user_ingest_to_review():
             200,
             {"Content-Type": " application/json"},
         )
-    #if not successfull, review data is deleted form file system since input to review database was
-    #not successfull
+    # if not successfull, review data is deleted form file system since input to review database was
+    # not successfull
     review_path = lzv_util.CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"]
     shutil.rmtree(review_path)
     return (
         json.dumps({"Result": "Error Storing ingest"}),
         500,
         {"Content-Type": "application/json"},
-        )
+    )
 
 
 @APP.route("/ingest/revoke", methods=["PUT"])
@@ -737,7 +762,7 @@ def revoke_ingest():
     returned to sender with a note what need to be changes.
     """
     if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
-        return ({"Error": "NOT PERMITTED"},401,{"Content-Type": "application/json"})
+        return ({"Error": "NOT PERMITTED"}, 401, {"Content-Type": "application/json"})
     # token = authenticate_couchdb()
     user_id = request.cookies["session_user"]
     ingest_id = request.args.get("ingest_id")
@@ -755,7 +780,7 @@ def revoke_ingest():
         json.dumps({"Result": "Error Storing ingest"}),
         500,
         {"Content-Type": "application/json"},
-        )
+    )
 
 
 @APP.route("/ingest/approve", methods=["PUT"])
@@ -799,7 +824,9 @@ def approve_ingest():
     # store the modified ingst in database.
 
 
-def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_review_db=True):
+def create_ingest_on_filesystem(
+    user_id, ingest_id, base_folder, search_in_review_db=True
+):
     """
     create the files for the ingest on the defined folder. folder should be hotfolder to rosetta
     system. also created the mets files basedo n the data provided in the ingest.
@@ -865,11 +892,19 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
                     tmp_file.touch(mode=0o770, exist_ok=True)
                     tmp_json_file.touch(mode=0o770, exist_ok=True)
                     tmp_file.write_bytes(response.content)
-                    tmp = [item for item in storage_file \
-                            if f["package_id"] == item["package_id"]][0]
+                    tmp = [
+                        item
+                        for item in storage_file
+                        if f["package_id"] == item["package_id"]
+                    ][0]
                     tmp_json_file.write_text(
-                        json.dumps([item for item in storage_file \
-                            if f["package_id"] == item["package_id"]][0])
+                        json.dumps(
+                            [
+                                item
+                                for item in storage_file
+                                if f["package_id"] == item["package_id"]
+                            ][0]
+                        )
                     )
                 except:
                     success = False
@@ -884,8 +919,6 @@ def create_ingest_on_filesystem(user_id, ingest_id, base_folder, search_in_revie
 # TODO function which checks state of ingest after
 
 
-
-
 @APP.route("/ingest/toreview", methods=["GET"])
 def get_toreview_ingests():
     """
@@ -893,14 +926,18 @@ def get_toreview_ingests():
      information. if no permission is available for review 401 is returned.
     """
     if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
-        sys.stderr.write("get_toreview_ingests: Error user not authorized for review.\n")
+        sys.stderr.write(
+            "get_toreview_ingests: Error user not authorized for review.\n"
+        )
         return (
             {"Error": "NOT AUTHORIZED FOR REVIEW"},
             401,
             {"Content-Type": "application/json"},
         )
     query = {"selector": {"state": "REVIEW"}}
-    response = lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
+    response = lzv_util.query_db(
+        query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"]
+    )
     return response
 
 
@@ -910,7 +947,9 @@ def get_submitted_ingests():
     Get the submitted ingests for user from database
     """
     query = {"selector": {"owner": request.cookies["session_user"]}}
-    response = lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"])
+    response = lzv_util.query_db(
+        query, lzv_util.CONFIGPARAMS["couchDBIngestReviewDatabaseName"]
+    )
     if response:
         return response
     sys.stderr.write("get_submitted_ingests: Error requesting submitted ingests\n")
@@ -934,8 +973,10 @@ def receive_file():
         lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
     )["docs"]
     if not check_response:
-        sys.stderr.write("receive_file: Error: Invalid Package ID oder Package does not belong\
-                         to user\n")
+        sys.stderr.write(
+            "receive_file: Error: Invalid Package ID oder Package does not belong\
+                         to user\n"
+        )
         return (
             json.dumps(
                 {
@@ -1025,19 +1066,23 @@ def append_children_to_package(user_id, package_id, append_children):
     )
     data = {}
     # prepare data to be written to db. if it is an update we only need to change some
-    if check_response["docs"]:  # only one entry with same id should exist at the same time
+    if check_response[
+        "docs"
+    ]:  # only one entry with same id should exist at the same time
         data = check_response["docs"][0]
         headers["If-Match"] = check_response["docs"][0]["_rev"]
         data["package_object_metadata"]["last_change"] = time.strftime(
             "%Y-%m-%dT%T.000+0000"
         )
-        if not 'child_data_objects' in data:
+        if not "child_data_objects" in data:
             data["child_data_objects"] = []
         for item in append_children:
             data["child_data_objects"].append(item["package_id"])
     else:  # when this is a new package, some additional fields need to be changed
-        sys.stderr.write("append_children_to_package: Error adding children to package. \
-            No Package found  with package_id.\n")
+        sys.stderr.write(
+            "append_children_to_package: Error adding children to package. \
+            No Package found  with package_id.\n"
+        )
         return (
             json.dumps(
                 {
@@ -1103,7 +1148,9 @@ def upload_file_to_couchdb_document_db(f, metadata_obj):
         metadata_obj["data_object_metadata"]["filename"] = filename
         metadata_obj["data_object_metadata"]["doc_id"] = json_answer["id"]
     else:
-        sys.stderr.write("upload_file_to_couchdb_document_db: Error Uploading File to Database.\n")
+        sys.stderr.write(
+            "upload_file_to_couchdb_document_db: Error Uploading File to Database.\n"
+        )
         return (
             json.dumps({"Result": "Error Uploading File to Database."}),
             500,
@@ -1177,4 +1224,4 @@ def receive_package():
 if __name__ == "__main__":
     # print(get_storage_for_user("bt303343", return_as_string=True))
     # authenticate_couchdb()
-    APP.run(debug=True, ssl_context=('./ssl/ca.crt', './ssl/ca.key'))
+    APP.run(debug=True, ssl_context=("./ssl/ca.crt", "./ssl/ca.key"))
