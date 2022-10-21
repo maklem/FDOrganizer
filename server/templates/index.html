@@ -1,18 +1,4 @@
 {% extends "template.html" %}
-{% block content %}
-<div class="col-md-8" id="mainpage">
-	<div class="col-md-8">
-		<b><p>Herzlich willkommen!</p></b>
-		Dies ist eine Alpha-Version des FDOrganizers in aktiver Entwicklung. Dieser kann sich jederzeit ändern und Daten können jederzeit gelöscht werden. Bitte mit Vorsicht nutzen.
-		<br>
-		Bei Problemen bitte melden bei robert.guenther@uni-bayreuth.de
-	</div>
-</div>
-<div class="col-md-4">
-				
-
-</div>
-{% endblock %}
-{% block script %}
-<script src="{{ url_for('static', filename='js/LZVIndex.js') }}"></script>
+{% block js %}
+<script type="module" src="{{url_for('static', filename='js/index/index.js')}}"></script>
 {% endblock %}
