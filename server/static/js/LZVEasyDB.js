@@ -1,11 +1,8 @@
 //Initialization Function
-$(document).ready(function() {
+$(document).ready(function () {
     var ct = getLocalStorage('easyDBToken');
     if (ct && ct != '') {
         updateContentAfterLogin();
-    }
-    if (checkLZVLogin()) {
-        $('#logout_lzv').show();
     }
     getEasyDBStorage();
 });
@@ -28,11 +25,11 @@ function authenticate(form) {
     console.log("trying to auth")
     var username = form.elements.username.value;
     var password = form.elements.pwd.value;
-    interface_easydb_authenticate(username, password, function(xhttp_repsonse) {
+    interface_easydb_authenticate(username, password, function (xhttp_repsonse) {
         data = JSON.parse(xhttp_repsonse);
-        if(!("error" in data)) {
+        if (!("error" in data)) {
             var easyDBToken = data.token;
-            setLocalStorage("easyDBToken",  easyDBToken);
+            setLocalStorage("easyDBToken", easyDBToken);
             updateContentAfterLogin();
         }
 
@@ -53,7 +50,7 @@ function clearCookies() {
 
 
 function logout() {
-    interface_easydb_logout(getLocalStorage("easyDBToken"), function() {
+    interface_easydb_logout(getLocalStorage("easyDBToken"), function () {
         $('form[id=selectableEntries]').empty();
         $("#repositoryLoginform").show();
         $("#repositoryLoginSuccesful").hide();
@@ -63,9 +60,9 @@ function logout() {
 }
 
 
-function getEasyDBStorage () {
+function getEasyDBStorage() {
     var url = baseURL + '/easydb/storage';
-    xhttp.onreadystatechange = function(e) {
+    xhttp.onreadystatechange = function (e) {
         if (this.readyState == 4) {
             if (this.status == 200) {
                 console.log(xhttp.response);
@@ -78,14 +75,14 @@ function getEasyDBStorage () {
 }
 
 
-$("#downloadSelectedElements").click(function() {
+$("#downloadSelectedElements").click(function () {
     downloadSelectedElements();
 });
 
 
 function downloadSelectedElements() {
-        downloadSelectedCollections();
-/*        getStorageFile();*/
+    downloadSelectedCollections();
+    /*        getStorageFile();*/
 }
 
 
@@ -120,7 +117,7 @@ function updateContentAfterLogin() {
 }
 
 function getCollections() {
-    interface_easydb_get_collections(getLocalStorage("easyDBToken"), function(xhttp_response){
+    interface_easydb_get_collections(getLocalStorage("easyDBToken"), function (xhttp_response) {
         easyDBCollections = JSON.parse(xhttp_response);
         setLocalStorage("easyDBCollections", xhttp_response);
         updateEasyDBSelectableElements();
@@ -128,7 +125,7 @@ function getCollections() {
 }
 
 function getCollectionContentInfo(id) {
-    interface_easydb_get_collection_content_info(getLocalStorage("easyDBToken"), id, function(xhttp_response){
+    interface_easydb_get_collection_content_info(getLocalStorage("easyDBToken"), id, function (xhttp_response) {
         return JSON.parse(xhttp_response);
     });
 }
@@ -136,51 +133,51 @@ function getCollectionContentInfo(id) {
 function updateEasyDBSelectableElements() {
     $('form[id=selectableEntries]').empty();
     var append = '';
-        for (var i = 0; i < easyDBCollections.length; i++) {
-            var obj = easyDBCollections[i];
-            append += '<div class="collectionEntry"><div class="entrySelect lzvButton easyDBCollection"><input type="checkbox" value="" id="' + obj.collection._id + '" name="' + obj.collection._id + '">';
-            append += '<label for="' + obj.collection._id + '" class="selectLabel">' + Object.values(obj.collection.displayname)[0];
-            append += '<div class="versionCounter"><button type="button" class="expandVersionButton" id="'+ obj.collection._id +'"onclick="toggleDisplayCollectionInfo(this)">Details</button></div>';
-            /*if (display_objects_storage && storage_entry && unique_entry_versions > 0) {
-                append += '<span class="versionCounter"><button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);">';
-                append += unique_entry_versions + ' version';
-                if (unique_entry_versions > 1) {
-                    append += 's ';
-                } else {
-                append += ' ';
+    for (var i = 0; i < easyDBCollections.length; i++) {
+        var obj = easyDBCollections[i];
+        append += '<div class="collectionEntry"><div class="entrySelect lzvButton easyDBCollection"><input type="checkbox" value="" id="' + obj.collection._id + '" name="' + obj.collection._id + '">';
+        append += '<label for="' + obj.collection._id + '" class="selectLabel">' + Object.values(obj.collection.displayname)[0];
+        append += '<div class="versionCounter"><button type="button" class="expandVersionButton" id="' + obj.collection._id + '"onclick="toggleDisplayCollectionInfo(this)">Details</button></div>';
+        /*if (display_objects_storage && storage_entry && unique_entry_versions > 0) {
+            append += '<span class="versionCounter"><button type="button" class="expandVersionButton" onclick="toggleDisplayVersions(this);">';
+            append += unique_entry_versions + ' version';
+            if (unique_entry_versions > 1) {
+                append += 's ';
+            } else {
+            append += ' ';
+            }
+            append += '<span class="arrow">v</span></button></span>';
+        }*/
+        append += '</label>';
+        append += '</div>\n';
+        append += '<div class="versionList collectionInfo">';
+        /*if (unique_entry_versions > 0) {
+            var done_versions = {};
+            for (var j = 0; j < storage_entry.length; j++) {
+                var entry_version_id = storage_entry[j].origin_metadata.entry_version_id;
+                if (done_versions[entry_version_id]) {
+                    continue;
                 }
-                append += '<span class="arrow">v</span></button></span>';
-            }*/
-            append += '</label>';
-            append += '</div>\n';
-            append += '<div class="versionList collectionInfo">';
-                /*if (unique_entry_versions > 0) {
-                    var done_versions = {};
-                    for (var j = 0; j < storage_entry.length; j++) {
-                        var entry_version_id = storage_entry[j].origin_metadata.entry_version_id;
-                        if (done_versions[entry_version_id]) {
-                            continue;
-                        }
-                        done_versions[entry_version_id] = true;
-                        date = new Date(storage_entry[j].origin_metadata.entry_version_date);
-                        let formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-                        append += '<div class="versionDetail"><span>';
-                        append += formatted_date;
-                        var dlurl = baseURL + '/labfolder/download?project_id=' + display_project_id + '&entry_id=' + obj.id + '&entry_version_id=' + storage_entry[j].origin_metadata.entry_version_id;
-                        append += '</span><button type="button" class="expandVersionButton" id="' + dlurl + '" + onclick="downloadVersion(this);">Download</button></div>';
-                    }
-                }*/
-                append += '</div></div></div>';
-        }
-        $(append).appendTo('#selectableEntries');
+                done_versions[entry_version_id] = true;
+                date = new Date(storage_entry[j].origin_metadata.entry_version_date);
+                let formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                append += '<div class="versionDetail"><span>';
+                append += formatted_date;
+                var dlurl = baseURL + '/labfolder/download?project_id=' + display_project_id + '&entry_id=' + obj.id + '&entry_version_id=' + storage_entry[j].origin_metadata.entry_version_id;
+                append += '</span><button type="button" class="expandVersionButton" id="' + dlurl + '" + onclick="downloadVersion(this);">Download</button></div>';
+            }
+        }*/
+        append += '</div></div></div>';
+    }
+    $(append).appendTo('#selectableEntries');
 }
 
 function toggleDisplayCollectionInfo(clicked) {
-    if($(clicked).parents('.collectionEntry').find('.collectionDetail').length){
+    if ($(clicked).parents('.collectionEntry').find('.collectionDetail').length) {
         $(clicked).parents('.collectionEntry').children('.versionList').empty();
         return;
     }
-    interface_easydb_get_collection_content_info(getLocalStorage("easyDBToken"), $(clicked).attr('id'), function(xhttp_response){
+    interface_easydb_get_collection_content_info(getLocalStorage("easyDBToken"), $(clicked).attr('id'), function (xhttp_response) {
         var collection_info = JSON.parse(xhttp_response);
         let total_filesize = 0;
         let filecount = 0;
@@ -188,7 +185,7 @@ function toggleDisplayCollectionInfo(clicked) {
 
         let num_obj = collection_info.objects.length;
         for (const ele of collection_info.objects) {
-            if(ele.object.file){
+            if (ele.object.file) {
                 filecount++;
                 total_filesize += ele.object.file[0].filesize; //filesize if in Byte
                 filetypes[ele.object.file[0].extension] = true;
@@ -196,19 +193,16 @@ function toggleDisplayCollectionInfo(clicked) {
         }
         if (total_filesize > 1000000000) //GB
         {
-            total_filesize = String(Math.round(total_filesize/10000000)/100)+ "GB";
+            total_filesize = String(Math.round(total_filesize / 10000000) / 100) + "GB";
         }
-        else if(total_filesize > 1000000)
-        {
-            total_filesize = String(Math.round(total_filesize/10000)/100)+ "MB";
+        else if (total_filesize > 1000000) {
+            total_filesize = String(Math.round(total_filesize / 10000) / 100) + "MB";
         }
-        else if(total_filesize > 1000)
-        {
-            total_filesize = String(Math.round(total_filesize/10)/100)+ "kB";
+        else if (total_filesize > 1000) {
+            total_filesize = String(Math.round(total_filesize / 10) / 100) + "kB";
         }
-        else
-        {
-            total_filesize = String(total_filesize)+ "B";
+        else {
+            total_filesize = String(total_filesize) + "B";
         }
         var str_filetypes = '';
         for (const [key, value] of Object.entries(filetypes)) {
@@ -235,11 +229,10 @@ function downloadSelectedCollections() {
         }
     }
     if (ids.length > 0) {
-        for(const id of ids)
-        {
+        for (const id of ids) {
             interface_easydb_download_collection(getLocalStorage('easyDBToken'), id,
-                function() {
-                    $( "form[id=selectableEntries]" ).find("input:checkbox").prop( "checked", false );
+                function () {
+                    $("form[id=selectableEntries]").find("input:checkbox").prop("checked", false);
                     alert("Collection successfully downloaded!");
                 });
         }

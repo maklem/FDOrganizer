@@ -1,13 +1,10 @@
 //Initialization Function
-$(document).ready(function() {
+$(document).ready(function () {
     var ct = getLocalStorage('labFolderToken');
     if (ct && ct != '') {
         $("#repositoryDownloadButton").show();
         labFolderToken = ct;
         updateContentAfterLogin();
-    }
-    if (checkLZVLogin()) {
-        $('#logout_lzv').show();
     }
 });
 //contains the entries of the loged in user from labfolder, these are stored in cookies with same name
@@ -21,19 +18,19 @@ var labFolderMDB = {
     categories: Array()
 };
 var labFolderStorageFile; //storage file on server, will be filled with json object containing the files already available on server
-$("#logoutButton").click(function() {
+$("#logoutButton").click(function () {
     logout();
 });
-$("#getEntries").click(function() {
+$("#getEntries").click(function () {
     getEntries();
 });
-$("#downloadSelectedElements").click(function() {
+$("#downloadSelectedElements").click(function () {
     downloadSelectedElements();
 });
-$("#downloadMDB").click(function() {
+$("#downloadMDB").click(function () {
     downloadMDB();
 });
-$("#getProjects").click(function() {
+$("#getProjects").click(function () {
     getProjects();
 });
 
@@ -65,7 +62,7 @@ function downloadSelectedElements() {
     }
 }
 
-$("#selectAllElements").click(function() {
+$("#selectAllElements").click(function () {
     var childrenDiv = $('form[id=selectableEntries]').children();
     for (var i = 0; i < childrenDiv.length; i++) {
         var children = childrenDiv[i].children;
@@ -76,7 +73,7 @@ $("#selectAllElements").click(function() {
         }
     }
 });
-$("#deSelectAllElements").click(function() {
+$("#deSelectAllElements").click(function () {
     var childrenDiv = $('form[id=selectableEntries]').children();
     for (var i = 0; i < childrenDiv.length; i++) {
         var children = childrenDiv[i].children;
@@ -87,7 +84,7 @@ $("#deSelectAllElements").click(function() {
         }
     }
 });
-$("#updateContent").click(function() {
+$("#updateContent").click(function () {
     setLocalStorage("labFolderProjects", "");
     setLocalStorage("labFolderEntries", "");
     setLocalStorage("labFolderMDB", "");
@@ -158,7 +155,7 @@ function updateProjectMaterialSelection() {
 function authenticate(form) {
     var username = form.elements.username.value;
     var password = form.elements.pwd.value;
-    interface_labfolder_authenticate(username, password, function(xhttp_response) {
+    interface_labfolder_authenticate(username, password, function (xhttp_response) {
         data = JSON.parse(xhttp_response);
         if (!("error" in data)) {
             labFolderToken = data.token;
@@ -171,7 +168,7 @@ function authenticate(form) {
 }
 
 function logout() {
-    interface_labfolder_logout(getLocalStorage('labFolderToken'), function() {
+    interface_labfolder_logout(getLocalStorage('labFolderToken'), function () {
         $('form[id=selectableEntries]').empty();
         $("#repositoryLoginform").show();
         $("#repositoryLoginSuccesful").hide();
@@ -219,14 +216,14 @@ function updateContentAfterLogin() {
 }
 
 function getStorageFile() {
-    interface_labfolder_get_storagefile(function(xhttp_response) {
+    interface_labfolder_get_storagefile(function (xhttp_response) {
         labFolderStorageFile = JSON.parse(xhttp_response);
         setLocalStorage("labFolderStorageFile", JSON.stringify(labFolderStorageFile));
     });
 }
 
 function getProjects() {
-    interface_labfolder_get_projects(getLocalStorage('labFolderToken'), function(xhttp_response) {
+    interface_labfolder_get_projects(getLocalStorage('labFolderToken'), function (xhttp_response) {
         var parsedData = JSON.parse(xhttp_response);
         labFolderProjects.projects = [];
         for (var i = 0; i < parsedData.length; i++) {
@@ -247,7 +244,7 @@ function getProjects() {
 }
 
 function getEntries() {
-    interface_labfolder_get_entries(getLocalStorage('labFolderToken'), function(xhttp_response) {
+    interface_labfolder_get_entries(getLocalStorage('labFolderToken'), function (xhttp_response) {
         var parsedData = JSON.parse(xhttp.response);
         labFolderEntries.entries = [];
         for (var i = 0; i < parsedData.length; i++) {
@@ -280,7 +277,7 @@ function getEntries() {
 }
 
 function getMDBCategories() {
-    interface_labfolder_get_mdbcategories(getLocalStorage('labFolderToken'), function(xhttp_response) {
+    interface_labfolder_get_mdbcategories(getLocalStorage('labFolderToken'), function (xhttp_response) {
         var parsedData = JSON.parse(xhttp.response);
         labFolderMDB.categories = [];
         for (var i = 0; i < parsedData.length; i++) {
@@ -421,7 +418,7 @@ function downloadSelectedEntries() {
         }
         //elements contains the set of id, entryTitle, elementID. These should now be downloaded from server and saved in  a folder structure
         if (elements.length > 0) {
-            interface_labfolder_download_elements(elements, getLocalStorage('labFolderToken'), function() {});
+            interface_labfolder_download_elements(elements, getLocalStorage('labFolderToken'), function () { });
         }
     }
 }
@@ -437,7 +434,7 @@ function downloadSelectedMDBCategories() {
     }
     //elements contains the set of id, entryTitle, elementID. These should now be downloaded from server and saved in  a folder structure
     for (var i = 0; i < categoryIds.length; i++) {
-        xhttp.onreadystatechange = function(e) {
+        xhttp.onreadystatechange = function (e) {
             if (this.readyState == 4) {
                 if (this.status == 200) {
                     var answer = xhttp.response;
@@ -447,6 +444,6 @@ function downloadSelectedMDBCategories() {
                 }
             }
         };
-        interface_labfolder_download_mdbcategories(categoryIds[i], getLocalStorage('labFolderToken'), function() {});
+        interface_labfolder_download_mdbcategories(categoryIds[i], getLocalStorage('labFolderToken'), function () { });
     }
 }

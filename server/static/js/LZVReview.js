@@ -1,15 +1,12 @@
-$( document ).ready(function() {
+$(document).ready(function () {
 	getIngestsToReview();
 	fillSidebar();
-	if(checkLZVLogin())
-	{
-		$('#logout_lzv').show();
-	}
+
 });
 
 function toggleDisplayToReview(clicked) {
 	$(clicked).parent().children('#toReviewIngestsSubItems, #reviewedIngestsSubItems').toggle();
-	if($(clicked).children(".arrow").html() == "v") {
+	if ($(clicked).children(".arrow").html() == "v") {
 		$(clicked).children(".arrow").text("x");
 	}
 	else {
@@ -19,33 +16,33 @@ function toggleDisplayToReview(clicked) {
 
 function fillSidebar() {
 	var submittedIngests = JSON.parse(getLocalStorage("submittedIngests"));
-	if(submittedIngests) {
-	$('#toReviewIngestsSubItems').empty();
-	$('#reviewedIngestsSubItems').empty();
-	var appendToReview = '';
-	var appendToSubmitted = '';
-	for (var ingest of submittedIngests) {
-		if (ingest.state == "REVIEW") {
-			appendToReview += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForToReviewIngest(this);">' + ingest.name + '</button><div class="round-button">';
-			appendToReview += '</div></div>';
+	if (submittedIngests) {
+		$('#toReviewIngestsSubItems').empty();
+		$('#reviewedIngestsSubItems').empty();
+		var appendToReview = '';
+		var appendToSubmitted = '';
+		for (var ingest of submittedIngests) {
+			if (ingest.state == "REVIEW") {
+				appendToReview += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForToReviewIngest(this);">' + ingest.name + '</button><div class="round-button">';
+				appendToReview += '</div></div>';
+			}
+			if (ingest.state == "APPROVED") {
+				appendToSubmitted += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(this);">' + ingest.name + '</button><div class="round-button">';
+				appendToSubmitted += '</div></div>';
+			}
 		}
-		if (ingest.state == "APPROVED") {
-			appendToSubmitted += '<div class="sidebarSubItemContainer"><button class="sidebarItem sidebarSubItem sidebarUserSet" id="' + ingest.ingest_id + '" onclick="createFormForSubmittedIngest(this);">' + ingest.name + '</button><div class="round-button">';
-			appendToSubmitted += '</div></div>';
-		}
-	}
-	$(appendToReview).appendTo('#toReviewIngestsSubItems');
-	$(appendToSubmitted).appendTo('#reviewedIngestsSubItems');
+		$(appendToReview).appendTo('#toReviewIngestsSubItems');
+		$(appendToSubmitted).appendTo('#reviewedIngestsSubItems');
 	}
 }
 
 function getIngestsToReview() {
-	var url = baseURL +  '/ingest/toreview';
-	xhttp.onreadystatechange  = function(e) {
-		if(this.readyState == 4) {
-			if(this.status == 200) {
+	var url = baseURL + '/ingest/toreview';
+	xhttp.onreadystatechange = function (e) {
+		if (this.readyState == 4) {
+			if (this.status == 200) {
 				if (xhttp.response != "") {
-					parsedJSON =  JSON.parse(xhttp.response);
+					parsedJSON = JSON.parse(xhttp.response);
 					setLocalStorage("submittedIngests", JSON.stringify(parsedJSON.docs));
 				}
 			}
@@ -60,35 +57,35 @@ function createFormForToReviewIngest(clicked) {
 	var submittedIngests = JSON.parse(getLocalStorage("submittedIngests"));
 	let clicked_id = $(clicked).attr('id');
 	console.log(clicked_id);
-	var display_ingest = submittedIngests.find(set=>set.ingest_id == clicked_id);
+	var display_ingest = submittedIngests.find(set => set.ingest_id == clicked_id);
 	fillToReviewIngestForm(display_ingest);
 }
 
 function createFormForSubmittedIngest(clicked) {
 	var submittedIngests = JSON.parse(getLocalStorage("submittedIngests"));
 	let clicked_id = $(clicked).attr('id');
-	var display_ingest = submittedIngests.find(set=>set.ingest_id == clicked_id);
+	var display_ingest = submittedIngests.find(set => set.ingest_id == clicked_id);
 }
 
 function fillToReviewIngestForm(userInputSet) {
 	console.log(JSON.stringify(userInputSet));
-	var headerHTML = '<div id="title" ingest_id="'+ userInputSet.ingest_id +'" name="ingestTitle">Submitted Ingest</div><hr>';
+	var headerHTML = '<div id="title" ingest_id="' + userInputSet.ingest_id + '" name="ingestTitle">Submitted Ingest</div><hr>';
 	headerHTML += '<div class="staticFormContent orig">';
 	headerHTML += '<div class="staticText">Name of Ingest: ' + userInputSet.name + '</div>';
-	headerHTML += '<div class="staticText">Ingest Metadata: '+ userInputSet.metadata.name +'</div>';
-	headerHTML += '<div class="staticText">State: '+ userInputSet.state +'</div>';
+	headerHTML += '<div class="staticText">Ingest Metadata: ' + userInputSet.metadata.name + '</div>';
+	headerHTML += '<div class="staticText">State: ' + userInputSet.state + '</div>';
 	var date = new Date(userInputSet.ingest_metadata.submit_date);
 	var formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-	headerHTML += '<div class="staticText">Submission Date: '+ formatted_date +'</div>';
-	if(userInputSet.ingest_metadata.review_date !== undefined) {
+	headerHTML += '<div class="staticText">Submission Date: ' + formatted_date + '</div>';
+	if (userInputSet.ingest_metadata.review_date !== undefined) {
 		date = new Date(userInputSet.ingest_metadata.review_date);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		headerHTML += '<div class="staticText">Review Date: '+ formatted_date +'</div>';
+		headerHTML += '<div class="staticText">Review Date: ' + formatted_date + '</div>';
 	}
-	if(userInputSet.ingest_metadata.ingest_date !== undefined) {
+	if (userInputSet.ingest_metadata.ingest_date !== undefined) {
 		date = new Date(userInputSet.ingest_metadata.ingest_date);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		headerHTML += '<div class="staticText">Ingest Date: '+ formatted_date +'</div>';
+		headerHTML += '<div class="staticText">Ingest Date: ' + formatted_date + '</div>';
 	}
 	headerHTML += '</div><hr>';
 	$('#ingestFormHeader').empty();
@@ -100,7 +97,7 @@ function fillToReviewIngestForm(userInputSet) {
 		let con = userInputSet.content[i];
 		date = new Date(con.package_data.package_object_metadata.last_change);
 		formatted_date = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-		inputHTML += '<tr><td>' + con.package_data.name+' - ' + formatted_date +'<button class="open_info_button" package_id="' + con.package_data.package_id + '" onclick="open_package_info(this);"></button></td>';
+		inputHTML += '<tr><td>' + con.package_data.name + ' - ' + formatted_date + '<button class="open_info_button" package_id="' + con.package_data.package_id + '" onclick="open_package_info(this);"></button></td>';
 		if (con.metadata_userset !== undefined) {
 			inputHTML += '<td>' + con.metadata_userset.name + '<button class="open_info_button" package_id="' + con.metadata_userset.set_id + '" onclick="open_metadata_info(this);"></button></td>';
 		}
@@ -118,18 +115,18 @@ function fillToReviewIngestForm(userInputSet) {
 	$(footerHTML).appendTo('#ingestFormFooter');
 }
 
-function createReviewPopupFormContent(metaStruc,userInputSet) {
-	var	set_id = userInputSet.set_id;
+function createReviewPopupFormContent(metaStruc, userInputSet) {
+	var set_id = userInputSet.set_id;
 	var returnHTML = '<div id="metaDataMainForm"><div id="metaDataFormHeader">';
-	returnHTML += '<div id="title" set_id="'+ set_id +'" name="' + metaStruc.identifier + '">' + metaStruc.title + " v" + metaStruc.version + '</div>';
+	returnHTML += '<div id="title" set_id="' + set_id + '" name="' + metaStruc.identifier + '">' + metaStruc.title + " v" + metaStruc.version + '</div>';
 	returnHTML += '<div class="metaFormElement"><label class="formDescriptor" for="metaSchemeName">Name of Metadata Set:</label>';
 	returnHTML += '<div class="metaFormUIField"><input required name="metaSchemeName" type="text" value="' + userInputSet.name + '"></div></div><hr></div>';
 	returnHTML += '<form id="metaDataForm">';
-	for (var i=0; i<metaStruc.fields.length; i++){
+	for (var i = 0; i < metaStruc.fields.length; i++) {
 		var field = metaStruc.fields[i];
 		returnHTML += '<div class="metaFormElement"><label class="formDescriptor" for="';
 		returnHTML += field.field_name + '" ';
-		returnHTML += '><div class="metaFieldName">' + field.field_name.charAt(0).toUpperCase() + field.field_name.slice(1) + '</div><div class="metaFieldDescription">'+ field.field_description +'</div></label>';
+		returnHTML += '><div class="metaFieldName">' + field.field_name.charAt(0).toUpperCase() + field.field_name.slice(1) + '</div><div class="metaFieldDescription">' + field.field_description + '</div></label>';
 		if (field.field_type != 'cv') {
 			returnHTML += '<div class="metaFormUIField orig"><input ';
 		}
@@ -137,10 +134,10 @@ function createReviewPopupFormContent(metaStruc,userInputSet) {
 			returnHTML += '<div class="metaFormUIField metaFormCVField orig"><select ';
 		}
 		returnHTML += 'name="' + field.field_name + '" ';
-		if (field.field_mandatory){
+		if (field.field_mandatory) {
 			returnHTML += 'required ';
 		}
-		switch(field.field_type) {
+		switch (field.field_type) {
 			case 'string':
 				returnHTML += 'type="text" ';
 				break;
@@ -153,14 +150,14 @@ function createReviewPopupFormContent(metaStruc,userInputSet) {
 			case 'cv':
 				returnHTML += '>\n';
 				returnHTML += '<option selected value=""></option>';
-				for (var j=0; j<field.field_options.length; j++){
+				for (var j = 0; j < field.field_options.length; j++) {
 					option = field.field_options[j];
-					returnHTML += '<option value="'+option+'">'+option+'</option>';
+					returnHTML += '<option value="' + option + '">' + option + '</option>';
 				}
 				break;
 		}
 		if (field.field_type != 'cv') {
-			if(field.field_verification) {
+			if (field.field_verification) {
 				returnHTML += 'pattern="' + field.field_verification + '" ';
 			}
 			returnHTML += '>';
@@ -168,8 +165,8 @@ function createReviewPopupFormContent(metaStruc,userInputSet) {
 		else {
 			returnHTML += '</select>';
 		}
-		if(field.field_multiple) {
-			returnHTML += '<button type="button" class="duplicateMetaButton" id="' + field.field_name +'" onclick="duplicateMetaDataField(this);">+</button>';
+		if (field.field_multiple) {
+			returnHTML += '<button type="button" class="duplicateMetaButton" id="' + field.field_name + '" onclick="duplicateMetaDataField(this);">+</button>';
 		}
 		returnHTML += '</div></div>';
 	}
@@ -207,7 +204,7 @@ function display_popup() {
 
 function approve_ingest() {
 	var ingest_id = $('#title').attr('ingest_id')
-	interface_ingest_approve(ingest_id, function() {
+	interface_ingest_approve(ingest_id, function () {
 		alert("Ingest successfully submitted for ingest!");
 		location.reload();
 	});
@@ -215,7 +212,7 @@ function approve_ingest() {
 
 function revoke_ingest() {
 	var ingest_id = $('#title').attr('ingest_id')
-	interface_ingest_revoke(ingest_id, function() {
+	interface_ingest_revoke(ingest_id, function () {
 		alert("Ingest revoked!");
 		location.reload();
 	});
