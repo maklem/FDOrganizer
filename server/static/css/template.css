@@ -16,9 +16,14 @@ html {
     font-size: 16px;
 
     --primary-color: #008557;
+    --rgb-primary-color: 0, 133, 87;
     --on-primary-color: #ffffff;
     --secondary-color: #ff9e80;
+    --rgb-secondary-color: 255, 158, 128;
     --on-secondary-color: #000000;
+    --error: #b71c1c;
+    --rgb-error: 183, 28, 28;
+    --on-error: #ffffff;
 
 }
 

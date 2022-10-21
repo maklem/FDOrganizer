@@ -1,0 +1,17 @@
+<div class="login">
+    <TopBanner></TopBanner>
+    <h2>Anmeldung</h2>
+    <form @submit="login">
+        <label for="username">Username</label>
+        <input name="username" type="text" @input="setUsername" placeholder="Enter Username (btxxxxxx)" required
+            :invalid="showErrorText">
+        <label for="password">Password</label>
+        <input name="password" type="password" @input="setPassword" placeholder="Enter Password" required
+            :invalid="showErrorText">
+        <div class="error-text" :class="{visible: showErrorText}">
+            Wrong username or password!
+        </div>
+        <button type="submit">Login</button>
+    </form>
+
+</div>
