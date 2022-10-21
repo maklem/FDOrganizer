@@ -1,0 +1,42 @@
+.scrolling-content {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1 1 auto;
+    width: 100%;
+}
+
+.scrolling-content .main-content {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+.scrolling-content .bottom-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0.5rem;
+    flex: 0 0 0;
+
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.bottom-bar .links {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    flex: 1 0 1;
+}
+
+.links a {
+    padding: 0 1rem;
+    text-decoration: none;
+
+    color: var(--on-primary-color);
+
+}
