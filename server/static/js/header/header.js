@@ -1,11 +1,14 @@
+import { logout } from "../authentication.js";
 import NavbarTab from "../navbar-tab/navbar-tab.js";
 import { setup } from "../setup.js";
+import TopBanner from "../top-banner/top-banner.js";
 
 const template = await setup('header');
 
 export default {
     components: {
-        NavbarTab
+        NavbarTab,
+        TopBanner
     },
     data() {
         return {
@@ -14,7 +17,7 @@ export default {
     },
     methods: {
         logout() {
-
+            logout();
         }
     },
     template

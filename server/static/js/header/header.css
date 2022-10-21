@@ -1,24 +1,3 @@
-.top-banner {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-
-    width: 100%;
-    flex: 0 0 0;
-    padding: 1rem;
-
-}
-
-.top-banner div {
-    font-size: 3rem;
-    font-weight: 1000;
-}
-
-.top-banner img {
-    height: 5rem;
-}
-
 .navbar {
     display: flex;
     flex-direction: row;
@@ -55,4 +34,5 @@
 
     font-size: 1.1rem;
     color: var(--primary-color);
+    cursor: pointer;
 }

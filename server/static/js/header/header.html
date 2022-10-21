@@ -1,8 +1,5 @@
-<div class="top-banner">
-    <div>FD Organizer</div>
-    <img src="static/images/Logo-Uni-BT_UNIVERSITÄTSBIBLIOTHEK_gruen-sw-9.jpg" id="top_logo">
-</div>
+<TopBanner></TopBanner>
 <div class="navbar">
     <NavbarTab v-for="tab in tabs" :url="tab.url" :title="tab.title"></NavbarTab>
-    <div class="right-content"><button>Log out</button></div>
+    <div class="right-content"><button @click="logout">Log out</button></div>
 </div>
