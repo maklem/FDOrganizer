@@ -1,0 +1,71 @@
+.upload-page {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+
+    padding: 1rem;
+    flex: 0 0 0;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    width: 100%;
+    flex: 1 0 auto;
+    min-height: 7rem;
+    border: 1px dashed #ccc;
+    padding: 0.5rem 0.5rem;
+    cursor: pointer;
+
+}
+
+.custom-file-upload .file {
+    min-height: 100%;
+    max-width: 10%;
+    flex: 1 0 auto;
+}
+
+.custom-file-upload:hover {
+    color: var(--secondary-color);
+}
+
+
+.custom-file-upload .placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    flex: 1 1 auto;
+}
+
+Button.start-upload {
+    width: fit-content;
+}
+
+form[method="dialog"] {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+dialog {
+    border: 0.1rem solid #aaaaaa !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 1.6rem;
+    max-width: 400px;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}

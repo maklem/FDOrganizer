@@ -1,0 +1,28 @@
+<App>
+    <div class="upload-page">
+        <input @change="selectFiles" id="file-upload" type="file" multiple />
+        <label for="file-upload" class="custom-file-upload" @dragover="addFileProxy" @dragleave="removeFileProxy"
+            @drop="dropFiles">
+
+            <UploadFile v-for="file in files" v-bind="file" @delete="removeFile"></UploadFile>
+
+            <UploadFile v-if="fileProxy" v-bind="fileProxy"></UploadFile>
+            <UploadFile v-if="files.length >= 1 && !fileProxy" :name="'Add more files'" :icon="'plus'" :proxy="true">
+                <i class="icon fa-solid fa-plus"></i>
+                <span class="name">Add more Files</span>
+            </UploadFile>
+            <div v-if="files.length < 1 && !fileProxy" class="placeholder">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span class="text">Click here or drag files to upload</span>
+            </div>
+        </label>
+        <Button class="start-upload" @click="openDialog">Start Upload</Button>
+        <dialog>
+            <p>Do you really want to upload all those files?</p>
+            <form method="dialog">
+                <Button @click="closeDialog">Abort</Button>
+                <Button @click="closeDialog">OK</Button>
+            </form>
+        </dialog>
+    </div>
+</App>
