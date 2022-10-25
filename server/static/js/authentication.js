@@ -19,7 +19,9 @@ export function login(username, password) {
 		});
 
 }
-
+/**
+ * @returns {Promise<void>}
+ */
 export function logout() {
 	fetch('/logout', {
 		method: 'POST',
@@ -33,7 +35,10 @@ export function logout() {
 	});
 }
 
-
+/**
+ * @param  {string} cname
+ * @param  {string} cvalue
+ */
 function setCookie(cname, cvalue) {
 	document.cookie = cname + "=" + cvalue + ";path=/";
 }
