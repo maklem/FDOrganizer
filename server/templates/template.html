@@ -7,13 +7,15 @@
 	<title>FD Organizer</title>
 	<link rel="icon" type="image/x-icon" href="{{url_for('static', filename='images/favicon.ico')}}">
 	<link href="{{ url_for('static',     filename='css/loading-spinner.css') }}" rel="stylesheet">
+	<link href="{{ url_for('static',     filename='fontawesome/css/fontawesome.min.css') }}" rel="stylesheet">
+	<link href="{{ url_for('static',     filename='fontawesome/css/solid.min.css') }}" rel="stylesheet">
 	<link href="{{ url_for('static',     filename='css/template.css') }}" rel="stylesheet">
 	{% block js %}
 	{% endblock %}
 </head>
 
 <body>
-	<div id="app-container">
+	<main id="app-container">
 		<div class="lds-spinner">
 			<div></div>
 			<div></div>
@@ -28,7 +30,7 @@
 			<div></div>
 			<div></div>
 		</div>
-	</div>
+	</main>
 </body>
 
 </html>
