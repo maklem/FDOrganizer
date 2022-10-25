@@ -1,5 +1,6 @@
 import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 import { login } from "../authentication.js";
+import Button from "../button/button.js";
 import { setup } from "../setup.js";
 import TopBanner from "../top-banner/top-banner.js";
 
@@ -8,7 +9,8 @@ const template = await setup('login');
 
 createApp({
     components: {
-        TopBanner
+        TopBanner,
+        Button
     },
     data() {
         return {
