@@ -1,0 +1,10 @@
+<div class="file" :class="proxy">
+    <i class="icon fa-solid" :class="'fa-' + icon"></i>
+    <span class="name">{{name}}</span>
+    <span class="size">{{size}}</span>
+    <div v-if="!proxy" class="overlay">
+        <button class="delete-file" @click="$emit('delete', name)">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+</div>
