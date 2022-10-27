@@ -9,7 +9,6 @@ import uuid
 from pathlib import Path
 
 import requests
-
 # from flask import Flask, session
 from flask import Flask, redirect, render_template, request, url_for
 from flask_cors import CORS
@@ -245,7 +244,8 @@ def get_storage_for_user(user_id, return_as_string=False):
     """
     query = {"selector": {"owner": user_id}}
     response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
     )["docs"]
     return json.dumps(response) if return_as_string else response
 
@@ -269,7 +269,8 @@ def set_package_object():
     data = json.loads(request.get_data())
     query = {"selector": {"owner": user_id, "package_id": data["package_id"]}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
     )
     url = (
         lzv_util.CONFIGPARAMS["couchDBBaseURL"]
@@ -333,7 +334,8 @@ def delete_package_object():
     data = json.loads(request.get_data())
     query = {"selector": {"owner": user_id, "package_id": data["package_id"]}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
     )
     if check_response["docs"]:  # found the entry to delete
         url = (
@@ -400,7 +402,8 @@ def get_user_stored_metadata():
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
     response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
     )
     return json.dumps(response["docs"])
 
@@ -424,7 +427,8 @@ def delete_user_metadata_set():
     data = json.loads(request.get_data())
     query = {"selector": {"owner": user_id, "set_id": data["set_id"]}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
     )
     if check_response["docs"]:  # found the entry to delete
         url = (
@@ -468,7 +472,8 @@ def store_user_metadata():
     data["owner"] = user_id
     query = {"selector": {"owner": user_id, "set_id": data["set_id"]}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBMetaDataDatabaseName"])
     )
     url = (
         lzv_util.CONFIGPARAMS["couchDBBaseURL"]
@@ -504,7 +509,8 @@ def get_user_stored_ingests():
     user_id = request.cookies["session_user"]
     query = {"selector": {"owner": user_id}}
     response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
     )
     return json.dumps(response["docs"])
 
@@ -530,7 +536,8 @@ def get_ingest_by_user_and_id_in_ingest_db(user_id, ingest_id):
     query = {"selector": {"owner": user_id, "ingest_id": ingest_id}}
     # query = {"selector": {"owner": user_id}}
     response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
     )
     return response["docs"]
 
@@ -554,7 +561,8 @@ def update_or_create_user_ingest(user_id, ingest):
     """
     query = {"selector": {"owner": user_id, "ingest_id": ingest["ingest_id"]}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
     )
     url = (
         lzv_util.CONFIGPARAMS["couchDBBaseURL"]
@@ -604,7 +612,8 @@ def remove_user_ingest(user_id, ingest):
     """
     query = {"selector": {"owner": user_id, "ingest_id": ingest["ingest_id"]}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBIngestsDatabaseName"])
     )
     url = (
         lzv_util.CONFIGPARAMS["couchDBBaseURL"]
@@ -629,7 +638,8 @@ def remove_user_ingest(user_id, ingest):
         "docs"
     ]:  # only one entry with same id should exist at the same time
         headers["If-Match"] = check_response["docs"][0]["_rev"]
-        response = requests.delete(url, headers=headers, data=json.dumps(ingest))
+        response = requests.delete(
+            url, headers=headers, data=json.dumps(ingest))
         if response:
             return (
                 {"Result": "All good"},
@@ -711,7 +721,8 @@ def submit_user_ingest_to_review():
     ingest = json.loads(request.get_data())
     ingest["owner"] = user_id
     ingest["state"] = "REVIEW"
-    ingest["ingest_metadata"]["submit_date"] = time.strftime("%Y-%m-%dT%T.000+0000")
+    ingest["ingest_metadata"]["submit_date"] = time.strftime(
+        "%Y-%m-%dT%T.000+0000")
     success = create_ingest_on_filesystem(
         user_id,
         ingest["ingest_id"],
@@ -737,7 +748,8 @@ def submit_user_ingest_to_review():
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    response = requests.put(couchdb_url, headers=headers, data=json.dumps(ingest))
+    response = requests.put(couchdb_url, headers=headers,
+                            data=json.dumps(ingest))
     if response:
         return (
             json.dumps({"Result": "All good"}),
@@ -768,7 +780,8 @@ def revoke_ingest():
     ingest_id = request.args.get("ingest_id")
     ingest = get_ingest_by_user_and_id_in_review_db(user_id, ingest_id)[0]
     ingest["state"] = "REJECTED"
-    ingest["ingest_metadata"]["reject_data"] = time.strftime("%Y-%m-%dT%T.000+0000")
+    ingest["ingest_metadata"]["reject_data"] = time.strftime(
+        "%Y-%m-%dT%T.000+0000")
     resp = update_or_create_reviewdb_ingest(user_id, ingest)
     if resp:
         return (
@@ -811,7 +824,8 @@ def approve_ingest():
         resp = update_or_create_reviewdb_ingest(user_id, ingest)
         if resp:
             # remove the review files from file system
-            review_path = lzv_util.CONFIGPARAMS["LZV_REVIEW"] + ingest["ingest_id"]
+            review_path = lzv_util.CONFIGPARAMS["LZV_REVIEW"] + \
+                ingest["ingest_id"]
             shutil.rmtree(review_path)
             return remove_user_ingest(user_id, ingest)
     return (
@@ -952,84 +966,10 @@ def get_submitted_ingests():
     )
     if response:
         return response
-    sys.stderr.write("get_submitted_ingests: Error requesting submitted ingests\n")
+    sys.stderr.write(
+        "get_submitted_ingests: Error requesting submitted ingests\n")
     return (
         json.dumps({"Result": "Error requesting submitted ingests"}),
-        500,
-        {"Content-Type": "application/json"},
-    )
-
-
-@APP.route("/upload/file", methods=["POST"])
-def receive_file():
-    """
-    Receive files belonging to a package. This is definied by package_id in parameteres. It
-    needs to check if the package is manually created AND belonging to the right user.
-    """
-    package_id = request.args.get("package_id")
-    user_id = request.cookies["session_user"]
-    query = {"selector": {"package_id": package_id, "owner": user_id}}
-    check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
-    )["docs"]
-    if not check_response:
-        sys.stderr.write(
-            "receive_file: Error: Invalid Package ID oder Package does not belong\
-                         to user\n"
-        )
-        return (
-            json.dumps(
-                {
-                    "Result": "Error: Invalid Package ID oder Package does not belong\
-                         to user"
-                }
-            ),
-            500,
-            {"Content-Type": "application/json"},
-        )
-    # check if the post request has the file part
-    if "uploaded_file" not in request.files:
-        sys.stderr.write("receive_file: Error No files provided.\n")
-        return (
-            json.dumps({"Result": "Error: No files provided"}),
-            500,
-            {"Content-Type": "application/json"},
-        )
-    files = request.files.getlist("uploaded_file")
-    # if user does not select file, browser also
-    # submit an empty part without filename
-    storage_metadata = []
-    for f in files:
-        if f.filename == "":
-            continue
-        if f:
-            # filename = file.filename
-            # file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-            # print("Succesfully saved files")
-            metadata_obj = create_storage_data_structure_from_upload(user_id, f)
-            response = upload_file_to_couchdb_document_db(f, metadata_obj)
-            if response:
-                storage_metadata.append(metadata_obj)
-    if storage_metadata:
-        lzv_util.add_to_storage(storage_metadata)
-        package_response = append_children_to_package(
-            user_id, package_id, storage_metadata
-        )
-        if package_response:  # should be true, else there is a inconsistency in db.
-            return (
-                json.dumps({"Result": "Succesfully saved files"}),
-                200,
-                {"Content-Type": "application/json"},
-            )
-        sys.stderr.write("receive_file: Error: Saving Package File.\n")
-        return (
-            json.dumps({"Result": "Error: Saving Package File"}),
-            500,
-            {"Content-Type": "application/json"},
-        )
-    sys.stderr.write("receive_file: Error: No files provided.\n")
-    return (
-        json.dumps({"Result": "Error: No files provided"}),
         500,
         {"Content-Type": "application/json"},
     )
@@ -1042,7 +982,8 @@ def append_children_to_package(user_id, package_id, append_children):
     """
     token = lzv_util.authenticate_couchdb()
     if not token:
-        sys.stderr.write("append_children_to_package: Error Authenticating couch DB.\n")
+        sys.stderr.write(
+            "append_children_to_package: Error Authenticating couch DB.\n")
         return (
             json.dumps({"Result": "Error Authenticating couch DB"}),
             500,
@@ -1055,7 +996,8 @@ def append_children_to_package(user_id, package_id, append_children):
     }
     query = {"selector": {"owner": user_id, "package_id": package_id}}
     check_response = json.loads(
-        lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+        lzv_util.query_db(
+            query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
     )
     url = (
         lzv_util.CONFIGPARAMS["couchDBBaseURL"]
@@ -1100,7 +1042,8 @@ def append_children_to_package(user_id, package_id, append_children):
             200,
             {"Content-Type": "application/json"},
         )
-    sys.stderr.write("append_children_to_package: Error updating file to database.\n")
+    sys.stderr.write(
+        "append_children_to_package: Error updating file to database.\n")
     return (
         json.dumps({"Result": "Error updating file to database."}),
         500,
@@ -1131,7 +1074,8 @@ def upload_file_to_couchdb_document_db(f, metadata_obj):
         + lzv_util.CONFIGPARAMS["couchDBDocumentDatabaseName"]
     )
     json_answer = json.loads(
-        requests.post(couchdb_url, headers=couch_header, data=json.dumps({})).text
+        requests.post(couchdb_url, headers=couch_header,
+                      data=json.dumps({})).text
     )
     couch_header["If-Match"] = json_answer["rev"]
     couchdb_url = couchdb_url + "/" + json_answer["id"] + "/"
@@ -1144,7 +1088,8 @@ def upload_file_to_couchdb_document_db(f, metadata_obj):
     )
     if att_create_response:
         metadata_obj["data_object_metadata"]["file_type"] = f.mimetype
-        metadata_obj["data_object_metadata"]["is_stored"] = bool(att_create_response)
+        metadata_obj["data_object_metadata"]["is_stored"] = bool(
+            att_create_response)
         metadata_obj["data_object_metadata"]["filename"] = filename
         metadata_obj["data_object_metadata"]["doc_id"] = json_answer["id"]
     else:
@@ -1203,7 +1148,8 @@ def receive_package():
     if response:
         return (
             json.dumps(
-                {"Result": "Succesfully saved files", "package_id": data["package_id"]}
+                {"Result": "Succesfully saved files",
+                    "package_id": data["package_id"]}
             ),
             200,
             {"Content-Type": "application/json"},
