@@ -11,6 +11,7 @@ LZVUTIL module. general functions for usage in lzv application. no anchors are h
 import hashlib
 import json
 import secrets
+from typing import Union
 
 import ldap
 import requests
@@ -23,6 +24,12 @@ FAILED_AUTHENTICATION = "Failed Authentication, please login to use this service
 CONFIGPARAMS = {}
 with open("./conf/config.json") as f:
     CONFIGPARAMS = json.load(f)
+
+
+def get_config() -> dict[str, Union[str, list[str]]]:
+    with open("./conf/config.json", encoding="UTF-8") as config:
+        return json.load(config)
+
 
 def check_user_permission_review(user_id):
     """
@@ -127,6 +134,7 @@ def authenticate_couchdb():
         return couchdb_token
     return False
 
+
 def query_db(query, db_url_suffix):
     """
     Query the storage Couch db with given query json object and return the result.
@@ -139,13 +147,15 @@ def query_db(query, db_url_suffix):
             500,
             {"Content-Type": "application/json"},
         )
-    couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + "/" + db_url_suffix + "/_find"
+    couchdb_url = CONFIGPARAMS["couchDBBaseURL"] + \
+        "/" + db_url_suffix + "/_find"
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
         "Cookie": token,
     }
-    response = requests.post(couchdb_url, headers=headers, data=json.dumps(query))
+    response = requests.post(
+        couchdb_url, headers=headers, data=json.dumps(query))
     return response.text
 
 
@@ -196,9 +206,11 @@ def update_storage(add_elements):
             "Content-Type": "application/json",
             "Cookie": token,
         }
-        query = {"selector": {"owner": item["owner"], "package_id": item["package_id"]}}
+        query = {"selector": {
+            "owner": item["owner"], "package_id": item["package_id"]}}
         response = json.loads(
-            lzv_util.query_db(query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+            lzv_util.query_db(
+                query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
         )
         if len(response["docs"]) >= 0:
             headers["If-Match"] = response["docs"][0]["_rev"]
@@ -212,7 +224,7 @@ def calculate_sha224_from_file(filename):
     '''
     calculate the sha224 of a file in a memory-efficient way. returns hexdigest of hash
     '''
-    BLOCK_SIZE = 65536  #64kB
+    BLOCK_SIZE = 65536  # 64kB
 
     sha224 = hashlib.sha224()
 
@@ -238,7 +250,7 @@ def calculate_md5_from_file(filename):
     '''
     calculate the md5 of a file in a memory-efficient way. returns hexdigest of hash
     '''
-    BLOCK_SIZE = 65536  #64kB
+    BLOCK_SIZE = 65536  # 64kB
 
     md5 = hashlib.md5()
 
