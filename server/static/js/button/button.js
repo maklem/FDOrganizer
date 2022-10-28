@@ -18,8 +18,7 @@ export default {
          * @param  {MouseEvent} event
          */
         buttonClicked(event) {
-            event.stopPropagation()
-            !this.disabled && this.$emit('buttonClicked');
+            !this.disabled && this.$emit('button-clicked');
         }
     },
     template

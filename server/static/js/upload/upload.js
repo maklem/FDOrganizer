@@ -1,4 +1,4 @@
-import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+import { createApp } from "../vue.js";
 import App from "../app/app.js";
 import Button from "../button/button.js";
 import { formatFilesize } from "../format-util.js";

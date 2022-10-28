@@ -69,7 +69,7 @@ def create_css(component: str, path: str):
 
 def create_app_js(app: str, path: str):
     with open(f'{path}/{app}.js', 'w', encoding='utf_8') as file:
-        file.write("""import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+        file.write("""import { createApp } from "../vue.js";
 import App from "../app/app.js";
 import { setup } from "../setup.js";
 
