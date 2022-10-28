@@ -18,3 +18,16 @@
 .button-component:active {
     box-shadow: 0 0.25rem 1rem 0px rgba(var(--rgb-primary-color), 0.15);
 }
+
+.button-component[disabled] {
+    cursor:not-allowed;
+
+    box-shadow: none;
+
+    opacity: 0.5;
+}
+
+.button-component.flat {
+    border: none;
+    box-shadow: none;
+}

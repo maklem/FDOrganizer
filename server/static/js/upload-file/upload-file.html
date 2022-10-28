@@ -3,7 +3,7 @@
     <span class="name">{{name}}</span>
     <span class="size">{{size}}</span>
     <div v-if="!proxy" class="overlay">
-        <button class="delete-file" @click="$emit('delete', name)">
+        <Button class="delete-file" @button-clicked="$emit('delete', name)" :flat="true">
             <i class="fa-solid fa-trash"></i>
         </button>
     </div>

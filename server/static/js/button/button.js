@@ -5,6 +5,7 @@ export default {
     props: {
         type: String,
         disabled: Boolean,
+        flat: Boolean
     },
     components: {
     },
@@ -18,7 +19,7 @@ export default {
          */
         buttonClicked(event) {
             event.stopPropagation()
-            this.disabled && this.$emit('click');
+            !this.disabled && this.$emit('buttonClicked');
         }
     },
     template
