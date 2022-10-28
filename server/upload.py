@@ -1,5 +1,6 @@
 from flask import jsonify, make_response, request
 from requests import HTTPError, Response
+from .services.authentication import user
 
 from server.db_connector import attach, post
 from server.entities.databases import Databases
@@ -27,9 +28,8 @@ def receive_file():
             'text': 'No filename available'
         }), 400)
     # file.save(f'{lzv_util.get_config()["tempFolder"]}/{secure_filename(file.filename)}')
-    user_id = request.cookies["session_user"]
     metadata = File(name=file.filename or "", size=file.content_length,
-                    mimetype=file.mimetype, origin="manual", is_stored=True, owner=user_id)
+                    mimetype=file.mimetype, origin="manual", is_stored=True, owner=user(request))
     try:
         success = create_document_with_attachement(file, metadata)
     except HTTPError as error:

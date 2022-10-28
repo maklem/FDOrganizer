@@ -15,10 +15,7 @@ from typing import Union
 
 import ldap
 import requests
-from flask import session
 from pkg_resources import resource_filename
-
-FAILED_AUTHENTICATION = "Failed Authentication, please login to use this service!"
 
 CONFIGPARAMS = {}
 with open(resource_filename(__name__, "./conf/config.json"), encoding='utf-8') as f:
@@ -38,81 +35,6 @@ def check_user_permission_review(user_id):
         if val == user_id:
             return True
     return False
-
-
-def secure_username(user_id):
-    """
-    This should verify that the user_id is a secure string. This needs to be adapted dependent
-    on the possible user_ids that exist in the system. Prevent malicious usernames, since this
-    is user regularly to query the db. f.e. user_id = '{ "selector" : ...}' could be harmfull!
-    """
-    # TODO fill this function and every appearance of user_id which if taken from a cookies needs to be secured
-
-
-def create_sessionid():
-    """
-    Creates a cryptographically-secure, URL-safe string
-    """
-    return secrets.token_urlsafe(64)
-
-
-def create_user_session(userid):
-    """
-    create new session for user. check if correct credentials to ad if true, create new session
-    """
-    session[userid] = create_sessionid()
-
-
-def check_session(userid, sessionid):
-    """
-    check if provided session id is valid
-    """
-    return session.get(userid) == sessionid
-
-
-def get_sessionid(userid):
-    """
-    return the session id for userid
-    """
-    return session.get(userid)
-
-
-def logout_session(userid):
-    """
-    deletes the session object for user userid
-    """
-    session.pop(userid)
-
-
-def authenticate_ldap(uname, pword):
-    """
-    Authenticate against LDAP Server, return true if uname,pword is correct, false else
-    """
-    ldap_server = "ldaps://proxy-ubtrz.uni-bayreuth.de:636"
-    ldap_base = "ou=users,ou=rz-ad,o=uni-bayreuth"
-    user_dn = "cn=" + uname + "," + ldap_base
-    try:
-        connect = ldap.initialize(ldap_server)
-        connect.bind_s(user_dn, pword)
-        connect.unbind_s()
-        return True
-    except ldap.LDAPError:
-        connect.unbind_s()
-        return False
-
-
-def validate_user_session(request):
-    '''
-        checks request for session_user and session_auth object and validates these against local
-        session files. 
-        Returns a boolean indicating the validity of the session.
-    '''
-    if not "session_user" in request.cookies and not "session_auth" in request.cookies:
-        return False
-    if not check_session(request.cookies["session_user"], request.cookies["session_auth"]):
-        return False
-    return True
-
 
 def authenticate_couchdb():
     """

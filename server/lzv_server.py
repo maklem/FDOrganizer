@@ -10,11 +10,11 @@ import uuid
 from pathlib import Path
 
 import requests
-from flask import request
+from flask import request, make_response
 from werkzeug.utils import secure_filename
 
-from server import lzv_util
-from server import mets
+from server import lzv_util, mets
+from server.authentication import authorize
 
 # TODO: Navigation auf SPA umstellen
 # TODO: Redirect auf Seite vor dem erzwungenen Login
@@ -22,44 +22,13 @@ from server import mets
 
 @APP.route("/login", methods=["POST"])
 def login_lzv():
-    if lzv_util.validate_user_session(request):
-        return (
-            json.dumps(
-                {
-                    "session_id": request.cookies["session_auth"],
-                    "username": request.cookies["session_user"],
-                }
-            ),
-            200,
-            {"Content-Type": "application/json"},
-        )
-    data = json.loads(request.get_data())
-    if lzv_util.authenticate_ldap(data["username"], data["password"]):
-        lzv_util.create_user_session(data["username"])
-        return (
-            json.dumps(
-                {
-                    "session_id": lzv_util.get_sessionid(data["username"]),
-                    "username": data["username"],
-                }
-            ),
-            200,
-            {"Content-Type": "application/json"},
-        )
-    return {"Error": "invalid credentials"}, 401, {"Content-Type": "application/json"}
-
-
-@APP.route("/logout", methods=["POST"])
-def logout_lzv():
-    """
-    Logout User from lzv System. Deletes local stored session id.
-    """
-    lzv_util.logout_session(request.cookies["session_user"])
-    return (
-        json.dumps({"Message": "All good!"}),
-        200,
-        {"Content-Type": "application/json"},
-    )
+    username = json.loads(request.data).get('username')
+    password = json.loads(request.data).get('password')
+    try:
+        token = authorize(username, password, organisation='uni-bayreuth')
+    except RuntimeError:
+        return make_response({"Error": "invalid credentials"}, 401)
+    return make_response(json.dumps({'token': token}), 200)
 
 
 def create_storage_data_structure_from_upload(user_id, _file):

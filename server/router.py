@@ -1,16 +1,17 @@
 from flask import render_template, request, url_for, redirect
 from server import APP
-from server.lzv_util import check_user_permission_review, validate_user_session
+from server.authentication import is_authorized
+from server.lzv_util import check_user_permission_review
 
 
-def needs_authentication():
-    return request.path != url_for("navlogin") and "static" not in request.path
+def needs_authentication(request):
+    return request.path not in [url_for("navlogin"), url_for('login_lzv')] and "static" not in request.path
 
 @APP.before_request
 def auth_guard():
-    if not needs_authentication():
+    if not needs_authentication(request):
         return None
-    if not validate_user_session(request):
+    if not is_authorized(request):
         return redirect(url_for("navlogin"))
     return None
 
@@ -68,8 +69,8 @@ def navlzvreview():
     return render_template("lzvreview.html")
 
 
-@APP.route("/login", methods=["GET"])
+@APP.route("/login")
 def navlogin():
-    if validate_user_session(request):
+    if is_authorized(request):
         return redirect(url_for("navhome"))
     return render_template("login.html")

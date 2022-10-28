@@ -8,3 +8,4 @@ class Databases(Enum):
     REVIEW = 'ingest_review'
     STATIC = 'static'
     STORAGE = 'storage'
+    ORGANISATIONS = 'organisations'

@@ -13,8 +13,7 @@ export function login(username, password) {
 	})
 		.then((response) => response.json(), () => false)
 		.then((payload) => {
-			setCookie("session_auth", payload.session_id);
-			setCookie("session_user", username);
+			setCookie("token", payload.token);
 			window.history.go();
 		});
 
@@ -23,16 +22,8 @@ export function login(username, password) {
  * @returns {Promise<void>}
  */
 export function logout() {
-	fetch('/logout', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	}).then(() => {
-		setCookie("session_auth", '');
-		setCookie("session_user", '');
-		window.history.go();
-	});
+	setCookie("token", '');
+	window.history.go();
 }
 
 /**
