@@ -11,7 +11,7 @@ from zipfile import ZipFile
 import requests
 from flask import Blueprint, request, send_from_directory
 
-import lzv_util
+from server import lzv_util
 
 rep_labfolder = Blueprint('labfolder', __name__)
 

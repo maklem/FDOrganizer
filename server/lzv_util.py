@@ -16,18 +16,17 @@ from typing import Union
 import ldap
 import requests
 from flask import session
-
-DEBUG = 1
+from pkg_resources import resource_filename
 
 FAILED_AUTHENTICATION = "Failed Authentication, please login to use this service!"
 
 CONFIGPARAMS = {}
-with open("./conf/config.json") as f:
+with open(resource_filename(__name__, "./conf/config.json"), encoding='utf-8') as f:
     CONFIGPARAMS = json.load(f)
 
 
 def get_config() -> dict[str, Union[str, list[str]]]:
-    with open("./conf/config.json", encoding="UTF-8") as config:
+    with open(resource_filename(__name__, "./conf/config.json"), encoding="utf-8") as config:
         return json.load(config)
 
 
@@ -193,11 +192,11 @@ def update_storage(add_elements):
     updated to the new revision. if it does not exist yet, it is only added to db.
     """
     url = (
-        lzv_util.CONFIGPARAMS["couchDBBaseURL"]
+        CONFIGPARAMS["couchDBBaseURL"]
         + "/"
-        + lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"]
+        + CONFIGPARAMS["couchDBStorageDatabaseName"]
     )
-    token = lzv_util.authenticate_couchdb()
+    token = authenticate_couchdb()
     if not token:
         return
     for item in add_elements:
@@ -209,8 +208,8 @@ def update_storage(add_elements):
         query = {"selector": {
             "owner": item["owner"], "package_id": item["package_id"]}}
         response = json.loads(
-            lzv_util.query_db(
-                query, lzv_util.CONFIGPARAMS["couchDBStorageDatabaseName"])
+            query_db(
+                query, CONFIGPARAMS["couchDBStorageDatabaseName"])
         )
         if len(response["docs"]) >= 0:
             headers["If-Match"] = response["docs"][0]["_rev"]

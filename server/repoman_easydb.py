@@ -11,7 +11,7 @@ import uuid
 import requests
 from flask import Blueprint, request
 
-import lzv_util
+from server import lzv_util
 
 rep_easydb = Blueprint('easydb', __name__)
 

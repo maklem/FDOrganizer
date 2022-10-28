@@ -3,9 +3,9 @@ from base64 import b64encode
 
 import requests
 
-from entities.databases import Databases
-from entities.document import CouchDocument
-from lzv_util import get_config
+from server.entities.databases import Databases
+from server.entities.document import CouchDocument
+from server import get_config
 
 
 def auth_header() -> dict[str, str]:
