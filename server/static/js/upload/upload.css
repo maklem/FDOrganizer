@@ -48,7 +48,7 @@ input[type="file"] {
     flex: 1 1 auto;
 }
 
-Button.start-upload {
+.start-upload {
     width: fit-content;
 }
 
@@ -63,9 +63,32 @@ dialog {
     border-radius: 0.5rem;
     box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     padding: 1.6rem;
-    max-width: 400px;
+    max-width: 25rem;
+}
+
+dialog p {
+    font-weight: 700;
+}
+dialog .loading {
+    width: 100%;
+    height: 1rem;
+    background: linear-gradient(to right, var(--secondary-color), transparent, var(--secondary-color));
+    background-size: 200%;
+    animation: gradient 2s ease infinite;
 }
 
 dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
 }

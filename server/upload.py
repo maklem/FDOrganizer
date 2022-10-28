@@ -31,16 +31,17 @@ def receive_file():
     metadata = File(name=file.filename or "", size=file.content_length,
                     mimetype=file.mimetype, origin="manual", is_stored=True, owner=user_id)
     try:
-        create_document_with_attachement(file, metadata)
+        success = create_document_with_attachement(file, metadata)
     except HTTPError as error:
         return make_response(jsonify({
             'title': error.response.reason,
             'method': error.request.method,
             'url': error.request.url
         }), error.response.status_code)
-    return make_response(jsonify(
-        {'message': 'ok'}
-    ), 200)
+    return make_response(jsonify({
+        "result": success.json(),
+        "file": file.filename
+    }), 200)
 
 
 def create_document_with_attachement(file, metadata: File) -> Response:

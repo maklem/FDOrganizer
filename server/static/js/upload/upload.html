@@ -4,7 +4,7 @@
         <label for="file-upload" class="custom-file-upload" @dragover="addFileProxy" @dragleave="removeFileProxy"
             @drop="dropFiles">
 
-            <UploadFile v-for="file in files" v-bind="file" @delete="removeFile"></UploadFile>
+            <UploadFile v-for="file in files" v-bind="prepareFile(file)" @delete="removeFile"></UploadFile>
 
             <UploadFile v-if="fileProxy" v-bind="fileProxy"></UploadFile>
             <UploadFile v-if="files.length >= 1 && !fileProxy" :name="'Add more files'" :icon="'plus'" :proxy="true">
@@ -16,13 +16,26 @@
                 <span class="text">Click here or drag files to upload</span>
             </div>
         </label>
-        <Button class="start-upload" @click="openDialog">Start Upload</Button>
+        <Button class="start-upload" @button-clicked="openDialog" :disabled="files.length < 1">Start Upload</Button>
         <dialog>
-            <p>Do you really want to upload all those files?</p>
-            <form method="dialog">
-                <Button @click="closeDialog">Abort</Button>
-                <Button @click="closeDialog">OK</Button>
-            </form>
+            <div v-if="!uploadInProgress && !failedUploads?.length">
+                <p>Do you really want to upload all those files?</p>
+                <form method="dialog">
+                    <Button @button-clicked="closeDialog">Abort</Button>
+                    <Button @button-clicked="startUpload">Yes</Button>
+                </form>
+            </div>
+            <div v-if="failedUploads?.length">
+                <p>Upload finished! {{failedUploads.length}} files could not be uploaded</p>
+                <form method="dialog">
+                    <Button @button-clicked="closeDialog">Abort</Button>
+                    <Button @button-clicked="startUpload">Try again</Button>
+                </form>
+            </div>
+            <div v-if="uploadInProgress">
+                <div class="loading"></div>
+                <p>Currently uploading {{files.length}} files</p>
+            </div>
         </dialog>
     </div>
 </App>

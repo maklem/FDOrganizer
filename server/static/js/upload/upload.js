@@ -16,7 +16,9 @@ createApp({
     data() {
         return {
             files: [],
-            fileProxy: undefined
+            fileProxy: undefined,
+            failedUploads: [],
+            uploadInProgress: false
         }
     },
     methods: {
@@ -26,13 +28,14 @@ createApp({
         },
         closeDialog() {
             const dialog = document.getElementsByTagName('dialog')[0]
+            this.failedUploads = []
             dialog.close()
         },
         /**
          * @param  {Event} event
          */
         selectFiles(event) {
-            const files = [...event.currentTarget.files].map(item => prepareFile(item))
+            const files = [...event.currentTarget.files]
             this.files.push(...files);
         },
         /**
@@ -66,7 +69,6 @@ createApp({
             event.preventDefault();
 
             const files = extractFiles(event)
-                .map(file => prepareFile(file, false));
 
             this.fileProxy = undefined;
             this.files.push(...files);
@@ -76,6 +78,20 @@ createApp({
          */
         removeFile(name) {
             this.files = this.files.filter(file => file.name !== name);
+        },
+        prepareFile(file) {
+            return {
+                name: file.name,
+                size: formatFilesize(file.size),
+                icon: getIcon(file.type),
+            };
+        },
+        async startUpload() {
+            this.uploadInProgress = true;
+            this.failedUploads = await upload(this.files)
+            this.files = this.files.filter((file) => this.failedUploads.map(promise => promise.value).includes(file.name))
+            if (!this.failedUploads?.length) this.closeDialog();
+            this.uploadInProgress = false;
         }
     },
     template
@@ -125,11 +141,21 @@ function extractFiles(event) {
  * @param  {boolean} ephemereal
  * @returns {CustomFile} CustomFile
  */
-function prepareFile(file) {
-    return {
-        name: file.name,
-        size: formatFilesize(file.size),
-        icon: getIcon(file.type),
-    };
-}
 
+
+async function upload(files) {
+    const promises = files.map(file => {
+        const body = new FormData()
+        body.append('file', file)
+        return fetch('upload/file', {
+            method: 'POST',
+            body
+        })
+        .then(response => response.json())
+        .then(json => json.file)
+    })
+    return Promise.allSettled(promises).then((promiseArray) => {
+        return promiseArray
+        .filter(promise => promise.status === 'rejected')
+    })
+}
