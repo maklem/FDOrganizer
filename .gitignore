@@ -2,9 +2,13 @@
 /env
 
 # Server config and caches
-/server/__pycache__
+__pycache__
 /server/conf/config.json
-/server/flask_session
+flask_session
+/server/tmp
+
+# Package files
+*.egg-info
 
 # IDE settings
 /.vscode
