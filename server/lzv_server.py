@@ -1,6 +1,7 @@
 """
 Software for LZV Server.
 """
+from server import APP
 import json
 import shutil
 import sys
@@ -9,109 +10,14 @@ import uuid
 from pathlib import Path
 
 import requests
-# from flask import Flask, session
-from flask import Flask, redirect, render_template, request, url_for
-from flask_cors import CORS
+from flask import request
 from werkzeug.utils import secure_filename
 
-import lzv_util
-import mets
-from flask_session import Session
-from repoman_easydb import rep_easydb
-from repoman_labfolder import rep_labfolder
-
-DEBUG = 1
-# ----------------------initialization------------------------------------------
-
-APP = Flask(__name__)
-APP.secret_key = "any random string"
-APP.config["SESSION_TYPE"] = "filesystem"
-APP.config["PERMANENT_SESSION_LIFETIME"] = 43200
-APP.config["SESSION_PERMANENT"] = False
-APP.config["UPLOAD_FOLDER"] = lzv_util.CONFIGPARAMS["USR_UPLOAD_TMP_FOLDER"]
-CORS(APP)
-Session(APP)
-APP.register_blueprint(rep_labfolder, url_prefix="/labfolder")
-APP.register_blueprint(rep_easydb, url_prefix="/easydb")
-
-# ----------------------Page Navigation-----------------------------------------
+from server import lzv_util
+from server import mets
 
 # TODO: Navigation auf SPA umstellen
 # TODO: Redirect auf Seite vor dem erzwungenen Login
-
-
-def needs_authentication():
-    return request.path != url_for("navlogin") and "static" not in request.path
-
-
-@APP.before_request
-def auth_guard():
-    if not needs_authentication():
-        return None
-    if not lzv_util.validate_user_session(request):
-        return redirect(url_for("navlogin"))
-    return None
-
-
-@APP.route("/")
-def navhome():
-    return render_template("index.html")
-
-
-@APP.route("/impressum")
-def navimpressum():
-
-    return render_template("impressum.html")
-
-
-@APP.route("/history")
-def navhistory():
-    return render_template("history.html")
-
-
-@APP.route("/labfolder")
-def navlabfolder():
-    return render_template("labfolder.html")
-
-
-@APP.route("/easydb")
-def naveasydb():
-
-    return render_template("easydb.html")
-
-
-@APP.route("/metadata")
-def navmetadata():
-    return render_template("metadata.html")
-
-
-@APP.route("/lzv")
-def navlzvingest():
-    return render_template("lzvingest.html")
-
-
-@APP.route("/package")
-def navlzvpackage():
-    return render_template("lzvpackage.html")
-
-
-@APP.route("/upload")
-def navupload():
-    return render_template("upload.html")
-
-
-@APP.route("/review")
-def navlzvreview():
-    if not lzv_util.check_user_permission_review(request.cookies["session_user"]):
-        return render_template("index.html")
-    return render_template("lzvreview.html")
-
-
-@APP.route("/login", methods=["GET"])
-def navlogin():
-    if lzv_util.validate_user_session(request):
-        return redirect(url_for("navhome"))
-    return render_template("login.html")
 
 
 @APP.route("/login", methods=["POST"])
@@ -1165,9 +1071,3 @@ def receive_package():
         500,
         {"Content-Type": "application/json"},
     )
-
-
-if __name__ == "__main__":
-    # print(get_storage_for_user("bt303343", return_as_string=True))
-    # authenticate_couchdb()
-    APP.run(debug=True, ssl_context=("./ssl/ca.crt", "./ssl/ca.key"))
