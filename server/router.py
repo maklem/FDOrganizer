@@ -1,15 +1,15 @@
 from flask import render_template, request, url_for, redirect
 from server import APP
-from server.authentication import is_authorized
+from server.services.authentication import is_authorized
 from server.lzv_util import check_user_permission_review
 
 
-def needs_authentication(request):
-    return request.path not in [url_for("navlogin"), url_for('login_lzv')] and "static" not in request.path
+def needs_authentication(route: str) -> bool:
+    return route not in [url_for("navlogin"), url_for('login_lzv')] and "static" not in route
 
 @APP.before_request
 def auth_guard():
-    if not needs_authentication(request):
+    if not needs_authentication(request.path):
         return None
     if not is_authorized(request):
         return redirect(url_for("navlogin"))
@@ -22,7 +22,6 @@ def navhome():
 
 @APP.route("/impressum")
 def navimpressum():
-
     return render_template("impressum.html")
 
 

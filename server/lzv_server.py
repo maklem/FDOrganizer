@@ -1,7 +1,6 @@
 """
 Software for LZV Server.
 """
-from server import APP
 import json
 import shutil
 import sys
@@ -13,11 +12,8 @@ import requests
 from flask import request, make_response
 from werkzeug.utils import secure_filename
 
-from server import lzv_util, mets
-from server.authentication import authorize
-
-# TODO: Navigation auf SPA umstellen
-# TODO: Redirect auf Seite vor dem erzwungenen Login
+from server import APP, lzv_util, mets
+from server.services.authentication import authorize
 
 
 @APP.route("/login", methods=["POST"])

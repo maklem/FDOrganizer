@@ -7,7 +7,7 @@ from flask.wrappers import Request
 from jwt import InvalidSignatureError, encode, decode, DecodeError
 from requests import HTTPError
 import ldap
-from server.db_connector import get
+from server.services.database import get
 from server.entities.databases import Databases
 
 class TokenPayload(TypedDict):

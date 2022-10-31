@@ -5,7 +5,7 @@ import requests
 
 from server.entities.databases import Databases
 from server.entities.document import CouchDocument
-from server import get_config
+from server.lzv_util import get_config
 
 
 def auth_header() -> dict[str, str]:

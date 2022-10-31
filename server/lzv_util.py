@@ -1,8 +1,6 @@
 '''
 LZVUTIL module. general functions for usage in lzv application. no anchors are handled in this file
 '''
-# TODO: Extract auth methods into separate module
-# TODO: Change authentication to serverless sessions (e.g. JWT)
 
 # With Review Process:
 # TODO: Put permissions for users into Database
@@ -10,10 +8,8 @@ LZVUTIL module. general functions for usage in lzv application. no anchors are h
 
 import hashlib
 import json
-import secrets
 from typing import Union
 
-import ldap
 import requests
 from pkg_resources import resource_filename
 

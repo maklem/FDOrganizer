@@ -2,10 +2,10 @@ from flask import jsonify, make_response, request
 from requests import HTTPError, Response
 from .services.authentication import user
 
-from server.db_connector import attach, post
-from server.entities.databases import Databases
-from server.entities.document import CouchDocument
-from server.entities.file import File
+from server.services.database import attach, post
+from .entities.databases import Databases
+from .entities.document import CouchDocument
+from .entities.file import File
 from server import APP
 
 
