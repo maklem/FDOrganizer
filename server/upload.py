@@ -1,5 +1,7 @@
-from flask import jsonify, make_response, request
+from flask import request
 from requests import HTTPError, Response
+
+from .lzv_util import web_error, web_response
 from .services.authentication import user
 
 from server.services.database import attach, post
@@ -16,32 +18,19 @@ def receive_file():
     needs to check if the package is manually created AND belonging to the right user.
     """
     if request.files.get("file") is None:
-        return make_response(jsonify({
-            'title': 'Server Error',
-            'text': 'No file content'
-        }), 400)
+        return web_error(400, 'No file content detected')
         # Put here some other checks (security, file length etc...)
     file = request.files["file"]
     if not file.filename:
-        return make_response(jsonify({
-            'title': 'Server Error',
-            'text': 'No filename available'
-        }), 400)
+        return web_error(400, 'No filename available')
     # file.save(f'{lzv_util.get_config()["tempFolder"]}/{secure_filename(file.filename)}')
     metadata = File(name=file.filename or "", size=file.content_length,
                     mimetype=file.mimetype, origin="manual", is_stored=True, owner=user(request))
     try:
         success = create_document_with_attachement(file, metadata)
     except HTTPError as error:
-        return make_response(jsonify({
-            'title': error.response.reason,
-            'method': error.request.method,
-            'url': error.request.url
-        }), error.response.status_code)
-    return make_response(jsonify({
-        "result": success.json(),
-        "file": file.filename
-    }), 200)
+        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+    return web_response(200, 'Success', success.json() | {"file": file.filename})
 
 
 def create_document_with_attachement(file, metadata: File) -> Response:

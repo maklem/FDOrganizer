@@ -9,9 +9,9 @@ import uuid
 from pathlib import Path
 
 import requests
-from flask import request, make_response
+from flask import request
 from werkzeug.utils import secure_filename
-
+from server.lzv_util import web_error, web_response
 from server import APP, lzv_util, mets
 from server.services.authentication import authorize
 
@@ -23,8 +23,8 @@ def login_lzv():
     try:
         token = authorize(username, password, organisation='uni-bayreuth')
     except RuntimeError:
-        return make_response({"Error": "invalid credentials"}, 401)
-    return make_response(json.dumps({'token': token}), 200)
+        return web_error(401, "Invalid credentials")
+    return web_response(200, 'Success', {'token': token})
 
 
 def create_storage_data_structure_from_upload(user_id, _file):

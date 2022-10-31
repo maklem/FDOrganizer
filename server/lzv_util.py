@@ -8,7 +8,8 @@ LZVUTIL module. general functions for usage in lzv application. no anchors are h
 
 import hashlib
 import json
-from typing import Union
+from typing import Any, Optional, Union
+from flask import make_response
 
 import requests
 from pkg_resources import resource_filename
@@ -187,3 +188,22 @@ def calculate_md5_from_data(data):
     md5 = hashlib.md5()
     md5.update(data)
     return md5.hexdigest()
+
+def web_error(code: int, message:str, stacktrace: Optional[str | list[str]] = None, component = "SERVER"):
+    error_data: dict[str, str | list[str]] = {
+        'message': message,
+        'component': component
+    }
+    if stacktrace is not None:
+        error_data['stacktrace'] = stacktrace
+    return make_response(json.dumps(error_data), code)
+
+def web_response(code: int, message:str, details: Optional[dict[str, Any]] = None):
+    if (details == None):
+        return make_response(json.dumps(
+            {
+                'message': message,
+            }
+        ), code)
+    details['message'] = message
+    return make_response(json.dumps(details), code)
