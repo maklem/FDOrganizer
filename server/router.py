@@ -30,15 +30,9 @@ def navhistory():
     return render_template("history.html")
 
 
-@APP.route("/labfolder")
-def navlabfolder():
-    return render_template("labfolder.html")
-
-
-@APP.route("/easydb")
-def naveasydb():
-
-    return render_template("easydb.html")
+@APP.route("/import")
+def navimport():
+    return render_template("import.html")
 
 
 @APP.route("/metadata")
