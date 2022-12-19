@@ -1,0 +1,56 @@
+.import-page {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: minmax(20rem, 1fr) 4fr;
+}
+
+.left-sidebar {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    border-right: 0.2rem solid #ccc;
+}
+
+.left-sidebar .import-source {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0 0;
+    width: 100%;
+}
+
+.right-content {
+    display: grid;
+    grid-template-rows: min-content auto;
+}
+
+.right-content .files{
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(8rem, 1fr));
+    padding: 1rem
+
+}
+
+.files .file {
+    background-color: #ffffff;
+}
+
+.right-content .button-row {
+    display: grid;
+    grid-template-columns: auto max-content max-content;
+    grid-template-rows: auto;
+    justify-items: end;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.button-row .number-selected {
+    font-weight: 700;
+    color: #444444;
+}
+
+

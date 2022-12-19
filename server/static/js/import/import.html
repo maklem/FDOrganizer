@@ -1,0 +1,27 @@
+<App>
+    <main class="import-page">
+        <aside class="left-sidebar">
+            <ImportSource
+                v-for="source in sources"
+                class="import-source"
+                v-bind="source"
+                @activate ="() => !source.active && activate(source.id)"
+                @select-project="collectionId => showFiles(source.id, collectionId)"
+            ></ImportSource>
+        </aside>
+        <div class="right-content">
+            <div v-if="activeSource" class="button-row">
+                <span class="number-selected">{{selectedFiles.length}} files selected</span>
+                <Button :disabled="!selectedFiles.length">Ausgewählte importieren</Button>
+                <Button :disabled="!formattedFiles.length">Alle importieren</Button>
+            </div>
+            <div class="files">
+                <ImportFile
+                    v-for="file in formattedFiles"
+                    v-bind="file"
+                    @click="toggleSelectFile(file.id)"
+                ></ImportFile>
+            </div>
+        </div>
+    </main>
+</App>
