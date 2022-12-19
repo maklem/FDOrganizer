@@ -198,12 +198,14 @@ def web_error(code: int, message:str, stacktrace: Optional[str | list[str]] = No
         error_data['stacktrace'] = stacktrace
     return make_response(json.dumps(error_data), code)
 
-def web_response(code: int, message:str, details: Optional[dict[str, Any]] = None):
-    if (details == None):
+def web_response(code: int, message:Optional[str] = None, details: Optional[Union[dict[str, Any],list]] = None):
+    if message is None and details is None:
+        return make_response(code)
+    if details is None:
         return make_response(json.dumps(
             {
                 'message': message,
             }
         ), code)
-    details['message'] = message
     return make_response(json.dumps(details), code)
+    
