@@ -1,0 +1,90 @@
+.file {
+    display: grid;
+    grid-template-rows: 3fr max-content max-content;
+    grid-template-columns: 1fr min-content;
+    place-items: center;
+    place-content: center;
+
+    border: 0.1rem solid #aaaaaa;
+    border-radius: 1rem;
+
+}
+
+.file.proxy {
+    opacity: 0.4;
+}
+
+.file .icon {
+    grid-row: 1 / span 1;
+    grid-column: 1/ span 2;
+
+    padding: 0.25rem;
+
+    font-size: 3rem;
+    color: var(--primary-color)
+}
+
+.file .name {
+    grid-row: 2 / span 1;
+    grid-column: 1/ span 2;
+
+    padding: 0.25rem;
+
+    font-weight: 700;
+    max-width: 100%;
+
+    color: #000000;
+    text-align: center;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+}
+
+.file .size {
+    grid-row: 3 / span 1;
+    grid-column: 1/ span 2;
+
+    padding: 0.25rem;
+
+    color: #777777;
+}
+/* 
+.file .overlay {
+    display: flex;
+    grid-row: 1 / span 3;
+    grid-column: 1/ span 2;
+    align-self: stretch;
+    justify-self: stretch;
+
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    border-radius: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.4s;
+
+    opacity: 0;
+
+}
+
+.file .overlay:hover {
+    opacity: 1;
+}
+
+.file .overlay .import-file {
+
+    background-color: rgba(210, 210, 210);
+
+    color: #000;
+} */
+
+.file .select-file {
+    grid-row: 1 / span 1;
+    grid-column: 2/ span 1;
+    align-self: start;
+    justify-self: start;
+
+    margin: 0.5rem;
+}
