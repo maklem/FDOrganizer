@@ -31,12 +31,8 @@ const tabs = [
         url: ""
     },
     {
-        title: "Labfolder",
-        url: "labfolder"
-    },
-    {
-        title: "easyDB",
-        url: "easydb"
+        title: "Import",
+        url: "import"
     },
     {
         title: "Editor",
@@ -47,16 +43,8 @@ const tabs = [
         url: "upload"
     },
     {
-        title: "Metadata",
-        url: "metadata"
-    },
-    {
         title: "Archive",
         url: "lzv"
-    },
-    {
-        title: "Review",
-        url: "review"
     },
 
 ]
