@@ -5,7 +5,6 @@
     gap: 1rem;
 
     padding: 1rem;
-    flex: 0 0 0;
 }
 
 input[type="file"] {
@@ -20,10 +19,13 @@ input[type="file"] {
     gap: 0.5rem;
 
     width: 100%;
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     min-height: 7rem;
     border: 1px dashed #ccc;
+    background-color: rgba(230, 230, 230, 0.3);
+    backdrop-filter: blur(5px);
     padding: 0.5rem 0.5rem;
+
     cursor: pointer;
 
 }
@@ -32,6 +34,8 @@ input[type="file"] {
     min-height: 100%;
     max-width: 10%;
     flex: 1 0 auto;
+
+    background-color: #ffffff;
 }
 
 .custom-file-upload:hover {
@@ -46,6 +50,10 @@ input[type="file"] {
     gap: 0.5rem;
 
     flex: 1 1 auto;
+}
+
+.upload-page .button-row {
+    flex: 7 1 auto;
 }
 
 .start-upload {

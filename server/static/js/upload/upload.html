@@ -1,5 +1,5 @@
 <App>
-    <div class="upload-page">
+    <main class="upload-page">
         <input @change="selectFiles" id="file-upload" type="file" multiple />
         <label for="file-upload" class="custom-file-upload" @dragover="addFileProxy" @dragleave="removeFileProxy"
             @drop="dropFiles">
@@ -16,7 +16,9 @@
                 <span class="text">Click here or drag files to upload</span>
             </div>
         </label>
-        <Button class="start-upload" @button-clicked="openDialog" :disabled="files.length < 1">Start Upload</Button>
+        <div class="button-row">
+            <Button class="start-upload" @button-clicked="openDialog" :disabled="files.length < 1">Start Upload</Button>
+        </div>
         <dialog>
             <div v-if="!uploadInProgress && !failedUploads?.length">
                 <p>Do you really want to upload all those files?</p>
@@ -37,5 +39,5 @@
                 <p>Currently uploading {{files.length}} files</p>
             </div>
         </dialog>
-    </div>
+    </main>
 </App>
