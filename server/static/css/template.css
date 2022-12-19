@@ -18,8 +18,8 @@ html {
     --primary-color: #008557;
     --rgb-primary-color: 0, 133, 87;
     --on-primary-color: #ffffff;
-    --secondary-color: #ff9e80;
-    --rgb-secondary-color: 255, 158, 128;
+    --secondary-color: #c54700;
+    --rgb-secondary-color: 197, 71, 0;
     --on-secondary-color: #000000;
     --error: #b71c1c;
     --rgb-error: 183, 28, 28;
@@ -35,6 +35,7 @@ body {
     margin: 0;
     height: 100%;
     width: 100%;
+    overflow: hidden;
 
     background-color: white;
 
