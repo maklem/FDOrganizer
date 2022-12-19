@@ -22,11 +22,18 @@ def create_payload(username: str, organisation: str) -> TokenPayload:
         'organisation': organisation
     }
 
-def create_token(username, organisation):
-    return encode(payload = create_payload(username, organisation), key = SECRET)
 
-def payload(token):
-    return decode(token, key = SECRET, algorithms = ['HS256', ])
+def add_payload(token: str, key: str, value: str):
+    updated_payload = payload(token) | {key: value}
+    return encode(payload = updated_payload, key = SECRET)
+
+
+def create_token(username, organisation):
+    return encode(payload = create_payload(username, organisation), key = SECRET, algorithm='HS256')
+
+
+def payload(token: str):
+    return decode(token, key = SECRET, algorithms = ['HS256'])
 
 
 def token_valid(token: str):
