@@ -1,0 +1,21 @@
+<div class="source-name" @click="$emit('activate')">
+    <i class="fa-solid fa-plus"></i>
+    <span class="text">{{name}}</span>
+    <i v-if="!authenticated" class="fa-solid fa-lock"></i>
+</div>
+<div v-if="active" class="source-content">
+    <form v-if="!authenticated && needsAuthentication" class="authenticate" @submit="authenticate">
+        <label for="username">Username</label>
+        <input name="username" type="text" @input="setUsername" placeholder="Enter Username" required>
+        <label for="password">Password</label>
+        <input name="password" type="password" @input="setPassword" placeholder="Enter Password" required>            
+        <Button type="submit">Login</Button>
+    </form>
+    <div v-else class="collection-list">
+        <div v-for="collection in collections" class="collection-list-item" :class="{active: collection.active}"@click="selectCollection(collection.id)">
+            <i class="fa-solid fa-folder icon"></i>
+            <div class="primary">{{collection.displayname}}</div>
+            <div class="secondary">{{collection.count}} {{collection.count === 1 ? 'Datei' : 'Dateien'}}</div>
+        </div>
+    </div>
+</div>
