@@ -1,0 +1,157 @@
+.package-overview {
+    display: grid;
+    align-items: stretch;
+    justify-items: stretch;
+    grid-template-columns: minmax(20rem, 1fr) 3fr 0;
+}
+
+.package-overview.details {
+    transition: grid-template-columns 1s;
+    grid-template-columns: 0 3fr minmax(20rem, 1fr);
+}
+
+.left-sidebar {
+    display: grid;
+    grid-auto-rows: max-content;
+    grid-auto-flow: row;
+    justify-items: stretch;
+    align-items: start;
+    overflow-y: auto;
+
+    padding-bottom: 1rem;
+    border-right: 0.2rem solid #eee;
+}
+
+.left-sidebar .package-list-item {
+    border-bottom: 0.05rem solid #eee;
+}
+
+.left-sidebar .add-package {
+    
+    padding: 1rem 1rem 0 1rem;
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+.add-package Button {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.loading {
+    width: 100%;
+    height: 1rem;
+    background: linear-gradient(to right, var(--primary-color), transparent 100%);
+    background-size: 200%;
+    animation: gradient 2s ease-in infinite;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 300% 50%;
+	}
+	50% {
+		background-position: 200% 50%;
+	}
+    100% {
+		background-position: 300% 50%;
+	}
+
+}
+
+.create-package {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 1rem;
+    max-width: 50vw;
+}
+
+.create-package h1 {
+    font-weight: 700;
+}
+.create-package .text {
+    font-size: 1.1rem;
+    padding: 0.1rem 1rem;
+}
+
+.create-package form {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: end;
+
+    width: 100%;
+    padding-top: 1rem;
+}
+
+.create-package::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.create-package .abort-create {
+    display:flex;
+    gap: 0.5rem;
+
+    --primary-color: #ccc;
+    color: #000;
+    --rgb-primary-color: 204,204,204;
+}
+
+
+.create-package input {
+    outline: none;
+    border: 0.1rem solid var(--secondary-color);
+    border-radius: 0.2rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.5rem;
+
+    font-size: 1.1rem;
+}
+
+.create-package input[invalid=true] {
+    border-color: var(--error);
+    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-error), 0.20), 0px 0px 0px 1px rgba(var(--rgb-error), 0.20);
+}
+
+.create-package input:focus,
+.create-package input:active {
+    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-secondary-color), 0.20), 0px 0px 0px 1px rgba(var(--rgb-secondary-color), 0.20);
+}
+
+.create-package label {
+    font-weight: 700;
+    color: grey;
+}
+
+
+
+.package-content {
+    display: grid;
+    grid-template-rows: max-content minmax(0, 1fr) max-content;
+    justify-items: stretch;
+    gap: 0.5rem;
+
+    min-height: 0;
+    min-width: 0;
+    padding: 0 1rem 1rem 1rem;
+}
+
+.package-content .package-header {
+    width: 100%;
+    max-width: 100%;
+}
+
+.package-content .button-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.package-content .files {
+    display: grid;
+    grid-auto-rows: max-content;
+    grid-auto-flow: row;
+    justify-items: stretch;
+    overflow-y: auto;
+}

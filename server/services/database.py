@@ -4,8 +4,8 @@ from base64 import b64encode
 import requests
 
 from server.entities.databases import Databases
-from server.entities.document import CouchDocument
-from server.lzv_util import get_config
+from server.entities.couch_document import CouchDocument
+from server.util import get_config
 
 
 def auth_header() -> dict[str, str]:
@@ -59,8 +59,23 @@ def post(database: Databases, payload: str, parameters: dict[str, str] | None = 
 
 
 def get(database: Databases, query: str, parameters: dict[str, str] | None = None) -> requests.Response:
+    url = f'{db_url(database)}/_find'
+    
     headers = auth_header() | {
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    return requests.post(db_url(database, parameters), headers=headers, data=query, timeout=20)
+    return requests.post(url, headers=headers, data=query, timeout=20)
+
+
+def delete(database: Databases, doc_id: str) -> requests.Response:
+
+    revision = requests.head(doc_url(database, doc_id), headers=auth_header(), timeout=10).headers.get('etag')
+    print(revision)
+    headers = auth_header() | {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "If-Match": revision
+    }
+
+    return requests.delete(doc_url(database, doc_id), headers=headers, timeout=20)

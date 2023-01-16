@@ -1,0 +1,54 @@
+<App>
+    <main class="package-overview" :class="{details: details}">
+        <aside class="left-sidebar">
+            <template v-if="!store.loading.packageList">
+                <PackageListItem
+                    v-for="pkg in store.packages"
+                    v-bind="pkg"
+                ></PackageListItem>
+                <div class="add-package">
+                    <Button @click="$refs.newPackage.showModal()">
+                        <i class="fa-solid fa-plus"></i>
+                        <div>Add project</div>
+                    </Button>
+                </div>
+            </template>
+            <div class="loading" v-else></div>
+            <dialog ref="newPackage" class="create-package">
+                <h1>Create a new project</h1>
+                <label for="package-name">
+                    <div>Choose a name:</div>
+                    <input
+                    name="package-name"
+                    v-model="packageName"
+                    placeholder="e.g. Dataset 1"
+                    required
+                    :invalid="showErrorText">
+                </label>
+                <form method="dialog">
+                    <Button class="abort-create" @button-clicked="$refs.newPackage.close()">Abort</Button>
+                    <Button class="confirm-create" @button-clicked="store.createPackage(packageName)">
+                        <div>Create project</div>
+                    </Button>
+                </form>
+            </dialog>
+        </aside>
+        <div v-if="!!store.selectedPackage" class="package-content">
+            <PackageHeader></PackageHeader>
+            <div class="files">
+                <PackageContentFolder
+                    v-for="folder in store.folders()"
+                    v-bind="folder"
+                ></PackageContentFolder>
+                <PackageContentDocument
+                    v-for="document in store.content.documents"
+                    v-bind="document"
+                ></PackageContentDocument>
+            </div>
+            <div class="button-row">
+                <Button>Add folder</Button>
+                <Button>Upload files</Button>
+            </div>
+        </div>
+    </main>
+</App>
