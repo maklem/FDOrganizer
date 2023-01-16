@@ -1,0 +1,21 @@
+<div class="package-header">
+    <button class="back-button" @click="back">
+        <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="package-name">
+        {{store.selectedPackage.name}}
+        <template
+            v-for="path in store.pathNames()"
+        >
+            <div class="icons">
+                <i class="fa-solid fa-chevron-right"></i>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="folder-name">{{path}}</div>
+        </template>
+    </div>
+    <Button class="edit-button">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <div>Edit project</div>
+    </Button>
+</div>
