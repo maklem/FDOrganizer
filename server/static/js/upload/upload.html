@@ -19,7 +19,7 @@
         <div class="button-row">
             <Button class="start-upload" @button-clicked="openDialog" :disabled="files.length < 1">Start Upload</Button>
         </div>
-        <dialog>
+        <dialog class="upload-dialog">
             <div v-if="!uploadInProgress && !failedUploads?.length">
                 <p>Do you really want to upload all those files?</p>
                 <form method="dialog">
