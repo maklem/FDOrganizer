@@ -5,20 +5,23 @@ from flask import request
 from pkg_resources import resource_listdir, resource_isdir, resource_filename
 
 from server import APP
-from server.lzv_util import web_error, web_response
+from server.util import web_error, web_response
 from server.services.authentication import add_payload, payload
 
 def needs_authentication(api_method):
     @wraps(api_method)
 
     def check_plugin_auth(*args, **kwargs):
+        # Identify plugin and auth token from request params
         auth_token = payload(request.cookies['token'])
         source = str(kwargs.get('source'))
+        # Get correct plugin subtoken from auth token
         if kwargs.get('source') is None:
             return web_error(400, f'Path parameter <source> is needed for this route', component="SERVER")
         plugin_token = auth_token.get(source)
         if plugin_token is None:
             return web_error(401, f'{source} not authorized', component=source)
+        # Proceed with API request method
         return api_method(*args, **kwargs)
 
     return check_plugin_auth

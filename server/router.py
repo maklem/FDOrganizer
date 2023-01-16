@@ -1,7 +1,6 @@
 from flask import render_template, request, url_for, redirect
 from server import APP
 from server.services.authentication import is_authorized
-from server.lzv_util import check_user_permission_review
 
 
 def needs_authentication(route: str) -> bool:
@@ -19,48 +18,29 @@ def auth_guard():
 def navhome():
     return render_template("index.html")
 
-
 @APP.route("/impressum")
 def navimpressum():
     return render_template("impressum.html")
-
 
 @APP.route("/history")
 def navhistory():
     return render_template("history.html")
 
-
 @APP.route("/import")
 def navimport():
     return render_template("import.html")
 
-
-@APP.route("/metadata")
-def navmetadata():
-    return render_template("metadata.html")
-
-
-@APP.route("/lzv")
-def navlzvingest():
-    return render_template("lzvingest.html")
-
-
 @APP.route("/package")
-def navlzvpackage():
-    return render_template("lzvpackage.html")
+def navpackage():
+    return render_template("package.html")
 
+@APP.route("/package/<id>")
+def navpackagedetails():
+    return render_template("package-details.html")
 
 @APP.route("/upload")
 def navupload():
     return render_template("upload.html")
-
-
-@APP.route("/review")
-def navlzvreview():
-    if not check_user_permission_review(request.cookies["session_user"]):
-        return render_template("index.html")
-    return render_template("lzvreview.html")
-
 
 @APP.route("/login")
 def navlogin():

@@ -1,24 +1,5 @@
 {
-  "tempFolder": "./tmp",
-  "tempFolderEasyDBDownload": "./tmp/easydbdownload/",
   "couchDBBaseURL": "http://127.0.0.1:5984",
   "couchDBAdmin": "admin",
-  "couchDBPassword": "admin",
-  "couchDBStorageDatabaseName": "storage",
-  "couchDBMetaDataDatabaseName": "metadata",
-  "couchDBDocumentDatabaseName": "documents",
-  "couchDBStaticDatabaseName": "static",
-  "couchDBIngestsDatabaseName": "ingests",
-  "couchDBIngestReviewDatabaseName": "ingest_review",
-  "LZV_REVIEW": "/lzv_ingest_review",
-  "LZV_HOTFOLDER": "/lzv_hotfolder/SIP",
-  "METADATA_INFO_FILE": "./conf/metadata_schemes.json",
-  "METADATA_EXPORT_DEFINITIONS": "./conf/metadata_export_definitions.json",
-  "METADATA_EXPORT_MAPPINGS": "./conf/metadata_export_mappings.json",
-  "REVIEW_PERMITTED_USERS": [
-    "bt303343",
-    "btxxxxxx",
-    "test"
-  ],
-  "USR_UPLOAD_TMP_FOLDER": "./tmp/usr_uploads/"
+  "couchDBPassword": "admin"
 }
