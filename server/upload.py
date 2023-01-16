@@ -1,13 +1,13 @@
 from flask import request
 from requests import HTTPError, Response
 
-from .lzv_util import web_error, web_response
+from .util import web_error, web_response
 from .services.authentication import user
 
 from server.services.database import attach, post
 from .entities.databases import Databases
-from .entities.document import CouchDocument
-from .entities.file import File
+from .entities.couch_document import CouchDocument
+from .entities.document import Document
 from server import APP
 
 
@@ -24,7 +24,7 @@ def receive_file():
     if not file.filename:
         return web_error(400, 'No filename available')
     # file.save(f'{lzv_util.get_config()["tempFolder"]}/{secure_filename(file.filename)}')
-    metadata = File(name=file.filename or "", size=file.content_length,
+    metadata = Document(name=file.filename or "", size=file.content_length,
                     mimetype=file.mimetype, origin="manual", is_stored=True, owner=user(request))
     try:
         success = create_document_with_attachement(file, metadata)
@@ -33,14 +33,14 @@ def receive_file():
     return web_response(200, 'Success', success.json() | {"file": file.filename})
 
 
-def create_document_with_attachement(file, metadata: File) -> Response:
+def create_document_with_attachement(file, document: Document) -> Response:
     document_created = post(Databases.DOCUMENTS,
-                            metadata.to_json())  # type: ignore
+                            document.to_json())  # type: ignore
     document_created.raise_for_status()
 
-    document = CouchDocument(document_created.json())
+    response_document = CouchDocument(document_created.json())
 
-    attachment_response = attach(Databases.DOCUMENTS, document, file)
+    attachment_response = attach(Databases.DOCUMENTS, response_document, file)
     attachment_response.raise_for_status()
 
     return attachment_response

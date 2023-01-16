@@ -11,8 +11,10 @@ import uuid
 import requests
 from flask.wrappers import Request, Response
 from pkg_resources import resource_filename
+from server.entities.plugin_document import PluginDocument
+from server.entities.plugin_folder import PluginFolder
 
-from server.lzv_util import web_error, web_response
+from server.util import web_error, web_response
 
 def get_config():
     config_filepath = resource_filename(__name__, f'config.json')
@@ -74,6 +76,49 @@ def get_toplevel(request: Request, auth):
     '''
         querys the easydb server for collections. returns the collections either as string or json array
     '''
+    # search_query = {
+    #     "type" : "object",
+    #     "offset": 8300,
+    #     "search" : [
+            # {
+            #     "type" : "in",
+            #     "objecttype": "object",
+            #     "bool" : "must",
+            #     "fields" : [
+            #         "_owner.user._id"
+            #     ],
+            #     "in" : [
+            #         auth.get('user')
+            #     ]
+
+            # },
+            # {
+            #     "type" : "in",
+            #     "bool" : "must",
+            #     "fields" : [
+            #         "collection.is_system_collection"
+            #     ],
+            #     "in" : [
+            #         False
+            #     ]
+
+            # },
+    #     ]
+    # }
+    # url = f'{get_config()["baseUrl"]}/search?token={auth.get("token")}'
+    # response = requests.post(url, json= search_query, timeout=10)
+    # if response.status_code > 399:
+    #     print('didnt work')
+    #     print(response.text)
+    # result_list = json.loads(response.text)
+    # with open('debug_objects.json', 'w', encoding='utf-8') as debug:
+    #     debug.write(response.text)
+    #     debug.close()
+    # filtered_list = list(filter(lambda o: o.get('_owner') is not None, result_list.get('objects')))
+    # print(filtered_list)
+    # print(list(map(convert_file, result_list.get('objects'))))
+    # objects = result_list.get('objects')
+    # objects = list(map(convert_file, objects))
 
     search_query = {
         "type" : "collection",
@@ -114,7 +159,7 @@ def get_toplevel(request: Request, auth):
     #     return web_response(201, "No collections found")
     return web_response(200, details=collections)
 
-def convert_collection(collection):
+def convert_collection(collection) -> PluginFolder:
     count = collection.get('_count')
     collection = collection.get('collection')
     displayname = collection.get('displayname').get('de-DE')
@@ -122,11 +167,12 @@ def convert_collection(collection):
     return {'count': count, 'displayname': displayname, 'id': collection_id}
 
 
-def convert_file(file):
-    obj = file.get('object')
-    file = obj.get('file')[0]
+def convert_file(obj) -> PluginDocument:
+    inner_object = obj.get('object')
+    file_id = obj.get('_uuid')
 
-    file_id = obj.get('_id')
+    file = inner_object.get('file')[0]
+
     displayname = f'{file.get("original_filename")}'
     extension = f'{file.get("extension")}'
     size = file.get('filesize')

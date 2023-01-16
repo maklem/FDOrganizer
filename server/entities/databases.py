@@ -3,9 +3,8 @@ from enum import Enum
 
 class Databases(Enum):
     DOCUMENTS = 'documents'
-    INGESTS = 'ingests'
+    PACKAGES = 'packages'
     METADATA = 'metadata'
-    REVIEW = 'ingest_review'
-    STATIC = 'static'
-    STORAGE = 'storage'
+    FOLDERS = 'folders'
+    USERS = 'users'
     ORGANISATIONS = 'organisations'

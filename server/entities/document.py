@@ -1,12 +1,19 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Optional
+
+from dataclasses_json import dataclass_json
 
 
+@dataclass_json
 @dataclass
-class CouchDocument:
-    id: str
-    rev: str
-
-    def __init__(self, document_response: dict[Literal['id'] | Literal['rev'], str]):
-        self.id = document_response['id']
-        self.rev = document_response['rev']
+class Document:
+    name: str
+    size: int
+    mimetype: str
+    is_stored: bool
+    origin: Literal["manual"] | str
+    owner: str
+    _id: Optional[str] = None
+    source_id: Optional[str] = None
+    resource_type: Optional[str] = "Other"
+    metadata: Optional[str] = None
