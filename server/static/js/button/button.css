@@ -10,7 +10,8 @@
     cursor: pointer;
     background-color: var(--on-primary-color);
     font-size: 1.1rem;
-    color: var(--primary-color)
+    color: var(--primary-color);
+    white-space: nowrap;
 }
 
 .button-component:hover,
