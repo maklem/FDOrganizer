@@ -7,7 +7,7 @@ from flask.wrappers import Request
 from jwt import InvalidSignatureError, encode, decode, DecodeError
 from requests import HTTPError
 import ldap
-from server.services.database import get
+from server.services.database import find
 from server.entities.databases import Databases
 
 class TokenPayload(TypedDict):
@@ -75,7 +75,7 @@ def credentials_valid(username: str, password: str, organisation: str):
 
 def get_organisation(organisation: str):
     query = {"selector": {"name": organisation}}
-    org = get(Databases.ORGANISATIONS, query = dumps(query))
+    org = find(Databases.ORGANISATIONS, query = dumps(query))
     return loads(org.json())
 
 def auth_ldap(username, password, ldap_server, ldap_base):
