@@ -35,8 +35,8 @@ def navpackage():
     return render_template("package.html")
 
 @APP.route("/package/<id>")
-def navpackagedetails():
-    return render_template("package-details.html")
+def navpackageedit(id):
+    return render_template("package-edit.html")
 
 @APP.route("/upload")
 def navupload():

@@ -1,0 +1,35 @@
+<App>
+    <main class="package-details">
+        <PackageContent
+        v-if="!!store.package"
+        @new-folder = "$refs.newFolder.showModal()"
+        ></PackageContent>
+        <dialog ref="newFolder" class="create-folder">
+            <h1>New Folder</h1>
+            <label for="folder-name">
+                <div>Choose a name:</div>
+                <input
+                name="folder-name"
+                v-model="folderName"
+                placeholder="e.g. Supplements"
+                required
+                :invalid="showErrorText">
+            </label>
+            <form method="dialog">
+                <Button class="abort-create" @button-clicked="$refs.newFolder.close()">Abort</Button>
+                <Button class="confirm-create" @button-clicked="store.createFolder(folderName)">
+                    <div>Create folder</div>
+                </Button>
+            </form>
+        </dialog>
+    </main>
+    <aside class="right-sidebar">
+        <ImportSource
+            v-for="source in sources"
+            class="import-source"
+            v-bind="source"
+            @activate ="() => !source.active && activate(source.id)"
+            @select-project="collectionId => showFiles(source.id, collectionId)"
+        ></ImportSource>
+    </aside>
+</App>
