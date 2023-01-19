@@ -1,5 +1,5 @@
 async function getTemplate(component) {
-    const url = `static/js/${component}/${component}.html`
+    const url = `/static/js/${component}/${component}.html`
     return fetch(url).then(response => response.text());
 }
 
