@@ -1,6 +1,6 @@
 <div class="package-content-document">
-    <i class="fa-solid icon" :class="'fa-' + icon"></i>
+    <i class="fa-solid icon" :class="'fa-' + filetypeIcon(type)"></i>
     <div class="name">{{name}}</div>
-    <div class="size">{{formattedSize}}</div>
+    <div class="size">{{formatFilesize(size)}}</div>
     <div class="source">{{sourceName}}</div>
 </div>

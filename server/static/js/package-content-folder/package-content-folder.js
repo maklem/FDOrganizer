@@ -1,6 +1,5 @@
 import { setup } from "../setup.js";
-import {store} from '../package/state.js'
-import { formatFilesize } from "../format-util.js";
+import { store } from '../package-edit/state.js'
 const template = await setup('package-content-folder');
 
 export default {
@@ -12,19 +11,13 @@ export default {
         size: Number,
         count: Number
     },
+    inject:['editable'],
     data() {
         return {
+            store
         }
     },
     methods: {
-        open() {
-            store.openFolder(this.id, this.name)
-        }
-    },
-    computed: {
-        formattedSize() {
-            return formatFilesize(this.size)
-        }
     },
     template
 }

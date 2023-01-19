@@ -3,7 +3,7 @@
         <i class="fa-solid fa-arrow-left"></i>
     </button>
     <div class="package-name">
-        {{store.selectedPackage.name}}
+        {{store.package.name}}
         <template
             v-for="path in store.pathNames()"
         >
@@ -14,8 +14,18 @@
             <div class="folder-name">{{path}}</div>
         </template>
     </div>
-    <Button class="edit-button">
+    <Button
+    v-if="!editable"
+    class="side-button"
+    @button-clicked="overviewStore.openDetails()">
         <i class="fa-solid fa-pen-to-square"></i>
         <div>Edit project</div>
+    </Button>
+    <Button
+    v-else
+    class="side-button"
+    @button-clicked="$emit('new-folder')">
+        <i class="fa-solid fa-folder-plus"></i>
+        <div>Add folder</div>
     </Button>
 </div>

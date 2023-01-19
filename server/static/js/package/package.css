@@ -2,12 +2,7 @@
     display: grid;
     align-items: stretch;
     justify-items: stretch;
-    grid-template-columns: minmax(20rem, 1fr) 3fr 0;
-}
-
-.package-overview.details {
-    transition: grid-template-columns 1s;
-    grid-template-columns: 0 3fr minmax(20rem, 1fr);
+    grid-template-columns: minmax(20rem, 1fr) 3fr;
 }
 
 .left-sidebar {
@@ -127,31 +122,8 @@
 
 
 .package-content {
-    display: grid;
-    grid-template-rows: max-content minmax(0, 1fr) max-content;
-    justify-items: stretch;
-    gap: 0.5rem;
-
     min-height: 0;
     min-width: 0;
     padding: 0 1rem 1rem 1rem;
 }
 
-.package-content .package-header {
-    width: 100%;
-    max-width: 100%;
-}
-
-.package-content .button-row {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
-.package-content .files {
-    display: grid;
-    grid-auto-rows: max-content;
-    grid-auto-flow: row;
-    justify-items: stretch;
-    overflow-y: auto;
-}

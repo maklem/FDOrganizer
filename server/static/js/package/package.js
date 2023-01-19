@@ -1,23 +1,20 @@
 import { createApp } from "../vue.js";
 import App from "../app/app.js";
 import PackageListItem from "../package-list-item/package-list-item.js";
-import PackageContentDocument from "../package-content-document/package-content-document.js";
-import PackageContentFolder from "../package-content-folder/package-content-folder.js";
 import Button from "../button/button.js";
-import PackageHeader from "../package-header/package-header.js";
+import PackageContent from "../package-content/package-content.js";
+
 import {store} from './state.js'
 import { setup } from "../setup.js";
 
 const template = await setup('package');
 
-createApp({
+const pkg = createApp({
     components: {
         App,
         PackageListItem,
         Button,
-        PackageContentDocument,
-        PackageContentFolder,
-        PackageHeader,
+        PackageContent
     },
     data() {
         return {
@@ -31,4 +28,6 @@ async mounted() {
     methods: {
     },
     template
-}).mount('#app-container')
+})
+pkg.provide("editable", false)
+pkg.mount('#app-container')

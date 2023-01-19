@@ -1,0 +1,15 @@
+<div class="package-content">
+    <PackageHeader
+    @new-folder="$emit('new-folder')"></PackageHeader>
+    <div v-if="!store.loading.content" class="files" >
+        <PackageContentFolder
+            v-for="folder in store.folders()"
+            v-bind="folder"
+        ></PackageContentFolder>
+        <PackageContentDocument
+            v-for="document in store.content.documents"
+            v-bind="document"
+        ></PackageContentDocument>
+    </div>
+    <div class="loading" v-else></div>
+</div>

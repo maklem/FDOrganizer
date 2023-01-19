@@ -51,9 +51,9 @@
     font-size: 1rem;
 }
 
-.package-header .edit-button {
+.package-header .side-button {
     display:flex;
-    gap: 0.25rem;
+    gap: 0.5rem;
 
     flex: 0 0 0;
     --primary-color: #ccc;

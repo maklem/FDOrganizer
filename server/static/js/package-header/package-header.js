@@ -1,6 +1,7 @@
 import { setup } from "../setup.js";
+import { store } from '../package-edit/state.js'
+import { store as overviewStore } from '../package/state.js'
 import Button from '../button/button.js';
-import {store} from "../package/state.js";
 const template = await setup('package-header');
 
 export default {
@@ -9,12 +10,15 @@ export default {
     },
     data() {
         return {
-            store: store
+            store,
+            overviewStore
         }
     },
+    inject: ['editable'],
     methods: {
         back() {
-            this.store.climbPackagePath()
+            if(this.editable) this.store.climbPackagePath()
+            else this.overviewStore.climbPackagePath()
         }
     },
     template
