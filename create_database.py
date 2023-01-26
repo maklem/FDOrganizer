@@ -6,19 +6,19 @@ import sys
 import requests
 
 #Reading Config
-def getConfig():
+def config_file():
     with open('./server/conf/config.json') as f:
         return json.load(f)
 
-def getCredentials():
-    config = getConfig()
+def credentials():
+    config = config_file()
     return {
         "username": f'{config["couchDBAdmin"]}',
         "password": f'{config["couchDBPassword"]}',
     }
 
-def getBaseURL():
-    return getConfig()["couchDBBaseURL"]
+def base_url():
+    return config_file()["couchDBBaseURL"]
 
 #Authentication
 def authenticate(url: str, username: str, password: str):
@@ -27,8 +27,8 @@ def authenticate(url: str, username: str, password: str):
     return requests.post(url, data=data, headers=headers)
 
 
-def getAuthenticationToken(username: str, password: str):
-    url = f'{getBaseURL()}/_session'
+def authentication_token(username: str, password: str):
+    url = f'{base_url()}/_session'
     response = authenticate(url, username, password)
     print(url)
     if not response.status_code == 200:
@@ -39,7 +39,7 @@ def getAuthenticationToken(username: str, password: str):
 
 
 #Creating Database
-def getDatabaseName():
+def get_database_name():
     if len(sys.argv) == 2:
         return str(sys.argv[1])
     return input("Wählen Sie einen Namen für die Datenbank:\n")
@@ -52,7 +52,7 @@ def create(url: str, token: str):
 
 def create_database(name: str, token: str):
     print(f'Creating Database "{name}"')
-    url = f'{getBaseURL()}/{name}'
+    url = f'{base_url()}/{name}'
     response = create(url, token)
     if response.status_code != 201:
         print(f'Error creating Database "{name}":')
@@ -62,9 +62,9 @@ def create_database(name: str, token: str):
 
 #Run
 if __name__ == '__main__':
-    username, password = getCredentials().values()
-    token = getAuthenticationToken(username, password)
+    username, password = credentials().values()
+    token = authentication_token(username, password)
     if not token:
         sys.exit()
-    databaseName = getDatabaseName()
+    databaseName = get_database_name()
     create_database(databaseName, token)
