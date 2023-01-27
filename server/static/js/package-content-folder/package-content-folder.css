@@ -1,6 +1,6 @@
 .package-content-folder{
     display: inline-grid;
-    grid-template-columns: max-content max-content auto;
+    grid-template-columns: max-content minmax(auto, max-content) auto;
     grid-template-rows: auto;
     grid-template-areas:
         "icon name size"
@@ -26,6 +26,8 @@
 
 .package-content-folder .name {
     grid-area: name;
+
+    line-break: anywhere;
 }
 
 .package-content-folder .size {
@@ -34,8 +36,8 @@
     color: #666666
 }
 
-.package-content-folder .source {
-    grid-area: source;
+.package-content-folder .count {
+    grid-area: count;
 
     color: #666666
 }

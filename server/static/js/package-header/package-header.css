@@ -36,6 +36,7 @@
     flex: 1 0 0;
     font-size: 1.3rem;
     font-weight: 500;
+    line-break: anywhere;
 }
 
 .package-name .icons {

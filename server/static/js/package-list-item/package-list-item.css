@@ -48,7 +48,7 @@
 
 }
 
-.action .circle {
+.action .delete {
     background-color: transparent;
     color: var(--error);
     border: none;
@@ -59,12 +59,12 @@
     cursor: pointer;
 }
 
-.action .circle:hover {
+.action .delete:hover {
     background-color: rgba(var(--rgb-error), 0.3);
     transition: all 300ms;
 }
 
-.action .circle:active {
+.action .delete:active {
     background-color: rgba(var(--rgb-error), 0.1);
     transition: all 300ms;
 }
@@ -79,6 +79,8 @@
 
 .delete-package h1 {
     font-weight: 700;
+
+    line-break: anywhere;
 }
 .delete-package .text {
     font-size: 1.1rem;
