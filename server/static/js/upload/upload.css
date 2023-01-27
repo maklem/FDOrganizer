@@ -1,9 +1,12 @@
-.upload-page {
-    display: flex;
+.manual-upload {
+    display: inline-flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 1rem;
 
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
     padding: 1rem;
 }
 
@@ -12,66 +15,77 @@ input[type="file"] {
 }
 
 .custom-file-upload {
-    display: flex;
-    align-items: stretch;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    display: grid;
+    align-items: start;
+    justify-items: stretch;
+    grid-auto-rows: max-content;
+    grid-auto-flow: row;
     gap: 0.5rem;
 
     width: 100%;
-    flex: 1 1 auto;
+    flex: 1 0 0;
     min-height: 7rem;
     border: 1px dashed #ccc;
     background-color: rgba(230, 230, 230, 0.3);
     backdrop-filter: blur(5px);
     padding: 0.5rem 0.5rem;
 
+    overflow-y: auto;
     cursor: pointer;
 
 }
 
 .custom-file-upload .file {
-    min-height: 100%;
-    max-width: 10%;
     flex: 1 0 auto;
-
-    background-color: #ffffff;
 }
 
-.custom-file-upload:hover {
-    color: var(--secondary-color);
-}
-
-
-.custom-file-upload .placeholder {
+.custom-file-upload .add-files {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
 
-    flex: 1 1 auto;
+    flex: 1 0 auto;
+    background-color: var(--on-primary-color);
+
+    border: 0.1rem solid #aaaaaa;
+    border-radius: 1rem;
+    padding: 1rem;
+
+    font-size: 1.7rem;
+    color: var(--primary-color);
 }
 
-.upload-page .button-row {
-    flex: 7 1 auto;
+.custom-file-upload .add-by-drag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 1 0 auto;
+    background-color: var(--on-primary-color);
+
+    border: 0.1rem solid #aaaaaa;
+    border-radius: 1rem;
+    padding: 1rem;
+
+    font-size: 1.2rem;
 }
 
-.start-upload {
-    width: fit-content;
+.manual-upload .button-row {
+    flex: 0 0 0;
+}
+
+.manual-upload .upload-dialog {
+    border: 0.1rem solid #aaaaaa !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 1.6rem;
+    max-width: 25rem;
 }
 
 form[method="dialog"] {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-}
-
-.upload-page .upload-dialog {
-    border: 0.1rem solid #aaaaaa !important;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    padding: 1.6rem;
-    max-width: 25rem;
 }
 
 .upload-dialog p {
@@ -87,6 +101,16 @@ form[method="dialog"] {
 
 .upload-dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
+}
+
+.upload-dialog .close-button {
+    display:flex;
+    gap: 0.5rem;
+
+    flex: 0 0 0;
+    --primary-color: #ccc;
+    color: #000;
+    --rgb-primary-color: 204,204,204;
 }
 
 @keyframes gradient {

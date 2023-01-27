@@ -3,6 +3,7 @@ import App from "../app/app.js";
 import PackageListItem from "../package-list-item/package-list-item.js";
 import PackageContent from "../package-content/package-content.js";
 import Button from "../button/button.js";
+import Upload from "../upload/upload.js";
 import {store} from './state.js'
 import { setup } from "../setup.js";
 
@@ -13,7 +14,8 @@ const packageEdit = createApp({
         App,
         PackageListItem,
         Button,
-        PackageContent
+        PackageContent,
+        Upload
     },
     data() {
         return {

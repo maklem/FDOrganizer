@@ -22,14 +22,15 @@
                 </Button>
             </form>
         </dialog>
+        <aside class="right-sidebar">
+            <ImportSource
+                v-for="source in sources"
+                class="import-source"
+                v-bind="source"
+                @activate ="() => !source.active && activate(source.id)"
+                @select-project="collectionId => showFiles(source.id, collectionId)"
+            ></ImportSource>
+            <Upload></Upload>
+        </aside>
     </main>
-    <aside class="right-sidebar">
-        <ImportSource
-            v-for="source in sources"
-            class="import-source"
-            v-bind="source"
-            @activate ="() => !source.active && activate(source.id)"
-            @select-project="collectionId => showFiles(source.id, collectionId)"
-        ></ImportSource>
-    </aside>
 </App>

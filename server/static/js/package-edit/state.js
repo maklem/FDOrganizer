@@ -10,12 +10,15 @@ export const store = reactive({
         documents: [],
     },
     packagePath: [],
-    getPackage,
-    createFolder,
-    openFolder,
     climbPackagePath,
-    pathNames,
+    createFolder,
+    currentPath,
+    deleteDocument,
     folders,
+    getPackage,
+    getPackageContent,
+    openFolder,
+    pathNames
 });
 
 function pathNames() {
@@ -31,17 +34,23 @@ async function getPackage(packageId) {
     const response = await fetch(`/package/${packageId}/content`, {method: 'GET'})
     const json = await response.json()
     if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
-    store.package = json
-    resetContent()
-    if(!store.package.folders.length && !store.package.documents.length) return
-    getPackageContent(store.package.folders, store.package.documents)
+    store.package = json.package
+    store.content = json
+    store.packagePath = []
+}
+
+async function getFolder(folderId) {
+    const response = await fetch(`/folder/${folderId}/content`, {method: 'GET'})
+    const json = await response.json()
+    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    store.content = json
 }
 
 async function openFolder(id) {
     const folder = store.content.folders.find(folder => folder.id === id)
     store.packagePath.push(folder);
     resetContent()
-    getPackageContent(folder.folders, folder.documents)
+    getPackageContent()
 }
 
 async function climbPackagePath() {
@@ -49,15 +58,7 @@ async function climbPackagePath() {
         return location.assign(`${location.origin}/package`)
     store.packagePath.pop()
     resetContent()
-    let folders, documents;
-    if (store.packagePath.length) {
-        folders = store.packagePath.at(-1).folders
-        documents = store.packagePath.at(-1).documents
-    } else {
-        folders = store.package.folders
-        documents = store.package.documents
-    }
-    getPackageContent(folders, documents)
+    getPackageContent()
 }
 
 function resetContent() {
@@ -67,21 +68,11 @@ function resetContent() {
     };
 }
 
-async function getPackageContent(folders, documents) {
+async function getPackageContent() {
     store.loading.content = true
-    const response = await fetch('/package/content', {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            folders,
-            documents
-        })
-    })
-    const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
-    store.content = json
+    const {parent, parentType} = currentPath()
+    if (parentType === "package") await getPackage(parent)
+    else await getFolder(parent)
     store.loading.content = false
 }
 
@@ -102,9 +93,27 @@ async function createFolder(name) {
     const json = await response.json()
 	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
 
-    const folders = [...store.content.folders.map(folder => folder.id), json.id]
-    const documents = store.content.documents.map(document => document.id)
-    await getPackageContent(folders, documents)
+    await getPackageContent()
+    store.loading.content = false
+}
+
+async function deleteDocument(id) {
+    store.loading.content = true
+    const {parent, parentType} = currentPath()
+    const response = await fetch(`/package/document/${id}`, {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: 'DELETE',
+        body: JSON.stringify({
+            parent,
+            parentType
+        })
+    });
+    const json = await response.json()
+	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+
+    await getPackageContent()
     store.loading.content = false
 }
 

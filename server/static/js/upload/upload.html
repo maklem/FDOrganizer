@@ -1,43 +1,36 @@
-<App>
-    <main class="upload-page">
-        <input @change="selectFiles" id="file-upload" type="file" multiple />
-        <label for="file-upload" class="custom-file-upload" @dragover="addFileProxy" @dragleave="removeFileProxy"
-            @drop="dropFiles">
+<div class="manual-upload">
+    <input @change="selectFiles" id="file-upload" type="file" multiple />
+    <label for="file-upload" class="custom-file-upload" @dragover="addFileProxy" @dragleave="removeFileProxy"
+        @drop="dropFiles">
 
-            <UploadFile v-for="file in files" v-bind="prepareFile(file)" @delete="removeFile"></UploadFile>
+        <UploadFile v-for="file in store.displayFiles()" v-bind="file"></UploadFile>
 
-            <UploadFile v-if="fileProxy" v-bind="fileProxy"></UploadFile>
-            <UploadFile v-if="files.length >= 1 && !fileProxy" :name="'Add more files'" :icon="'plus'" :proxy="true">
-                <i class="icon fa-solid fa-plus"></i>
-                <span class="name">Add more Files</span>
-            </UploadFile>
-            <div v-if="files.length < 1 && !fileProxy" class="placeholder">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span class="text">Click here or drag files to upload</span>
-            </div>
-        </label>
-        <div class="button-row">
-            <Button class="start-upload" @button-clicked="openDialog" :disabled="files.length < 1">Start Upload</Button>
+        <UploadFile v-if="fileProxy" v-bind="fileProxy"></UploadFile>
+        <div v-if="store.draggedFiles.length" class="add-by-drag">
+            <div>+{{store.draggedFiles.length}} {{store.draggedFiles.length > 1 ? 'files': 'file'}}</div>
         </div>
-        <dialog class="upload-dialog">
-            <div v-if="!uploadInProgress && !failedUploads?.length">
-                <p>Do you really want to upload all those files?</p>
-                <form method="dialog">
-                    <Button @button-clicked="closeDialog">Abort</Button>
-                    <Button @button-clicked="startUpload">Yes</Button>
-                </form>
-            </div>
-            <div v-if="failedUploads?.length">
-                <p>Upload finished! {{failedUploads.length}} files could not be uploaded</p>
-                <form method="dialog">
-                    <Button @button-clicked="closeDialog">Abort</Button>
-                    <Button @button-clicked="startUpload">Try again</Button>
-                </form>
-            </div>
-            <div v-if="uploadInProgress">
-                <div class="loading"></div>
-                <p>Currently uploading {{files.length}} files</p>
-            </div>
-        </dialog>
-    </main>
-</App>
+        <div class="add-files">
+            <i class="fa-solid fa-plus"></i>
+        </div>
+    </label>
+    <div class="button-row">
+        <Button
+        class="start-upload"
+        @button-clicked="$refs.uploadFiles.showModal()"
+        :disabled="store.files.length < 1"
+        >Start Upload</Button>
+    </div>
+    <dialog
+    ref="uploadFiles"
+    class="upload-dialog" 
+    @close="store.failedUploads = []">
+        <div>
+            <div v-if="store.loading.upload" class="loading"></div>
+            <p>{{store.dialogText ?? `Do you really want to upload ${store.files.length} selected files?`}}</p>
+            <form method="dialog">
+                <Button class="close-button" @button-clicked="$refs.uploadFiles.close()">Abort</Button>
+                <Button @button-clicked="store.startUpload()">{{store.failedUploads.length ? 'Try Again': 'Yes'}}</Button>
+            </form>
+        </div>
+    </dialog>
+</div>

@@ -1,22 +1,22 @@
 .file {
     display: grid;
-    grid-template-rows: 3fr max-content max-content;
-    grid-template-columns: 1fr;
+    grid-template-rows: max-content max-content;
+    grid-template-columns: max-content 1fr max-content;
+    grid-template-areas:
+        "icon name action"
+        "icon size action";
     place-items: center;
     place-content: center;
 
     border: 0.1rem solid #aaaaaa;
     border-radius: 1rem;
+    background-color: var(--on-primary-color);
 
-}
 
-.file.proxy {
-    opacity: 0.4;
 }
 
 .file .icon {
-    grid-row: 1 / span 1;
-    grid-column: 1/ span 1;
+    grid-area: icon;
 
     padding: 0.25rem;
 
@@ -25,8 +25,7 @@
 }
 
 .file .name {
-    grid-row: 2 / span 1;
-    grid-column: 1/ span 1;
+    grid-area: name;
 
     padding: 0.25rem;
 
@@ -34,16 +33,12 @@
     max-width: 100%;
 
     color: #000000;
-    text-align: center;
-    white-space: nowrap;
     overflow-x: hidden;
-    text-overflow: ellipsis;
     overflow-wrap: anywhere;
 }
 
 .file .size {
-    grid-row: 3 / span 1;
-    grid-column: 1/ span 1;
+    grid-area: size;
 
     padding: 0.25rem;
 
@@ -52,8 +47,8 @@
 
 .file .overlay {
     display: flex;
-    grid-column: 1/ span 1;
-    grid-row: 1 / span 3;
+    grid-column: 1/ span 3;
+    grid-row: 1 / span 2;
     align-self: stretch;
     justify-self: stretch;
 

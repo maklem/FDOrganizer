@@ -39,10 +39,6 @@ const tabs = [
         url: "package"
     },
     {
-        title: "Manual Upload",
-        url: "upload"
-    },
-    {
         title: "Archive",
         url: "lzv"
     },
