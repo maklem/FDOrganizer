@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Literal, Optional
+from typing import Any, List, Literal, Optional
 
 from dataclasses_json import dataclass_json, config
 
@@ -18,3 +18,9 @@ class Package:
     metadata: Optional[str] = None
     id: Optional[str] = field(default=None, metadata=config(exclude=lambda x: x is None))
     archive_id: Optional[str] = None
+
+    @staticmethod
+    def convert(package_in: dict[str, Any]) -> dict[str, Any]:
+        package_out: Package = Package.from_dict(package_in)
+        package_out.id = package_in.get('_id')
+        return package_out.to_dict()

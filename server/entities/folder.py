@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from dataclasses_json import dataclass_json
 
@@ -13,3 +13,9 @@ class Folder:
     documents: List[int]
     id: Optional[str] = None
     metadata: Optional[str] = None
+
+    @staticmethod
+    def convert(folder_in: dict[str, Any]) -> dict[str, Any]:
+        folder_out: Folder = Folder.from_dict(folder_in)
+        folder_out.id = folder_in.get('_id')
+        return folder_out.to_dict() # type: ignore

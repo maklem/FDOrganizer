@@ -192,17 +192,6 @@ def create_document_with_attachement(file, document: Document) -> Response:
 
     return attachment_response
 
-#TODO: Move converters to dataclasses
-def convert_folder(folder_in: dict[str, Any]) -> dict[str, Any]:
-    folder_out: Folder = Folder.from_dict(folder_in)
-    folder_out.id = folder_in.get('_id')
-    return folder_out.to_dict() # type: ignore
-
-def convert_document(document_in: dict[str, Any]) -> dict[str, Any]:
-    document_out: Document = Document.from_dict(document_in) 
-    document_out.id = document_in.get('_id')
-    return document_out.to_dict() # type: ignore
-
 def content_query(id_array):
     return {
         "selector": {
@@ -230,7 +219,7 @@ def get_content(folders: list[str], documents: list[str]):
         json.dumps(content_query(documents))
     ).json().get('docs')
 
-    return {"folders": list(map(convert_folder, found_folders)), "documents": list(map(convert_document, found_documents)) }
+    return {"folders": list(map(Folder.convert, found_folders)), "documents": list(map(Document.convert, found_documents)) }
 
 def get_parent_database(parent_type) -> Databases:
     match parent_type:

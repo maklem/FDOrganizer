@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 from dataclasses_json import dataclass_json
 
@@ -16,3 +16,9 @@ class Document:
     id: Optional[str] = None
     source_id: Optional[str] = None
     metadata: Optional[str] = None
+
+    @staticmethod
+    def convert(document_in: dict[str, Any]) -> dict[str, Any]:
+        document_out: Document = Document.from_dict(document_in) 
+        document_out.id = document_in.get('_id')
+        return document_out.to_dict() # type: ignore
