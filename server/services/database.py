@@ -82,10 +82,8 @@ def get(database: Databases, id: str) -> requests.Response:
 
 def update(database: Databases, doc_id, changes: dict[str, Any], parameters: dict[str, str] | None = None) -> requests.Response:
     current_document = get(database, doc_id).json()
-    print(current_document)
-    new_document = patch(current_document, changes)
-    print(new_document)
 
+    new_document = patch(current_document, changes)
     headers = auth_header() | {
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -116,13 +114,14 @@ def patch(obj: dict[str, Any], changes: dict[str, Any]):
             obj[key] = patch_array(obj[key], value)
     return obj
 
-def patch_array(list_property: list, change: dict[Literal["method"] | Literal["value"], str|Any]):
+def patch_array(list_property: list, change: dict[Literal["method"] | Literal["value"], Any]):
     value = change.get('value')
-    print("Array Change: ", change)
     match change.get('method'):
         case "replace":
             return value
         case "append":
             return list_property + [value]
         case "remove":
-            return list(filter(lambda x: x is not value, list_property))
+            return list(filter(lambda x: x != value, list_property))
+        case "extend":
+            return list_property + value # type: ignore

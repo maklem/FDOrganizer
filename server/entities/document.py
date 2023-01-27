@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Optional
 
 from dataclasses_json import dataclass_json
 
@@ -9,11 +9,10 @@ from dataclasses_json import dataclass_json
 class Document:
     name: str
     size: int
-    mimetype: str
+    type: str
     is_stored: bool
-    origin: Literal["manual"] | str
+    source: str
     owner: str
-    _id: Optional[str] = None
+    id: Optional[str] = None
     source_id: Optional[str] = None
-    resource_type: Optional[str] = "Other"
     metadata: Optional[str] = None

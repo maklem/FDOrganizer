@@ -1,6 +1,6 @@
-.package-content-document{
+.package-content-document {
     display: inline-grid;
-    grid-template-columns: max-content max-content auto;
+    grid-template-columns: max-content minmax(auto, max-content) auto;
     grid-template-rows: auto;
     grid-template-areas:
         "icon name size"
@@ -15,6 +15,13 @@
     cursor:pointer
 }
 
+.package-content-document.editable {
+    grid-template-columns: max-content minmax(auto, max-content) auto max-content;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "icon name size action"
+        "icon source source action";
+}
 .package-content-document:hover {
     color: var(--primary-color);
 }
@@ -26,10 +33,12 @@
 
 .package-content-document .name {
     grid-area: name;
+    line-break: anywhere;
 }
 
 .package-content-document .size {
     grid-area: size;
+    align-self: start;
 
     color: #666666
 }
@@ -44,4 +53,77 @@
     grid-area: icon;
 
     font-size: 2rem;
+}
+
+.package-content-document .action {
+    grid-area: action;
+}
+
+.action .delete {
+    background-color: transparent;
+    color: var(--error);
+    border: none;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.action .delete:hover {
+    background-color: rgba(var(--rgb-error), 0.3);
+    transition: all 300ms;
+}
+
+.action .delete:active {
+    background-color: rgba(var(--rgb-error), 0.1);
+    transition: all 300ms;
+}
+
+.delete-document {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 1rem;
+    max-width: 50vw;
+}
+
+.delete-document h1 {
+    font-weight: 700;
+
+    line-break: anywhere;
+}
+.delete-document .text {
+    font-size: 1.1rem;
+    padding: 0.1rem 1rem;
+}
+
+.delete-document form {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: end;
+
+    width: 100%;
+    padding-top: 1rem;
+}
+
+.delete-document::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.delete-document .abort-delete {
+    display:flex;
+    gap: 0.5rem;
+
+    --primary-color: #ccc;
+    color: #000;
+    --rgb-primary-color: 204,204,204;
+}
+
+.delete-document .confirm-delete {
+    display:flex;
+    gap: 0.5rem;
+
+    --primary-color: var(--error);
+    --rgb-primary-color: var(--rgb-error);
 }

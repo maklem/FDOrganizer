@@ -1,6 +1,25 @@
-<div class="package-content-document">
+<div class="package-content-document" :class="{editable}">
     <i class="fa-solid icon" :class="'fa-' + filetypeIcon(type)"></i>
     <div class="name">{{name}}</div>
     <div class="size">{{formatFilesize(size)}}</div>
-    <div class="source">{{sourceName}}</div>
+    <div class="source">{{source}}</div>
+    <div v-if=editable class="action">
+        <button class="delete" @click="openDialog">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
 </div>
+<dialog ref="documentDelete" class="delete-document">
+    <h1>Delete {{name}}?</h1>
+
+    <div class="text">If the file was uploaded manually, it will be deleted.</div>
+    <div class="text">With external files only the reference will be lost.</div>
+    <div class="text">Do you really want to delete the file?</div>
+    <form method="dialog">
+        <Button class="abort-delete" @button-clicked="closeDialog">Do not delete</Button>
+        <Button class="confirm-delete" @button-clicked="store.deleteDocument(id)">
+            <i class="fa-solid fa-trash"></i>
+            <div>Delete file</div>
+        </Button>
+    </form>
+</dialog>
