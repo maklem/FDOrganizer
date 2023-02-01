@@ -116,12 +116,22 @@ def patch(obj: dict[str, Any], changes: dict[str, Any]):
 
 def patch_array(list_property: list, change: dict[Union[Literal["method"], Literal["value"]], Any]):
     value = change.get('value')
-    match change.get('method'):
-        case "replace":
-            return value
-        case "append":
-            return list_property + [value]
-        case "remove":
-            return list(filter(lambda x: x != value, list_property))
-        case "extend":
-            return list_property + value # type: ignore
+    # Only valid code starting with Python 3.10.
+    # match change.get('method'):
+    #     case "replace":
+    #         return value
+    #     case "append":
+    #         return list_property + [value]
+    #     case "remove":
+    #         return list(filter(lambda x: x != value, list_property))
+    #     case "extend":
+    #         return list_property + value # type: ignore
+    method = change.get('method')
+    if method == "replace":
+        return value
+    elif method == "append":
+        return list_property + [value]
+    elif method == "remove":
+        return list(filter(lambda x: x != value, list_property))
+    elif method == "extend":
+        return list_property + value # type: ignore

@@ -222,10 +222,15 @@ def get_content(folders: list[str], documents: list[str]):
     return {"folders": list(map(Folder.convert, found_folders)), "documents": list(map(Document.convert, found_documents)) }
 
 def get_parent_database(parent_type) -> Databases:
-    match parent_type:
-        case 'folder':
-            return Databases.FOLDERS
-        case 'package':
-            return Databases.PACKAGES
-        case _:
-            return Databases.PACKAGES
+    # Only valid code starting with Python 3.10.
+    # match parent_type:
+    #     case 'folder':
+    #         return Databases.FOLDERS
+    #     case 'package':
+    #         return Databases.PACKAGES
+    #     case _:
+    #         return Databases.PACKAGES
+    if parent_type == 'folder':
+        return Databases.FOLDERS
+    else:
+        return Databases.PACKAGES
