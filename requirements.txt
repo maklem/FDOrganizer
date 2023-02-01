@@ -12,7 +12,6 @@ dataclasses-json==0.5.7
 debugpy==1.6.3
 Deprecated==1.2.13
 dill==0.3.5.1
--e git+https://gitlab.uni-bayreuth.de/bt303343/lzv.git@d78d743d7643f327b5a7f150f4dda09c123dca49#egg=fdorganizer
 Flask==2.2.2
 Flask-Cors==3.0.10
 Flask-Session==0.4.0
