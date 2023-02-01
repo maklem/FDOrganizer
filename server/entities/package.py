@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Literal, Optional
+from typing import Any, List, Literal, Optional, Union
 
 from dataclasses_json import dataclass_json, config
 
@@ -9,7 +9,7 @@ from dataclasses_json import dataclass_json, config
 @dataclass
 class Package:
     name: str
-    status: Literal["active"] | Literal["archived"]
+    status: Union[Literal["active"], Literal["archived"]]
     documents: List[str]
     folders: List[str]
     created: int

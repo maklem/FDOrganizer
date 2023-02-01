@@ -1,5 +1,5 @@
 import json
-from typing import Any, Literal
+from typing import Any, Literal, Optional, Union
 import urllib.parse
 from base64 import b64encode
 
@@ -27,13 +27,13 @@ def query_params(parameters: dict[str, str]) -> str:
     return params
 
 
-def db_url(database: Databases, parameters: dict[str, str] | None = None) -> str:
+def db_url(database: Databases, parameters: Optional[dict[str, str]] = None) -> str:
     if not parameters:
         return f'{base_url()}/{database.value}'
     return f'{db_url(database)}?{query_params(parameters)}'
 
 
-def doc_url(database: Databases, document: str, parameters: dict[str, str] | None = None) -> str:
+def doc_url(database: Databases, document: str, parameters: Optional[dict[str, str]] = None) -> str:
     if not parameters:
         return f'{base_url()}/{database.value}/{document}'
     return f'{doc_url(database, document)}?{query_params(parameters)}'
@@ -44,7 +44,7 @@ def encode_credentials(username, password) -> str:
     return str(b64encode(string), 'utf-8')
 
 
-def attach(database: Databases, document: CouchDocument, file, parameters: dict[str, str] | None = None):
+def attach(database: Databases, document: CouchDocument, file, parameters: Optional[dict[str, str]] = None):
     headers = auth_header() | {
         'Content-Type': file.mimetype,
         'If-Match': document.rev
@@ -52,7 +52,7 @@ def attach(database: Databases, document: CouchDocument, file, parameters: dict[
     return requests.put(f'{doc_url(database, document.id, parameters)}/{urllib.parse.quote(file.filename)}', headers=headers, data=file, timeout=20)
 
 
-def post(database: Databases, payload: str, parameters: dict[str, str] | None = None) -> requests.Response:
+def post(database: Databases, payload: str, parameters: Optional[dict[str, str]] = None) -> requests.Response:
     headers = auth_header() | {
         "Content-Type": "application/json",
         "Accept": "application/json"
@@ -60,7 +60,7 @@ def post(database: Databases, payload: str, parameters: dict[str, str] | None = 
     return requests.post(db_url(database, parameters), headers=headers, data=payload, timeout=20)
 
 
-def find(database: Databases, query: str, parameters: dict[str, str] | None = None) -> requests.Response:
+def find(database: Databases, query: str, parameters: Optional[dict[str, str]] = None) -> requests.Response:
     url = f'{db_url(database)}/_find'
     
     headers = auth_header() | {
@@ -80,7 +80,7 @@ def get(database: Databases, id: str) -> requests.Response:
     return requests.get(url, headers=headers, timeout=20)
 
 
-def update(database: Databases, doc_id, changes: dict[str, Any], parameters: dict[str, str] | None = None) -> requests.Response:
+def update(database: Databases, doc_id, changes: dict[str, Any], parameters: Optional[dict[str, str]] = None) -> requests.Response:
     current_document = get(database, doc_id).json()
 
     new_document = patch(current_document, changes)
@@ -114,7 +114,7 @@ def patch(obj: dict[str, Any], changes: dict[str, Any]):
             obj[key] = patch_array(obj[key], value)
     return obj
 
-def patch_array(list_property: list, change: dict[Literal["method"] | Literal["value"], Any]):
+def patch_array(list_property: list, change: dict[Union[Literal["method"], Literal["value"]], Any]):
     value = change.get('value')
     match change.get('method'):
         case "replace":

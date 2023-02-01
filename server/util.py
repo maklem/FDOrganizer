@@ -7,8 +7,8 @@ def get_config() -> dict[str, Union[str, list[str]]]:
     with open(resource_filename(__name__, "./conf/config.json"), encoding="utf-8") as config:
         return json.load(config)
 
-def web_error(code: int, message:str, stacktrace: Optional[str | list[str]] = None, component = "SERVER"):
-    error_data: dict[str, str | list[str]] = {
+def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]] = None, component = "SERVER"):
+    error_data: dict[str, Union[str, list[str]]] = {
         'message': message,
         'component': component
     }
