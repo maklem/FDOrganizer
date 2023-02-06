@@ -5,8 +5,8 @@ from flask import request
 from pkg_resources import resource_listdir, resource_isdir, resource_filename
 
 from server import APP
-from server.util import web_error, web_response
-from server.services.authentication import add_payload, payload
+from .util import web_error, web_response
+from .services.authentication import add_payload, payload
 
 def needs_authentication(api_method):
     @wraps(api_method)

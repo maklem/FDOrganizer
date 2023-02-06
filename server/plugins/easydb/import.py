@@ -11,10 +11,12 @@ import uuid
 import requests
 from flask.wrappers import Request, Response
 from pkg_resources import resource_filename
-from server.entities.plugin_document import PluginDocument
-from server.entities.plugin_folder import PluginFolder
 
-from server.util import web_error, web_response
+from entities.folder import Folder
+from entities.document import Document
+
+
+from util import web_error, web_response
 
 def get_config():
     config_filepath = resource_filename(__name__, f'config.json')
@@ -159,7 +161,7 @@ def get_toplevel(request: Request, auth):
     #     return web_response(201, "No collections found")
     return web_response(200, details=collections)
 
-def convert_collection(collection) -> PluginFolder:
+def convert_collection(collection) -> Folder:
     count = collection.get('_count')
     collection = collection.get('collection')
     displayname = collection.get('displayname').get('de-DE')
@@ -167,7 +169,7 @@ def convert_collection(collection) -> PluginFolder:
     return {'count': count, 'displayname': displayname, 'id': collection_id}
 
 
-def convert_file(obj) -> PluginDocument:
+def convert_file(obj) -> Document:
     inner_object = obj.get('object')
     file_id = obj.get('_uuid')
 

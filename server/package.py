@@ -3,13 +3,13 @@ import time
 from flask import request
 from requests import HTTPError
 
-from server.entities.package import Package
-from server.entities.databases import Databases
+from .entities.package import Package
+from .entities.databases import Databases
 
-from server.services.authentication import user
-from server.services.database import delete, find, post
+from .services.authentication import user
+from .services.database import delete, find, post
 
-from server.util import web_error, web_response
+from .util import web_error, web_response
 from server import APP
 
 

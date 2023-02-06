@@ -2,8 +2,8 @@ from flask import request
 import json
 
 from server import APP
-from server.util import web_error, web_response
-from server.services.authentication import authorize
+from .util import web_error, web_response
+from .services.authentication import authorize
 
 @APP.route("/login", methods=["POST"])
 def login_lzv():

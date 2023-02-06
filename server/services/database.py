@@ -5,9 +5,9 @@ from base64 import b64encode
 
 import requests
 
-from server.entities.databases import Databases
-from server.entities.couch_document import CouchDocument
-from server.util import get_config
+from ..entities.databases import Databases
+from ..entities.couch_document import CouchDocument
+from ..util import get_config
 
 
 def auth_header() -> dict[str, str]:

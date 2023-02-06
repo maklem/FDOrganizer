@@ -1,6 +1,6 @@
 from flask import render_template, request, url_for, redirect
 from server import APP
-from server.services.authentication import is_authorized
+from .services.authentication import is_authorized
 
 
 def needs_authentication(route: str) -> bool:

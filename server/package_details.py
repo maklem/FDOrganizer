@@ -6,15 +6,15 @@ from flask import request
 from requests import HTTPError, Response
 from server import APP
 
-from server.entities.folder import Folder
-from server.entities.databases import Databases
-from server.entities.couch_document import CouchDocument
-from server.entities.document import Document
-from server.entities.package import Package
+from .entities.folder import Folder
+from .entities.databases import Databases
+from .entities.couch_document import CouchDocument
+from .entities.document import Document
+from .entities.package import Package
 
-from server.util import web_error, web_response
-from server.services.authentication import user
-from server.services.database import attach, delete, find, get, post, update
+from .util import web_error, web_response
+from .services.authentication import user
+from .services.database import attach, delete, find, get, post, update
 
 
 @APP.route("/package/<package_id>/content", methods=["GET"])
@@ -93,6 +93,8 @@ def create_folder():
     
 @APP.route("/package/documents", methods=["POST"])
 def create_documents():
+    if int(request.headers.get('Content-Length')) > APP.config.get('MAX_CONTENT_LENGTH'):
+        return web_error(413, "Request is too large to be processed", component= "SERVER")
     # Get Infos from request header and body
     username = user(request)
     parent = request.form.get('parent')
