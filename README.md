@@ -28,7 +28,7 @@ Projekt LZV des Bibliotheksverbund Bayern
 
 1. Installation der Abhängigkeiten am Server (siehe `requirements.txt`)
 
-    `pip install -r`
+    `pip install -r requirements.txt`
 
 1. Installation des ldap-binaries
 
@@ -57,7 +57,21 @@ Projekt LZV des Bibliotheksverbund Bayern
     ```
     Wird kein Name beim Start des Skripts übergeben, wird dieser nachträglich abgefragt.
     Die Namen der benötigten Datenbanken können in der Datei `server/entities/databases.py` eingesehen werden.
-    Dadurch werden Namenskonflikte auf bestehenden Server-Instanzen vermieden.
+
+## Betrieb
+
+### Lokal
+
+Zum lokalen Ausführen der App können entweder das [Flask CLI](https://flask.palletsprojects.com/en/2.2.x/cli/) oder die Startskripte benutzt werden.
+Die Startskripte starten die App im Debug-Modus und nutzen die mitgelieferten Self-Signed-Certificates zur ssl-Verschlüsselung.
+
+* Windows
+
+    Start via `./start.bat`
+
+* Linux
+
+    Start via `./start.sh` oder `sh start.sh`
 
 ## Wartung
 
