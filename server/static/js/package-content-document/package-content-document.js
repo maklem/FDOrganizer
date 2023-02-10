@@ -28,7 +28,7 @@ export default {
         openDialog(event) {
             event.stopPropagation()
             this.$refs.documentDelete.showModal()
-        },
+        }
     },
     template
 }

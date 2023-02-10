@@ -4,6 +4,7 @@ import PackageListItem from "../package-list-item/package-list-item.js";
 import PackageContent from "../package-content/package-content.js";
 import Button from "../button/button.js";
 import Upload from "../upload/upload.js";
+import Metadata from "../metadata/metadata.js";
 import {store} from './state.js'
 import { setup } from "../setup.js";
 
@@ -15,7 +16,8 @@ const packageEdit = createApp({
         PackageListItem,
         Button,
         PackageContent,
-        Upload
+        Upload,
+        Metadata
     },
     data() {
         return {
@@ -25,6 +27,11 @@ const packageEdit = createApp({
     async mounted() {
         const packageId = location.pathname.split('/').at(-1)
         this.store.getPackage(packageId)
+
+        const params = new URLSearchParams(location.search);
+        const documentId = params.get("document");
+        console.log(!!documentId)
+        if (!!documentId) this.store.openDocument(documentId)
     },
     methods: {
     },

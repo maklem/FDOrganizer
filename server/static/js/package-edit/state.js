@@ -9,6 +9,7 @@ export const store = reactive({
         folders: [],
         documents: [],
     },
+    modalOpen:false,
     packagePath: [],
     climbPackagePath,
     createFolder,
@@ -18,8 +19,24 @@ export const store = reactive({
     getPackage,
     getPackageContent,
     openFolder,
+    openDocument,
+    closeDocument,
     pathNames
 });
+
+function openDocument(documentId) {
+    history.pushState({document: documentId}, '', `?document=${documentId}`)
+    addEventListener('popstate', function close() {
+        store.closeDocument()
+        removeEventListener('popstate', close)
+    })
+    store.modalOpen = true
+}
+
+function closeDocument() {
+    history.pushState({document: null}, '', `${location.origin}${location.pathname}`)
+    store.modalOpen = false
+}
 
 function pathNames() {
     return store.packagePath.map(path => path.name)

@@ -34,5 +34,6 @@
             </dialog>
         </aside>
         <PackageContent v-if="!!store.selectedPackage"></PackageContent>
+        <Metadata :open="editStore.modalOpen" @close="editStore.closeDocument()"></Metadata>
     </main>
 </App>

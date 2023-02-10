@@ -5,6 +5,7 @@ import Button from "../button/button.js";
 import PackageContent from "../package-content/package-content.js";
 
 import {store} from './state.js'
+import {editStore} from "../package-edit/state.js"
 import { setup } from "../setup.js";
 
 const template = await setup('package');
@@ -18,12 +19,18 @@ const pkg = createApp({
     },
     data() {
         return {
-            store
+            store,
+            editStore
         }
     },
 
 async mounted() {
         this.store.getPackages()
+
+        const params = new URLSearchParams(location.search);
+        const documentId = params.get("document");
+        console.log(!!documentId)
+        if (!!documentId) this.editStore.openDocument(documentId)
     },
     methods: {
     },
