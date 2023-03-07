@@ -1,0 +1,344 @@
+[
+    {
+        "id": "identifier",
+        "label": {
+            "en": "Identifier",
+            "de": "Eindeutiger Bezeichner"
+          },
+          "min": 1,
+          "fields": [
+            {
+                "id":"resourceIdentifierScheme",
+                "label": {
+                    "en": "Type of identifier",
+                    "de": "Art des Bezeichners"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "uri",
+                        "label": "URI"
+                    },
+                    {
+                        "id": "doi",
+                        "label": "DOI"
+                    },
+                    {
+                        "id": "custom",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstiges"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "resourceURI",
+                "conditions": {
+                    "resourceIdentifierScheme": "uri"
+                },
+                "label": "URI",
+                "min": 1,
+                "max": 1,
+                "type": "uri",
+                "placeholder": "z.B. https://example.com/dataset"
+            },
+            {
+                "id": "resourceDOI",
+                "conditions": {
+                    "resourceIdentifierScheme": "doi"
+                },
+                "label": "DOI",
+                "min": 1,
+                "max": 1,
+                "type": "doi",
+                "placeholder": "z.B. 10.1109/5.771073"
+            },
+            {
+                "id": "resourceIdentifier",
+                "conditions": {
+                    "resourceIdentifierScheme": "custom"
+                },
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "string"
+            }
+          ]
+    },
+    {
+        "id": "creator",
+        "label": {
+            "en": "Creator",
+            "de": "Autor/Schaffender"
+        },
+        "min": 1,
+          "fields": [
+            {
+                "id":"personalIdentifierScheme",
+                "label": {
+                    "en": "Type of identifier",
+                    "de": "Art des Bezeichners"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "name",
+                        "label": "Name"
+                    },
+                    {
+                        "id": "orcid",
+                        "label": "ORCiD"
+                    }
+                ]
+            },
+            {
+                "id": "authorOrcid",
+                "conditions": {
+                    "personalIdentifierScheme": "orcid"
+                },
+                "label": "ORCiD",
+                "placeholder": "z.B. 0000-0001-2345-6789",
+                "min": 1,
+                "max": 1,
+                "type": "orcid"
+            },
+            {
+                "id": "authorFirstName",
+                "conditions": {
+                    "personalIdentifierScheme": "name"
+                },
+                "label": {
+                    "en": "First Name",
+                    "de": "Vorname"
+                },
+                "placeholder": "z.B. Hannah",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            },
+            {
+                "id": "authorLastName",
+                "conditions": {
+                    "personalIdentifierScheme": "name"
+                },
+                "label": {
+                    "en": "Last Name",
+                    "de": "Nachname"
+                },
+                "placeholder": "z.B. Arendt",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            }
+          ]
+    },
+    {
+        "id": "title",
+        "label": {
+            "en": "Title",
+            "de": "Titel"
+        },
+        "min":1,
+        "fields": [
+            {
+                "id": "titleType",
+                "label": {
+                    "en": "Type of title",
+                    "de": "Art des Titels"
+                },
+                "max":1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "subtitle",
+                        "label": {
+                            "de": "Untertitel",
+                            "en": "Subtitle"
+                        }
+                    },
+                    {
+                        "id": "mainTitle",
+                        "label": {
+                            "en": "Main title",
+                            "de": "Haupttitel"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "titleText",
+                "label": {
+                    "en": "Title",
+                    "de": "Titel"
+                },
+                "max":1,
+                "type": "string",
+                "placeholder": "z.B. Vita activa oder Vom tätigen Leben"
+            }
+        ]
+    },
+    {
+        "id": "subject",
+        "label": {
+            "en": "Subject & Keywords",
+            "de": "Thema & Keywords"
+        },
+        "fields": [
+            {
+                "id": "subjectScheme",
+                "label": {
+                    "en": "Topic classification",
+                    "de": "Themenklassifizierung"
+                },
+                "max": 1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "rvk",
+                        "label": {
+                            "de": "Bibliothekarische Einordnung",
+                            "en": "Library Classification"
+                        }
+                    },
+                    {
+                        "id": "csv",
+                        "label": "Keywords"
+                    }
+                ]
+            },
+            {
+                "id": "rvk",
+                "conditions": {
+                    "subjectScheme": "rvk"
+                },
+                "label": {
+                    "de": "Bibliothekarische Einordnung",
+                    "en": "Library Classification"
+                },
+                "type": "string"
+            },
+            {
+                "id": "keywords",
+                "conditions": {
+                    "subjectScheme": "csv"
+                },
+                "placeholder": "z.B. Handlungsmotivation, Menschenrechte, Gesellschaft",
+                "label": "Keywords",
+                "type": "csv"
+            }
+        ]
+    },
+    {
+        "id": "relation",
+        "label": {
+            "en": "Related Works",
+            "de": "Beziehung zu anderen Werken"
+        },
+        "fields": [
+            {
+                "id": "relationType",
+                "label": {
+                    "en": "Type of relation",
+                    "de": "Art der Beziehung"
+                },
+                "type": "monoselect",
+                "min": 1,
+                "max": 1,
+                "description": "Description of the relationship of the resource being registered and the related resource.",
+                "options": [
+                    {
+                        "id": "supplement",
+                        "label": {
+                            "en": "Is supplement to",
+                            "de": "Daten zu ..."
+                        }
+                    },
+                    {
+                        "id": "describes",
+                        "label": {
+                            "en": "Describes",
+                            "de": "Beschreibt ..."
+                        }
+                    },
+                    {
+                        "id": "partOf",
+                        "label": {
+                            "en": "Is part of",
+                            "de": "Ist Teil von ..."
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "relationIdentifierScheme",
+                "label": {
+                    "en": "Type of identifier",
+                    "de": "Art des Bezeichners"
+                },
+                "type": "monoselect",
+                "min": 1,
+                "max": 1,
+                "options": [
+                    {
+                        "id": "uri",
+                        "label": "URI"
+                    },
+                    {
+                        "id": "doi",
+                        "label": "DOI"
+                    },
+                    {
+                        "id": "document",
+                        "label": {
+                            "en": "File",
+                            "de": "Datei"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "relationURI",
+                "conditions": {
+                    "relationIdentifierScheme": "uri"
+                },
+                "label": "URI",
+                "min": 1,
+                "max": 1,
+                "type": "uri",
+                "placeholder": "z.B. https://example.com/dataset"
+            },
+            {
+                "id": "relationDOI",
+                "conditions": {
+                    "relationIdentifierScheme": "doi"
+                },
+                "label": "DOI",
+                "min": 1,
+                "max": 1,
+                "type": "doi",
+                "placeholder": "z.B. 10.1109/5.771073"
+            },
+            {
+                "id": "relationDocument",
+                "conditions": {
+                    "relationIdentifierScheme": "document"
+                },
+                "label": {
+                    "en": "Choose file",
+                    "de": "Datei wählen"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "suggestion"
+            }
+        ]
+    }
+]
