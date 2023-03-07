@@ -1,20 +1,32 @@
 <dialog class="metadata-modal" ref="modal">
-    <div class="content">
+    <div class="content" v-if="!store.loading.document">
         <header class="metadata-header">
             <i class="fa-solid fa-file-lines"></i>
             <h1 v-if="!!store.document">{{store.document.name}}</h1>
+                <LabeledInput
+                    :id="'resourceType'"
+                    :options="store.resourceType.options"
+                    :value="store.resourceType.value"
+                    @input="(value) => store.setResourceType(value)"
+                    @input="store.touched = true"
+                ></LabeledInput>
             <button class="back-button" @click="$emit('close')">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </header>
-        <details :open="open === 'required'" class="metadata-section">
-            <summary class="section-header">
-                <i class="icon fa-solid" class= "fa-plus" :class="{'fa-plus': open === 'required'}"></i>
-                <h2>Required</h2>
-            </summary>
-            <fieldset class="field-group">
-                
-            </fieldset>
-        </details>
+        <main v-if="!!store.resourceType.value" class="metadata-sections">
+            <MetadataSection :id="'required'" :label="'Required'" :selectedSection="selectedSection" @select-section=selectSection('required')></MetadataSection>
+            <MetadataSection :id="'content'" :label="'Content'" :selectedSection="selectedSection" @select-section=selectSection('content')></MetadataSection>
+            <MetadataSection :id="'relations'" :label="'Related Documents'"></MetadataSection>
+        </main>
+        <div v-else class="choose-type">Choose a Resource Type for the File</div>
+        <div class="button-row">
+            <Button class="close-button" @button-clicked="$emit('close')">Abort</Button>
+            <Button class="save-metadata" @button-clicked="store.saveMetadata();$emit('close')" :disabled="!store.touched">Save</Button>
+        </div>
+        <!-- <div class="help-overlay">
+            <button @click="helpOverlay=!helpOverlay">x</button>
+            <div v-if="helpOverlay">{{JSON.stringify(store.metadata,(key, value) => value ?? "undefined", 4)}}</div>
+        </div> -->
     </div>
 </dialog>

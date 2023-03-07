@@ -7,6 +7,7 @@
     height: 95%;
     width: 97.5%;
 
+    overflow: hidden;
     padding: 1rem;
 }
 
@@ -16,20 +17,18 @@
 
 .metadata-modal .content {
     display:grid;
-    grid-auto-flow: row;
-    grid-auto-rows: max-content;
-    grid-template-rows: min-content;
-    gap: 2rem;
+    grid-template-rows: min-content auto min-content;
+    gap: 1rem;
 
     width: 100%;
     height: 100%;
 }
 .metadata-header {
-    width: 100%;
-    display: inline-grid;
-    grid-template-columns: max-content minmax(max-content, auto) min-content;
+    display: grid;
+    grid-template-columns: max-content minmax(auto, max-content) minmax(max-content, auto) min-content;
     align-items: center;
     gap: 1rem;
+
 }
 
 .metadata-header > h1 {
@@ -38,6 +37,10 @@
 
 .metadata-header > i {
     font-size: 2rem;
+}
+
+.metadata-header .field-label {
+    padding-bottom: 0;
 }
 
 .metadata-header .back-button {
@@ -60,27 +63,47 @@
     transition: all 300ms;
 }
 
-.metadata-section {
-    display:grid;
-    grid-template-columns: auto auto;
-    border-bottom: solid 0.1rem #ccc;
+.metadata-modal .button-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: end;
 }
 
-.metadata-section .section-header {
+.button-row .close-button {
+    width: fit-content;
+    height: fit-content;
+    --button-color: #333;
+    --rgb-button-color: 51, 51, 51;
+}
+
+.metadata-sections {
     display: grid;
-    grid-template-columns: min-content minmax(max-content, auto);
-    gap: 2rem;
+    grid-template-rows: repeat(6, max-content);
+
+    overflow-y: scroll;
+}
+
+.choose-type {
+    display: grid;
     align-items: center;
+    justify-content: center;
 
-    cursor: pointer;
-}
-
-.section-header h2{
-    margin:0;
-    padding: 1rem;
-}
-
-.section-header .icon{
+    color: #777;
     font-size: 1.5rem;
-    color: var(--primary-color);
+
+}
+
+.help-overlay {
+    position: absolute;
+    width: 30%;
+    max-height:92vh;
+    top:3rem;
+    left: 35%;
+
+    background-color: #ccc;
+}
+.help-overlay>div{
+    white-space: pre;
+    overflow-y: scroll;
+    max-height:90vh;
 }
