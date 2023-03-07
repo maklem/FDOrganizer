@@ -44,6 +44,9 @@ def encode_credentials(username, password) -> str:
     return str(b64encode(string), 'utf-8')
 
 
+
+
+
 def attach(database: Databases, document: CouchDocument, file, parameters: Optional[dict[str, str]] = None):
     headers = auth_header() | {
         'Content-Type': file.mimetype,
@@ -80,10 +83,10 @@ def get(database: Databases, id: str) -> requests.Response:
     return requests.get(url, headers=headers, timeout=20)
 
 
-def update(database: Databases, doc_id, changes: dict[str, Any], parameters: Optional[dict[str, str]] = None) -> requests.Response:
+def update(database: Databases, doc_id, changes: dict[str, Any], replace: bool = False) -> requests.Response:
     current_document = get(database, doc_id).json()
 
-    new_document = patch(current_document, changes)
+    new_document = changes if replace else patch(current_document, changes)
     headers = auth_header() | {
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -106,7 +109,7 @@ def delete(database: Databases, doc_id: str) -> requests.Response:
 
 def patch(obj: dict[str, Any], changes: dict[str, Any]):
     for key, value in changes.items():
-        if obj.get(key) is None:
+        if key not in obj:
             raise KeyError(f'Key {key} is not part of {obj}')
         if not isinstance(obj.get(key), list):
             obj[key] = value
