@@ -30,7 +30,6 @@ const packageEdit = createApp({
 
         const params = new URLSearchParams(location.search);
         const documentId = params.get("document");
-        console.log(!!documentId)
         if (!!documentId) this.store.openDocument(documentId)
     },
     methods: {

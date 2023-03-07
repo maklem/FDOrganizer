@@ -3,9 +3,10 @@ import App from "../app/app.js";
 import PackageListItem from "../package-list-item/package-list-item.js";
 import Button from "../button/button.js";
 import PackageContent from "../package-content/package-content.js";
+import Metadata from "../metadata/metadata.js"
 
 import {store} from './state.js'
-import {editStore} from "../package-edit/state.js"
+import {store as editStore} from "../package-edit/state.js"
 import { setup } from "../setup.js";
 
 const template = await setup('package');
@@ -15,7 +16,8 @@ const pkg = createApp({
         App,
         PackageListItem,
         Button,
-        PackageContent
+        PackageContent,
+        Metadata
     },
     data() {
         return {
@@ -29,7 +31,6 @@ async mounted() {
 
         const params = new URLSearchParams(location.search);
         const documentId = params.get("document");
-        console.log(!!documentId)
         if (!!documentId) this.editStore.openDocument(documentId)
     },
     methods: {

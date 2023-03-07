@@ -23,6 +23,7 @@ async function getPackages() {
     store.loading.packageList = true
     const response = await fetch(`package/all`, {method: 'GET'})
     const json = await response.json()
+    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
     store.packages = json
     store.loading.packageList = false
 }
