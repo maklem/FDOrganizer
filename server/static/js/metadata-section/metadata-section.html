@@ -1,0 +1,46 @@
+<details class="metadata-section" @toggle="open = !open">
+    <summary class="section-header">
+        <i class="icon fa-solid" :class="open ? 'fa-plus':'fa-minus'"></i>
+        <h2>{{label}}</h2>
+    </summary>
+    <div v-if="!!store.metadata" class="section-content">
+        <template v-for="field in store.schema[sectionId]">
+            <fieldset v-if="!!field.fields" class="field-group">
+                <legend>{{localized(field.label)}}</legend>
+                <div v-if="!!store.metadata[field.id]?.length" class="field-instance" v-for="(instance, index) in store.metadata[field.id]">
+                    <Button class="remove-instance" @button-clicked="store.metadata[field.id].splice(index,1)">
+                        <i class="fa-solid fa-minus"></i>
+                    </Button>
+                    <template v-for="subfield in field.fields">
+                        <template v-if="checkConditions(instance, subfield)">
+                            <LabeledInput
+                                :id="subfield.id + index"
+                                :label="subfield.label"
+                                :options="subfield.options ? subfield.options : false"
+                                :value="store.metadata[field.id][index][subfield.id]"
+                                :invalid="!validate(store.metadata[field.id][index][subfield.id], subfield.type)"
+                                :placeholder="subfield.placeholder ?? ''"
+                                @input="(value) => store.metadata[field.id][index][subfield.id] = value"
+                                @input="store.touched = true"
+                            ></LabeledInput>
+                            <!-- <Button
+                            v-if="!subfield.max || subfield.max > 1"
+                            class="add-instance"
+                            :disabled="!!subfield.max && store.metadata[field.id][index][subfield.id].length >= subfield.max"
+                            @button-clicked="store.addSubfield(id, field.id, index, subfield.id)">
+                                <i class="fa-solid fa-plus"></i>
+                            </Button> -->
+                        </template>
+                    </template>
+                </div>
+                <Button
+                    class="add-instance"
+                    :disabled="!!field.max && store.metadata[field.id]?.length >= field.max"
+                    @button-clicked="store.addField(id, field.id)"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                </Button>
+            </fieldset>
+        </template>
+    </div>
+</details>

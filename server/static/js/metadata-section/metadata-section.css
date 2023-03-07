@@ -1,0 +1,60 @@
+
+.metadata-section {
+    border-bottom: solid 0.1rem #ccc;
+}
+
+.metadata-section[open] {
+    border-bottom: none;
+}
+
+.metadata-section .section-header {
+    display: grid;
+    grid-template-columns: min-content minmax(max-content, auto);
+    align-items: center;
+
+    cursor: pointer;
+}
+
+.section-header h2{
+    margin:0;
+    padding: 1rem;
+}
+
+.section-header .icon{
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.metadata-section .section-content {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.field-group {
+    min-width: fit-content;
+    display: grid;
+    grid-auto-flow: row;
+    grid-auto-rows: max-content;
+    grid-template-rows: repeat(auto-fit, max-content);
+}
+
+.field-group .field-instance{
+    max-width: fit-content;
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    align-items: center;
+    gap: 1rem;
+}
+
+.field-instance .remove-instance {
+    width: fit-content;
+    height: fit-content;
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
+}
+
+.field-group .add-instance{
+    width: fit-content;
+}
