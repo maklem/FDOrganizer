@@ -16,6 +16,10 @@ def auth_guard():
 
 @APP.route("/")
 def navhome():
+    return redirect(url_for("navindex"))
+
+@APP.route("/start")
+def navindex():
     return render_template("index.html")
 
 @APP.route("/impressum")

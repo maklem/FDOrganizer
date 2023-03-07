@@ -28,7 +28,7 @@ export default {
 const tabs = [
     {
         title: "Welcome",
-        url: ""
+        url: "start"
     },
     {
         title: "Import",

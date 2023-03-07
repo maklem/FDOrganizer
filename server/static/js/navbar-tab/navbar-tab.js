@@ -9,7 +9,7 @@ export default {
     },
     computed: {
         isActive() {
-            return '/' + this.url === window.location.pathname
+            return window.location.pathname.startsWith('/' + this.url)
         }
     },
     template
