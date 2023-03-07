@@ -1,0 +1,30 @@
+<label class="field-label" :for="id">
+    <div v-if="!!label" class="label-text" :invalid="!focus && invalid">{{localizedLabel}}</div>
+    <template v-if="!options">
+        <input
+            :value = "value"
+            :list="!!options ? `${id}-options` : null"
+            class="input"
+            :id="id"
+            :name="id"
+            type="text"
+            :placeholder="placeholder ?? ''"
+            :invalid="!focus && invalid"
+            @input="select"
+            @focus="focus = true"
+            @blur ="focus = false"
+        />
+        <datalist v-if="!!options" :id="`${id}-options`">
+            <option v-for="option in localizedOptions" :value="option.id">{{option.label}}</option>
+        </datalist>
+    </template>
+    <select v-else
+        :name="id"
+        :id="id"
+        :invalid="invalid"
+        class="input select"
+        @input="select"
+    >
+        <option v-for="option in localizedOptions" :value="option.id" :selected="option.id === value" @input="select">{{option.label}}</option>
+    </select>
+</label>

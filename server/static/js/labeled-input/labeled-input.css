@@ -1,0 +1,60 @@
+.field-label {
+  --label-font: 0.875rem;
+  --label-size: calc(var(--label-font) * 1.28571428571);
+  padding-bottom: var(--label-size);
+}
+
+.field-label .label-text{
+    padding-left: 0.5rem;
+    font-weight: 700;
+    color: #777;
+    font-size: var(--label-font);
+}
+
+.field-label .label-text[invalid="true"]{
+    color: var(--error);
+}
+
+.field-label .input {
+    outline: 0;
+    border: 0.1rem solid var(--secondary-color);
+    border-radius: 0.2rem;
+    padding: 0.5rem 0.5rem;
+
+    font-size: 1.1rem;
+}
+
+.field-label .input[invalid="true"] {
+    border-color: var(--error);
+    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-error), 0.20), 0px 0px 0px 1px rgba(var(--rgb-error), 0.20) !important;
+}
+
+.field-label .input:focus,
+.field-label .input:active {
+    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-secondary-color), 0.20), 0px 0px 0px 1px rgba(var(--rgb-secondary-color), 0.20);
+}
+
+.field-label .select {
+    background-color: #fff;
+    appearance: none;
+    padding-right: 2rem;
+
+    background-image:
+    linear-gradient(45deg, transparent 50%, #777 50%),
+    linear-gradient(135deg, #777 50%, transparent 50%);
+  background-position:
+    calc(100% - 1rem) 1rem,
+    calc(100% - 0.5rem) 1rem;
+  background-size:
+    0.5rem 0.5rem,
+    0.5rem 0.5rem;
+  background-repeat: no-repeat;
+}
+
+.field-label .select:focus,
+.field-label .select:active {
+    background-image:
+    linear-gradient(45deg, transparent 50%, var(--secondary-color) 50%),
+    linear-gradient(135deg, var(--secondary-color) 50%, transparent 50%),
+    linear-gradient(to right, #fff, #fff);
+}
