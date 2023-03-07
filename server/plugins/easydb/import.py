@@ -12,11 +12,11 @@ import requests
 from flask.wrappers import Request, Response
 from pkg_resources import resource_filename
 
-from entities.folder import Folder
-from entities.document import Document
+from ...entities.folder import Folder
+from ...entities.document import Document
 
 
-from util import web_error, web_response
+from ...util import web_error, web_response
 
 def get_config():
     config_filepath = resource_filename(__name__, f'config.json')
