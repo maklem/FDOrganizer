@@ -1,4 +1,4 @@
-.content {
+.app-content {
     display: inline-flex;
     flex-direction: column;
 
@@ -8,7 +8,7 @@
     width: 100%;
 }
 
-.content>*:first-child {
+.app-content>*:first-child {
     flex: 1 1 auto;
     max-height: 100%;
     width: 100%;
