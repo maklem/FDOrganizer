@@ -34,7 +34,6 @@ export function filetypeIcon(type) {
         case 'pdf':
             return 'file-pdf'
         case 'application/octet-stream':
-        case 'application/octet-stream':
             return 'file-binary'
         case 'image/avif':
         case 'image/bmp':
@@ -42,8 +41,20 @@ export function filetypeIcon(type) {
         case 'image/jpeg':
         case 'image/png':
         case 'image/svg+xml':
+        case 'image/tiff':
         case 'png':
             return 'file-image'
+        case 'audio/aac':
+        case 'audio/midi':
+        case 'audio/x-midi':
+        case 'audio/wav':
+        case 'audio/mpeg':
+        case '.aac':
+        case '.midi':
+        case '.mid':
+        case '.mp3':
+        case '.wav':
+            return 'file-audio'
         case 'text/csv':
         case 'csv':
             return 'file-csv'
@@ -52,4 +63,9 @@ export function filetypeIcon(type) {
         default:
             return 'file-lines'
     }
+}
+
+export function localized(text) {
+    if (text instanceof Object) return text['en']
+    return text
 }
