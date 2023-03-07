@@ -6,6 +6,7 @@ from .util import web_error
 
 APP = Flask(__name__)
 APP.config["UPLOAD_FOLDER"] = './uploads'
+APP.config["MAX_CONTENT_LENGTH"] = 1_000_000_000
 
 
 @APP.errorhandler(HTTPException)
@@ -16,6 +17,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 import server.router
 import server.login
+import server.metadata
 import server.package_details
 import server.package
 import server.source_import
