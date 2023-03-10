@@ -15,6 +15,7 @@ export const store = reactive({
     createFolder,
     currentPath,
     deleteDocument,
+    deleteFolder,
     folders,
     getPackage,
     getPackageContent,
@@ -118,6 +119,26 @@ async function deleteDocument(id) {
     store.loading.content = true
     const {parent, parentType} = currentPath()
     const response = await fetch(`/package/document/${id}`, {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: 'DELETE',
+        body: JSON.stringify({
+            parent,
+            parentType
+        })
+    });
+    const json = await response.json()
+	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+
+    await getPackageContent()
+    store.loading.content = false
+}
+
+async function deleteFolder(id) {
+    store.loading.content = true
+    const {parent, parentType} = currentPath()
+    const response = await fetch(`/package/folder/${id}`, {
         headers: {
             "Content-Type": "application/json"
         },

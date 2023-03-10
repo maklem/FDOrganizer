@@ -115,15 +115,14 @@
     display:flex;
     gap: 0.5rem;
 
-    --primary-color: #ccc;
-    color: #000;
-    --rgb-primary-color: 204,204,204;
+    --button-color: #333;
+    --rgb-button-color: 51, 51, 51;
 }
 
 .delete-document .confirm-delete {
     display:flex;
     gap: 0.5rem;
 
-    --primary-color: var(--error);
-    --rgb-primary-color: var(--rgb-error);
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
 }

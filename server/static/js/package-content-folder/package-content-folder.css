@@ -15,6 +15,13 @@
     cursor:pointer
 }
 
+.package-content-folder.editable {
+    grid-template-columns: max-content minmax(auto, max-content) auto max-content;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "icon name size action"
+        "icon count count action";
+}
 .package-content-folder:hover {
     color: var(--primary-color);
 }
@@ -46,4 +53,76 @@
     grid-area: icon;
 
     font-size: 2rem;
+}
+
+.package-content-folder .action {
+    grid-area: action;
+}
+
+.action .delete {
+    background-color: transparent;
+    color: var(--error);
+    border: none;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.action .delete:hover {
+    background-color: rgba(var(--rgb-error), 0.3);
+    transition: all 300ms;
+}
+
+.action .delete:active {
+    background-color: rgba(var(--rgb-error), 0.1);
+    transition: all 300ms;
+}
+
+.delete-folder {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 1rem;
+    max-width: 50vw;
+}
+
+.delete-folder h1 {
+    font-weight: 700;
+
+    line-break: anywhere;
+}
+.delete-folder .text {
+    font-size: 1.1rem;
+    padding: 0.1rem 1rem;
+}
+
+.delete-folder form {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: end;
+
+    width: 100%;
+    padding-top: 1rem;
+}
+
+.delete-folder::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.delete-folder .abort-delete {
+    display:flex;
+    gap: 0.5rem;
+
+    --button-color: #333;
+    --rgb-button-color: 51, 51, 51;
+}
+
+.delete-folder .confirm-delete {
+    display:flex;
+    gap: 0.5rem;
+
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
 }
