@@ -46,6 +46,7 @@ async function createPackage(name) {
 async function deletePackage(id) {
     store.loading.packageList = true
     const response = await fetch(`package/${id}`, {method: 'DELETE'})
+    const json = await response.json()
 	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
     await store.getPackages()
     if (store.selectedPackage.id === id) store.selectedPackage = undefined
