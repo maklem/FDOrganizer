@@ -12,5 +12,5 @@ def login_lzv():
     try:
         token = authorize(username, password, organisation='uni-bayreuth')
     except RuntimeError:
-        return web_error(401, "Invalid credentials")
-    return web_response(200, 'Success', {'token': token})
+        return web_response(200, details = {'success': False, 'reason': "wrong credentials"})
+    return web_response(200, details = {'success': True, 'token': token})

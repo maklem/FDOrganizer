@@ -1,6 +1,7 @@
 import { setup } from "../setup.js";
 import Button from "../button/button.js"
 import { getSessionToken, loginSource } from "../authentication.js";
+import { get } from "../http.js"
 
 const template = await setup('import-source');
 
@@ -49,9 +50,7 @@ export default {
             this.password = event.currentTarget.value
         },
         async getCollections() {
-            const response = await fetch(`import/${this.id}`);
-            const collections = await response.json();
-            this.collections = collections
+            this.collections = await get(`import/${this.id}`);
         },
         selectCollection(collectionId) {
             this.collections = this.collections.map(collection => ({...collection, active: collection.id === collectionId}))

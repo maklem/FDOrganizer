@@ -1,4 +1,5 @@
 import {reactive} from '../vue.js';
+import {post} from "../http.js"
 import { store as editStore } from '../package-edit/state.js'
 
 export const store = reactive({
@@ -50,11 +51,7 @@ async function uploadFiles() {
     store.files.forEach(file => {
         body.append(file.name, file)
     })
-    const response = await fetch('/package/documents', {
-        method: 'POST',
-        body
-    })
-    return await response.json()
+    return await post('/package/documents', body, {"Content-Type": 'multipart/form-data'})
 }
 
 function removeFile(name) {

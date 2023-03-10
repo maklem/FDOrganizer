@@ -1,6 +1,8 @@
 import {reactive} from '../vue.js';
 import { store as toastStore } from "../toast/state.js"
 import { validate } from '../validation-util.js';
+import { put, get } from "../http.js"
+
 
 export const store = reactive({
     metadata: undefined,
@@ -36,13 +38,11 @@ export const store = reactive({
 async function getDocument(documentId) {
     store.loading.document = true
     store.resourceType.options = RESOURCE_TYPES
-    const response = await fetch(`/document/${documentId}/metadata`)
-    const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    const json = await get(`/document/${documentId}/metadata`)
 
     store.document = json.document
 
-    if (response.status !== 206) {
+    if (!!json.metadata) {
         store.metadata = json.metadata.metadata
         store.resourceType.value = json.metadata.resource_type
         store.schema = await getSchema(json.metadata.schema_version)
@@ -55,9 +55,7 @@ async function getDocument(documentId) {
 }
 
 async function getSchema(version) {
-    const response = await fetch(`/static/schema.json`)
-    const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    const json = await get(`/static/schema.json`)
 
     return splitSchema(json)
 }
@@ -70,19 +68,12 @@ async function saveMetadata() {
         toastStore.addMessage("error", "Manche Felder enthalten fehlerhafte Angaben")
         return false
     }
-    const response = await fetch(`/document/${store.document.id}/metadata`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+    await put(`/document/${store.document.id}/metadata`, {
             metadata: filteredData,
             schema_version: store.schemaVersion,
             resource_type: store.resourceType.value
-        })
-    })
-    const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+        }
+    )
     return true
 }
 

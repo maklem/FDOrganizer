@@ -1,4 +1,6 @@
 import {reactive} from '../vue.js';
+import { get } from "../http.js"
+
 
 export const store = reactive({
     files: [],
@@ -14,9 +16,7 @@ export const store = reactive({
  * @returns {Promise<ImportFile[]>}
  */
 async function getFiles(sourceId, collectionId) {
-    const response = await fetch(`import/${sourceId}/${collectionId}`)
-    const json = await response.json()
-    store.setFiles(json)
+    store.files = await get(`import/${sourceId}/${collectionId}`)
 }
 
 function toggleSelectFile(fileId) {

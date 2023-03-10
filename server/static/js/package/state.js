@@ -1,4 +1,5 @@
 import {reactive} from '../vue.js';
+import {put, get, dlt} from "../http.js"
 import {store as editStore} from '../package-edit/state.js'
 
 export const store = reactive({
@@ -21,33 +22,21 @@ function openDetails() {
 
 async function getPackages() {
     store.loading.packageList = true
-    const response = await fetch(`package/all`, {method: 'GET'})
-    const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    const json = await get(`package/all`)
     store.packages = json
     store.loading.packageList = false
 }
 
 async function createPackage(name) {
     store.loading.packageList = true
-    const response = await fetch(`package`, {
-        headers: {
-            "Content-Type": "application/json"
-        },
-        method: 'PUT',
-        body: JSON.stringify({name: name})
-    });
-	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
-    const pkg = await response.json()
+    await put(`package`, {name: name})
     await store.getPackages()
     store.loading.packageList = false
 }
 
 async function deletePackage(id) {
     store.loading.packageList = true
-    const response = await fetch(`package/${id}`, {method: 'DELETE'})
-    const json = await response.json()
-	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    await dlt(`package/${id}`)
     await store.getPackages()
     if (store.selectedPackage.id === id) store.selectedPackage = undefined
     store.loading.packageList = false

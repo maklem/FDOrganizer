@@ -1,4 +1,6 @@
 import {reactive} from '../vue.js';
+import {put, get, dlt} from "../http.js"
+
 
 export const store = reactive({
     package: undefined,
@@ -49,18 +51,14 @@ function folders() {
 }
 
 async function getPackage(packageId) {
-    const response = await fetch(`/package/${packageId}/content`, {method: 'GET'})
-    const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    const json = await get(`/package/${packageId}/content`)
     store.package = json.package
     store.content = json
     store.packagePath = []
 }
 
 async function getFolder(folderId) {
-    const response = await fetch(`/folder/${folderId}/content`, {method: 'GET'})
-    const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    const json = await get(`/folder/${folderId}/content`)
     store.content = json
 }
 
@@ -97,19 +95,11 @@ async function getPackageContent() {
 async function createFolder(name) {
     store.loading.content = true
     const {parent, parentType} = currentPath()
-    const response = await fetch(`/package/folder`, {
-        headers: {
-            "Content-Type": "application/json"
-        },
-        method: 'PUT',
-        body: JSON.stringify({
-            name,
-            parent,
-            parentType
-        })
+    await put(`/package/folder`, {
+        name,
+        parent,
+        parentType
     });
-    const json = await response.json()
-	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
 
     await getPackageContent()
     store.loading.content = false
@@ -118,18 +108,10 @@ async function createFolder(name) {
 async function deleteDocument(id) {
     store.loading.content = true
     const {parent, parentType} = currentPath()
-    const response = await fetch(`/package/document/${id}`, {
-        headers: {
-            "Content-Type": "application/json"
-        },
-        method: 'DELETE',
-        body: JSON.stringify({
-            parent,
-            parentType
-        })
+    await dlt(`/package/document/${id}`, {
+        parent,
+        parentType
     });
-    const json = await response.json()
-	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
 
     await getPackageContent()
     store.loading.content = false
@@ -138,18 +120,10 @@ async function deleteDocument(id) {
 async function deleteFolder(id) {
     store.loading.content = true
     const {parent, parentType} = currentPath()
-    const response = await fetch(`/package/folder/${id}`, {
-        headers: {
-            "Content-Type": "application/json"
-        },
-        method: 'DELETE',
-        body: JSON.stringify({
-            parent,
-            parentType
-        })
+    await dlt(`/package/folder/${id}`,{
+        parent,
+        parentType
     });
-    const json = await response.json()
-	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
 
     await getPackageContent()
     store.loading.content = false

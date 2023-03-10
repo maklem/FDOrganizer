@@ -4,6 +4,7 @@ import ImportSource from "../import-source/import-source.js"
 import ImportFile from "../import-file/import-file.js"
 import Button from "../button/button.js";
 import {store} from './state.js'
+import { get } from "../http.js"
 import { setup } from "../setup.js";
 
 const template = await setup('import');
@@ -63,7 +64,6 @@ createApp({
  * @returns {Promise<Source[]>}
  */
 async function getSources() {
-    const response = await fetch('import/sources')
-    return await response.json()
+    return await get('import/sources')
 }
 

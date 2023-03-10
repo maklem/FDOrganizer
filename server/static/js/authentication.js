@@ -1,22 +1,17 @@
+import { post } from "./http.js"
+
 /**
  * @param  {string} username
  * @param  {string} password
  * @returns {Promise<void>}
  */
-export function login(username, password) {
-	return fetch('/login', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Accept': 'application/json'
-		},
-		body: JSON.stringify({ username, password })
-	})
-		.then((response) => response.json(), () => false)
-		.then((payload) => {
-			setCookie("token", payload.token);
-			window.history.go();
-		});
+export async function login(username, password) {
+	const json = await post('/login', { username, password })
+	console.log(json)
+	if (!json.success) return false
+	setCookie("token", json.token);
+	window.history.go();
+	return true
 }
 /**
  * @returns {Promise<void>}
@@ -56,15 +51,6 @@ export function getSessionToken() {
 }
 
 export async function loginSource(source, credentials) {
-	const response = await fetch(`/import/${source}/login`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Accept': 'application/json'
-		},
-		body: JSON.stringify(credentials)
-	})
-	const json = await response.json()
-	if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+	const json = await post(`/import/${source}/login`, credentials)
 	setCookie("token", json.token);
 }
