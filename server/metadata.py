@@ -11,7 +11,7 @@ from .entities.metadata import Metadata
 from .services.authentication import user
 from .services.database import get, post, update
 
-from .util import web_error, web_response
+from .util import owner, web_error, web_response
 
 
 @APP.route("/document/<document_id>/metadata", methods=["GET"])
@@ -50,8 +50,7 @@ def update_document_metadata(document_id):
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")      
     # Check ownership
-    username = user(request)
-    if document.get('owner') != username:
+    if not owner(document, user(request)):
         return web_error(401, "You don't have permission to change this content", component= "SERVER")
     # Get metadata from request body
     new_metadata = request.json

@@ -27,3 +27,5 @@ def web_response(code: int, message:Optional[str] = None, details: Optional[Unio
         ), code)
     return make_response(json.dumps(details), code)
     
+def owner(object_with_owner: dict[str, Any], owner) -> bool:
+    return object_with_owner.get('owner') == owner

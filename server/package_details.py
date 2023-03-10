@@ -26,8 +26,7 @@ def get_package(package_id):
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Check if user has rights to view the package
-    username = user(request)
-    if package.get('owner') != username:
+    if not owner(package, user(request)):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get package content from DB
     try:
@@ -47,7 +46,7 @@ def get_folder_content(folder_id):
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Check if user has rights to view the folder contents
     username = user(request)
-    if folder.get('owner') != username:
+    if not owner(folder, user(request)):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get folder content from DB
     try:
@@ -67,11 +66,16 @@ def create_folder():
     name = request.json.get('name')
     parent = request.json.get('parent')
     parent_type = request.json.get('parentType')
+
+    # Check ownership of parent, to determine if creation of subelement is valid
+    package_or_folder = get(get_parent_database(parent_type), parent).json()
+    if not owner(package_or_folder, username):
+        return web_error(401, "You don't have permission to edit this content", component= "SERVER")
     # Create new folder object
     folder = Folder(name=name, documents=[], folders=[], owner=username)
     #Persist folder
     try:
-        folder_created = post(Databases.FOLDERS, folder.to_json())
+        folder_created = post(Databases.FOLDERS, folder.to_json()).json()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     except KeyError as error:
@@ -80,7 +84,7 @@ def create_folder():
     changes = {
         'folders': {
             "method": "append",
-            "value": folder_created.json().get('id')
+            "value": folder_created.get('id')
         }
     }
     try:
@@ -88,18 +92,24 @@ def create_folder():
         # TODO: Get package id for modify_package()
     except HTTPError as error:
         # Delete new folder on error
-        delete(Databases.FOLDERS, folder_created.json().get('id'))
+        delete_folder(folder_created.get('id'))
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
-    return web_response(200, 'Success', folder_created.json())
+    return web_response(200, 'Success', folder_created)
     
 @APP.route("/package/documents", methods=["POST"])
 def create_documents():
     if int(request.headers.get('Content-Length')) > APP.config.get('MAX_CONTENT_LENGTH'):
-        return web_error(413, "Request is too large to be processed", component= "SERVER")
+        return web_error(413, "File is too large to be processed", component= "SERVER")
     # Get Infos from request header and body
     username = user(request)
     parent = request.form.get('parent')
     parent_type = request.form.get('parentType')
+
+    # Check ownership of parent, to determine if creation of subelement is valid
+    package_or_folder = get(get_parent_database(parent_type), parent).json()
+    if not owner(package_or_folder, username):
+        return web_error(401, "You don't have permission to edit this content", component= "SERVER")
+    
     documents = {
         'failed': [],
         'success': []
