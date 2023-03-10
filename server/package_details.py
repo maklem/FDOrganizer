@@ -5,6 +5,7 @@ from typing import Any
 from flask import request
 from requests import HTTPError, Response
 from server import APP
+from .shared import delete_folder
 
 from .entities.folder import Folder
 from .entities.databases import Databases
@@ -12,7 +13,7 @@ from .entities.couch_document import CouchDocument
 from .entities.document import Document
 from .entities.package import Package
 
-from .util import web_error, web_response
+from .util import owner, web_error, web_response
 from .services.authentication import user
 from .services.database import attach, delete, find, get, post, update
 
@@ -127,10 +128,15 @@ def create_documents():
     return web_response(200, 'Success', documents)
 
 @APP.route("/package/document/<document_id>", methods=["DELETE"])
-def delete_document(document_id):
+def delete_document_from_package(document_id):
     # Check incoming request for errors
     if not request.json:
         return web_error(400, "Request is missing information", component= "SERVER")
+    
+    #Check ownership
+    document = get(Databases.DOCUMENTS, document_id).json()
+    if not owner(document, user(request)):
+        return web_error(401, "You don't have permission to delete this content", component= "SERVER")
     # Get Infos from request header and body
     username = user(request)
     parent = request.json.get('parent')
@@ -151,11 +157,41 @@ def delete_document(document_id):
 
     # After the reference is sucessfully deleted, delete document itself
     try:
-        print(parent, parent_type, username)
         delete(Databases.DOCUMENTS, document_id)
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     return web_response(200, 'Document deleted')
+
+
+@APP.route("/package/folder/<folder_id>", methods=["DELETE"])
+def delete_folder_from_package(folder_id):
+    # Check incoming request for errors
+    if not request.json:
+        return web_error(400, "Request is missing information", component= "SERVER")
+    # Get Infos from request header and body
+    folder = get(Databases.DOCUMENTS, folder_id).json()
+    if not owner(folder, user(request)):
+        return web_error(401, "You don't have permission to delete this content", component= "SERVER")
+    parent = request.json.get('parent')
+    parent_type = request.json.get('parentType')
+
+    # Delete document reference from parent object first
+    changes = {
+        'folders': {
+            'method': 'remove',
+            'value': folder_id
+        }
+    }
+    try:
+        update(get_parent_database(parent_type), parent, changes)
+        # TODO: Get package id for modify_package()
+    except HTTPError as error:
+        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+
+    # After the reference is sucessfully deleted, delete document itself
+    if not delete_folder(folder_id):
+        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+    return web_response(200, 'Folder deleted')
 
 
 def create_document(file, username):
