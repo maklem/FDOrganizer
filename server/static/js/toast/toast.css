@@ -1,0 +1,34 @@
+.toast {
+    position: fixed;
+    top: 0;
+    left: 50%;
+
+    padding: 1rem;
+    font-size: 1.1rem;
+    border-radius: 0.25rem;
+    animation: animate 4s ease-in;
+
+    transform: translateY(-100%) translateX(-50%)
+}
+
+
+.toast.error {
+    color: var(--on-error);
+    background-color: var(--error);
+}
+
+.toast.success {
+    color: #fff;
+    background-color: #178500;
+}
+
+.toast.info {
+    color: #fff;
+    background-color: #1C6CCE;
+}
+
+@keyframes animate {
+    10% {transform: translateY(50%) translateX(-50%)}
+    50% {opacity: 1;transform: translateY(50%) translateX(-50%)}
+    100% {opacity: 0;transform: translateY(50%) translateX(-50%)}
+}

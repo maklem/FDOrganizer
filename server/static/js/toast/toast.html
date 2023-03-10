@@ -1,0 +1,1 @@
+<div v-if="!!store.active" class="toast" :class="store.active.type" @animationend="store.next()">{{store.active.text}}</div>
