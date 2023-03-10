@@ -1,4 +1,6 @@
 import {reactive} from '../vue.js';
+import { store as toastStore } from "../toast/state.js"
+import { validate } from '../validation-util.js';
 
 export const store = reactive({
     metadata: undefined,
@@ -27,6 +29,7 @@ export const store = reactive({
     addField,
     addSubfield,
     setResourceType,
+    checkConditions,
     reset
 });
 
@@ -63,6 +66,10 @@ async function saveMetadata() {
     const schema = Object.values(store.schema).reduce((schema, section) => [...schema, ...section], [])
     const filteredData = filterUndefined(filterUnmetConditions(store.metadata, schema));
 
+    if(!validateAll(filteredData, schema)) {
+        toastStore.addMessage("error", "Manche Felder enthalten fehlerhafte Angaben")
+        return false
+    }
     const response = await fetch(`/document/${store.document.id}/metadata`, {
         method: "PUT",
         headers: {
@@ -76,6 +83,7 @@ async function saveMetadata() {
     })
     const json = await response.json()
     if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    return true
 }
 
 function createRequired(schema) {
@@ -135,7 +143,7 @@ function filterUnmetConditions(data, schema) {
         .filter(key => {
             const subfield = schema.find(field => field.id === key)
             if (subfield === undefined) {
-                console.log(key, 'not found; ommiting value')
+                console.warn(key, 'not found; ommiting value from metadata')
                 return false
             }
             return checkConditions(data, schema.find(field => field.id === key))
@@ -170,7 +178,26 @@ function filterUndefined(dataObject) {
 
 function checkConditions(fieldInstance, subfield) {
     if (!subfield.conditions) return true
-    return Object.keys(subfield.conditions).every(conditionKey => fieldInstance[conditionKey] === subfield.conditions[conditionKey])
+    
+    return subfield.conditions.every(condition => {
+        const property = condition[0]
+        const relation = condition[1]
+        const value = condition[2]
+
+        if (relation === "is") return fieldInstance[property] === value
+        if (relation === "exists") return fieldInstance[property] !== undefined
+        console.warn(`Relation '${relation}' cannot be used to test a field condition`)
+        return false
+    })
+}
+
+function validateAll(metadata, schema) {
+    return Object.entries(metadata).every(([key, value]) => {
+        const field = schema.find(field => field.id === key)
+        if(!!field.fields) return value.every(instance => validateAll(instance, field.fields))
+        if(Array.isArray(value)) return value.every(instance => validate(instance, field.type, true))
+        return validate(value, field.type, true)
+    })
 }
 
 function setResourceType(value) {

@@ -22,11 +22,12 @@
         <div v-else class="choose-type">Choose a Resource Type for the File</div>
         <div class="button-row">
             <Button class="close-button" @button-clicked="$emit('close')">Abort</Button>
-            <Button class="save-metadata" @button-clicked="store.saveMetadata();$emit('close')" :disabled="!store.touched">Save</Button>
+            <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched">Save</Button>
         </div>
         <!-- <div class="help-overlay">
             <button @click="helpOverlay=!helpOverlay">x</button>
             <div v-if="helpOverlay">{{JSON.stringify(store.metadata,(key, value) => value ?? "undefined", 4)}}</div>
         </div> -->
     </div>
+    <Toast></Toast>
 </dialog>

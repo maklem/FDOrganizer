@@ -3,6 +3,7 @@ import {store} from "./state.js";
 import MetadataSection from "../metadata-section/metadata-section.js"
 import Button from "../button/button.js"
 import LabeledInput from "../labeled-input/labeled-input.js"
+import Toast from "../toast/toast.js"
 
 const template = await setup('metadata');
 
@@ -10,7 +11,8 @@ export default {
     components: {
         MetadataSection,
         Button,
-        LabeledInput
+        LabeledInput,
+        Toast
     },
     props: {
         open: String
@@ -40,6 +42,9 @@ export default {
         }
     },
     methods: {
+        async save() {
+            if (await this.store.saveMetadata()) this.$emit('close')
+        }
     },
     template
 }

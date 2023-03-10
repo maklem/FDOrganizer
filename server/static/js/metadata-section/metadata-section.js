@@ -32,10 +32,6 @@ export default {
     watch: {
     },
     methods: {
-        checkConditions(fieldInstance, subfield) {
-            if (!subfield.conditions) return true
-            return Object.keys(subfield.conditions).every(conditionKey => fieldInstance[conditionKey] === subfield.conditions[conditionKey])
-        }
     },
     template
 }

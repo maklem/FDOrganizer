@@ -12,7 +12,7 @@
                         <i class="fa-solid fa-minus"></i>
                     </Button>
                     <template v-for="subfield in field.fields">
-                        <template v-if="checkConditions(instance, subfield)">
+                        <template v-if="store.checkConditions(instance, subfield)">
                             <LabeledInput
                                 :id="subfield.id + index"
                                 :label="subfield.label"
