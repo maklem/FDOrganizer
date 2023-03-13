@@ -7,7 +7,6 @@ import { post } from "./http.js"
  */
 export async function login(username, password) {
 	const json = await post('/login', { username, password })
-	console.log(json)
 	if (!json.success) return false
 	setCookie("token", json.token);
 	window.history.go();

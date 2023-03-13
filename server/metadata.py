@@ -29,13 +29,11 @@ def get_document_metadata(document_id):
     result = {'document': Document.convert(document)}
     # Check if document already has metadata
     metadata_id = document.get('metadata')
-    print(document.get('metadata'))
     if metadata_id is None:
         return web_response(206, details = result)
     # Get metadata from DB
     try:
         metadata = get(Databases.METADATA, metadata_id).json()
-        print(metadata)
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")    
     # Return metadata
@@ -56,17 +54,14 @@ def update_document_metadata(document_id):
     new_metadata = request.json
     # Check if document already has metadata
     metadata_id = document.get('metadata')
-    print(document.get('metadata'), new_metadata)
     if metadata_id is None:
         try:
             metadata = post(Databases.METADATA, payload = json.dumps(new_metadata)).json()
-            print(metadata)
         except HTTPError as error:
             return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
         document_changes = {'metadata': metadata.get('id')}
         try:
             document = update(Databases.DOCUMENTS, document.get('_id'), document_changes).json()
-            print(document)
         except HTTPError as error:
             return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     else:

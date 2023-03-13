@@ -20,7 +20,6 @@ export default {
     data() {
         return {
             focus: false,
-            console
         }
     },
     computed: {

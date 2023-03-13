@@ -177,7 +177,7 @@ function checkConditions(fieldInstance, subfield) {
 
         if (relation === "is") return fieldInstance[property] === value
         if (relation === "exists") return fieldInstance[property] !== undefined
-        console.warn(`Relation '${relation}' cannot be used to test a field condition`)
+        console.warn(`Relation '${relation}' cannot be used to test condition on '${property}'`)
         return false
     })
 }
