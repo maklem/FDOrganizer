@@ -2,9 +2,6 @@ from dataclasses import dataclass
 from typing import Any, Optional
 from dataclasses_json import dataclass_json
 
-from .metadata_field import MetadataField
-from .metadata_schemas import MetadataSchemas
-
 
 @dataclass_json
 @dataclass
