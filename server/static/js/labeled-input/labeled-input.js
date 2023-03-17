@@ -9,6 +9,7 @@ export default {
         id: String,
         options: Array,
         label: String,
+        type: String,
         placeholder: String,
         invalid: {
             type: Boolean,

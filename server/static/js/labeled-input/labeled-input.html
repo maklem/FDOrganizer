@@ -7,7 +7,7 @@
             class="input"
             :id="id"
             :name="id"
-            type="text"
+            :type= "type ?? 'text'"
             :placeholder="placeholder ?? ''"
             :invalid="!focus && invalid"
             @input="select"
