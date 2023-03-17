@@ -34,7 +34,7 @@ export function filetypeIcon(type) {
         case 'pdf':
             return 'file-pdf'
         case 'application/octet-stream':
-            return 'file-binary'
+            return 'file-circle-question'
         case 'image/avif':
         case 'image/bmp':
         case 'image/gif':
@@ -55,13 +55,59 @@ export function filetypeIcon(type) {
         case '.mp3':
         case '.wav':
             return 'file-audio'
+        case '.mov':
+        case '.mp4':
+        case '.avi':
+        case '.wmv':
+        case '.mpeg':
+        case 'video/mp4':
+        case 'video/mpeg':
+        case 'video/webm':
+        case 'video/quicktime':
+        case 'video/x-ms-wmv':
+        case 'video/x-msvideo':
+            return 'file-video'
         case 'text/csv':
         case 'csv':
             return 'file-csv'
-        case 'docx':
+        case 'application/vnd.ms-excel':
+        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        case '.xls':
+        case '.xlsx':
+            return 'file-excel'
+        case '.html':
+        case '.js':
+        case '.mjs':
+        case '.css':
+        case '.r':
+        case 'text/css':
+        case 'text/html':
+        case 'text/javascript':
+        case 'application/xhtml+xml':
+        case 'application/xml':
+        case 'text/xml':
+            return 'file-code'
+        case '.zip':
+        case '.tar':
+        case '.gz':
+        case '.7z':
+        case '.rar':
+        case 'application/zip':
+        case 'application/x-7z-compressed':
+        case 'application/x-tar':
+        case 'application/vnd.rar':
+            return 'file-code'
+        case '.docx':
+        case 'application/msword':
+        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             return 'file-word'
-        default:
+        case 'text/markdown':
+        case 'text/plain':
+        case '.md':
+        case '.txt':
             return 'file-lines'
+        default:
+            return 'file'
     }
 }
 
