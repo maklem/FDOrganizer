@@ -9,8 +9,8 @@ from dataclasses_json import dataclass_json
 class Folder:
     name: str
     owner: str
-    folders: List[int]
-    documents: List[int]
+    folders: List[str]
+    documents: List[str]
     id: Optional[str] = None
     metadata: Optional[str] = None
 
