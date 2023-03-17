@@ -36,9 +36,9 @@
             },
             {
                 "id": "resourceURI",
-                "conditions": {
-                    "resourceIdentifierScheme": "uri"
-                },
+                "conditions": [
+                    ["resourceIdentifierScheme", "is", "uri"]
+                ],
                 "label": "URI",
                 "min": 1,
                 "max": 1,
@@ -47,9 +47,9 @@
             },
             {
                 "id": "resourceDOI",
-                "conditions": {
-                    "resourceIdentifierScheme": "doi"
-                },
+                "conditions": [
+                    ["resourceIdentifierScheme", "is", "doi"]
+                ],
                 "label": "DOI",
                 "min": 1,
                 "max": 1,
@@ -58,9 +58,9 @@
             },
             {
                 "id": "resourceIdentifier",
-                "conditions": {
-                    "resourceIdentifierScheme": "custom"
-                },
+                "conditions": [
+                    ["resourceIdentifierScheme", "is", "custom"]
+                ],
                 "label": {
                     "en": "Identifier",
                     "de": "Bezeichner"
@@ -101,9 +101,9 @@
             },
             {
                 "id": "authorOrcid",
-                "conditions": {
-                    "personalIdentifierScheme": "orcid"
-                },
+                "conditions": [
+                    ["personalIdentifierScheme", "is", "orcid"]
+                ],
                 "label": "ORCiD",
                 "placeholder": "z.B. 0000-0001-2345-6789",
                 "min": 1,
@@ -112,9 +112,9 @@
             },
             {
                 "id": "authorFirstName",
-                "conditions": {
-                    "personalIdentifierScheme": "name"
-                },
+                "conditions": [
+                    ["personalIdentifierScheme", "is", "name"]
+                ],
                 "label": {
                     "en": "First Name",
                     "de": "Vorname"
@@ -126,9 +126,9 @@
             },
             {
                 "id": "authorLastName",
-                "conditions": {
-                    "personalIdentifierScheme": "name"
-                },
+                "conditions": [
+                    ["personalIdentifierScheme", "is", "name"]
+                ],
                 "label": {
                     "en": "Last Name",
                     "de": "Nachname"
@@ -209,16 +209,16 @@
                         }
                     },
                     {
-                        "id": "csv",
-                        "label": "Keywords"
+                        "id": "keyword",
+                        "label": "Keyword"
                     }
                 ]
             },
             {
                 "id": "rvk",
-                "conditions": {
-                    "subjectScheme": "rvk"
-                },
+                "conditions": [
+                    ["subjectScheme", "is", "rvk"]
+                ],
                 "label": {
                     "de": "Bibliothekarische Einordnung",
                     "en": "Library Classification"
@@ -227,12 +227,12 @@
             },
             {
                 "id": "keywords",
-                "conditions": {
-                    "subjectScheme": "csv"
-                },
+                "conditions": [
+                    ["subjectScheme", "is", "keyword"]
+                ],
                 "placeholder": "z.B. Handlungsmotivation, Menschenrechte, Gesellschaft",
-                "label": "Keywords",
-                "type": "csv"
+                "label": "Keyword",
+                "type": "string"
             }
         ]
     },
@@ -283,6 +283,9 @@
                     "en": "Type of identifier",
                     "de": "Art des Bezeichners"
                 },
+                "conditions": [
+                    ["relationType", "exists"]
+                ],
                 "type": "monoselect",
                 "min": 1,
                 "max": 1,
@@ -306,9 +309,9 @@
             },
             {
                 "id": "relationURI",
-                "conditions": {
-                    "relationIdentifierScheme": "uri"
-                },
+                "conditions": [
+                    ["relationIdentifierScheme", "is", "uri"]
+                ],
                 "label": "URI",
                 "min": 1,
                 "max": 1,
@@ -317,9 +320,9 @@
             },
             {
                 "id": "relationDOI",
-                "conditions": {
-                    "relationIdentifierScheme": "doi"
-                },
+                "conditions": [
+                    ["relationIdentifierScheme", "is", "doi"]
+                ],
                 "label": "DOI",
                 "min": 1,
                 "max": 1,
@@ -328,9 +331,9 @@
             },
             {
                 "id": "relationDocument",
-                "conditions": {
-                    "relationIdentifierScheme": "document"
-                },
+                "conditions": [
+                    ["relationIdentifierScheme", "is", "document"]
+                ],
                 "label": {
                     "en": "Choose file",
                     "de": "Datei wählen"
