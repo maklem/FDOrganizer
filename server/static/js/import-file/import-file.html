@@ -1,11 +1,6 @@
-<div class="file" :class="proxy">
-    <i class="icon fa-solid" :class="'fa-' + icon"></i>
-    <span class="name">{{name}}</span>
-    <span class="size">{{formattedSize}}</span>
-    <input type="checkbox" name="select-file" id="select-file-{{name}}" class="select-file" :checked="selected"/>
-    <!-- <div class="overlay">
-        <Button class="import-file" @button-clicked="$emit('import')" :flat="true">
-            <i class="fa-solid fa-cloud-arrow-down"></i>
-        </Button>
-    </div> -->
-</div>
+<label :for="'select-file-' + id" class="import-document">
+    <input type="checkbox" name="select-file" :id="'select-file-' + id" class="select" @input="store.toggleSelectFile(id)"/>
+    <i class="fa-solid icon" :class="'fa-' + filetypeIcon(type)"></i>
+    <div class="name">{{name}}</div>
+    <div class="size">{{formatFilesize(size)}}</div>
+</label>

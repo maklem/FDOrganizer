@@ -1,90 +1,48 @@
-.file {
-    display: grid;
-    grid-template-rows: 3fr max-content max-content;
-    grid-template-columns: 1fr min-content;
-    place-items: center;
-    place-content: center;
-
-    border: 0.1rem solid #aaaaaa;
-    border-radius: 1rem;
-
-}
-
-.file.proxy {
-    opacity: 0.4;
-}
-
-.file .icon {
-    grid-row: 1 / span 1;
-    grid-column: 1/ span 2;
-
-    padding: 0.25rem;
-
-    font-size: 3rem;
-    color: var(--primary-color)
-}
-
-.file .name {
-    grid-row: 2 / span 1;
-    grid-column: 1/ span 2;
-
-    padding: 0.25rem;
-
-    font-weight: 700;
-    max-width: 100%;
-
-    color: #000000;
-    text-align: center;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-    overflow-wrap: anywhere;
-}
-
-.file .size {
-    grid-row: 3 / span 1;
-    grid-column: 1/ span 2;
-
-    padding: 0.25rem;
-
-    color: #777777;
-}
-/* 
-.file .overlay {
-    display: flex;
-    grid-row: 1 / span 3;
-    grid-column: 1/ span 2;
-    align-self: stretch;
-    justify-self: stretch;
-
+.import-document {
+    display: inline-grid;
+    grid-template-columns: max-content max-content auto;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "select icon name"
+        "select icon size";
+    justify-items: start;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    grid-gap: 0.3rem 1rem;
 
-    border-radius: 1rem;
-    background-color: rgba(0, 0, 0, 0.5);
-    transition: opacity 0.4s;
+    border-bottom: 0.05rem solid #eeeeee;
+    padding: 1rem;
 
-    opacity: 0;
-
+    cursor:pointer
 }
 
-.file .overlay:hover {
-    opacity: 1;
+.import-document:hover {
+    color: var(--primary-color);
 }
 
-.file .overlay .import-file {
+.import-document.active {
+    font-weight: 700;
+    color: var(--primary-color);
+}
 
-    background-color: rgba(210, 210, 210);
+.import-document .name {
+    grid-area: name;
+    line-break: anywhere;
+}
 
-    color: #000;
-} */
-
-.file .select-file {
-    grid-row: 1 / span 1;
-    grid-column: 2/ span 1;
+.import-document .size {
+    grid-area: size;
     align-self: start;
-    justify-self: start;
 
-    margin: 0.5rem;
+    color: #666666
+}
+
+.import-document .icon {
+    grid-area: icon;
+
+    font-size: 2rem;
+}
+
+.import-document .select {
+    grid-area: select;
+    align-self: stretch;
 }

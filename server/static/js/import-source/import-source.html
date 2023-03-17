@@ -1,21 +1,61 @@
-<div class="source-name" @click="$emit('activate')">
-    <i class="fa-solid fa-plus"></i>
-    <span class="text">{{name}}</span>
+<div class="source-header" @click="store.activateSource(id)">
     <i v-if="!authenticated" class="fa-solid fa-lock"></i>
-</div>
-<div v-if="active" class="source-content">
-    <form v-if="!authenticated && needsAuthentication" class="authenticate" @submit="authenticate">
-        <label for="username">Username</label>
-        <input name="username" type="text" @input="setUsername" placeholder="Enter Username" required>
-        <label for="password">Password</label>
-        <input name="password" type="password" @input="setPassword" placeholder="Enter Password" required>            
-        <Button type="submit">Login</Button>
-    </form>
-    <div v-else class="collection-list">
-        <div v-for="collection in collections" class="collection-list-item" :class="{active: collection.active}"@click="selectCollection(collection.id)">
-            <i class="fa-solid fa-folder icon"></i>
-            <div class="primary">{{collection.displayname}}</div>
-            <div class="secondary">{{collection.count}} {{collection.count === 1 ? 'Datei' : 'Dateien'}}</div>
+    <button v-else v-if="!!store.remotePath.length" class="back-button" @click="store.climbRemotePath()">
+        <i class="fa-solid fa-arrow-left"></i>
+    </button>
+        <header class="source-name">
+        <h2 class="text">{{name}}</h2>
+        <template v-else
+        v-for="path in store.pathNames()"
+        >
+        <div class="icons">
+            <i class="fa-solid fa-chevron-right"></i>
+            <i class="fa-solid fa-chevron-right"></i>
         </div>
-    </div>
+        <div class="folder-name">{{path}}</div>
+        </template>
+    </header>
+</div>
+<div v-if="store.activeSource === id" class="source-content">
+    <div v-if="store.loading.content || store.loading.authentication" class="loading"></div>
+    <template v-else>
+        <form v-if="!authenticated && needsAuthentication" class="authenticate">
+            <LabeledInput
+                :id="id + '-username'"
+                :label="'Username'"
+                :placeholder="'Your ' + name + ' login name'"
+                :value="store.username"
+                @input="(value) => store.username = value"></LabeledInput>
+            <LabeledInput
+                :id="id + '-password'"
+                :label="'Password'"
+                :type="'password'"
+                :placeholder="'Your ' + name + ' password'"
+                :value="store.password"
+                @input="(value) => store.password = value"></LabeledInput>
+            <Button @click="authenticate">Login</Button>
+        </form>
+        <template v-else>
+            <div class="import-content">
+                <div v-for="folder in store.getFolders()" class="import-folder" @click="store.openFolder(folder.id)">
+                    <i class="fa-solid fa-folder icon"></i>
+                    <div class="name">{{folder.name}}</div>
+                    <!-- <div class="size">{{formatFilesize(folder.size)}}</div> -->
+                    <div class="count">{{folder.count}} {{folder.count === 1 ? "content" : "contents"}}</div>
+                </div>
+                <ImportFile
+                    v-for="document in store.documents"
+                    :name="document.name"
+                    :size="document.size"
+                    :type="document.type"
+                    :id="document.source_id"
+                    :selected="document.selected"
+                ></ImportFile>
+            </div>
+            <div class="button-row">
+                <Button :disabled="!store.selectedDocuments.length" @button-clicked="store.importSelected()">Ausgewählte importieren</Button>
+                <Button :disabled="!store.documents.length">Alle importieren</Button>
+            </div>
+        </template>
+    </template>
 </div>

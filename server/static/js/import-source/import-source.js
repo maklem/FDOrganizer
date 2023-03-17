@@ -1,60 +1,34 @@
 import { setup } from "../setup.js";
 import Button from "../button/button.js"
-import { getSessionToken, loginSource } from "../authentication.js";
-import { get } from "../http.js"
+import LabeledInput from "../labeled-input/labeled-input.js";
+import ImportFile from "../import-file/import-file.js"
+import { store } from "../import/state.js"
+import { formatFilesize } from "../format-util.js";
 
 const template = await setup('import-source');
 
 export default {
     components: {
-        Button
+        Button,
+        LabeledInput,
+        ImportFile
     },
     props: {
         id: String,
         name: String,
-        active: Boolean,
+        authenticated: Boolean,
         needsAuthentication: Boolean
     },
     data() {
         return {
-            username: '',
-            password: '',
-            authenticated: false,
-            collections: []
+            store,
+            formatFilesize
         }
-    },
-    watch: {
-        authenticated(before, after) {
-            before && this.getCollections()
-        }
-    },
-    mounted() {
-        const token = getSessionToken()[this.id];
-        if (!!token) this.authenticated = true
     },
     methods: {
         authenticate(event) {
             event.preventDefault()
-            loginSource(
-                this.id,
-                {
-                    username: this.username,
-                    password: this.password
-                }
-            ).then(() => this.authenticated = true)
-        },
-        setUsername(event) {
-            this.username = event.currentTarget.value
-        },
-        setPassword(event) {
-            this.password = event.currentTarget.value
-        },
-        async getCollections() {
-            this.collections = await get(`import/${this.id}`);
-        },
-        selectCollection(collectionId) {
-            this.collections = this.collections.map(collection => ({...collection, active: collection.id === collectionId}))
-            this.$emit('select-project', collectionId)
+            store.authenticate(this.id)
         }
     },
     template
