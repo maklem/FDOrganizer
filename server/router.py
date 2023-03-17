@@ -30,10 +30,6 @@ def navimpressum():
 def navhistory():
     return render_template("history.html")
 
-@APP.route("/import")
-def navimport():
-    return render_template("import.html")
-
 @APP.route("/package")
 def navpackage():
     return render_template("package.html")

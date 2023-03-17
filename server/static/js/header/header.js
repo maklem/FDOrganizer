@@ -31,10 +31,6 @@ const tabs = [
         url: "start"
     },
     {
-        title: "Import",
-        url: "import"
-    },
-    {
         title: "Editor",
         url: "package"
     },
