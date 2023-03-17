@@ -1,12 +1,17 @@
 import importlib
 import json
 from functools import wraps
-from flask import request
+from typing import List, Literal
+from flask import request, Response
 from pkg_resources import resource_listdir, resource_isdir, resource_filename
 
 from server import APP
-from .util import web_error, web_response
-from .services.authentication import add_payload, payload
+from .shared import persist_documents
+from .services.database import get
+from .entities.document import Document
+from .entities.folder import Folder
+from .util import get_parent_database, owner, web_error, web_response
+from .services.authentication import add_payload, payload, user
 
 def needs_authentication(api_method):
     @wraps(api_method)
@@ -31,15 +36,50 @@ def needs_authentication(api_method):
 def get_toplevel(source: str):
     plugin = get_plugin(source)
     auth = get_plugin_auth(source)
-    return plugin.get_toplevel(request, auth)
+    result = plugin.get_toplevel(request, auth)
+    if isinstance(result, Response):
+        return result
+    return web_response(200, details = serialize(result))
+
+@APP.route('/import/<source>', methods=['POST'])
+@needs_authentication
+def import_documents_from(source: str):
+    # Get data from request body
+    if request.json is None:
+        return web_error(400, f'Request does not contain data', component="SERVER")
+    source_ids = request.json.get('sourceIds')
+    parent = request.json.get('parent')
+    parent_type = request.json.get('parentType')
+    if source_ids is None or parent is None or parent_type is None:
+        return web_error(400, f'Request does not contain correct data in body', component="SERVER")
+    
+    # Get selected files and their metadata from the plugin source
+    plugin = get_plugin(source)
+    auth = get_plugin_auth(source)
+    result = plugin.get_files_with_metadata(source_ids, request, auth)
+    if isinstance(result, Response):
+        return result
+    
+    # Import the files and metadata into the selected FDO package
+    persisted_documents =  import_files(result, parent, parent_type)
+    if isinstance(persisted_documents, Response):
+        return persisted_documents
+    for document in persisted_documents['success']:
+        #TODO Add metadata to DB
+        pass
+    return web_response(200, details=persisted_documents)
 
 @APP.route('/import/<source>/<collection>', methods=['GET'])
 @needs_authentication
 def get_collection(source: str, collection: str):
+    if collection is None:
+        return web_error(400, 'No valid Collection ID provided', component="SERVER")
     plugin = get_plugin(source)
     auth = get_plugin_auth(source)
-    return plugin.get_collection(request, auth)
-
+    result = plugin.get_collection(collection, request, auth)
+    if isinstance(result, Response):
+        return result
+    return web_response(200, details = serialize(result))
 
 @APP.route('/import/<source>/login', methods=['POST'])
 def login_source(source: str):
@@ -103,3 +143,16 @@ def get_plugin_auth(source: str):
 
 def get_plugin(source: str):
     return importlib.import_module(f'.plugins.{source}.import', 'server')
+
+def serialize(content: dict[Literal["folders"] | Literal["documents"], List[Folder | Document]]) -> dict[str, List]:
+    folders = list(map(Folder.to_dict, content['folders'])) # type: ignore
+    documents = list(map(Document.to_dict, content['documents'])) # type: ignore
+    return{'folders':folders, 'documents': documents}
+
+def import_files(import_documents: List[dict], parent: str, parent_type: str):
+    # Check ownership of parent, to determine if creation of subelement is valid
+    package_or_folder = get(get_parent_database(parent_type), parent).json()
+    if not owner(package_or_folder, user(request)):
+        return web_error(401, "You don't have permission to edit this content", component="SERVER")
+
+    return persist_documents(import_documents, parent, parent_type)
