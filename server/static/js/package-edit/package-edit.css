@@ -78,5 +78,53 @@
 }
 
 .right-sidebar {
+    display: grid;
+    grid-template-rows: min-content auto;
     max-height: 100%;
+}
+
+.right-sidebar .tabs {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.tabs .tab {
+    display: grid;
+    grid-template-rows: auto max-content;
+    justify-items: stretch;
+}
+
+.tab .text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    padding: 1rem 1rem;
+    border: none;
+
+    font-weight: 500;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--primary-color);
+    background-color: var(--on-primary-color);
+
+    transition: all 300ms;
+
+}
+
+.tab .indicator {
+    min-height: 0.5rem;
+
+    background-color: #bbbbbb;
+
+    transition: all 300ms;
+}
+
+.tab.active .indicator {
+    background-color: var(--secondary-color);
+}
+
+.tab.active text {
+    font-weight: 700;
 }

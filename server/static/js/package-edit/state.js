@@ -13,6 +13,7 @@ export const store = reactive({
     },
     modalOpen:false,
     packagePath: [],
+    activeTab: 'upload',
     climbPackagePath,
     createFolder,
     currentPath,

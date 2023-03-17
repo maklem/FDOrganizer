@@ -4,6 +4,7 @@ import PackageListItem from "../package-list-item/package-list-item.js";
 import PackageContent from "../package-content/package-content.js";
 import Button from "../button/button.js";
 import Upload from "../upload/upload.js";
+import Import from "../import/import.js"
 import Metadata from "../metadata/metadata.js";
 import {store} from './state.js'
 import { setup } from "../setup.js";
@@ -17,6 +18,7 @@ const packageEdit = createApp({
         Button,
         PackageContent,
         Upload,
+        Import,
         Metadata
     },
     data() {

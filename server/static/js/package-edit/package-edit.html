@@ -23,14 +23,18 @@
             </form>
         </dialog>
         <aside class="right-sidebar">
-            <ImportSource
-                v-for="source in sources"
-                class="import-source"
-                v-bind="source"
-                @activate ="() => !source.active && activate(source.id)"
-                @select-project="collectionId => showFiles(source.id, collectionId)"
-            ></ImportSource>
-            <Upload></Upload>
+            <div class="tabs">
+                <div class="tab" :class="{active: store.activeTab === 'upload'}">
+                    <button class="text" @click="store.activeTab = 'upload'">File Upload</button>
+                    <div class="indicator"></div>
+                </div>
+                <div class="tab" :class="{active: store.activeTab === 'import'}">
+                    <button class="text" @click="store.activeTab = 'import'">Import</button>
+                    <div class="indicator"></div>
+                </div>
+            </div>
+            <Import v-if="store.activeTab === 'import'"></Import>
+            <Upload v-if="store.activeTab === 'upload'"></Upload>
         </aside>
         <Metadata :open="store.modalOpen" @close="store.closeDocument()"></Metadata>
     </main>
