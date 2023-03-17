@@ -3,6 +3,8 @@ from typing import Any, Optional, Union
 from flask import make_response
 from pkg_resources import resource_filename
 
+from .entities.databases import Databases
+
 def get_config() -> dict[str, Union[str, list[str]]]:
     with open(resource_filename(__name__, "./conf/config.json"), encoding="utf-8") as config:
         return json.load(config)
@@ -29,3 +31,17 @@ def web_response(code: int, message:Optional[str] = None, details: Optional[Unio
     
 def owner(object_with_owner: dict[str, Any], owner) -> bool:
     return object_with_owner.get('owner') == owner
+
+def get_parent_database(parent_type: str) -> Databases:
+    # Only valid code starting with Python 3.10.
+    # match parent_type:
+    #     case 'folder':
+    #         return Databases.FOLDERS
+    #     case 'package':
+    #         return Databases.PACKAGES
+    #     case _:
+    #         return Databases.PACKAGES
+    if parent_type == 'folder':
+        return Databases.FOLDERS
+    else:
+        return Databases.PACKAGES

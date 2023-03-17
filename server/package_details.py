@@ -1,11 +1,12 @@
+import io
 import json
 import os
 import time
-from typing import Any
+from werkzeug.datastructures import FileStorage
 from flask import request
-from requests import HTTPError, Response
+from requests import HTTPError
 from server import APP
-from .shared import delete_folder
+from .shared import delete_folder, persist_documents
 
 from .entities.folder import Folder
 from .entities.databases import Databases
@@ -75,7 +76,7 @@ def create_folder():
     folder = Folder(name=name, documents=[], folders=[], owner=username)
     #Persist folder
     try:
-        folder_created = post(Databases.FOLDERS, folder.to_json()).json()
+        folder_created = post(Databases.FOLDERS, folder.to_json()).json() # type: ignore
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     except KeyError as error:
@@ -98,44 +99,34 @@ def create_folder():
     
 @APP.route("/package/documents", methods=["POST"])
 def create_documents():
-    if int(request.headers.get('Content-Length')) > APP.config.get('MAX_CONTENT_LENGTH'):
+    if int(request.headers['Content-Length']) > int(APP.config['MAX_CONTENT_LENGTH']):
         return web_error(413, "File is too large to be processed", component= "SERVER")
     # Get Infos from request header and body
     username = user(request)
     parent = request.form.get('parent')
     parent_type = request.form.get('parentType')
+    if parent is None or parent_type is None:
+        return web_error(400, "Request is missing information", component= "SERVER")
 
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_parent_database(parent_type), parent).json()
     if not owner(package_or_folder, username):
-        return web_error(401, "You don't have permission to edit this content", component= "SERVER")
+        return web_error(401, "You don't have permission to edit this content", component="SERVER")
     
-    documents = {
-        'failed': [],
-        'success': []
-    }
+    #Create documents for uploaded files
+    file_document_pairs = []
+    failed_files= []
     for file in request.files.values():
-        result = create_document(file, username)
-        if not result.get('success'):
-            documents['failed'].append({'file': file.filename, 'error': result.get('error')})
-        else:
-            documents['success'].append({'file': file.filename, 'document_id': result.get('document_id')})
+        try:
+            file_document_pairs.append(create_file_document_pair(file, username))
+        except HTTPError as error:
+            failed_files.append({'file': file.filename, 'error': error.args[0]})
 
-    #Update parent to include documents
-    changes = {
-        "documents": {
-            "method": 'extend',
-            "value": list(map(lambda doc: doc.get('document_id'), documents['success']))
-        }
-    }
-    try:
-        update(get_parent_database(parent_type), parent, changes)
-        # TODO: Get package id for modify_package()
-    except HTTPError as error:
-        # Delete new document on error
-        # delete(Databases.DOCUMENTS, document_created.json().get('id'))
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
-    return web_response(200, 'Success', documents)
+    #Persist documents and files in DB
+    persisted_documents = persist_documents(file_document_pairs, parent, parent_type)
+    
+    persisted_documents['failed'].append(failed_files)
+    return web_response(200, 'Success', persisted_documents)
 
 @APP.route("/package/document/<document_id>", methods=["DELETE"])
 def delete_document_from_package(document_id):
@@ -145,10 +136,12 @@ def delete_document_from_package(document_id):
     
     #Check ownership
     document = get(Databases.DOCUMENTS, document_id).json()
+    if document is None:
+        return web_error(400, f'Document with id {document_id} does not exist', component= "SERVER")
     if not owner(document, user(request)):
         return web_error(401, "You don't have permission to delete this content", component= "SERVER")
+    
     # Get Infos from request header and body
-    username = user(request)
     parent = request.json.get('parent')
     parent_type = request.json.get('parentType')
 
@@ -179,9 +172,14 @@ def delete_folder_from_package(folder_id):
     if not request.json:
         return web_error(400, "Request is missing information", component= "SERVER")
     # Get Infos from request header and body
-    folder = get(Databases.DOCUMENTS, folder_id).json()
+    folder = get(Databases.FOLDERS, folder_id).json()
+
+    if folder is None: 
+        return web_error(400, f'Folder with id {folder_id} does not exist', component= "SERVER")
     if not owner(folder, user(request)):
         return web_error(401, "You don't have permission to delete this content", component= "SERVER")
+    
+    # Get Infos from request header and body
     parent = request.json.get('parent')
     parent_type = request.json.get('parentType')
 
@@ -200,21 +198,19 @@ def delete_folder_from_package(folder_id):
 
     # After the reference is sucessfully deleted, delete document itself
     if not delete_folder(folder_id):
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error(500, "Folder could not be deleted successfully", component= "DATABASE")
     return web_response(200, 'Folder deleted')
 
 
-def create_document(file, username):
+def create_file_document_pair(file: FileStorage, username: str):
     result = {'success': False}
     # Check uploaded file integrity
     if file is None:
-        return result | {
-            'error': web_error(400, 'No file content detected')
-        }
+        raise HTTPError('No file provided')
     if not file.filename:
-        return result | {
-            'error': web_error(400, 'No filename available')
-        }   
+        raise HTTPError('No filename available')
+    outfile = io.BytesIO(file.read())
+    outfile.seek(0)
     # Create Document from uploaded information + file
     document = Document(
         name=file.filename,
@@ -223,23 +219,9 @@ def create_document(file, username):
         source="manual upload",
         is_stored=True,
         owner=username)
-    document_created = create_document_with_attachement(file, document)
+    return {'document': document, 'file': outfile }
 
-    return {
-        'success': True,
-        'document_id': document_created.json().get('id')
-    }
             
-
-def create_document_with_attachement(file, document: Document) -> Response:
-    # Create initial document in DB
-    document_created = post(Databases.DOCUMENTS,document.to_json())  # type: ignore
-    # Attach uploaded file to created document
-    response_document = CouchDocument(document_created.json())
-    attachment_response = attach(Databases.DOCUMENTS, response_document, file)
-
-    return attachment_response
-
 def content_query(id_array):
     return {
         "selector": {
@@ -269,7 +251,7 @@ def get_content(folders: list[str], documents: list[str]):
 
     return {"folders": list(map(Folder.convert, found_folders)), "documents": list(map(Document.convert, found_documents)) }
 
-def get_parent_database(parent_type) -> Databases:
+def get_parent_database(parent_type: str) -> Databases:
     # Only valid code starting with Python 3.10.
     # match parent_type:
     #     case 'folder':

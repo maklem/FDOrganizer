@@ -1,5 +1,13 @@
+from typing import List
+from requests import HTTPError, Response
+
+from .entities.document import Document
+
+from .entities.couch_document import CouchDocument
+
+from .util import get_parent_database
 from .entities.databases import Databases
-from .services.database import delete, get
+from .services.database import attach, delete, get, update, post
 
 def delete_folder(id: str) -> bool:
     folder = get(Databases.FOLDERS, id).json()
@@ -63,3 +71,45 @@ def delete_document(id: str) -> bool:
         return False
 
     return True
+
+def persist_documents(doc_file_pairs: List, parent, parent_type):    
+    documents = {
+        'failed': [],
+        'success': []
+    }
+    for pair in doc_file_pairs:
+        try:
+            document_id = create_document_with_attachement(pair['file'], pair['document'])
+            documents['success'].append({'file': pair['document'].name, 'document_id': document_id})
+        except BaseException as error:
+            documents['failed'].append({'file': pair['document'].name, 'error': error.args[0]})
+
+    #Update parent to include documents
+    new_documents = list(map(lambda doc: doc.get('document_id'), documents['success']))
+    changes = {
+        "documents": {
+            "method": 'extend',
+            "value": new_documents
+        }
+    }
+    try:
+        update(get_parent_database(parent_type), parent, changes)
+        # TODO: Get package id for modify_package()
+    except HTTPError as error:
+        # Delete new documents on error
+        for doc in new_documents:
+            delete_document(doc['document_id'])
+        for document in documents['success']:
+            document['document_id': None]
+            document.set('error', 'Parent Entity could not be updated')
+        return {'failed': [documents['failed'], documents['success']], 'success': []}
+    return documents
+
+def create_document_with_attachement(file, document: Document) -> str:
+    # Create initial document in DB
+    document_created = post(Databases.DOCUMENTS,document.to_json())  # type: ignore
+    # Attach uploaded file to created document
+    response_document = CouchDocument(document_created.json())
+    attach(Databases.DOCUMENTS, response_document, file_content = file, filename = document.name, mimetype=document.type)
+
+    return response_document.id

@@ -47,12 +47,12 @@ def encode_credentials(username, password) -> str:
 
 
 
-def attach(database: Databases, document: CouchDocument, file, parameters: Optional[dict[str, str]] = None):
-    headers = auth_header() | {
-        'Content-Type': file.mimetype,
-        'If-Match': document.rev
-    }
-    return requests.put(f'{doc_url(database, document.id, parameters)}/{urllib.parse.quote(file.filename)}', headers=headers, data=file, timeout=20)
+def attach(database: Databases, document: CouchDocument, file_content, filename, mimetype: Optional[str] = None, parameters: Optional[dict[str, str]] = None):
+    headers = auth_header() | {'If-Match': document.rev}
+    if mimetype is not None:
+        headers = headers | {'Content-Type': mimetype}
+
+    return requests.put(f'{doc_url(database, document.id, parameters)}/{urllib.parse.quote(filename)}', headers=headers, data=file_content, timeout=20)
 
 
 def post(database: Databases, payload: str, parameters: Optional[dict[str, str]] = None) -> requests.Response:
