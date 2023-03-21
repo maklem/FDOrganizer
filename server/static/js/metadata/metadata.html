@@ -15,9 +15,7 @@
             </button>
         </header>
         <main v-if="!!store.resourceType.value" class="metadata-sections">
-            <MetadataSection :id="'required'" :label="'Required'" :selectedSection="selectedSection" @select-section=selectSection('required')></MetadataSection>
-            <MetadataSection :id="'content'" :label="'Content'" :selectedSection="selectedSection" @select-section=selectSection('content')></MetadataSection>
-            <MetadataSection :id="'relations'" :label="'Related Documents'"></MetadataSection>
+            <MetadataSection v-for="key in Object.keys(store.schema)" :id="key" :label="store.sectionLabel(key)" :selectedSection="selectedSection" @select-section=selectSection(key)></MetadataSection>
         </main>
         <div v-else class="choose-type">Choose a Resource Type for the File</div>
         <div class="button-row">

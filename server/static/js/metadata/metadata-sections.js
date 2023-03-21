@@ -1,0 +1,5 @@
+export const CONTENT = ['subject', 'description']
+export const RELATIONS = ['relation']
+export const SCOPE = []
+export const ORIGIN_AND_CREATION = []
+export const USAGE_AND_RIGHTS = []

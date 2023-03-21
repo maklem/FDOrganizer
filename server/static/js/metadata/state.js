@@ -2,6 +2,8 @@ import {reactive} from '../vue.js';
 import { store as toastStore } from "../toast/state.js"
 import { validate } from '../validation-util.js';
 import { put, get } from "../http.js"
+import { CONTENT, RELATIONS, SCOPE, ORIGIN_AND_CREATION, USAGE_AND_RIGHTS } from './metadata-sections.js';
+import { localized } from '../format-util.js';
 
 
 export const store = reactive({
@@ -9,14 +11,7 @@ export const store = reactive({
     metadataId: undefined,
     touched: false,
     document: undefined,
-    schema: {
-        required: undefined,
-        content: undefined,
-        relations: undefined,
-        // timeAndPlace: undefined,
-        // usageAndRights: undefined,
-        // resourceSpecific: undefined
-    },
+    schema: undefined,
     schemaVersion: "1",
     resourceType: {
         value: undefined,
@@ -32,7 +27,9 @@ export const store = reactive({
     addSubfield,
     setResourceType,
     checkConditions,
-    reset
+    getAllFields,
+    reset,
+    sectionLabel
 });
 
 async function getDocument(documentId) {
@@ -60,8 +57,11 @@ async function getSchema(version) {
     return splitSchema(json)
 }
 
+function getAllFields() {
+    return Object.values(store.schema).reduce((schema, section) => [...schema, ...section], [])
+}
 async function saveMetadata() {
-    const schema = Object.values(store.schema).reduce((schema, section) => [...schema, ...section], [])
+    const schema = store.getAllFields()
     const filteredData = filterUndefined(filterUnmetConditions(store.metadata, schema));
 
     if(!validateAll(filteredData, schema)) {
@@ -87,33 +87,47 @@ function createRequired(schema) {
     return requiredFields
 }
 
-function createContent(schema) {
-    const contentFields = ['subject', 'description']
-    return schema.filter(field => contentFields.includes(field.id))
+function createResourceSpecific(schema) {
+    return schema.filter(field => field.compatibleTypes?.includes(store.resourceType.value))
 }
 
-
-function createRelations(schema) {
-    return schema.filter(field => field.id === 'relation')
+function createSection(schema, fieldNames, label) {
+    return schema.filter(field => fieldNames.includes(field.id))
 }
 
 function splitSchema(schema) {
+    const required = createRequired(schema)
+    const resourceSpecific = createResourceSpecific(schema)
     return {
-        required: createRequired(schema),
-        content: createContent(schema),
-        relations: createRelations(schema),
+        required,
+        content: createSection(schema, CONTENT, 'Content'),
+        scope: createSection(schema, SCOPE, 'Data Scope'),
+        provenance: createSection(schema, ORIGIN_AND_CREATION, 'Data Creation & Aquisition'),
+        relations: createSection(schema, RELATIONS, 'Related Documents'),
+        rights: createSection(schema, USAGE_AND_RIGHTS, 'Usage & Rights'),
+        resourceSpecific,
     }
 }
 
-function addField(id, fieldId) {
-    const field = store.schema[id].find(field => field.id === fieldId)
+function sectionLabel(key) {
+    if (!store.schema.hasOwnProperty(key)) return ''
+    if (key === 'resourceSpecific') return resourceSectionLabel()
+    return LABELS[key]
+}
+
+function resourceSectionLabel() {
+    const resourceType = store.resourceType.options.find(type => type.id === store.resourceType.value)
+    return `Specific for ${localized(resourceType.label)}` 
+}
+function addField(fieldId) {
+    const field = store.getAllFields().find(field => field.id === fieldId)
     const dummy = makeTemplate(field)
     if (store.metadata?.[fieldId]?.length) store.metadata[fieldId].push(dummy)
     else store.metadata[fieldId] = [dummy]
 }
 
-function addSubfield(id, fieldId, index, subfieldId) {
-    const field = store.schema[id].find(field => field.id === fieldId).fields.find(subfield => subfield.id === subfieldId)
+function addSubfield(fieldId, index, subfieldId) {
+    const field = store.getAllFields().find(field => field.id === fieldId).fields.find(subfield => subfield.id === subfieldId)
     const dummy = makeTemplate(field)
     if (store.metadata?.[fieldId][index][subfieldId]?.length) store.metadata[fieldId][index][subfieldId].push(dummy)
     else store.metadata[fieldId][index][subfieldId] = [dummy]
@@ -200,6 +214,15 @@ function reset() {
     store.touched = false
     store.document = undefined
     store.resourceType.value = undefined
+}
+
+const LABELS = {
+    required: 'Required',
+    content: 'Content',
+    relations: 'Related Documents',
+    scope: 'Data Scope',
+    provenance: 'Data Creation & Acquisition',
+    rights: 'Usage & Rights'
 }
 
 const RESOURCE_TYPES = [
