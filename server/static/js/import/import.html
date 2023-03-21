@@ -1,7 +1,10 @@
 <div class="sources-list">
     <ImportSource
         v-for="source in store.sources"
-        class="import-source"
         v-bind="source"
     ></ImportSource>
+    <div class="button-row" v-if="store.showImportButtons()">
+        <Button :disabled="!store.selectedDocuments.length" @button-clicked="store.importSelected()">Ausgewählte importieren</Button>
+        <Button :disabled="!store.documents.length" @button-clicked="store.importAll()">Alle importieren</Button>
+    </div>
 </div>

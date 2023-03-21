@@ -27,7 +27,8 @@ export const store = reactive({
     pathNames,
     getSources,
     getSource,
-    authenticate
+    authenticate,
+    showImportButtons
 });
 /**
  * @param  {string} sourceId
@@ -45,6 +46,12 @@ async function getFolderContent(sourceId, folderId) {
 function getFolders() {
     return store.folders
     .map(folder => ({...folder, count: folder.documents.length + folder.folders.length}))
+}
+
+function showImportButtons() {
+    if(!store.activeSource) return false
+    return store.sources.find(source => source.id === store.activeSource).authenticated
+    
 }
 
 function toggleSelectFile(documentId) {
