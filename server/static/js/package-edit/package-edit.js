@@ -6,6 +6,7 @@ import Button from "../button/button.js";
 import Upload from "../upload/upload.js";
 import Import from "../import/import.js"
 import Metadata from "../metadata/metadata.js";
+import LabeledInput from "../labeled-input/labeled-input.js"
 import {store} from './state.js'
 import { setup } from "../setup.js";
 
@@ -17,6 +18,7 @@ const packageEdit = createApp({
         PackageListItem,
         Button,
         PackageContent,
+        LabeledInput,
         Upload,
         Import,
         Metadata
@@ -35,6 +37,11 @@ const packageEdit = createApp({
         if (!!documentId) this.store.openDocument(documentId)
     },
     methods: {
+        enterPressed(event) {
+            if (event.which !== 13) return
+            this.store.createFolder()
+            this.$refs.newFolder.close()
+        }
     },
     template
 })

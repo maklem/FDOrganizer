@@ -14,6 +14,7 @@ export const store = reactive({
     modalOpen:false,
     packagePath: [],
     activeTab: 'upload',
+    newFolderName: undefined,
     climbPackagePath,
     createFolder,
     currentPath,
@@ -93,16 +94,18 @@ async function getPackageContent() {
     store.loading.content = false
 }
 
-async function createFolder(name) {
+async function createFolder() {
     store.loading.content = true
     const {parent, parentType} = currentPath()
+    console.log(store.newFolderName)
     await put(`/package/folder`, {
-        name,
+        name: store.newFolderName,
         parent,
         parentType
     });
 
     await getPackageContent()
+    store.newFolderName = undefined
     store.loading.content = false
 }
 
