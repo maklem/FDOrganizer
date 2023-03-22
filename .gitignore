@@ -1,5 +1,7 @@
 # venv dir
 /env
+/.venv
+
 
 # Server config and caches
 __pycache__
