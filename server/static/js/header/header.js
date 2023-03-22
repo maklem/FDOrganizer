@@ -36,7 +36,7 @@ const tabs = [
     },
     {
         title: "Archive",
-        url: "lzv"
+        url: "archive"
     },
 
 ]

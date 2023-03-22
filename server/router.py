@@ -38,6 +38,10 @@ def navpackage():
 def navpackageedit(id):
     return render_template("package-edit.html")
 
+@APP.route("/archive")
+def navarchive():
+    return render_template("archive.html")
+
 @APP.route("/login")
 def navlogin():
     if is_authorized(request):

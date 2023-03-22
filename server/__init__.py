@@ -21,3 +21,4 @@ import server.metadata
 import server.package_details
 import server.package
 import server.source_import
+import server.archive

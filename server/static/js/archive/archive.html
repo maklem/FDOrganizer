@@ -1,0 +1,22 @@
+<App>
+    <main class="package-overview">
+        <aside class="left-sidebar">
+            <template v-if="!store.loading.packageList">
+                <template v-for="status in STATUS">
+                    <header class="package-status-header">
+                        <i class="icon fa-solid" :class="status.icon"></i>
+                        <h2 class="text">{{status.name}}</h2>
+                    </header>
+                    <ArchiveListItem v-if="!!store.packagesWithStatus(status.id).length"
+                        v-for="pkg in store.packagesWithStatus(status.id)"
+                        v-bind="pkg"
+                    ></ArchiveListItem>
+                    <div v-else class="no-data-placeholder">No packages with status "{{status.name}}"</div>
+                </template>
+            </template>
+            <div class="loading" v-else></div>
+        </aside>
+        <PackageContent v-if="!!store.selectedPackage" @back="store.climbPackagePath()"></PackageContent>
+        <Metadata :open="editStore.modalOpen" @close="editStore.closeDocument()"></Metadata>
+    </main>
+</App>
