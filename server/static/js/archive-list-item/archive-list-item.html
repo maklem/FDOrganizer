@@ -1,0 +1,15 @@
+<div
+    class="archive-list-item"
+    :class="{active: store.selectedPackage?.id === id}"
+    @click="store.selectPackage(id)"
+>
+    <i class="fa-solid fa-box icon"></i>
+    <div class="name">{{name}}</div>
+    <div class="date">{{formatRelativeDate(last_changed)}}</div>
+    <div class="action" v-if="status === 'active'">
+        <button class="settings">
+            <i class="fa-solid fa-cog"></i>
+        </button>
+    </div>
+</div>
+

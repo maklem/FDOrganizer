@@ -1,0 +1,70 @@
+.archive-list-item{
+    display: inline-grid;
+    grid-template-columns: min-content auto min-content;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "icon name action"
+        "icon date action";
+    justify-items: start;
+    align-items: center;
+    grid-gap: 0.3rem 1rem;
+
+    border-bottom: 0.05rem solid #eeeeee;
+    padding: 1rem;
+
+    cursor:pointer
+}
+
+.archive-list-item:hover {
+    transition: all 300ms;
+    color: var(--primary-color);
+}
+
+.archive-list-item.active {
+    transition: all 300ms;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.archive-list-item .name {
+    grid-area: name;
+    line-break: anywhere;
+}
+
+.archive-list-item .date {
+    grid-area: date;
+
+    color: #666666
+}
+
+.archive-list-item .icon {
+    grid-area: icon;
+
+    font-size: 2rem;
+}
+
+.archive-list-item .action {
+    grid-area: action;
+
+}
+
+.action .settings {
+    background-color: transparent;
+    color: var(--font-color);
+    border: none;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.action .settings:hover {
+    background-color: rgba(var(--rgb-font-color), 0.3);
+    transition: all 300ms;
+}
+
+.action .settings:active {
+    background-color: rgba(var(--rgb-font-color), 0.1);
+    transition: all 300ms;
+}
