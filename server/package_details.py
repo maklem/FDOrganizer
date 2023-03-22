@@ -31,7 +31,7 @@ def get_package(package_id):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get package content from DB
     try:
-        content = get_content(package.get('folders'), package.get('documents'))
+        content = get_content(package.get('folders'), package.get('documents'), username = user(request))
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Return package and its content
@@ -46,12 +46,11 @@ def get_folder_content(folder_id):
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Check if user has rights to view the folder contents
-    username = user(request)
     if not owner(folder, user(request)):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get folder content from DB
     try:
-        content = get_content(folder.get('folders'), folder.get('documents'))
+        content = get_content(folder.get('folders'), folder.get('documents'), username = user(request))
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Return folder contents
@@ -222,13 +221,13 @@ def create_file_document_pair(file: FileStorage, username: str):
     return {'document': document, 'file': outfile }
 
             
-def content_query(id_array):
+def content_query(id_array, username):
     return {
         "selector": {
             "_id": {
                 "$in": id_array
             },
-            "owner": 'test'
+            "owner": username
         }
     }
 
@@ -239,14 +238,14 @@ def modify_package(package_id: str):
     }
     return update(Databases.PACKAGES, package_id, changes)
 
-def get_content(folders: list[str], documents: list[str]):
+def get_content(folders: list[str], documents: list[str], username):
     found_folders =find(
         Databases.FOLDERS,
-        json.dumps(content_query(folders))
+        json.dumps(content_query(folders, username))
     ).json().get('docs')
     found_documents = find(
         Databases.DOCUMENTS,
-        json.dumps(content_query(documents))
+        json.dumps(content_query(documents, username))
     ).json().get('docs')
 
     return {"folders": list(map(Folder.convert, found_folders)), "documents": list(map(Document.convert, found_documents)) }
