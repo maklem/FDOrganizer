@@ -115,3 +115,50 @@ export function localized(text) {
     if (text instanceof Object) return text['en']
     return text
 }
+
+export function formatRelativeDate(timestamp) {
+    const relativeTimeDiff = timestamp - Date.now()
+    const outputUnit = unit(relativeTimeDiff)
+    if (outputUnit === 'exact') return formatDate(timestamp)
+
+    const format = new Intl.RelativeTimeFormat(navigator.language, {style: 'long', numeric: 'auto'})
+    return format.format(Math.ceil(timeIn(outputUnit, relativeTimeDiff)), outputUnit)
+}
+
+function unit(millisecondDiff) {
+    const absoluteDiff = Math.abs(millisecondDiff)
+    if (absoluteDiff < 60_000) return 'second'
+    if (absoluteDiff < 3_600_000) return 'minute'
+    if (absoluteDiff < 86_400_000) return 'hour'
+    if (absoluteDiff < 604_800_000) return 'day'
+    if (absoluteDiff < 2_419_200_000) return 'week'
+    else return 'exact'
+}
+
+function timeIn(unit, milliseconds) {
+    switch (unit) {
+        case 'second':
+            return milliseconds / 1000
+        case 'minute':
+            return milliseconds / 60_000
+        case 'hour':
+            return milliseconds / 3_600_000
+        case 'day':
+            return milliseconds / 86_400_000
+        case 'week':
+            return milliseconds / 604_800_000
+        default:
+            return milliseconds
+    }
+}
+
+export function formatDate(timestamp) {
+
+const date = new Date(timestamp);
+
+const day = date.getDate();
+const month = date.getMonth() + 1;
+const year = date.getFullYear();
+
+return `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year}`
+}
