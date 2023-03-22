@@ -3,6 +3,7 @@
         <PackageContent
         v-if="!!store.package"
         @new-folder = "$refs.newFolder.showModal()"
+        @back = "store.climbPackagePath()"
         ></PackageContent>
         <dialog ref="newFolder" class="create-folder">
             <h1>New Folder</h1>

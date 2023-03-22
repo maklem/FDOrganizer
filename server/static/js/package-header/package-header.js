@@ -14,12 +14,8 @@ export default {
             overviewStore
         }
     },
-    inject: ['editable'],
+    inject: ['editable', 'archive'],
     methods: {
-        back() {
-            if(this.editable) this.store.climbPackagePath()
-            else this.overviewStore.climbPackagePath()
-        }
     },
     template
 }

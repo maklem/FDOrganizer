@@ -33,7 +33,7 @@
                 </form>
             </dialog>
         </aside>
-        <PackageContent v-if="!!store.selectedPackage"></PackageContent>
+        <PackageContent v-if="!!store.selectedPackage" @back="store.climbPackagePath()"></PackageContent>
         <Metadata :open="editStore.modalOpen" @close="editStore.closeDocument()"></Metadata>
     </main>
 </App>

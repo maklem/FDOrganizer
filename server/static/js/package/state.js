@@ -22,8 +22,7 @@ function openDetails() {
 
 async function getPackages() {
     store.loading.packageList = true
-    const json = await get(`package/all`)
-    store.packages = json
+    store.packages = await get(`package/all`)
     store.loading.packageList = false
 }
 

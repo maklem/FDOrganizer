@@ -1,5 +1,5 @@
 <div class="package-header">
-    <button class="back-button" @click="back">
+    <button class="back-button" @click="$emit('back')">
         <i class="fa-solid fa-arrow-left"></i>
     </button>
     <div class="package-name">
@@ -15,17 +15,24 @@
         </template>
     </div>
     <Button
-    v-if="!editable"
+    v-if="!editable && !archive"
     class="side-button"
     @button-clicked="overviewStore.openDetails()">
         <i class="fa-solid fa-pen-to-square"></i>
         <div>Edit project</div>
     </Button>
     <Button
-    v-else
+    v-if="editable"
     class="side-button"
     @button-clicked="$emit('new-folder')">
         <i class="fa-solid fa-folder-plus"></i>
         <div>Add folder</div>
+    </Button>
+    <Button
+    v-if="archive"
+    class="side-button"
+    @button-clicked="$emit('open-submit')">
+        <i class="fa-solid fa-file-import"></i>
+        <div>Submit package</div>
     </Button>
 </div>
