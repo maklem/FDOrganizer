@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  fdorganizer:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - ../lzv-docker/config/config.json:/server/server/conf/config.json:ro
+
+  db:
+    image: couchdb:latest
+    ports:
+      - "5984:5984"
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: password
