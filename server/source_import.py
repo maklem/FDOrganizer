@@ -1,7 +1,7 @@
 import importlib
 import json
 from functools import wraps
-from typing import List, Literal
+from typing import List, Literal, Union
 from flask import request, Response
 from pkg_resources import resource_listdir, resource_isdir, resource_filename
 
@@ -144,7 +144,7 @@ def get_plugin_auth(source: str):
 def get_plugin(source: str):
     return importlib.import_module(f'.plugins.{source}.import', 'server')
 
-def serialize(content: dict[Literal["folders"] | Literal["documents"], List[Folder | Document]]) -> dict[str, List]:
+def serialize(content: dict[Union[Literal["folders"], Literal["documents"]], List[Union[Folder, Document]]]) -> dict[str, List]:
     folders = list(map(Folder.to_dict, content['folders'])) # type: ignore
     documents = list(map(Document.to_dict, content['documents'])) # type: ignore
     return{'folders':folders, 'documents': documents}

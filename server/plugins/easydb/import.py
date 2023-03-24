@@ -7,7 +7,7 @@ from ast import List
 import io
 import json
 import mimetypes
-from typing import Literal, Optional
+from typing import Literal, Union
 
 import requests
 from flask.wrappers import Request, Response
@@ -59,7 +59,7 @@ def login(request: Request) -> Response:
     user = response.json().get('user').get('user').get('_id')
     return web_response(200, "Authentication with Easy DB successful", {'token': token, 'user': user})
 
-def get_toplevel(request: Request, auth) -> Response | dict[Literal['folders'] | Literal['documents'], List]:
+def get_toplevel(request: Request, auth) -> Union[Response, dict[Union[Literal['folders'], Literal['documents']], List]]:
     '''
         querys the easydb server for collections. returns the collections either as string or json array
     '''
