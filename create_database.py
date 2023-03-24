@@ -39,9 +39,9 @@ def authentication_token(username: str, password: str):
 
 
 #Creating Database
-def get_database_name():
-    if len(sys.argv) == 2:
-        return str(sys.argv[1])
+def get_database_names():
+    if len(sys.argv) >= 2:
+        return sys.argv[1:]
     return input("Wählen Sie einen Namen für die Datenbank:\n")
 
 def create(url: str, token: str):
@@ -66,5 +66,6 @@ if __name__ == '__main__':
     token = authentication_token(username, password)
     if not token:
         sys.exit()
-    databaseName = get_database_name()
-    create_database(databaseName, token)
+    databaseNames = get_database_names()
+    for dbn in databaseNames:
+        create_database(dbn, token)
