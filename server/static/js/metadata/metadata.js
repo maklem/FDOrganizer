@@ -34,10 +34,9 @@ export default {
             if (now) {
                 const params = new URLSearchParams(location.search);
                 const documentId = params.get("document");
-                if (!!documentId) {
-                    this.store.getDocument(documentId)
-                    this.$refs.modal.showModal()
-                }
+                if (!documentId) return
+                this.store.getDocument(documentId)
+                this.$refs.modal.showModal()
             }
         }
     },
