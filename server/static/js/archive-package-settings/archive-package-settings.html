@@ -1,0 +1,238 @@
+<dialog class="package-settings-modal" ref="modal">
+    <div class="content" v-if="!store.loading.packageSettings && !!store.package">
+        <header class="package-settings-header">
+            <i class="fa-solid fa-file-lines"></i>
+            <h1>{{store.package.name}}</h1>
+            <button class="back-button" @click="$emit('close')">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </header>
+        <div class="introduction">
+            You can choose the future distribution of this package and its contents according to the <dfn title="Findability, Accessibility, Interoperability, Reusability">FAIR</dfn> Principles: Findability, Accessibility, Interoperability, Reusability. 
+        </div>
+        <form class="package-settings">
+            <fieldset class="settings-group findability">
+                <legend>Findability</legend>
+                <div class="description">Who can find information (e.g. by using databases) about this data package through the metadata you provided for the files and folders?</div>
+                <div class="radio-option">
+                  <input
+                    :ref="radio => {if (!!radio) radio.checked = store.findability === radio.value}"
+                    type="radio"
+                    id="open-metadata" 
+                    name="findability"
+                    value="open"
+                    @input="event => store.findability = event.currentTarget.value">
+                  <label for="open-metadata">Make the Metadata of this package visible for the public</label>
+                </div>
+                <div class="radio-option">
+                <input
+                    :ref="radio => {if (!!radio) radio.checked = store.findability === radio.value}"
+                    type="radio"
+                    id="closed-metadata"
+                    name="findability"
+                    value="closed"
+                    @input="event => store.findability = event.currentTarget.value">
+                <label for="closed-metadata">Use the metadata of this package for preservation only</label>
+                </div>
+            </fieldset>
+            <fieldset class="settings-group accessibility" :class="{'disabled': store.findability === 'closed'}">
+                <legend>Accessibility <span v-if="store.findability === 'closed'" class="disabled-text">(Only effective with public metadata)</span></legend>
+                <div class="description">Who has access to the content of this package (e.g. a Download of the files)?</div>
+                <div class="radio-option">
+                  <input
+                    :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
+                    type="radio"
+                    id="open-data"
+                    name="accessibility" 
+                    value="open"
+                    :disabled="store.findability === 'closed' ? true : undefined"
+                    @input="event => store.accessibility = event.currentTarget.value">
+                  <label for="open-data">Everyone can access the content</label>
+                </div>
+                <div class="radio-option">
+                  <input
+                    :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
+                    type="radio"
+                    id="embargo-data"
+                    name="accessibility"
+                    value="embargo"
+                    :disabled="store.findability === 'closed' ? true : undefined"
+                    @input="event => store.accessibility = event.currentTarget.value"
+                  >
+                  <label for="embargo-data">Everyone can access the content starting with the</label>
+                  <LabeledInput
+                    type="date"
+                    :value="store.embargodate"
+                    :disabled="store.findability === 'closed' || store.accessibility !== 'embargo' ? true : undefined"
+                    @input="value => store.embargodate = value"
+                    ></LabeledInput>
+                </div>
+                <div class="radio-option">
+                  <input
+                    :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
+                    type="radio"
+                    id="request-data"
+                    name="accessibility" 
+                    value="request"
+                    :disabled="store.findability === 'closed' ? true : undefined"
+                    @input="event => store.accessibility = event.currentTarget.value">
+                  <label for="request-data">Access to the content must be required by contacting me via this e-mail address:</label>
+                  <LabeledInput
+                  :value="store.contactemail"
+                  :disabled="store.findability === 'closed' || store.accessibility !== 'request' ? true : undefined"
+                  :placeholder="'e.g. myemail@example.com'"
+                  @input="value => store.embargodate = value"
+                  ></LabeledInput>
+                </div>
+                <div class="radio-option">
+                    <input
+                      :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
+                      type="radio"
+                      id="closed-data"
+                      name="accessibility" 
+                      value="closed"
+                      :disabled="store.findability === 'closed' ? true : undefined"
+                      @input="event => store.accessibility = event.currentTarget.value">
+                    <label for="closed-data">No one should access the content</label>
+                  </div>
+            </fieldset>
+            <fieldset class="settings-group reusability">
+                <legend>Reusability
+                  <!-- <span v-if="store.findability === 'closed'" class="disabled-text">(Only effective with public metadata)</span -->
+                  </legend>
+                <div class="description">Under which terms (license) can someone use this data for their purposes?</div>
+                <div class="radio-option">
+                  <input
+                    :ref="radio => {if (!!radio) radio.checked = store.licenseType === radio.value}"
+                    type="radio"
+                    id="cc-reuse"
+                    name="reusability" 
+                    value="cc"
+                    @input="event => store.licenseType = event.currentTarget.value">
+                  <label for="cc-reuse">Usage is allowed under the <a href="https://creativecommons.org/choose/" target="_blank" rel="noopener noreferrer">Creative Commons </a>license</label>
+                  <LabeledInput
+                  :id="'cc0-license'"
+                  :value="store.creativecommons"
+                  :disabled="store.licenseType !== 'cc' ? true : undefined"
+                  :options="store.LICENSES.cc"
+                  @input="value => store.creativecommons = value"
+                  ></LabeledInput>
+                </div>
+                <div class="radio-option">
+                  <input
+                    :ref="radio => {if (!!radio) radio.checked = store.licenseType === radio.value}"
+                    type="radio"
+                    id="gdl-reuse"
+                    name="reusability" 
+                    value="gdl"
+                    @input="event => store.licenseType = event.currentTarget.value">
+                  <label for="gdl-reuse">Usage is allowed under the <a href="https://www.govdata.de/web/guest/lizenzen" target="_blank" rel="noopener noreferrer">German Data License</a></label>
+                  <LabeledInput
+                  :id="'cc0-license'"
+                  :value="store.germandatalicense"
+                  :disabled="store.licenseType !== 'gdl' ? true : undefined"
+                  :options="store.LICENSES.gdl"
+                  @input="value => store.germandatalicense = value"
+                  ></LabeledInput>
+                </div>
+                <div class="description">When should the chosen license be applied?</div>
+                <div class="radio-option">
+                  <input
+                    :ref="radio => {if (!!radio) radio.checked = store.licenseTiming === radio.value}"
+                    type="radio"
+                    id="license-now" 
+                    name="license-timing"
+                    value="now"
+                    @input="event => store.licenseTiming = event.currentTarget.value">
+                  <label for="license-now">As soon as the data is archived</label>
+                </div>
+                <div class="radio-option">
+                <input
+                    :ref="radio => {if (!!radio) radio.checked = store.licenseTiming === radio.value}"
+                    type="radio"
+                    id="license-later"
+                    name="license-timing"
+                    value="later"
+                    @input="event => store.licenseTiming = event.currentTarget.value">
+                <label for="license-later">After the chosen minimal preservation period</label>
+                </div>
+            </fieldset>
+            <fieldset class="settings-group terms-and-conditions">
+              <legend>Terms & Conditions</legend>
+              <div class="radio-option">
+                <input
+                :ref="box => {if(!!box) box.checked = store.checkTerms}"
+                type="checkbox"
+                id="check-terms"
+                @input="event => store.checkTerms = !store.checkTerms">
+                <label for="check-terms">I have read and understood the <a href="https://www.example.com/" target="_blank" rel="noopener noreferrer">Data Submission Agreement</a> and request the processing of the submitted data in accordance with the options chosen above.</label>
+              </div>
+              <div class="radio-option">
+                <input
+                :ref="box => {if(!!box) box.checked = store.checkDuration}"
+                type="checkbox"
+                id="check-duration"
+                @input="event => store.checkDuration = !store.checkDuration">
+                <label for="check-duration">I attest that the cost for the preservation is covered for a minimum preservation period of
+                  <LabeledInput
+                    class="duration-input"
+                    :value="store.duration"
+                    :disabled="!store.checkDuration ? true : undefined"
+                    :placeholder="'yy'"
+                    @input="value => store.duration = value"
+                  ></LabeledInput>
+                  years, starting with the successful archival of this package. I am aware that after the expiration of that time decisions about the further preservation of this package will be made by the institution named in the Data Submission Agreement
+                </label>
+                </div>
+              <div class="radio-option">
+                <input
+                :ref="box => {if(!!box) box.checked = store.checkDSGVO}"
+                type="checkbox"
+                id="check-dsgvo"
+                @input="event => store.checkDSGVO = !store.checkDSGVO">
+                <!-- TODO: Replace dummy link with path to DSGVO-->
+                <label for="check-dsgvo">I attest that all personal data in this package was processed in accordance following the <a href="https://www.example.com/" target="_blank" rel="noopener noreferrer">EU General Data Protection Regulation</a>. For this purpose I have taken the following measures:</label>
+              </div>
+              <div class="dsgvo-options">
+                <div class="radio-option">
+                  <input
+                  :ref="radio => {if (!!radio) radio.checked = store.personalData === radio.value}"
+                  type="radio"
+                  id="none-personal-data"
+                  name="personal-data"
+                  value="none"
+                  :disabled="!store.checkDSGVO"
+                  @input="event => store.personalData = event.currentTarget.value">
+                  <label for="none-personal-data">All existing personal data in this package was removed</label>
+                </div>
+                <div class="radio-option">
+                  <input
+                  :ref="radio => {if (!!radio) radio.checked = store.personalData === radio.value}"
+                  type="radio"
+                  id="anonymous-personal-data"
+                  name="personal-data"
+                  value="anonymous"
+                  :disabled="!store.checkDSGVO"
+                  @input="event => store.personalData = event.currentTarget.value">
+                  <label for="anonymous-personal-data">All existing personal data in this package was anonymised using standard procedures</label>
+                </div>
+                <div class="radio-option">
+                  <input
+                  :ref="radio => {if (!!radio) radio.checked = store.personalData === radio.value}"
+                  type="radio"
+                  id="consent-personal-data"
+                  name="personal-data"
+                  value="consent"
+                  :disabled="!store.checkDSGVO"
+                  @input="event => store.personalData = event.currentTarget.value">
+                  <label for="consent-personal-data">All existing personal data in this package was labeled accordingly. The remaining personal data is integral for its research purpose (as stated in <a href="https://www.example.com/" target="_blank" rel="noopener noreferrer">DSGVO_ARTICLE</a>). Written consent to processing and archival of the data was obtained. The physical or digital storage location of the consent documents is linked in the metadata of the respective files</label>
+                </div>
+              </div>
+            </fieldset>
+        </form>
+        <div class="button-row">
+            <Button class="close-button" @button-clicked="$emit('close')">Abort</Button>
+            <Button class="save-metadata" :disabled="!store.readyToSaveSettings()" @button-clicked="save">Save</Button>
+        </div>
+    </div>
+</dialog>
