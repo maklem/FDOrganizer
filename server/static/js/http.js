@@ -8,6 +8,9 @@ export async function get(url, body, headers) {
 export async function post(url, body, headers) {
     return fetchWithType("POST", url, body, headers)
 }
+export async function patch(url, body, headers) {
+    return fetchWithType("PATCH", url, body, headers)
+}
 export async function dlt(url, body, headers) {
     return fetchWithType("DELETE", url, body, headers)
 }
