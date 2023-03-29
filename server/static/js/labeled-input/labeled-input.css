@@ -2,6 +2,11 @@
   --label-font: 0.875rem;
   --label-size: calc(var(--label-font) * 1.28571428571);
   padding-bottom: var(--label-size);
+  display: block;
+}
+
+.field-label.no-label {
+  padding-bottom: 0;
 }
 
 .field-label .label-text{
@@ -29,8 +34,13 @@
     box-shadow: 0px 6px 24px 0px rgba(var(--rgb-error), 0.20), 0px 0px 0px 1px rgba(var(--rgb-error), 0.20) !important;
 }
 
-.field-label .input:focus,
-.field-label .input:active {
+.field-label .input[disabled] {
+    border-color: rgb(204, 204, 204);
+    color:rgba(51, 51, 51, 0.5)
+}
+
+.field-label .input:focus:not([disabled]),
+.field-label .input:active:not([disabled]) {
     box-shadow: 0px 6px 24px 0px rgba(var(--rgb-secondary-color), 0.20), 0px 0px 0px 1px rgba(var(--rgb-secondary-color), 0.20);
 }
 
@@ -51,10 +61,17 @@
   background-repeat: no-repeat;
 }
 
-.field-label .select:focus,
-.field-label .select:active {
+.field-label .select:focus:not([disabled]),
+.field-label .select:active:not([disabled]) {
     background-image:
     linear-gradient(45deg, transparent 50%, var(--secondary-color) 50%),
     linear-gradient(135deg, var(--secondary-color) 50%, transparent 50%),
     linear-gradient(to right, #fff, #fff);
+}
+
+.field-label .select[disabled] {
+  background-image:
+  linear-gradient(45deg, transparent 50%, rgba(51, 51, 51, 0.5) 50%),
+  linear-gradient(135deg, rgba(51, 51, 51, 0.5) 50%, transparent 50%),
+  linear-gradient(to right, #fff, #fff);
 }

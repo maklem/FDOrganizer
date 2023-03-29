@@ -1,4 +1,4 @@
-<label class="field-label" :for="id">
+<label class="field-label" :for="id" :class="{'no-label': !label}">
     <div v-if="!!label" class="label-text" :invalid="!focus && invalid">{{localizedLabel}}</div>
     <template v-if="!options">
         <input
@@ -10,6 +10,7 @@
             :type= "type ?? 'text'"
             :placeholder="placeholder ?? ''"
             :invalid="!focus && invalid"
+            :disabled="disabled"
             @input="select"
             @focus="focus = true"
             @blur ="focus = false"
@@ -22,6 +23,7 @@
         :name="id"
         :id="id"
         :invalid="invalid"
+        :disabled="disabled"
         class="input select"
         @input="select"
     >

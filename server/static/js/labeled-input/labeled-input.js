@@ -15,6 +15,10 @@ export default {
             type: Boolean,
             default: undefined
         },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
         initialValue: String,
         value: String
     },
