@@ -113,7 +113,6 @@ async function authenticate(sourceId) {
     const {username, password} = {...store}
     await loginSource(sourceId, {username, password})
     store.sources = store.sources.map(source => ({...source, authenticated: source.id === sourceId ? true : source.authenticated}))
-    console.log(store.sources)
     store.getSource(sourceId)
 }
 

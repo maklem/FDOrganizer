@@ -97,7 +97,6 @@ async function getPackageContent() {
 async function createFolder() {
     store.loading.content = true
     const {parent, parentType} = currentPath()
-    console.log(store.newFolderName)
     await put(`/package/folder`, {
         name: store.newFolderName,
         parent,
