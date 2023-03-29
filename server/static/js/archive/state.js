@@ -1,6 +1,7 @@
 import {reactive} from '../vue.js';
 import {put, get, dlt} from "../http.js"
 import {store as editStore} from '../package-edit/state.js'
+import {store as settingsStore} from '../archive-package-settings/state.js'
 
 export const STATUS = [
     {
@@ -25,12 +26,13 @@ export const store = reactive({
     selectedPackage: undefined,
     loading: {
         packageList: false,
-
     },
+    modalOpen:false,
     getPackages,
     selectPackage,
     climbPackagePath,
     openSettings,
+    closeSettings,
     packagesWithStatus
 });
 
@@ -58,6 +60,19 @@ function climbPackagePath() {
     else editStore.climbPackagePath()
 }
 
-function openSettings() {
-    return true;
+function openSettings(packageId) {
+    history.pushState({package: packageId}, '', `?package=${packageId}`)
+    addEventListener('popstate', function close() {
+        store.closeSettings()
+        removeEventListener('popstate', close)
+    })
+    const settingsPackage = store.packages.find(pkg => pkg.id === packageId)
+    settingsStore.setPackage(settingsPackage)
+    store.modalOpen = true
+}
+
+function closeSettings() {
+    history.pushState({package: null}, '', `${location.origin}${location.pathname}`)
+    settingsStore.package = undefined
+    store.modalOpen = false
 }

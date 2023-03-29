@@ -1,4 +1,4 @@
-.package-overview {
+.archive-page {
     display: grid;
     align-items: stretch;
     justify-items: stretch;
@@ -90,3 +90,16 @@
     padding: 0 1rem 1rem 1rem;
 }
 
+.right-sidebar {
+    display:grid;
+    grid-template-rows: auto max-content;
+    gap:0.25rem;
+
+    padding: 1rem;
+}
+
+.right-sidebar Button{
+    display:grid;
+    grid-template-columns: max-content auto;
+    gap: 0.5rem;
+}

@@ -4,6 +4,8 @@ import ArchiveListItem from "../archive-list-item/archive-list-item.js";
 import Button from "../button/button.js";
 import PackageContent from "../package-content/package-content.js";
 import Metadata from "../metadata/metadata.js"
+import ArchivePackageSettings from "../archive-package-settings/archive-package-settings.js"
+
 
 import {store, STATUS} from './state.js'
 import {store as editStore} from "../package-edit/state.js"
@@ -17,6 +19,7 @@ const archive = createApp({
         Button,
         ArchiveListItem,
         PackageContent,
+        ArchivePackageSettings,
         Metadata
     },
     data() {
@@ -30,8 +33,10 @@ const archive = createApp({
         this.store.getPackages()
 
         const params = new URLSearchParams(location.search);
+        const packageId = params.get("package");
+        if (!!packageId) return this.store.openSettings(packageId)
         const documentId = params.get("document");
-        if (!!documentId) this.editStore.openDocument(documentId)
+        if (!!documentId) return this.editStore.openDocument(documentId)
     },
     methods: {
     },

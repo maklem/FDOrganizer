@@ -7,7 +7,7 @@
     <div class="name">{{name}}</div>
     <div class="date">{{formatRelativeDate(last_changed)}}</div>
     <div class="action" v-if="status === 'active'">
-        <button class="settings">
+        <button class="settings" @click="openSettings">
             <i class="fa-solid fa-cog"></i>
         </button>
     </div>

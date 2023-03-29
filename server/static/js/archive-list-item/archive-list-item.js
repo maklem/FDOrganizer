@@ -24,7 +24,7 @@ export default {
     methods: {
         openSettings(event) {
             event.stopPropagation()
-            store.openSettings(id)
+            this.store.openSettings(this.id)
         }
     },
     template
