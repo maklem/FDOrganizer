@@ -110,8 +110,8 @@ def delete(database: Databases, doc_id: str) -> requests.Response:
 def patch(obj: dict[str, Any], changes: dict[str, Any]):
     for key, value in changes.items():
         if key not in obj:
-            raise KeyError(f'Key {key} is not part of {obj}')
-        if not isinstance(obj.get(key), list):
+            obj[key] = value
+        elif not isinstance(obj.get(key), list):
             obj[key] = value
         else:
             obj[key] = patch_array(obj[key], value)
