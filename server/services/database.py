@@ -126,7 +126,7 @@ def patch_array(list_property: list, change: dict[Union[Literal["method"], Liter
     #     case "append":
     #         return list_property + [value]
     #     case "remove":
-    #         return list(filter(lambda x: x != value, list_property))
+    #         return [x for x in list_property if x != value]
     #     case "extend":
     #         return list_property + value # type: ignore
     method = change.get('method')
@@ -135,6 +135,6 @@ def patch_array(list_property: list, change: dict[Union[Literal["method"], Liter
     elif method == "append":
         return list_property + [value]
     elif method == "remove":
-        return list(filter(lambda x: x != value, list_property))
+        return [x for x in list_property if x != value]
     elif method == "extend":
         return list_property + value # type: ignore

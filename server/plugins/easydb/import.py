@@ -98,9 +98,7 @@ def get_toplevel(request: Request, auth) -> Union[Response, dict[Union[Literal['
         return web_error(response.status_code, response.text, component="Easy DB")
     result_list = response.json()
     collections = result_list.get('objects')
-    folders = list(map(lambda collection: convert_collection(collection, user(request)), collections))
-    # if len(collections) == 0:
-    #     return web_response(201, "No collections found")
+    folders = [convert_collection(x, user(request)) for x in collections]
     return {'folders': folders, 'documents': []}
 
 def get_collection(collection_id: str, request: Request, auth):
@@ -135,9 +133,7 @@ def get_collection(collection_id: str, request: Request, auth):
     # Convert files for Frontend
     result_list = response.json()
     files = result_list.get('objects')
-    files = list(filter(lambda file: file.get('object').get('file'), files))
-    files = list(map(lambda file: convert_file(file, user(request)), files))
-
+    files = [convert_file(x, user(request)) for x in files if x.get('object').get('file')]
     return {'documents': files, 'folders': []}
 
 def get_files_with_metadata(file_ids, request, auth):
@@ -163,9 +159,9 @@ def get_files_with_metadata(file_ids, request, auth):
     # Convert files for Frontend
     result_list = response.json()
     objects = result_list.get('objects')
-    files = list(map(extract_file, objects))
-    documents = list(map(lambda obj: convert_file(obj, user(request), is_stored=True), objects))
-    metadata = list(map(extract_metadata, objects))
+    files = [extract_file(x) for x in objects]
+    documents = [convert_file(x, user(request), is_stored=True) for x in objects]
+    metadata = [extract_metadata(x) for x in objects]
     
     results = []
     for index in range(len(files)):

@@ -85,7 +85,7 @@ def persist_documents(doc_file_pairs: List, parent, parent_type):
             documents['failed'].append({'file': pair['document'].name, 'error': error.args[0]})
 
     #Update parent to include documents
-    new_documents = list(map(lambda doc: doc.get('document_id'), documents['success']))
+    new_documents = [x.get('document_id') for x in documents['success']]
     changes = {
         "documents": {
             "method": 'extend',

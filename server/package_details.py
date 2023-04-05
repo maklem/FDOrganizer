@@ -248,7 +248,7 @@ def get_content(folders: list[str], documents: list[str], username):
         json.dumps(content_query(documents, username))
     ).json().get('docs')
 
-    return {"folders": list(map(Folder.convert, found_folders)), "documents": list(map(Document.convert, found_documents)) }
+    return {"folders": [Folder.convert(x) for x in found_folders], "documents": [Document.convert(x) for x in found_documents] }
 
 def get_parent_database(parent_type: str) -> Databases:
     # Only valid code starting with Python 3.10.

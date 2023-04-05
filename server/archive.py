@@ -27,7 +27,7 @@ def get_archive_packages():
         packages = find(Databases.PACKAGES, json.dumps(query)).json().get('docs')
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
-    return web_response(200, details = list(map(Package.convert, packages)))
+    return web_response(200, details = [Package.convert(x) for x in packages])
 
 @APP.route("/archive/<package_id>/settings", methods=["PATCH"])
 def change_package_settings(package_id):

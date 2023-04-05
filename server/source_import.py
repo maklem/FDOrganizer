@@ -99,12 +99,7 @@ def login_source(source: str):
 
 @APP.route('/import/sources')
 def list_import_sources():
-    info = list(
-        map(
-            plugin_info,
-            get_plugins()
-        )
-    )
+    info = [plugin_info(x) for x in get_plugins()]
     return web_response(200, details = info)
 
 
@@ -130,12 +125,8 @@ def get_config(plugin: str):
 
 def get_plugins() -> list[str]:
     plugins = resource_listdir(__name__, "plugins")
-    return list(
-        filter(
-            lambda plugin: resource_isdir(__name__, f'plugins/{plugin}'),
-            plugins
-        )
-    )
+    return [x for x in plugins if resource_isdir(__name__, f'plugins/{x}')]
+
 
 def get_plugin_auth(source: str):
     auth_token = payload(request.cookies['token'])
@@ -145,8 +136,8 @@ def get_plugin(source: str):
     return importlib.import_module(f'.plugins.{source}.import', 'server')
 
 def serialize(content: dict[Union[Literal["folders"], Literal["documents"]], List[Union[Folder, Document]]]) -> dict[str, List]:
-    folders = list(map(Folder.to_dict, content['folders'])) # type: ignore
-    documents = list(map(Document.to_dict, content['documents'])) # type: ignore
+    folders = [Folder.to_dict(x) for x in content['folders']] # type: ignore
+    documents = [Document.to_dict(x) for x in content['documents']] # type: ignore
     return{'folders':folders, 'documents': documents}
 
 def import_files(import_documents: List[dict], parent: str, parent_type: str):
