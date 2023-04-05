@@ -65,7 +65,7 @@ def delete_package(package_id):
             failed_folders.append(folder)
     if len(failed_folders) > 0:
         # TODO: Rollback for deletion 
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error(500, f'{len(failed_folders)} could not be deleted', component= "DATABASE")
     
     # Delete documents, rollback for all if failed
     for document in package.get('documents'):
@@ -76,12 +76,12 @@ def delete_package(package_id):
             failed_documents.append(document)
     if len(failed_documents) > 0:
         # TODO: Rollback for deletion 
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error(500, f'{len(failed_documents)} could not be deleted', component= "DATABASE")
     
     # Delete metadata of folder, rollback for all, if failed
     if package.get('metadata') is not None:
         try:
-            delete(Databases.METADATA, folder.get('metadata'))
+            delete(Databases.METADATA, package.get('metadata'))
         except HTTPError as error:
             # TODO: Rollback for deletion 
             return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
