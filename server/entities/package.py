@@ -9,7 +9,7 @@ from .archive_settings import ArchiveSettings
 @dataclass
 class Package:
     name: str
-    status: Union[Literal["active"], Literal["archived"]]
+    status: Literal["active", "archived"]
     documents: List[str]
     folders: List[str]
     created: int

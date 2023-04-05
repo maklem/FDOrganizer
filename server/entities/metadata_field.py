@@ -9,10 +9,10 @@ class MetadataField:
     id: str
     label: Union[str, dict[str, str]]
     alias: list[str]
-    type: Union[Literal["text"], Literal["decimal"], Literal["integer"], Literal["boolean"], Literal["monoselect"], Literal["date"], Literal["doi"], Literal["uri"],Literal["letter-string"]]
+    type: Literal["text", "decimal", "integer", "boolean", "monoselect", "date", "doi", "uri", "letter-string"]
     fields: Optional[list['MetadataField']]
     min: Optional[int]
     max: Optional[int]
-    options: Optional[list[dict[Union[Literal["id"], Literal["label"]], str]]]
+    options: Optional[list[dict[Literal["id", "label"], str]]]
     conditions: Optional[list[tuple[str, str, str]]]
     applicable: Optional[list[str]]

@@ -117,7 +117,7 @@ def patch(obj: dict[str, Any], changes: dict[str, Any]):
             obj[key] = patch_array(obj[key], value)
     return obj
 
-def patch_array(list_property: list, change: dict[Union[Literal["method"], Literal["value"]], Any]):
+def patch_array(list_property: list, change: dict[Literal["method","value"], Any]):
     value = change.get('value')
     # Only valid code starting with Python 3.10.
     # match change.get('method'):

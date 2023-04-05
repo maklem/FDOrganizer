@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 from dataclasses_json import dataclass_json
 
@@ -8,15 +8,15 @@ from dataclasses_json import dataclass_json
 @dataclass_json
 @dataclass
 class ArchiveSettings:
-    findability: Union[Literal['open'], Literal['closed']]
-    licenseType: Union[Literal['cc'], Literal['gdl']]
-    licenseTiming: Union[Literal['now'], Literal['later']]
+    findability: Literal['open', 'closed']
+    licenseType: Literal['cc', 'gdl']
+    licenseTiming: Literal['now', 'later']
     license: str
     checkDuration: bool
     duration: int
     checkTerms: bool
     checkDSGVO: bool
-    personalData: Union[Literal['none'], Literal['anonymous'], Literal['consent']]
+    personalData: Literal['none', 'anonymous', 'consent']
     contactemail: Optional[str] = None
-    accessibility: Optional[Union[Literal['open'], Literal['embargo'], Literal['request'], Literal['closed']]] = None
+    accessibility: Optional[Literal['open', 'embargo', 'request', 'closed']] = None
     embargodate: Optional[str] = None
