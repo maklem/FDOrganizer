@@ -30,14 +30,6 @@ Projekt LZV des Bibliotheksverbund Bayern
 
     `pip install -r requirements.txt`
 
-1. Installation des ldap-binaries
-
-    1. Für Windows
-
-        `pip install python_ldap-3.4.0-cp310-cp310-win_amd64.whl`
-
-    2. Für Linux/macOS siehe [hier](https://www.python-ldap.org/en/python-ldap-3.3.0/installing.html)
-
 1. Konfigurieren der CouchDB Zugangsdaten in `.server/conf/config.json`
 
     ```json
