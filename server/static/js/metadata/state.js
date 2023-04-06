@@ -234,6 +234,20 @@ const RESOURCE_TYPES = [
         }
     },
     {
+        "id": "book",
+        "label": {
+            "en": "Book",
+            "de": "Buch"
+        }
+    },
+    {
+        "id": "bookChapter",
+        "label": {
+            "en": "Book chapter",
+            "de": "Buchkapitel",
+        } 
+    },
+    {
         "id": "collection",
         "label": {
             "en": "Collection",
@@ -241,9 +255,27 @@ const RESOURCE_TYPES = [
         }
     },
     {
+        "id": "computationalNotebook",
+        "label": "Computational notebook"
+    },
+    {
+        "id": "conferencePaper",
+        "label": {
+            "en": "Conference paper",
+            "de": "Konferenzbeitrag",
+        } 
+    },
+    {
+        "id": "conferenceProceeding",
+        "label": {
+            "en": "Conference proceeding",
+            "de": "Konferenzband",
+        } 
+    },
+    {
         "id": "dataPaper",
         "label": {
-            "en": "Data Paper",
+            "en": "Data paper",
             "de": "Datenpublikation"
         }
     },
@@ -253,6 +285,10 @@ const RESOURCE_TYPES = [
             "en": "Dataset",
             "de": "Datenset"
         }
+    },
+    {
+        "id": "dissertation",
+        "label": "Dissertation"
     },
     {
         "id": "event",
@@ -271,9 +307,23 @@ const RESOURCE_TYPES = [
     {
         "id": "interactiveResource",
         "label": {
-            "en": "Interactive Resource",
+            "en": "Interactive resource",
             "de": "Interaktive Ressource"
         }
+    },
+    {
+        "id": "journal",
+        "label": {
+            "en": "Journal",
+            "de": "Zeitschrift",
+        } 
+    },
+    {
+        "id": "journalArticle",
+        "label": {
+            "en": "Journal article",
+            "de": "Zeitschriftenartikel",
+        } 
     },
     {
         "id": "model",
@@ -283,11 +333,33 @@ const RESOURCE_TYPES = [
         }
     },
     {
+        "id": "outputManagementPlan",
+        "label": {
+            "en": "Output management plan",
+            "de": "Output-Management Plan",
+        } 
+    },
+    {
+        "id": "peerReview",
+        "label": {
+            "en": "Peer review",
+            "de": "Peer-review",
+        } 
+    },
+    {
         "id": "physicalObject",
         "label": {
-            "en": "Physical Object",
+            "en": "Physical object",
             "de": "Physisches Medium"
         }
+    },
+    {
+        "id": "preprint",
+        "label": "Preprint"
+    },
+    {
+        "id": "report",
+        "label": "Report"
     },
     {
         "id": "service",
@@ -305,6 +377,10 @@ const RESOURCE_TYPES = [
         }
     },
     {
+        "id": "standard",
+        "label": "Standard"
+    },
+    {
         "id": "text",
         "label": "Text"
     },
@@ -319,7 +395,7 @@ const RESOURCE_TYPES = [
         "id": "other",
         "label": {
             "en": "Other",
-            "de": "Anderes"
+            "de": "Sonstige"
         }
     }
 ]

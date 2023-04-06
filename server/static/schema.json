@@ -1,21 +1,21 @@
 [
     {
         "id": "identifier",
-        "alias": ["datacite:identifier"],
         "label": {
             "en": "Identifier",
             "de": "Eindeutiger Bezeichner"
           },
-          "min": 1,
+          "min":1,
           "fields": [
             {
                 "id":"resourceIdentifierScheme",
+                "alias": ["datacite:Identifier:identifierType"],
                 "label": {
                     "en": "Type of identifier",
                     "de": "Art des Bezeichners"
                 },
-                "min": 1,
-                "max": 1,
+                "min":1,
+                "max":1,
                 "type": "monoselect",
                 "options": [
                     {
@@ -27,117 +27,224 @@
                         "label": "DOI"
                     },
                     {
-                        "id": "custom",
+                        "id": "customResourceIdentifier",
                         "label": {
                             "en": "Other",
-                            "de": "Sonstiges"
+                            "de": "Sonstige"
                         }
                     }
                 ]
             },
             {
                 "id": "resourceURI",
+                "alias": ["datacite:Identifier","dcterms:identifier"],
                 "conditions": [
                     ["resourceIdentifierScheme", "is", "uri"]
                 ],
-                "alias": ["dcterms:identifier"],
                 "label": "URI",
-                "min": 1,
-                "max": 1,
+                "min":1,
+                "max":1,
                 "type": "uri",
-                "placeholder": "z.B. https://example.com/dataset"
+                "placeholder": "e.g. https://example.com/dataset"
             },
             {
                 "id": "resourceDOI",
-                "alias": ["dcterms:identifier"],
+                "alias": ["datacite:Identifier","dcterms:identifier"],
                 "conditions": [
                     ["resourceIdentifierScheme", "is", "doi"]
                 ],
                 "label": "DOI",
-                "min": 1,
-                "max": 1,
+                "min":1,
+                "max":1,
                 "type": "doi",
-                "placeholder": "z.B. 10.1109/5.771073"
+                "placeholder": "e.g. 10.1109/5.771073"
+            },
+            {
+                "id": "resourceIdentifierName",
+                "alias":["datacite:Identifier:identifierType"],
+                "conditions":[
+                    ["resourceIdentifierScheme", "is", "customResourceIdentifier"]
+                ],
+                "label": {
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
+                },
+                "min":1,
+                "max":1,
+                "type": "text"
             },
             {
                 "id": "resourceIdentifier",
-                "alias": ["dcterms:identifier"],
+                "alias": ["datacite:Identifier","dcterms:identifier"],
                 "conditions": [
-                    ["resourceIdentifierScheme", "is", "custom"]
+                    ["resourceIdentifierScheme", "is", "customResourceIdentifier"]
                 ],
                 "label": {
                     "en": "Identifier",
                     "de": "Bezeichner"
                 },
-                "min": 1,
-                "max": 1,
-                "type": "string"
+                "min":1,
+                "max":1,
+                "type": "text"
             }
           ]
     },
     {
         "id": "creator",
+        "alias":["datacite:Creator", "dcterms:creator"],
         "label": {
             "en": "Creator",
-            "de": "Autor/Schaffender"
+            "de": "Autor*in"
         },
-        "min": 1,
+        "min":1,
           "fields": [
             {
-                "id":"personalIdentifierScheme",
+                "id":"creatorNameType",
+                "alias":["datacite:Creator:nameType"],
                 "label": {
-                    "en": "Type of identifier",
-                    "de": "Art des Bezeichners"
+                    "en":"Name type",
+                    "de":"Namen-Typ"
                 },
-                "min": 1,
-                "max": 1,
-                "type": "monoselect",
-                "options": [
+                "min":1,
+                "max":1,
+                "type":"monoselect",
+                "options":[
                     {
-                        "id": "name",
-                        "label": "Name"
+                        "id": "personal",
+                        "label": "Person"
                     },
                     {
-                        "id": "orcid",
-                        "label": "ORCiD"
+                        "id":"organizational",
+                        "label": {
+                            "en":"Organization",
+                            "de":"Institution"
+                        }
                     }
                 ]
             },
             {
-                "id": "authorOrcid",
-                "conditions": [
-                    ["personalIdentifierScheme", "is", "orcid"]
+                "id":"creatorOrganizationalName",
+                "alias":["datacite:Creator:creatorName", "dcterms:creator"],
+                "conditions":[
+                    ["creatorNameType", "is","organizational"]
                 ],
-                "label": "ORCiD",
-                "placeholder": "z.B. 0000-0001-2345-6789",
-                "min": 1,
-                "max": 1,
-                "type": "orcid"
+                "label": "Name",
+                "placeholder": "e.g. GeoForschungsZentrum Potsdam (GFZ)",
+                "min":1,
+                "max":1,
+                "type":"text"
+                
+            },
+            {
+                "id":"creatorOrganizationalIdentifierName",
+                "alias":["datacite:Creator:nameIdentifierScheme"],
+                "conditions":[
+                    ["creatorNameType", "is","organizational"]
+                ],
+                "label": {
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
+                },
+                "placeholder": "e.g. ROR",
+                "min":1,
+                "max":1,
+                "type":"text"
+            
+            },
+            {
+                "id":"creatorOrganizationalIdentifier",
+                "alias":["datacite:Creator:nameIdentifier", "dcterms:identifier"],
+                "conditions":[
+                    ["creatorNameType", "is", "organizational"]
+                ],
+                "label": {
+                    "en":"Identifier",
+                    "de":"Bezeichner"
+                },
+                "placeholder": "e.g. https://ror.org/04z8jg394",
+                "min":1,
+                "max":1,
+                "type":"text"
             },
             {
                 "id": "authorFirstName",
+                "alias": ["datacite:Creator:givenName"],
                 "conditions": [
-                    ["personalIdentifierScheme", "is", "name"]
+                    ["creatorNameType", "is", "personal"]
                 ],
                 "label": {
                     "en": "First Name",
                     "de": "Vorname"
                 },
-                "placeholder": "z.B. Hannah",
+                "placeholder": "e.g. Hannah",
                 "min": 1,
                 "max": 1,
                 "type": "letter-string"
             },
             {
                 "id": "authorLastName",
+                "alias": ["datacite:Creator:familyName"],
                 "conditions": [
-                    ["personalIdentifierScheme", "is", "name"]
+                    ["creatorNameType", "is", "personal"]
                 ],
                 "label": {
                     "en": "Last Name",
                     "de": "Nachname"
                 },
-                "placeholder": "z.B. Arendt",
+                "placeholder": "e.g. Arendt",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            },
+            {
+                "id":"creatorIdentifier",
+                "alias":[""],
+                "conditions":[
+                    ["creatorNameType", "is","personal"]
+                ],
+                "label": "ORCiD",
+                "placeholder": "e.g. 0000-0001-2345-6789",
+                "min":1,
+                "max":1,
+                "type": "orcid"
+            },
+            {
+                "id": "authorAffiliationName",
+                "alias": ["datacite:Creator:affiliation", "dcterms:contributor"],
+                "conditions":[
+                    ["creatorNameType", "is", "personal"]
+                ],
+                "label": "Affiliation",
+                "placeholder": "e.g. Universität Bayreuth",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            },
+            {
+                "id": "authorAffiliationIdentifierType",
+                "conditions": [
+                    ["creatorNameType", "is", "personal"]
+                ],
+                "label": {
+                    "en": "Type of identifier of affiliation",
+                    "de": "Typ des Bezeichners der Affiliation"
+                },
+                "placeholder": "e.g. ROR",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            },
+            {
+                "id": "authorAffiliationIdentifier",
+                "alias": ["datacite:Creator:affiliationIdentifier", "dcterms:identifier"],
+                "conditions": [
+                    ["creatorNameType", "is", "personal"]
+                ],
+                "label": {
+                    "en": "Identifier of affiliation",
+                    "de": "Bezeichner der Affiliation"
+                },
+                "placeholder": "e.g. https://ror.org/0234wmv40",
                 "min": 1,
                 "max": 1,
                 "type": "letter-string"
@@ -154,6 +261,7 @@
         "fields": [
             {
                 "id": "titleType",
+                "alias": ["datacite:Title:titleType"],
                 "label": {
                     "en": "Type of title",
                     "de": "Art des Titels"
@@ -162,54 +270,187 @@
                 "type": "monoselect",
                 "options": [
                     {
-                        "id": "subtitle",
-                        "label": {
-                            "de": "Untertitel",
-                            "en": "Subtitle"
-                        }
-                    },
-                    {
                         "id": "mainTitle",
                         "label": {
                             "en": "Main title",
                             "de": "Haupttitel"
+                        }
+                    },
+                    {
+                        "id": "subtitle",
+                        "label": {
+                            "en": "Subtitle",
+                            "de": "Untertitel"
+                        }
+                    },
+                    {
+                        "id": "alternativeTitle",
+                        "alias":["dcterms:alternative"],
+                        "label": {
+                            "en": "Alternative title",
+                            "de": "alternativer Titel"
+                        }
+                    },
+                    {
+                        "id": "customTitle",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
                         }
                     }
                 ]
             },
             {
                 "id": "titleText",
+                "alias":["datacite:Title","dcterms:title"],
+                "conditions": [
+                    ["titleType", "exists"]
+                ],
                 "label": {
                     "en": "Title",
                     "de": "Titel"
                 },
                 "max":1,
-                "type": "string",
-                "placeholder": "z.B. Vita activa oder Vom tätigen Leben"
+                "type": "text",
+                "placeholder": "e.g. Vita activa oder Vom tätigen Leben"
             }
+        ]
+    },
+    {
+        "id": "publisher",
+        "alias":["datacite:Publisher","dcterms:publisher"],
+        "label": {
+            "en": "Publisher",
+            "de": "Herausgeber*in"
+        },
+        "min": 1,
+          "fields": [
+            {
+                "id": "publisherName",
+                "label": "Name",
+                "placeholder": "e.g. GeoForschungsZentrum Potsdam (GFZ)",
+                "type": "text"
+            },
+            {
+                "id": "publisherIdentifierScheme",
+                "label": {
+                    "en": "Type of identifier",
+                    "de": "Art des Bezeichners"
+                },
+                "min":1,
+                "max":1,
+                "type": "monoselect",
+                "options":[
+                    {
+                        "id": "publisherIdentifierOrcid",
+                        "label": "ORCiD"
+                    },
+                    {
+                        "id": "publisherIdentifierRor",
+                        "label": "ROR"
+                    },
+                    {
+                        "id": "customPublisherIdentifier",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "publisherOrcid",
+                "conditions":[
+                    ["publisherIdentifierScheme", "is", "publisherIdentifierOrcid"]
+                ],
+                "label": "ORCiD",
+                "min":1,
+                "max":1,
+                "type":"orcid",
+                "placeholder":"e.g. 0000-0001-2345-6789"
+            },
+            {
+               "id":"publisherRor",
+               "conditions":[
+                    ["publisherIdentifierScheme", "is", "publisherIdentifierRor"]
+               ],
+               "label": "ROR",
+               "min":1,
+               "max":1,
+               "type":"ror" ,
+               "placeholder":"e.g. https://ror.org/0234wmv40"
+            },
+            {
+                "id":"publisherCustomNameIdentifier",
+                "conditions":[
+                    ["publisherIdentifierScheme", "is", "customPublisherIdentifier"]
+                ],
+                "label":{
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
+                },
+                "min":1,
+                "max":1,
+                "type": "text"
+            },
+            {
+                "id":"publisherCustomIdentifier",
+                "conditions":[
+                    ["publisherIdentifierScheme", "is","customPublisherIdentifier"]
+                ],
+                "label":{
+                    "en":"Identifier",
+                    "de":"Bezeichner"
+                },
+                "min":1,
+                "max":1,
+                "type":"text"
+            }
+          ]
+    },
+    {
+        "id": "publicationYear",
+        "alias":["datacite:PublicationYear", "dcterms:issued"],
+        "label": {
+            "en": "Publication Year",
+            "de": "Publikationsjahr"
+        },
+        "min": 1,
+         "fields":[
+            {
+                "id": "publicationYear",
+                "label": {
+                    "en": "Publication Year",
+                    "de": "Publikationsjahr"
+                },
+                "placeholder": "e.g. 2021",
+                "type": "decimal"
+            }
+
         ]
     },
     {
         "id": "subject",
         "label": {
-            "en": "Subject & Keywords",
-            "de": "Thema & Keywords"
+            "en": "Discipline & Keywords",
+            "de": "Disziplin & Keywords"
         },
         "fields": [
             {
                 "id": "subjectScheme",
                 "label": {
-                    "en": "Topic classification",
-                    "de": "Themenklassifizierung"
+                    "en": "Type of subject",
+                    "de": "Art des Themas"
                 },
-                "max": 1,
                 "type": "monoselect",
+                "min": 1,
+                "max": 1,
                 "options": [
                     {
-                        "id": "rvk",
+                        "id": "classification",
                         "label": {
-                            "de": "Bibliothekarische Einordnung",
-                            "en": "Library Classification"
+                            "en": "Classification",
+                            "de": "Klassifikation"
                         }
                     },
                     {
@@ -219,24 +460,1849 @@
                 ]
             },
             {
-                "id": "rvk",
-                "conditions": [
-                    ["subjectScheme", "is", "rvk"]
-                ],
+                "id": "subjectIdentifier",
+                "alias":["datacite:Subject:subjectScheme"],
                 "label": {
-                    "de": "Bibliothekarische Einordnung",
-                    "en": "Library Classification"
+                    "en": "Type of Identifier",
+                    "de": "Art des Bezeichners"
                 },
-                "type": "string"
+                "conditions": [
+                    ["subjectScheme", "is", "classification"]
+                ],
+                "type": "monoselect",
+                "min": 1,
+                "max": 1,
+                "options": [
+                    {
+                        "id": "ddc",
+                        "label": "DDC"
+                    },
+                    {
+                        "id": "customClassification",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
             },
             {
-                "id": "keywords",
-                "conditions": [
+                "id": "subjectIdentifier",
+                "alias":["datacite:Subject:subjectScheme"],
+                "label": "Type of Keyword",
+                "conditions":[
                     ["subjectScheme", "is", "keyword"]
                 ],
-                "placeholder": "z.B. Handlungsmotivation, Menschenrechte, Gesellschaft",
+                "type": "monoselect",
+                "min": 1,
+                "max": 1,
+                "options": [
+                    {
+                        "id": "gnd",
+                        "label": "GND"
+                    },
+                    {
+                        "id": "wikidata",
+                        "label": "Wikidata"
+                    },
+                    {
+                        "id": "customKeyword",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "subjectIdentifierDdc",
+                "alias":["datacite:Subject:classificationCode","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "ddc"]
+                ],
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "ddc",
+                "placeholder": "e.g. 551.6"
+            },
+            {
+                "id": "subjectKeywordDdc",
+                "alias":["datacite:Subject", "dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "ddc"]
+                ],
                 "label": "Keyword",
-                "type": "string"
+                "min": 1,
+                "max": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. Klimatologie und Wetter"
+
+            },
+            {
+                "id": "subjectIdentifierCustomType",
+                "alias":["datacite:Subject:subjectScheme"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "customClassification"]
+                ],
+                "label": {
+                    "en": "Identifier type",
+                    "de": "Art des Bezeichners"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            },
+            {
+                "id": "subjectIdentifierCustom",
+                "alias":["datacite:Subject:classificationCode","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "customClassification"]
+                ],
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            },
+            {
+                "id": "subjectKeywordCustom",
+                "alias":["datacite:Subject","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "customClassification"]
+                ],
+                "label": "Keyword",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+
+            },
+            {
+                "id": "subjectIdentifierGND",
+                "alias":["datacite:Subject:classificationCode","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "gnd"]
+                ],
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "gnd",
+                "placeholder": "e.g. 4031178-8"
+            },
+            {
+                "id": "subjectKeywordGND",
+                "alias":["datacite:Subject","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "gnd"]
+                ],
+                "label": "Keyword",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. Klimatologie"
+            },
+            {
+                "id": "subjectIdentifierWikidata",
+                "alias":["datacite:Subject:classificationCode","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "wikidata"]
+                ],
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "wikidata",
+                "placeholder": "e.g. Q52139"
+            },
+            {
+                "id": "subjectKeywordWikidata",
+                "alias":["datacite:Subject","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "wikidata"]
+                ],
+                "label": "Keyword",
+                "min": 1,
+                "max": 1,
+                "type": "text",
+                "placeholder": "e.g. climatology "
+            },
+            {
+                "id": "subjectKeywordIdentifierCustomType",
+                "alias":["datacite:Subject:subjectScheme"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "customKeyword"]
+                ],
+                "label": {
+                    "en": "Identifier type",
+                    "de": "Art des Bezeichners"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "text"
+            },
+            {
+                "id": "subjectKeywordIdentifierCustom",
+                "alias":["datacite:Subject:classificationCode","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "customKeyword"]
+                ],
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+            },
+            {
+                "id": "subjectKeywordCustom",
+                "alias":["datacite:Subject","dcterms:subject"],
+                "conditions": [
+                    ["subjectIdentifier", "is", "customKeyword"]
+                ],
+                "label": "Keyword",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
+
+            }
+        ]
+    },
+    {
+        "id": "contributor",
+        "alias":["datacite:Contributor","dcterms:contributor"],
+        "label": {
+            "en": "Contributor",
+            "de": "Mitwirkende*r"
+        },
+          "fields": [
+            {
+                "id":"contributorScheme",
+                "alias":["datacite:Contributor:contributorType"],
+                "label": {
+                    "en": "Type of contributor",
+                    "de": "Art des Mitwirkens"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "contactPerson",
+                        "label": {
+                            "en": "Contact Person",
+                            "de": "Kontaktperson"
+                        }
+                    },
+                    {
+                        "id": "dataCollector",
+                        "label": {
+                            "en": "Data Collector",
+                            "de": "Datenerfasser*in"
+                        }
+                    },
+                    {
+                        "id": "dataCurator",
+                        "label": {
+                            "en":"Data Curator",
+                            "de": "Datenkurator*in"
+                        }
+                    },
+                    {
+                        "id": "dataManager",
+                        "label": {
+                            "en": "Data Manager",
+                            "de": "Datenmanager*in"
+                        }
+                    },
+                    {
+                        "id": "distributor",
+                        "label": {
+                            "en": "Distributor",
+                            "de": "Distributor*in"
+                        }
+                    },
+                    {
+                        "id": "editor",
+                        "label": {
+                            "en": "Editor",
+                            "de": "Editor*in"
+                        }
+                    },
+                    {
+                        "id": "hostingInstitution",
+                        "label": {
+                            "en": "Hosting Institution",
+                            "de": "Aufnehmende Einrichtung"
+                        }
+                    },
+                    {
+                        "id": "producer",
+                        "label": {
+                            "en": "Producer",
+                            "de": "Produzent*in"
+                        }
+                    },
+                    {
+                        "id": "projectLeader",
+                        "label": {
+                            "en": "Project Leader",
+                            "de": "Projektleiter*in"
+                        }
+                    },
+                    {
+                        "id": "projectManager",
+                        "label": {
+                            "en": "Project Manager",
+                            "de": "Projektkoordinator*in"
+                        }
+                    },
+                    {
+                        "id": "projectMember",
+                        "label": {
+                            "en": "Project Member",
+                            "de": "Projektmitglied"
+                        }
+                    },
+                    {
+                        "id": "relatedPerson",
+                        "label": "Related Person"
+                    },
+                    {
+                        "id": "researcher",
+                        "label": {
+                            "en": "Researcher",
+                            "de": "Forscher*in"
+                        }
+                    },
+                    {
+                        "id": "researchGroup",
+                        "label": {
+                            "en": "Research Group",
+                            "de": "Forschungsgruppe"
+                        }
+                    }, 
+                    {
+                        "id": "rightsHolder",
+                        "label": {
+                            "en": "Rights Holder",
+                            "de": "Rechteinhaber*in"
+                        }
+                    },
+                    {
+                        "id": "sponsor",
+                        "label": {
+                            "en": "Sponsor",
+                            "de": "Sponsor*in"
+                        }
+                    },
+                    {
+                      "id": "supervisor",
+                      "label": "Supervisor"  
+                    },
+                    {
+                        "id": "workPackageLeader",
+                        "label": {
+                            "en": "Work Package Leader",
+                            "de": "Leiter*in des Arbeitspakets"
+                        }
+                    },
+                    {
+                        "id": "customContributor",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id":"customContributorIdentifierType",
+                "alias":["datacite:Contributor:contributorType"],
+                "conditions": [
+                    ["contributorScheme", "is", "customContributor"]
+                ],
+                "label": {
+                    "en": "Contributor type",
+                    "de": "Mitwirkende*r"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "text"
+            },
+            {
+                "id": "contributorName",
+                "alias":["datacite:Contributor:contributorName","dcterms:contributor"],
+                "conditions": [
+                    ["contributorScheme", "exists"]
+                ],
+                "label": "Name",
+                "min": 1,
+                "max": 1,
+                "placeholder": "e.g. Arendt, Hannah",
+                "type": "letter-string"
+            },
+            {
+                "id": "contributorIdentifierType",
+                "alias":["datacite:Contributor:nameIdentifierScheme"],
+                "conditions":[
+                    ["contributorScheme", "exists"]
+                ],
+                "label": {
+                    "en": "Type of identifier",
+                    "de": "Art des Bezeichners"
+                },
+                "type": "monoselect",
+                "options":[
+                    {
+                        "id": "orcid",
+                        "label": "ORCiD"
+                    },
+                    {
+                        "id": "customContributorIdentifier",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "contributorOrcid",
+                "alias": ["datacite:Contributor:nameIdentifier","dcterms:identifier"],
+                "conditions":[
+                    ["contributorIdentifierType", "is", "orcid"]
+                ],
+                "label": "ORCiD",
+                "placeholder":"e.g. 0000-0001-2345-6789",
+                "type":"orcid"
+            },
+            {
+                "id": "contributorCustomIdentifierName",
+                "alias":["datacite:Contributor:nameIdentifierScheme"],
+                "conditions": [
+                    ["contributorIdentifierType", "is", "customContributorIdentifier"]
+                ],
+                "label": {
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
+                },
+                "type": "letter-string"
+            },
+            {
+                "id": "contributorCustomIdentifier",
+                "alias":["datacite:Contributor:nameIdentifier"],
+                "conditions": [
+                    ["contributorIdentifierType", "is", "customContributorIdentifier"]
+                ],
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "type": "letter-string"
+            },
+            {
+               "id": "contributorAffiliationName",
+               "alias":["datacite:Contributor:affiliation","dcterms:contributor"],
+               "conditions":[
+                    ["contributorScheme", "exists"]
+               ],
+               "label": "Affiliation",
+               "placeholder": "e.g. Universität Bayreuth",
+               "min": 1,
+               "max": 1,
+               "type": "text"
+            },
+            {
+                "id": "contributorAffiliationIdentifierType",
+                "conditions":[
+                    ["contributorScheme", "exists"]
+                ],
+                "label": {
+                    "en": "Type of identifier of affiliation",
+                    "de": "Art des Bezeichners der affiliation"
+                },
+                "placeholder": "e.g. ROR",
+                "min": 1,
+                "max": 1,
+                "type":"text"
+            },
+            {
+                "id": "contributorAffiliationIdentifier",
+                "alias":["datacite:Contributor:affiliationIdentifier","dcterms:identifier"],
+                "conditions":[
+                    ["contributorScheme", "exists"]
+                ],
+                "label": {
+                    "en": "Identifier of affiliation",
+                    "de": "Bezeichner der Affiliation"
+                },
+                "placeholder": "e.g. https://ror.org/0234wmv40",
+                "min": 1,
+                "max": 1,
+                "type":"text"
+            }
+          ]
+    },
+    {
+        "id": "date",
+        "label": {
+            "en": "Date",
+            "de": "Datum"
+        },
+        "fields": [
+            {
+                "id": "dateType",
+                "alias": ["datacite:Date:dateType"],
+                "label": {
+                    "en": "Date type",
+                    "de": "Datum-Typ"
+                },
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "accepted",
+                        "alias":["dcterms:dateAccepted"],
+                        "label": {
+                            "en": "Accepted",
+                            "de": "Akzeptiert"
+                        }
+                    },
+                    {
+                        "id": "available",
+                        "alias":["dcterms:available"],
+                        "label": {
+                            "en": "Available",
+                            "de": "Verfügbar"
+                        }
+                    },
+                    {
+                        "id": "copyrighted",
+                        "alias":["dcterms:dateCopyrighted"],
+                        "label": "Copyrighted"
+                    },
+                    {
+                        "id": "collected",
+                        "alias":["dcterms:date"],
+                        "label": {
+                            "en": "Collected",
+                            "de": "Gesammelt"
+                        }
+                    },
+                    {
+                       "id": "created",
+                       "alias":["dcterms:created"],
+                       "label": {
+                            "en": "Created",
+                            "de": "Erstellt"
+                       }
+                    },
+                    {
+                        "id": "issued",
+                        "alias":["dcterms:issued"],
+                        "label": {
+                            "en": "Issued",
+                            "de": "Herausgegeben"
+                        }
+                    },
+                    {
+                        "id": "submitted",
+                        "alias":["dcterms:dateSubmitted"],
+                        "label": {
+                            "en": "Submitted",
+                            "de": "Eingereicht"
+                        }
+                    },
+                    {
+                        "id": "updated",
+                        "alias":["dcterms:modified"],
+                        "label": {
+                            "en": "Updated",
+                            "de": "Aktualisiert"
+                        }
+                    },
+                    {
+                        "id": "valid",
+                        "label": "Valid"
+                    },
+                    {
+                        "id": "withdrawn",
+                        "label": {
+                            "en": "Withdrawn",
+                            "de": "Zurückgezogen"
+                        }
+                    },
+                    {
+                        "id": "customDateType",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "customDateTypeName",
+                "alias":["datacite:Date:dateType"],
+                "conditions":[
+                    ["dateType", "is", "customDateType"]
+                ],
+                "label": {
+                    "en":"Date type",
+                    "de": "Datum-Typ"
+                },
+                "type":"text"
+            },
+            {
+                "id": "dateInformation",
+                "alias":["datacite:Date","dcterms:date"],
+                "conditions": [
+                    ["dateType", "exists"]
+                ],
+                "label": {
+                    "en": "Date",
+                    "de": "Datum"
+                },
+                "type":"date",
+                "placeholder": "2021"
+            }
+        ]
+    },
+    {
+        "id": "language",
+        "alias":["datacite:Language","dcterms:language"],
+        "label": {
+            "en": "Language",
+            "de": "Sprache"
+        },
+        "fields": [
+            {
+                "id": "language",
+                "label": {
+                    "en": "Language",
+                    "de": "Sprache"
+                },
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "eng",
+                        "label": {
+                            "en": "English",
+                            "de": "Englisch"
+                        }
+                    },
+                    {
+                        "id": "ger",
+                        "label": {
+                            "en": "German",
+                            "de": "Deutsch"
+                        }
+                    },
+                    {
+                        "id": "fre",
+                        "label": {
+                            "en": "French",
+                            "de": "Französisch"
+                        }
+                    },
+                    {
+                        "id": "customLanguage",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+
+                ]
+            },
+            {
+                "id":"customLanguageText",
+                "conditions": [
+                    ["language", "is", "customLanguage"]
+                ],
+                "label": "Language",
+                "type": "letter-string"
+
+
+            }
+
+        ]
+    },
+    {
+        "id": "resourceType",
+        "label": {
+            "en": "Resource Type",
+            "de": "Ressourcentyp"
+        },
+        "min": 1,
+        "fields": [
+            {
+                "id": "resourceTypeGeneral",
+                "alias":["datacite:ResourceType:resourceTypeGeneral","dcterms:type"],
+                "label": {
+                    "en": "General resource type",
+                    "de": "Allgemeiner Ressourcentyp"
+                },
+                "type": "monoselect",
+                "min": 1,
+                "max": 1,
+                "options": [
+                    {
+                        "id": "audiovisual",
+                        "label": {
+                            "en": "Audiovisual",
+                            "de": "Audiovisuell"
+                        }
+                    },
+                    {
+                        "id": "book",
+                        "label": {
+                            "en": "Book",
+                            "de": "Buch"
+                        }
+                    },{
+                        "id": "bookChapter",
+                        "label": {
+                            "en": "Book chapter",
+                            "de": "Buchkapitel"
+                        }
+                    },{
+                        "id": "collection",
+                        "label": {
+                            "en": "Collection",
+                            "de": "Sammlung"
+                        }
+                    },{
+                        "id": "computationalNotebook",
+                        "label": "Computational notebook"
+                    },
+                    {
+                        "id": "conferencePaper",
+                        "label": {
+                            "en": "Conference paper",
+                            "de": "Konferenzbeitrag"
+                        }
+                    },
+                    {
+                        "id": "conferenceProceeding",
+                        "label": {
+                            "en": "Conference proceeding",
+                            "de": "Konferenzband"
+                        }
+                    },
+                    {
+                        "id": "dataPaper",
+                        "label": {
+                            "en": "Data paper",
+                            "de": "Datenpublikation"
+                        }
+                    },
+                    {
+                        "id": "dataset",
+                        "label": {
+                            "en": "Dataset",
+                            "de": "Datenset"
+                        }
+                    },
+                    {
+                        "id": "dissertation",
+                        "label": "Dissertation"
+                    },
+                    {
+                        "id": "event",
+                        "label": {
+                            "en": "Event",
+                            "de": "Veranstaltung"
+                        }
+                    },
+                    {
+                        "id": "image",
+                        "label": {
+                            "en": "Image",
+                            "de": "Bild"
+                        }
+                    },
+                    {
+                        "id": "interactiveResource",
+                        "label": {
+                            "en": "Interactive resource",
+                            "de": "Interaktive Ressource"
+                        }
+                    },
+                    {
+                        "id": "journal",
+                        "label": {
+                            "en": "Journal",
+                            "de": "Zeitschrift"
+                        }
+                    },
+                    {
+                        "id": "journalArticle",
+                        "label": {
+                            "en": "Journal article",
+                            "de": "Zeitschriftenartikel"
+                        }
+                    },
+                    {
+                        "id": "model",
+                        "label": {
+                            "en": "Model",
+                            "de": "Modell"
+                        }
+                    },
+                    {
+                        "id": "outputManagementPlan",
+                        "label": {
+                            "en": "Output management plan",
+                            "de": "Output-Management Plan"
+                        }
+                    },
+                    {
+                        "id": "peerReview",
+                        "label": {
+                            "en": "Peer review",
+                            "de": "Peer-review"
+                        }
+                    },
+                    {
+                        "id": "physicalObject",
+                        "label": {
+                            "en": "Physical object",
+                            "de": "Physisches Medium"
+                        }
+                    },
+                    {
+                        "id": "preprint",
+                        "label": "Preprint"
+                    },
+                    {
+                        "id": "report",
+                        "label": "Report"
+                    },
+                    {
+                        "id": "service",
+                        "label": "Service"
+                    },
+                    {
+                        "id": "software",
+                        "label": "Software"
+                    },
+                    {
+                        "id": "sound",
+                        "label": {
+                            "en": "Sound",
+                            "de": "Audio"
+                        }
+                    },
+                    {
+                        "id": "standard",
+                        "label": "Standard"
+                    },
+                    {
+                        "id": "text",
+                        "label": "Text"
+                    },
+                    {
+                        "id": "workflow",
+                        "label": {
+                            "en": "Workflow",
+                            "de": "Prozessbeschreibung"
+                        }
+                    },
+                    {
+                        "id": "customResourceType",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id":"customResourceTypeName",
+                "alias":["datacite:ResourceType:resourceTypeGeneral", "dcterms:type"],
+                "label": {
+                    "en": "Resource type",
+                    "de": "Ressourcentyp"
+                },
+                "conditions":[
+                    ["resourceTypeGeneral", "is", "customResourceType"]
+                ],
+                "type": "text"
+            },
+            {
+                "id": "resourceTypeDescription",
+                "alias":["datacite:ResourceType","dcterms:type"],
+                "label": {
+                    "en": "Further description",
+                    "de": "Nähere Beschreibung"
+                },
+                "conditions": [
+                    ["resourceTypeGeneral", "exists"]
+                ], 
+                "placeholder": "e.g. Climate Measurements",
+                "type": "letter-string"
+            }
+        ]
+    },
+    {
+        "id": "alternateIdentifier",
+        "alias":["dcterms:identifier"],
+        "label": {
+            "en": "Alternate identifier",
+            "de": "Alternativer Bezeichner"
+        }, 
+        "fields": [
+            {
+                "id": "alternateIdentifierScheme",
+                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
+                "label": {
+                    "en": "Type of alternate identifier",
+                    "de": "Art des alternativen Bezeichners"
+                },
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "institutionspecificIdentifier",
+                        "label": {
+                            "en": "Institution-specific identifier",
+                            "de": "Institutions-spezifischer Bezeichner"
+                        }
+                    },
+                    {
+                        "id": "projectspecificIdentifier",
+                        "label": {
+                            "en": "Project-specific identifier",
+                            "de": "Projekt-spezifischer Bezeichner"
+                        }
+
+                    },
+                    {
+                        "id": "customIdentifier",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+
+
+                ]
+            },
+            {
+                "id": "institutionspecificIdentifierName",
+                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
+                "conditions": [
+                    ["alternateIdentifierScheme", "is", "institutionspecificIdentifier"]
+
+                ],
+                "label": {
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
+
+                },
+                "placeholder":"e.g. UR-ID",
+                "type": "letter-string"
+                
+            },
+            {
+                "id": "institutionspecificIdentifierID",
+                "alias":["datacite:alternateIdentifier","dcterms:identifier"],
+                "conditions": [
+                    ["alternateIdentifierScheme", "is", "institutionspecificIdentifier"]
+                ],
+                "label": {
+                    "en": "Alternate identifier",
+                    "de": "Alternativer Bezeichner"
+                },
+                "placeholder": "e.g. 53636", 
+                "type": "letter-string"
+            },
+            {
+                "id": "projectspecificIdentifierName",
+                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
+                "conditions": [
+                    ["alternateIdentifierScheme", "is", "projectspecificIdentifier"]
+
+                ],
+                "label": {
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
+
+                },
+                "placeholder":"e.g. SFB_MP-ID",
+                "type": "letter-string"
+                
+            },
+            {
+                "id": "projectspecificIdentifierID",
+                "alias":["datacite:alternateIdentifier","dcterms:identifier"],
+                "conditions": [
+                    ["alternateIdentifierScheme", "is", "projectspecificIdentifier"]
+                ],
+                "label": {
+                    "en": "Alternate identifier",
+                    "de": "Alternativer Bezeichner"
+                },
+                "placeholder": "e.g. A02_V7398", 
+                "type": "letter-string"
+            },
+            {
+                "id": "customIdentifierName",
+                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
+                "conditions": [
+                    ["alternateIdentifierScheme", "is", "customIdentifier"]
+
+                ],
+                "label": {
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
+
+                },
+                "type": "letter-string"
+                
+            },
+            {
+                "id": "customIdentifierID",
+                "alias":["datacite:alternateIdentifier","dcterms:identifier"],
+                "conditions": [
+                    ["alternateIdentifierScheme", "is", "customIdentifier"]
+                ],
+                "label": {
+                    "en": "Alternate identifier",
+                    "de": "Alternativer Bezeichner"
+                }, 
+                "type": "letter-string"
+            }
+        ]
+    },
+    {
+        "id": "size",
+        "alias":["datacite:Size","dcterms:extent"],
+        "label": {
+            "en": "Size",
+            "de": "Größe"
+
+        },
+        "fields": [
+            {
+                "id": "sizeType",
+                "label": {
+                    "en": "Size",
+                    "de": "Größe"
+                },
+                "type": "monoselect",
+                "options": [
+                    {
+                       "id": "size",
+                       "label": {
+                        "en": "Size",
+                        "de": "Größe"
+                       }
+
+                    },
+                    {
+                        "id": "duration",
+                        "label": {
+                            "en": "Duration",
+                            "de": "Dauer"
+                        }
+                    },
+                    {
+                        "id": "customSize",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+                
+            },
+            {
+                "id": "fileSize",
+                "conditions": [
+                    ["sizeType", "is", "size"]
+                ],
+                "label": {
+                    "en": "Size",
+                    "de": "Größe"
+                },
+                "placeholder": "e.g. 6.75 GB",
+                "min": 1,
+                "type": "text"
+                
+            },
+            {
+                "id": "fileDuration",
+                "conditions": [
+                    ["sizeType", "is", "duration"]
+                ],
+                "label": {
+                    "en": "Duration",
+                    "de": "Dauer" 
+                },
+                "placeholder": "e.g. 45 minutes",
+                "min": 1,
+                "type": "text"
+            },
+            {
+                "id": "fileCustom",
+                "conditions": [
+                    ["sizeType", "is", "customSize"]
+                ],
+                "label": {
+                    "en": "Scope",
+                    "de": "Umfang"
+                },
+                "placeholder": "e.g. 9 pages",
+                "min": 1,
+                "type":"text"
+            }
+        ]
+    },
+    {
+      "id": "format",
+      "alias":["datacite:Format","dcterms:format"],
+      "label": "Format",
+      "fields": [
+        {
+            "id": "formatFileType",
+            "label": {
+                "en": "File extension",
+                "de": "Dateiendung"
+            },
+            "placeholder": "e.g. PDF, XML,...",
+            "type": "text"
+        },
+        {
+            "id": "formatMIMEType",
+            "label": "MIME-Type",
+            "placeholder": "e.g. application/pdf, application/xml,...", 
+            "type": "text"
+        }
+      ]
+    },
+    {
+        "id": "version",
+        "alias":["datacite:Version"],
+        "label": "Version",
+        "fields": [
+          {
+              "id": "formatFileType",
+              "label": {
+                  "en": "File extension",
+                  "de": "Dateiendung"
+              },
+              "min": 1,
+              "max": 1,
+              "placeholder": "e.g. 1.2, 4.2.1,... ",
+              "type": "text"
+          }
+        ]
+    },
+    {
+        "id": "rights",
+        "alias":["datacite:Rights","dcterms:rights"],
+        "label": {
+            "en": "Rights",
+            "de": "Rechte"
+        },
+        "fields": [
+            {
+                "id": "rightsType",
+                "label": {
+                    "en": "Type of rights",
+                    "de": "Art der Rechte"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "rightsCC",
+                        "label": {
+                            "en": "Creative Commons License",
+                            "de": "Creative Commons-Lizenz"
+                        }
+                    },
+                    {
+                        "id": "rightsGNU",
+                        "label": {
+                            "en": "GNU General Public License",
+                            "de": "GNU General Public-Lizenz"
+                        }
+                    },
+                    {
+                        "id": "rightsApache",
+                        "label": {
+                            "en": "Apache License",
+                            "de": "Apache-Lizenz"
+                        }
+                    },
+                    {
+                        "id": "allRightsReserved",
+                        "label": {
+                            "en": "All rights reserved",
+                            "de": "Alle Rechte vorbehalten"
+                        }
+                    },
+                    {
+                        "id": "rightsCustom",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                        
+                    }
+                ]
+            },
+            {
+             "id": "rightsIdentifierCC",
+             "alias":["datacite:Rights:rightsIdentifier","dcterms:rights"],  
+             "conditions": [
+                ["rightsType", "is", "rightsCC"]
+             ],
+             "label": {
+                "en": "Rights Identifier",
+                "de": "Lizenz Identifier"
+             },
+             "min": 1,
+             "max": 1,
+             "type": "letter-string",
+             "placeholder": "e.g. CC-BY-4.0"
+            },
+            {
+                "id": "rightsURICC",
+                "alias":["datacite:Rights:rightsURI","dcterms:rights"],
+                "conditions": [
+                    ["rightsType", "is", "rightsCC"]
+                ],
+                "label": {
+                    "en": "Rights URI",
+                    "de": "Lizenz URI"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "uri",
+                "placeholder": "e.g. https://creativecommons.org/licenses/by/4.0/legalcode"
+            },
+            {
+                "id": "rightsIdentifierGNU", 
+                "alias":["datacite:Rights:rightsIdentifier","dcterms:rights"], 
+                "conditions": [
+                   ["rightsType", "is", "rightsGNU"]
+                ],
+                "label": {
+                   "en": "Rights Identifier",
+                   "de": "Lizenz Identifier"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. GPL-3.0-only"
+               },
+               {
+                   "id": "rightsURIGNU",
+                   "alias":["datacite:Rights:rightsURI","dcterms:rights"],
+                   "conditions": [
+                       ["rightsType", "is", "rightsGNU"]
+                   ],
+                   "label": {
+                       "en": "Rights URI",
+                       "de": "Lizenz URI"
+                   },
+                   "min": 1,
+                   "max": 1,
+                   "type": "uri",
+                   "placeholder": "e.g. https://www.gnu.org/licenses/gpl-3.0"
+               },
+               {
+                "id": "rightsIdentifierApache",
+                "alias":["datacite:Rights:rightsIdentifier","dcterms:rights"],  
+                "conditions": [
+                   ["rightsType", "is", "rightsApache"]
+                ],
+                "label": {
+                   "en": "Rights Identifier",
+                   "de": "Lizenz Identifier"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. Apache-2.0"
+               },
+               {
+                   "id": "rightsURIApache",
+                   "alias":["datacite:Rights:rightsURI","dcterms:rights"],
+                   "conditions": [
+                       ["rightsType", "is", "rightsApache"]
+                   ],
+                   "label": {
+                       "en": "Rights URI",
+                       "de": "Lizenz URI"
+                   },
+                   "min": 1,
+                   "max": 1,
+                   "type": "uri",
+                   "placeholder": "e.g. https://www.apache.org/licenses/LICENSE-2.0"
+               },
+               {
+                "id":"rightsIdentifierCustomType",
+                "alias": ["datacite:Rights:rightsIdentifier","dcterms:rights"],
+                "conditions":[
+                    ["rightsType", "is", "rightsCustom"]
+                ],
+                "label": {
+                    "en": "Rights type",
+                    "de": "Rechts-Typ"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "text"
+               },
+               {
+                "id": "rightsIdentifierCustom",
+                "alias":["datacite:Rights:rightsIdentifier","dcterms:rights"],
+                "conditions": [
+                   ["rightsType", "is", "rightsCustom"]
+                ],
+                "label": {
+                   "en": "Rights Identifier",
+                   "de": "Lizenz Identifier"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "text"
+               },
+               {
+                   "id": "rightsURICustom",
+                   "alias":["datacite:Rights:rightsURI","dcterms:rights"],
+                   "conditions": [
+                       ["rightsType", "is", "rightsCustom"]
+                   ],
+                   "label": {
+                       "en": "Rights URI",
+                       "de": "Lizenz URI"
+                   },
+                   "min": 1,
+                   "max": 1,
+                   "type": "uri"
+               }
+               
+        ]
+
+    },
+    {
+        "id": "description",
+        "label": {
+            "en": "Description",
+            "de": "Inhaltsbeschreibung"
+        },
+        "fields": [
+            {
+                "id": "descriptionType",
+                "alias":["datacite:Description:descriptionType","dcterms:description"],
+                "label": {
+                    "en": "Type of description",
+                    "de": "Art der Beschreibung"
+                },
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "descriptionAbstract",
+                        "alias":["dcterms:abstract"],
+                        "label": {
+                            "en": "Abstract",
+                            "de": "Zusammenfassung"
+                        }
+                    },
+                    {
+                        "id": "descriptionMethod",
+                        "alias":["dcterms:description"],
+                        "label": {
+                            "en": "Method",
+                            "de": "Methode"
+                        }
+                    },
+                    {
+                        "id": "descriptionTechnicalInfo",
+                        "alias":["dcterms:description"],
+                        "label": {
+                            "en": "Technical Info",
+                            "de": "Technische Informationen"
+                        }   
+                    },
+                    {
+                        "id": "customDescription",
+                        "alias":["dcterms:description"],
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "abstractText",
+                "alias":["datacite:Description","dcterms:description"],
+                "conditions": [
+                    ["descriptionType", "is", "descriptionAbstract"]
+                ],
+                "placeholder": "e.g. Im Teilprojekt \"Biologische Effekte\" des Sonderforschungsbereich Mikroplastik an der Universität Bayreuth werden seit 2019 Mechanismen und Prozesse erforscht,...",
+                "label": "Abstract",
+                "type": "text"
+            },
+            {
+                "id": "methodText",
+                "alias":["datacite:Description"],
+                "conditions": [
+                    ["descriptionType", "is", "descriptionMethod"]
+                ],
+                "placeholder": "e.g. Software development, Data Visualization, Simulation,...",
+                "label": "Keyword",
+                "type": "text"
+            },
+            {
+                "id": "technicalInfoText",
+                "alias":["datacite:Description"],
+                "conditions": [
+                    ["descriptionType", "is", "descriptionTechnicalInfo"]
+                ],
+                "placeholder": "e.g. Python, CSS Frameworks, PostgreSQL",
+                "label": "Keyword",
+                "type": "text"
+            },
+            {
+                "id": "customDescriptionType",
+                "alias": ["datacite:Description:descriptionType", "dcterms:description"],
+                "conditions":[
+                    ["descriptionType", "is", "customDescription"]
+                ],
+                "label": {
+                    "en": "Description type",
+                    "de": "Beschreibungstyp"
+                },
+                "type": "text"
+            },
+            {
+                "id": "customText",
+                "alias":["datacite:Description"],
+                "conditions":[
+                    ["descriptionType", "is", "customDescription"]
+                ],
+                "label": {
+                    "en": "Description",
+                    "de": "Beschreibung"
+                },
+                "type": "text"
+
+            }
+        ]
+    },
+    {
+        "id": "geolocation",
+        "alias":["datacite:GeoLocation","dcterms:spatial"],
+        "label": {
+            "en": "Geolocation",
+            "de": "Geolokalisation"
+        },
+        "fields": [
+            {
+                "id": "geolocationType",
+                "label": {
+                    "en": "Type of geolocation",
+                    "de": "Art der Geolokalisation"
+                },
+                "max": 1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "geoLocationPlace",
+                        "label": {
+                            "en": "Geo Location Place",
+                            "de": "Geolokalisation Ort"
+                        }
+                    },
+                    {
+                        "id": "geoLocationPoint",
+                        "label": {
+                            "en": "Geo Location Point",
+                            "de": "Geolokalisation Punkte"
+                        }
+                    },
+                    {
+                        "id": "geoLocationBox",
+                        "label":{
+                            "en": "Geo Location Box",
+                            "de": "Geolokalisation Box"
+                        }   
+                    },
+                    {
+                        "id": "geoLocationPolygon",
+                        "label":{
+                            "en": "Geo Location Polygon",
+                            "de": "Geolokalisation Polygon"
+                        }   
+                    },
+                    {
+                        "id": "inPolygonPoint",
+                        "label": "In Polygon Point"
+                    }
+                ]
+            },
+            {
+                "id": "geoLocationPlaceType",
+                "alias":["datacite:GeoLocation:geoLocationPlace","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPlace"]
+                ],
+                "label": {
+                    "en": "Place",
+                    "de": "Ort"
+                },
+                "placeholder": "e.g. Bayreuth",
+                "min": 1,
+                "max": 1,
+                "type": "text"
+            },
+            {
+                "id": "geoLocationPointType",
+                "alias":["datacite:GeoLocation:geoLocationPoint:pointLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPoint"]
+                ],
+                "label":{
+                    "en": "Point Latitude",
+                    "de": "Breitengrad"
+                },
+                "placeholder": "e.g. 49.926789",
+                "type": "latitude"
+            },
+            {
+                "id": "geoLocationPointType",
+                "alias":["datacite:GeoLocation:geoLocationPoint:pointLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPoint"]
+                ],
+                "label":{
+                    "en": "Point Longitude",
+                    "de": "Längengrad"
+                },
+                "placeholder": "e.g. 11.586352",
+                "type": "longitude"
+            },
+            {
+                "id": "geoLocationBoxType",
+                "alias":["datacite:GeoLocation:geoLocationBox:southBoundLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationBox"]
+                ],
+                "label": {
+                    "en": "South Latitude",
+                    "de": "südlicher Breitengrad"
+                },
+                "placeholder": "e.g. 48.048021",
+                "type": "latitude"
+            },
+            {
+                "id": "geoLocationBoxType",
+                "alias":["datacite:GeoLocation:geoLocationBox:northBoundLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationBox"]
+                ],
+                "label": {
+                    "en": "North Latitude",
+                    "de": "nördlicher Breitengrad"
+                },
+                "placeholder": "e.g. 48.224673",
+                "type": "latitude"
+            },
+            {
+                "id": "geoLocationBoxType",
+                "alias":["datacite:GeoLocation:geoLocationBox:westBoundLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationBox"]
+                ],
+                "label": {
+                    "en": "West Longitude",
+                    "de": "westlicher Längengrad"
+                },
+                "placeholder": "e.g. 11.742668",
+                "type": "longitude"
+            },
+            {
+                "id": "geoLocationBoxType",
+                "alias":["datacite:GeoLocation:geoLocationBox:eastBoundLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationBox"]
+                ],
+                "label": {
+                    "en": "East Longitude",
+                    "de": "östlicher Längengrad"
+                },
+                "placeholder": "e.g. 11.438484",
+                "type": "longitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Latitude",
+                    "de": "Breitengrad"
+                },
+                "placeholder": "e.g. 48.148213",
+                "type": "latitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Longitude",
+                    "de": "Längengrad"
+                },
+                "placeholder": "e.g. 11.580483",
+                "type":"longitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Latitude",
+                    "de": "Breitengrad"
+                },
+                "placeholder": "e.g. 48.147975",
+                "type": "latitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Longitude",
+                    "de": "Längengrad"
+                },
+                "placeholder": "e.g. 11.581485",
+                "type":"longitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Latitude",
+                    "de": "Breitengrad"
+                },
+                "placeholder": "e.g. 48.146629",
+                "type": "latitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Longitude",
+                    "de": "Längengrad"
+                },
+                "placeholder": "e.g. 11.580906",
+                "type":"longitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Latitude",
+                    "de": "Breitengrad"
+                },
+                "placeholder": "e.g. 48.148213",
+                "type": "latitude"
+            },
+            {
+                "id": "geoLocationPolygonType",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "geoLocationPolygon"]
+                ],
+                "label": {
+                    "en": "Point Longitude",
+                    "de": "Längengrad"
+                },
+                "placeholder": "e.g. 11.580483",
+                "type":"longitude"
+            },
+            {
+                "id": "geoLocationinPolygonPoint",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:inPolygonPoint:pointLatitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "inPolygonPoint"]
+                ],
+                "label": {
+                    "en": "Point Latitude",
+                    "de": "Breitengrad"
+                },
+                "placeholder": "e.g. 49.926789",
+                "type": "latitude"
+            },
+            {
+                "id":"geoLocationinPolygonPoint",
+                "alias":["datacite:GeoLocation:geoLocationPolygon:inPolygonPoint:pointLongitude","dcterms:spatial"],
+                "conditions": [
+                    ["geolocationType", "is", "inPolygonPoint"]
+                ],
+                "label":{
+                    "en": "Point Longitude",
+                    "de": "Längengrad"
+                },
+                "placeholder": "e.g. 11.586352",
+                "type": "longitude"
+            }
+        ]
+    },
+    {
+        "id": "fundingReference",
+        "label": {
+            "en": "Funding",
+            "de": "Förderung"
+        },
+        "fields": [
+            {
+                "id": "funderType",
+                "label": {
+                    "en": "Funder",
+                    "de": "Förderer"
+                },
+                "type": "monoselect",
+                "options":[
+                    {
+                        "id": "DFG",
+                        "label": "DFG"
+                    },
+                    {
+                        "id": "BMBF",
+                        "label": "BMBF"
+                    },
+                    {
+                        "id": "EU",
+                        "label": "EU"
+                    },
+                    {
+                        "id": "customFunder",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "funderName",
+                "alias":["datacite:FundingReference:funderName","dcterms:contributor"],
+                "conditions": [  
+                    ["funderType", "is", "customFunder"]
+                ],
+                "label": {
+                    "en": "Name of funder",
+                    "de": "Name des Förderer"
+                },
+                "min": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. Volkswagenstiftung"
+            },
+            {
+                "id":"funderIdentifierType",
+                "alias":["datacite:FundingReference:funderIdentifierType"],
+                "conditions":[
+                    ["funderType", "exists"]
+                ],
+                "label": {
+                    "en":"Name of identifier",
+                    "de":"Name des Bezeichners"
+                },
+                "min": 1,
+                "type": "text",
+                "placeholder": "e.g. ROR"
+            },
+            {
+                "id": "funderIdentifier",
+                "alias":["datacite:FundingReference:funderIdentifier","dcterms:contributor"],
+                "conditions": [
+                    ["funderType", "exists"]
+                ],
+                "label": {
+                    "en": "Funder Identifier",
+                    "de": "Bezeichner des Förderers"
+                },
+                "min": 1,
+                "type": "text",
+                "placeholder": "e.g. https://ror.org/018mejw64"
+            },
+            {
+                "id":"awardNumber",
+                "alias":["datacite:FundingReference:awardNumber","dcterms:identifier"],
+                "conditions": [
+                    ["funderType", "exists"]
+                ],
+                "label": {
+                    "en": "Award number",
+                    "de": "Projektnummer"
+                }, 
+                "min": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. 413708228"
+            },
+            {
+                "id": "awardURI",
+                "alias":["datacite:FundingReference:awardURI","dcterms:identifier"],
+                "conditions": [
+                    ["funderType", "exists"]
+                ],
+                "label": {
+                    "en": "Award URI",
+                    "de": "Projekt URI"
+                },
+                "min": 1,
+                "type": "uri",
+                "placeholder": "e.g. https://gepris.dfg.de/gepris/projekt/413708228"
+            },
+            {
+                "id": "awardTitle",
+                "alias":["datacite:FundingReference:awardTitle","dcterms:description"],
+                "conditions": [
+                    ["funderType", "exists"]
+                ],
+                "label": {
+                    "en": "Award title",
+                    "de": "Projekt Titel"
+                },
+                "min": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. Forschungsdatendienst für die Ost-, Ostmittel- und Südosteuropaforschung (OstData)"
             }
         ]
     },
@@ -249,6 +2315,7 @@
         "fields": [
             {
                 "id": "relationType",
+                "alias":["datacite:RelatedIdentifier:relationType"],
                 "label": {
                     "en": "Type of relation",
                     "de": "Art der Beziehung"
@@ -259,30 +2326,282 @@
                 "description": "Description of the relationship of the resource being registered and the related resource.",
                 "options": [
                     {
-                        "id": "supplement",
+                        "id": "citedBy",
+                        "alias":["dcterms:relation"],
                         "label": {
-                            "en": "Is supplement to",
-                            "de": "Daten zu ..."
+                            "en": "is cited by",
+                            "de": "wird zitiert von"
+                        }
+                    },
+                    {
+                        "id": "cites",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "cites",
+                            "de": "zitiert"
+                        }
+                    },
+                    {
+                        "id": "supplementTo",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is supplement to",
+                            "de": "ist Ergänzung zu"
+                        }
+                    },
+                    {
+                        "id": "supplementedBy",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is supplemented by",
+                            "de": "wird ergänzt durch"
+                        }
+                    },
+                    {
+                        "id": "continuedBy",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is continued by",
+                            "de": "wird fortgesetzt durch"
+                        }
+                    },
+                    {
+                        "id": "continues",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "continues",
+                            "de": "setzt fort"
                         }
                     },
                     {
                         "id": "describes",
+                        "alias":["dcterms:relation"],
                         "label": {
-                            "en": "Describes",
-                            "de": "Beschreibt ..."
+                            "en": "describes",
+                            "de": "beschreibt"
+                        }
+                    },
+                    {
+                        "id": "describedBy",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is described by",
+                            "de": "wird beschrieben durch"
+                        }
+                    },
+                    {
+                        "id": "hasMetadata",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "has metadata",
+                            "de": "verfügt über Metadaten"
+                        }
+                    },
+                    {
+                        "id": "isMetadataFor",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is metadata for",
+                            "de": "sind Metadaten zu"
+                        }
+                    },
+                    {
+                        "id": "hasVersion",
+                        "alias":["dcterms:hasVersion"],
+                        "label": {
+                            "en": "has version",
+                            "de": "hat die Version"
+                        }
+                    },
+                    {
+                        "id": "versionOf",
+                        "alias":["dcterms:isVersionOf"],
+                        "label": {
+                            "en": "is version of",
+                            "de": "ist eine Version von"
+                        }
+                    },
+                    {
+                        "id": "newversionOf",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is new version of",
+                            "de": "ist eine neue Version von"
+                        }
+                    },
+                    {
+                        "id": "previousversionOf",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is previous version of",
+                            "de": "ist eine frühere Version von"
                         }
                     },
                     {
                         "id": "partOf",
+                        "alias":["dcterms:isPartOf"],
                         "label": {
-                            "en": "Is part of",
-                            "de": "Ist Teil von ..."
+                            "en": "is part of",
+                            "de": "ist Teil von"
+                        }
+                    },
+                    {
+                        "id": "hasPart",
+                        "alias":["dcterms:hasPart"],
+                        "label": {
+                            "en": "has part",
+                            "de": "hat Teil"
+                        }
+                    },
+                    {
+                        "id": "publishedIn",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is published in",
+                            "de": "wird veröffentlicht in"
+                        }
+                    },
+                    {
+                        "id": "referencedBy",
+                        "alias":["dcterms:isReferencedBy"],
+                        "label": {
+                            "en": "is referenced by",
+                            "de": "wird referenziert von"
+                        }
+                    },
+                    {
+                        "id": "references",
+                        "alias":["dcterms:references"],
+                        "label": {
+                            "en": "references",
+                            "de": "referenziert"
+                        }
+                    },
+                    {
+                        "id": "documentedBy",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is documented by",
+                            "de": "wird dokumentiert durch"
+                        }
+                    },
+                    {
+                        "id": "documents",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "documents",
+                            "de": "dokumentiert"
+                        }
+                    },
+                    {
+                        "id": "compiledBy",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is compiled by",
+                            "de": "wird erstellt durch"
+                        }
+                    },
+                    {
+                        "id": "compiles",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "compiles",
+                            "de": "erstellt"
+                        }
+                    },
+                    {
+                        "id": "variantformOf",
+                        "alias":["dcterms:isFormatOf"],
+                        "label": {
+                            "en": "is variant form of",
+                            "de": "ist eine Variante von"
+                        }
+                    },
+                    {
+                        "id": "originalformOf",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is original form of",
+                            "de": "ist die ursprüngliche Form von"
+                        }
+                    },
+                    {
+                        "id": "identicalTo",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is identical to",
+                            "de": "ist identisch mit"
+                        }
+                    },
+                    {
+                        "id": "reviewedBy",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is reviewed by",
+                            "de": "wird geprüft durch"
+                        }
+                    },
+                    {
+                        "id": "reviews",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "reviews",
+                            "de": "überprüft"
+                        }
+                    },
+                    {
+                        "id": "derivedFrom",
+                        "alias":["dcterms:source"],
+                        "label": {
+                            "en": "is derived from",
+                            "de": "wird abgeleitet von"
+                        }
+                    },
+                    {
+                        "id": "sourceOf",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "is source of",
+                            "de": "ist die Quelle von"
+                        }
+                    },
+                    {
+                       "id": "requiredBy",
+                       "alias":["dcterms:relation"],
+                       "label": {
+                        "en": "is required by",
+                        "de": "ist erforderlich für"
+                       }
+                    },
+                    {
+                        "id": "requires",
+                        "alias":["dcterms:relation"],
+                        "label": {
+                            "en": "requires",
+                            "de": "erfordert"
+                        }
+                    },
+                    {
+                        "id": "obsoletes",
+                        "alias":["dcterms:replaces"],
+                        "label": {
+                            "en": "obsoletes",
+                            "de": "veraltete Version"
+                        }
+                    },
+                    {
+                        "id": "obsoletedBy",
+                        "alias":["dcterms:isReplacedBy"],
+                        "label": {
+                            "en": "is obsoleted by",
+                            "de": "wird überholt durch"
                         }
                     }
                 ]
             },
             {
                 "id": "relationIdentifierScheme",
+                "alias":["datacite:RelatedIdentifier:relatedIdentifierType"],
                 "label": {
                     "en": "Type of identifier",
                     "de": "Art des Bezeichners"
@@ -295,57 +2614,293 @@
                 "max": 1,
                 "options": [
                     {
-                        "id": "uri",
-                        "label": "URI"
+                        "id": "ark",
+                        "label": "ARK"
+                    },
+                    {
+                        "id": "arxiv",
+                        "label": "arXiv"
+                    },
+                    {
+                        "id": "bibcode",
+                        "label": "bibcode"
                     },
                     {
                         "id": "doi",
                         "label": "DOI"
                     },
                     {
-                        "id": "document",
+                        "id": "ean13",
+                        "label": "EAN13"
+                    },
+                    {
+                        "id": "eissn",
+                        "label": "EISSN"
+                    },
+                    {
+                        "id": "handle",
+                        "label": "Handle"
+                    },
+                    {
+                        "id": "igsn",
+                        "label": "IGSN"
+                    },
+                    {
+                        "id": "isbn",
+                        "label": "ISBN"
+                    },
+                    {
+                        "id": "issn",
+                        "label": "ISSN"
+                    },
+                    {
+                        "id": "istc",
+                        "label": "ISTC"
+                    },
+                    {
+                        "id": "lissn",
+                        "label": "LISSN"
+                    },
+                    {
+                        "id": "lsid",
+                        "label": "LSID"
+                    },
+                    {
+                        "id": "pmid",
+                        "label": "PMID"
+                    },
+                    {
+                        "id": "purl",
+                        "label": "PURL"
+                    },
+                    {
+                        "id": "upc",
+                        "label": "UPC"
+                    },
+                    {
+                        "id": "url",
+                        "label": "URL"
+                    },
+                    {
+                        "id": "urn",
+                        "label": "URN"
+                    },
+                    {
+                        "id": "w3id",
+                        "label": "w3id"
+                    },
+                    {
+                        "id": "custom",
                         "label": {
-                            "en": "File",
-                            "de": "Datei"
+                            "en": "Other",
+                            "de": "Sonstige"
                         }
                     }
                 ]
             },
             {
-                "id": "relationURI",
-                "conditions": [
-                    ["relationIdentifierScheme", "is", "uri"]
-                ],
-                "label": "URI",
-                "min": 1,
-                "max": 1,
-                "type": "uri",
-                "placeholder": "z.B. https://example.com/dataset"
-            },
-            {
-                "id": "relationDOI",
-                "conditions": [
-                    ["relationIdentifierScheme", "is", "doi"]
-                ],
-                "label": "DOI",
-                "min": 1,
-                "max": 1,
-                "type": "doi",
-                "placeholder": "z.B. 10.1109/5.771073"
-            },
-            {
-                "id": "relationDocument",
-                "conditions": [
-                    ["relationIdentifierScheme", "is", "document"]
+                "id":"relationIdentifierCustomName",
+                "alias":["datacite:RelatedIdentifier:relatedIdentifierType"],
+                "conditions":[
+                    ["relationIdentifierScheme", "is", "custom"]
                 ],
                 "label": {
-                    "en": "Choose file",
-                    "de": "Datei wählen"
+                    "en": "Name of identifier",
+                    "de": "Name des Bezeichners"
                 },
                 "min": 1,
-                "max": 1,
-                "type": "suggestion"
+                "max": 1
+            },
+            {
+                "id": "relationIdentifier",
+                "alias":["datacite:RelatedIdentifier","dcterms:relation"],
+                "conditions": [
+                    ["relationIdentifierScheme", "exists"]
+                ],
+                "label": {
+                    "en": "Identifier",
+                    "de": "Bezeichner"
+                },
+                "min": 1,
+                "max": 1
+            }
+        ]
+    },
+    {
+        "id":"datasource",
+        "label": {
+            "en": "Data Source",
+            "de": "Datenquelle"
+        },
+        "fields": [
+            {
+                "id":"dataSourceDetail",
+                "label": {
+                    "en": "Type of data source",
+                    "de": "Art der Datenquelle"
+                },
+                "type": "monoselect",
+                "options":[
+                    {
+                        "id": "instrument",
+                        "label": "Instrument"
+                    },
+                    {
+                        "id": "media",
+                        "label": {
+                            "en": "Media",
+                            "de": "Medien"
+                        }
+                    },
+                    {
+                        "id": "observation",
+                        "label": {
+                            "en": "Observation",
+                            "de": "Beobachtung"
+                        }
+                    },
+                    {
+                        "id": "trial",
+                        "label": {
+                            "en": "Trial",
+                            "de": "Versuch"
+                        }
+                    },
+                    {
+                        "id": "survey",
+                        "label": {
+                            "en": "Survey",
+                            "de": "Umfrage"
+                        }
+                    },
+                    {
+                        "id": "organism",
+                        "label": {
+                            "en": "Organism",
+                            "de": "Organismus"
+                        }
+                    },
+                    {
+                        "id": "customDataSource",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+
+                ]
+            },
+            {
+                "id": "customDataSourceType",
+                "conditions":[
+                    ["dataSourceDetail", "is", "customDataSource"]
+                ],
+                "label": {
+                    "en": "Data source type",
+                    "de": "Datenquellen-Typ"
+                },
+                "type": "text"
+            },
+            {
+                "id": "dataSourceInformation",
+                "conditions":[
+                    ["dataSourceDetail", "exists"]
+                ],
+                "label": {
+                    "en": "Data source information",
+                    "de": "Informationen zur Datenquelle"
+                },
+                "type": "text"
+            }
+        ]
+    },
+    {
+        "id": "software",
+        "label": "Software",
+        "fields": [
+            {
+                "id": "softwareType",
+                "label": {
+                    "en": "Software type",
+                    "de": "Software-Typ"
+                },
+                "type": "monoselect",
+                "options":[
+                    {
+                        "id": "resourceProduction",
+                        "label": {
+                            "en": "Resource production",
+                            "de": "Datenerstellung"
+                        }
+                    },
+                    {
+                        "id": "resourceProcessing",
+                        "label": {
+                            "en": "Resource processing",
+                            "de": "Datenverarbeitung"
+                        }
+                    },
+                    {
+                        "id": "resourceViewing",
+                        "label": {
+                            "en": "Ressource viewing",
+                            "de": "Datenansicht"
+                        }
+                    },
+                    {
+                        "id": "customSoftware",
+                        "label": {
+                            "en": "Other",
+                            "de": "Sonstige"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "customSoftwareType",
+                "conditions":[
+                    ["softwareType", "is", "customSoftware"]
+                ],
+                "label": {
+                    "en": "Software type",
+                    "de": "Software-Typ"
+                },
+                "type": "text"
+            },
+            {
+                "id": "softwareName",
+                "conditions": [
+                    ["softwareType", "exists"]
+                ],
+                "label": {
+                    "en": "Software name",
+                    "de": "Name der Software"
+                },
+                "type": "text"
+            },
+            {
+                "id": "softwareVersion",
+                "conditions":[
+                    ["softwareType", "exists"]
+                ],
+                "label": {
+                    "en": "Software version",
+                    "de": "Version der Software"
+                },
+                "type": "text"
+            },
+            {
+                "id": "softwareAdditional",
+                "conditions":[
+                    ["softwareType", "exists"]
+                ],
+                "label": {
+                    "en": "Additional information",
+                    "de": "Weitere Informationen"
+                },
+                "type": "text"
             }
         ]
     }
+    
 ]
