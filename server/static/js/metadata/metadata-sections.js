@@ -1,4 +1,4 @@
-export const CONTENT = ['subject', 'description', 'geolocation', 'alternateIdentifier', 'language', 'version', 'date']
+export const CONTENT = ['geolocation', 'alternateIdentifier', 'language', 'version', 'date']
 export const RELATIONS = ['relation']
 export const SCOPE = ['format', 'size']
 export const ORIGIN_AND_CREATION = ['contributor', 'datasource', 'software', 'fundingReference']
