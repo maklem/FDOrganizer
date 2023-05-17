@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -f ./initialized ]; then
+if [ ! -f /server/initialized ]; then
   # Wait for db to come up
   ping -c 10 db > /dev/null || (echo "DB unreachable";exit)
 
@@ -17,7 +17,7 @@ if [ ! -f ./initialized ]; then
   
   # Set initialized
   echo "CouchDB initialized"
-  touch ./initialized
+  touch /server/initialized
 fi
 
 flask --app server --debug run --host=0.0.0.0 --cert=/server/server/ssl/ca.crt --key=/server/server/ssl/ca.key
