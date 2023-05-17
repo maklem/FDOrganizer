@@ -30,15 +30,18 @@ Projekt LZV des Bibliotheksverbund Bayern
 
     `pip install -r requirements.txt`
 
-1. Konfigurieren der CouchDB Zugangsdaten in `.server/conf/config.json`
+1. Konfigurieren der CouchDB Zugangsdaten in `.env`-Datei
 
-    ```json
-    {
-        "couchDBBaseURL": "protocol[http|https]://host:port",
-        "couchDBAdmin": "username",
-        "couchDBPassword": "password"
-    }
-    ```
+    1. Erstellen einer Datei im Projektverzeichnis mit dem Namen `.env`
+
+    2. Setzen von Umgebungsvariablen, die für die Interaktion des FDOrganizer mit der Datenbank nötig sind (hier mit Beispielwerten)
+
+        ```
+        COUCHDB_USER=admin
+        COUCHDB_PASSWORD=admin
+        COUCHDB_HOST=127.0.0.1
+        COUCHDB_PORT=5984
+        ```
 
 1. Erstellen von Datenbanken
 
@@ -64,6 +67,24 @@ Die Startskripte starten die App im Debug-Modus und nutzen die mitgelieferten Se
 * Linux
 
     Start via `./start.sh` oder `sh start.sh`
+
+### Docker
+
+Für das Setup via docker wird eine funktionierende Installation der Docker Engine sowie des Docker Compose Plugins benötigt.
+
+1. Setzen von Datenbanknutzer und -passwort wie unter [Installation -> Schritte](#schritte) beschrieben.
+
+2. Port Mapping für Datenbank und FDO in `docker-compose.yml` anpassen
+
+    * Die Syntax für die Ports ist *hostsystem:container*.
+
+    * Standardmäßig nutzt CouchDB Port **5984**, der FDO nutzt Port **5000**.
+
+3. Die benötigten Datenbanken und deren Setup wird beim ersten Starten des FDO-Containers ausgeführt (siehe [`init.sh`](./init.sh))
+
+4. Wird das compose plugin für Docker zum Starten genutzt, kann der Cluster über `docker compose up` gestartet werden.
+
+5. Die Default-Namen der Container können auch in `docker-compose.yml` angepasst werden mit dem Property `container_name`.
 
 ## Wartung
 
