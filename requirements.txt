@@ -37,6 +37,7 @@ pycparser==2.21
 PyJWT==2.6.0
 pylint==2.15.4
 pyparsing==3.0.9
+python-dotenv==1.0.0
 python-ldap==3.4.3 ; sys_platform != 'win32'
 ./python_ldap-3.4.0-cp310-cp310-win_amd64.whl ; sys_platform == 'win32'
 PyYAML==6.0

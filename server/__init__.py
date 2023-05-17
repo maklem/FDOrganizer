@@ -1,4 +1,5 @@
 import logging
+from dotenv import load_dotenv
 from flask import Flask
 from werkzeug.exceptions import HTTPException
 
@@ -8,6 +9,7 @@ APP = Flask(__name__)
 APP.config["UPLOAD_FOLDER"] = './uploads'
 APP.config["MAX_CONTENT_LENGTH"] = 1_000_000_000
 
+load_dotenv(dotenv_path="../.env")
 
 @APP.errorhandler(HTTPException)
 def handle_exception(error):

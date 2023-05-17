@@ -1,24 +1,19 @@
 '''
     Script for creating a new couchDB Database
 '''
-import json
+import os
 import sys
+from dotenv import load_dotenv
 import requests
 
-#Reading Config
-def config_file():
-    with open('./server/conf/config.json') as f:
-        return json.load(f)
-
 def credentials():
-    config = config_file()
     return {
-        "username": f'{config["couchDBAdmin"]}',
-        "password": f'{config["couchDBPassword"]}',
+        "username": f'{os.getenv("COUCHDB_USER")}',
+        "password": f'{os.getenv("COUCHDB_PASSWORD")}',
     }
 
 def base_url():
-    return config_file()["couchDBBaseURL"]
+    return f'http://{os.getenv("COUCHDB_HOST")}:{os.getenv("COUCHDB_PORT")}'
 
 #Authentication
 def authenticate(url: str, username: str, password: str):
@@ -62,6 +57,7 @@ def create_database(name: str, token: str):
 
 #Run
 if __name__ == '__main__':
+    load_dotenv()
     username, password = credentials().values()
     token = authentication_token(username, password)
     if not token:

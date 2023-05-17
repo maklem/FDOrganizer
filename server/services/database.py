@@ -1,5 +1,6 @@
 import json
-from typing import Any, Literal, Optional, Union
+import os
+from typing import Any, Literal, Optional
 import urllib.parse
 from base64 import b64encode
 
@@ -7,17 +8,16 @@ import requests
 
 from ..entities.databases import Databases
 from ..entities.couch_document import CouchDocument
-from ..util import get_config
 
 
 def auth_header() -> dict[str, str]:
-    username = get_config()["couchDBAdmin"]
-    password = get_config()["couchDBPassword"]
+    username = os.getenv('COUCHDB_USER')
+    password = os.getenv('COUCHDB_PASSWORD')
     return {"Authorization": f'Basic {encode_credentials(username, password)}'}
 
 
 def base_url():
-    return get_config()["couchDBBaseURL"]
+    return f'http://{os.getenv("COUCHDB_HOST")}:{os.getenv("COUCHDB_PORT")}'
 
 
 def query_params(parameters: dict[str, str]) -> str:

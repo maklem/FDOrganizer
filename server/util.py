@@ -1,13 +1,8 @@
 import json
 from typing import Any, Optional, Union
 from flask import make_response
-from pkg_resources import resource_filename
 
 from .entities.databases import Databases
-
-def get_config() -> dict[str, Union[str, list[str]]]:
-    with open(resource_filename(__name__, "./conf/config.json"), encoding="utf-8") as config:
-        return json.load(config)
 
 def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]] = None, component = "SERVER"):
     error_data: dict[str, Union[str, list[str]]] = {
