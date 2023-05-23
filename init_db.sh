@@ -19,5 +19,3 @@ if [ ! -f /server/initialized ]; then
   echo "CouchDB initialized"
   touch /server/initialized
 fi
-
-flask --app server --debug run --host=0.0.0.0 --cert=/server/server/ssl/ca.crt --key=/server/server/ssl/ca.key
