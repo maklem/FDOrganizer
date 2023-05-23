@@ -22,12 +22,4 @@ def handle_exception(error):
     return web_error(error.code, f'{error.name}: {error.description}', stacktrace=error.description, component="SERVER")
 
 logging.basicConfig(level=logging.DEBUG)
-
-import server.router
-import server.login
-import server.metadata
-import server.package_details
-import server.package
-import server.source_import
-import server.archive
-import server.export
+from . import router,login,metadata,package_details,package,source_import,archive,export
