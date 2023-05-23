@@ -4,6 +4,7 @@
 import sys
 import requests
 import create_database
+from dotenv import load_dotenv
 from requests import HTTPError
 from dotenv import load_dotenv
 
