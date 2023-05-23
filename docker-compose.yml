@@ -3,9 +3,9 @@ version: '3.3'
 services:
   fdorganizer:
     build: .
-    container_name: fdo
-    ports:
-      - "5000:5000"
+    container_name: fdorganizer
+    expose:
+      - "8080"
     depends_on:
       - db
     environment:
@@ -13,12 +13,24 @@ services:
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
       - COUCHDB_HOST=db
       - COUCHDB_PORT=5984
+    command:
+      - sh
+      - -c
+      - /server/init_db.sh && /server/start.sh
 
   db:
     image: couchdb:latest
     container_name: db
-    ports:
-      - "5984:5984"
+    expose:
+      - "5984"
     environment:
       - COUCHDB_USER=${COUCHDB_USER}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    depends_on:
+      - fdorganizer
+    ports:
+      - "34000:80"
