@@ -5,9 +5,8 @@ WORKDIR /server
 
 RUN apk add build-base openldap-dev python3-dev
 
-COPY requirements.txt .
+COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
-CMD ["./init.sh"]
+RUN chmod +x /server/init.sh
+CMD ["/bin/sh", "/server/init.sh"]
