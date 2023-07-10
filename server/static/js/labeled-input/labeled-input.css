@@ -14,6 +14,7 @@
     font-weight: 700;
     color: #777;
     font-size: var(--label-font);
+    white-space: nowrap;
 }
 
 .field-label .label-text[invalid="true"]{
@@ -22,7 +23,7 @@
 
 .field-label .input {
     outline: 0;
-    border: 0.1rem solid var(--secondary-color);
+    border: 0.1rem solid var(--primary-color);
     border-radius: 0.2rem;
     padding: 0.5rem 0.5rem;
 
@@ -41,7 +42,7 @@
 
 .field-label .input:focus:not([disabled]),
 .field-label .input:active:not([disabled]) {
-    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-secondary-color), 0.20), 0px 0px 0px 1px rgba(var(--rgb-secondary-color), 0.20);
+    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-primary-color), 0.20), 0px 0px 0px 1px rgba(var(--rgb-primary-color), 0.20);
 }
 
 .field-label .select {
@@ -64,8 +65,8 @@
 .field-label .select:focus:not([disabled]),
 .field-label .select:active:not([disabled]) {
     background-image:
-    linear-gradient(45deg, transparent 50%, var(--secondary-color) 50%),
-    linear-gradient(135deg, var(--secondary-color) 50%, transparent 50%),
+    linear-gradient(45deg, transparent 50%, var(--primary-color) 50%),
+    linear-gradient(135deg, var(--primary-color) 50%, transparent 50%),
     linear-gradient(to right, #fff, #fff);
 }
 

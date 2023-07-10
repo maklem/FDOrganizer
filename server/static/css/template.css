@@ -19,13 +19,13 @@ html {
     --rgb-font-color: 51, 51, 51;
     --font-color: #333333;
 
-    --primary-color: #008557;
-    --rgb-primary-color: 0, 133, 87;
+    --primary-color: #0B5FCB;
+    --rgb-primary-color: 11, 95, 203;
     --on-primary-color: #ffffff;
 
-    --secondary-color: #c54700;
-    --rgb-secondary-color: 197, 71, 0;
-    --on-secondary-color: #000000;
+    --secondary-color: #CB0B7A;
+    --rgb-secondary-color: 203, 11, 122;
+    --on-secondary-color: #ffffff;
 
     --error: #b71c1c;
     --rgb-error: 183, 28, 28;
