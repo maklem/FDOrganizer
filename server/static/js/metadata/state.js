@@ -13,10 +13,6 @@ export const store = reactive({
     document: undefined,
     schema: undefined,
     schemaVersion: "1",
-    resourceType: {
-        value: undefined,
-        options: [],
-    },
     subject: undefined,
     loading: {
         document: true,
@@ -25,7 +21,6 @@ export const store = reactive({
     saveMetadata,
     addField,
     addSubfield,
-    setResourceType,
     checkConditions,
     getAllFields,
     reset,
@@ -34,14 +29,12 @@ export const store = reactive({
 
 async function getDocument(documentId) {
     store.loading.document = true
-    store.resourceType.options = RESOURCE_TYPES
     const json = await get(`/document/${documentId}/metadata`)
 
     store.document = json.document
 
     if (!!json.metadata) {
         store.metadata = json.metadata.metadata
-        store.resourceType.value = json.metadata.resource_type
         store.schema = await getSchema(json.metadata.schema_version)
     }
     else {
@@ -71,7 +64,6 @@ async function saveMetadata() {
     await put(`/document/${store.document.id}/metadata`, {
             metadata: filteredData,
             schema_version: store.schemaVersion,
-            resource_type: store.resourceType.value
         }
     )
     return true
@@ -87,17 +79,12 @@ function createRequired(schema) {
     return requiredFields
 }
 
-function createResourceSpecific(schema) {
-    return schema.filter(field => field.compatibleTypes?.includes(store.resourceType.value))
-}
-
 function createSection(schema, fieldNames, label) {
     return schema.filter(field => fieldNames.includes(field.id))
 }
 
 function splitSchema(schema) {
     const required = createRequired(schema)
-    const resourceSpecific = createResourceSpecific(schema)
     return {
         required,
         content: createSection(schema, CONTENT, 'Content'),
@@ -105,20 +92,14 @@ function splitSchema(schema) {
         provenance: createSection(schema, ORIGIN_AND_CREATION, 'Data Creation & Aquisition'),
         relations: createSection(schema, RELATIONS, 'Related Documents'),
         rights: createSection(schema, USAGE_AND_RIGHTS, 'Usage & Rights'),
-        resourceSpecific,
     }
 }
 
 function sectionLabel(key) {
     if (!store.schema.hasOwnProperty(key)) return ''
-    if (key === 'resourceSpecific') return resourceSectionLabel()
     return LABELS[key]
 }
 
-function resourceSectionLabel() {
-    const resourceType = store.resourceType.options.find(type => type.id === store.resourceType.value)
-    return `Specific for ${localized(resourceType.label)}` 
-}
 function addField(fieldId) {
     const field = store.getAllFields().find(field => field.id === fieldId)
     const dummy = makeTemplate(field)
@@ -205,15 +186,11 @@ function validateAll(metadata, schema) {
     })
 }
 
-function setResourceType(value) {
-    store.resourceType.value = value
-}
 
 function reset() {
     store.metadata = undefined
     store.touched = false
     store.document = undefined
-    store.resourceType.value = undefined
 }
 
 const LABELS = {
@@ -224,178 +201,3 @@ const LABELS = {
     provenance: 'Data Creation & Acquisition',
     rights: 'Usage & Rights'
 }
-
-const RESOURCE_TYPES = [
-    {
-        "id": "audiovisual",
-        "label": {
-            "en": "Audiovisual",
-            "de": "Audiovisuell"
-        }
-    },
-    {
-        "id": "book",
-        "label": {
-            "en": "Book",
-            "de": "Buch"
-        }
-    },
-    {
-        "id": "bookChapter",
-        "label": {
-            "en": "Book chapter",
-            "de": "Buchkapitel",
-        } 
-    },
-    {
-        "id": "collection",
-        "label": {
-            "en": "Collection",
-            "de": "Sammlung"
-        }
-    },
-    {
-        "id": "computationalNotebook",
-        "label": "Computational notebook"
-    },
-    {
-        "id": "conferencePaper",
-        "label": {
-            "en": "Conference paper",
-            "de": "Konferenzbeitrag",
-        } 
-    },
-    {
-        "id": "conferenceProceeding",
-        "label": {
-            "en": "Conference proceeding",
-            "de": "Konferenzband",
-        } 
-    },
-    {
-        "id": "dataPaper",
-        "label": {
-            "en": "Data paper",
-            "de": "Datenpublikation"
-        }
-    },
-    {
-        "id": "dataset",
-        "label": {
-            "en": "Dataset",
-            "de": "Datenset"
-        }
-    },
-    {
-        "id": "dissertation",
-        "label": "Dissertation"
-    },
-    {
-        "id": "event",
-        "label": {
-            "en": "Event",
-            "de": "Veranstaltung"
-        }
-    },
-    {
-        "id": "image",
-        "label": {
-            "en": "Image",
-            "de": "Bild"
-        }
-    },
-    {
-        "id": "interactiveResource",
-        "label": {
-            "en": "Interactive resource",
-            "de": "Interaktive Ressource"
-        }
-    },
-    {
-        "id": "journal",
-        "label": {
-            "en": "Journal",
-            "de": "Zeitschrift",
-        } 
-    },
-    {
-        "id": "journalArticle",
-        "label": {
-            "en": "Journal article",
-            "de": "Zeitschriftenartikel",
-        } 
-    },
-    {
-        "id": "model",
-        "label": {
-            "en": "Model",
-            "de": "Modell"
-        }
-    },
-    {
-        "id": "outputManagementPlan",
-        "label": {
-            "en": "Output management plan",
-            "de": "Output-Management Plan",
-        } 
-    },
-    {
-        "id": "peerReview",
-        "label": {
-            "en": "Peer review",
-            "de": "Peer-review",
-        } 
-    },
-    {
-        "id": "physicalObject",
-        "label": {
-            "en": "Physical object",
-            "de": "Physisches Medium"
-        }
-    },
-    {
-        "id": "preprint",
-        "label": "Preprint"
-    },
-    {
-        "id": "report",
-        "label": "Report"
-    },
-    {
-        "id": "service",
-        "label": "Service",
-    },
-    {
-        "id": "software",
-        "label": "Software",
-    },
-    {
-        "id": "sound",
-        "label": {
-            "en": "Sound",
-            "de": "Audio"
-        }
-    },
-    {
-        "id": "standard",
-        "label": "Standard"
-    },
-    {
-        "id": "text",
-        "label": "Text"
-    },
-    {
-        "id": "workflow",
-        "label": {
-            "en": "Workflow",
-            "de": "Prozessbeschreibung"
-        }
-    },
-    {
-        "id": "other",
-        "label": {
-            "en": "Other",
-            "de": "Sonstige"
-        }
-    }
-]
