@@ -22,30 +22,25 @@
 
 .section-header .icon{
     font-size: 1.5rem;
-    color: var(--primary-color);
+    color: var(--secondary-color);
 }
 
 .metadata-section .section-content {
     display:grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
 }
 
 .field-group {
-    min-width: fit-content;
     display: grid;
     grid-auto-flow: row;
     grid-auto-rows: max-content;
-    grid-template-rows: repeat(auto-fit, max-content);
 }
 
 .field-group .field-instance{
-    max-width: fit-content;
-
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
+    display: flex;
     align-items: center;
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .field-instance .remove-instance {
