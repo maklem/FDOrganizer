@@ -51,5 +51,27 @@
 }
 
 .field-group .add-instance{
+    width: fit-container;
+}
+
+.field-instance .remove-instance {
     width: fit-content;
+    height: fit-content;
+    color: var(--error);
+
+    border: none;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 200ms;
+}
+
+.field-instance .remove-instance:hover {
+    background-color: rgba(var(--rgb-error), 0.3);
+}
+
+.field-instance .remove-instance:active {
+    filter: brightness(1.2);
 }

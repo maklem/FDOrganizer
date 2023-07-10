@@ -8,8 +8,8 @@
             <fieldset v-if="!!field.fields" class="field-group">
                 <legend>{{localized(field.label)}}</legend>
                 <div v-if="!!store.metadata[field.id]?.length" class="field-instance" v-for="(instance, index) in store.metadata[field.id]">
-                    <Button class="remove-instance" @button-clicked="store.metadata[field.id].splice(index,1)">
-                        <i class="fa-solid fa-minus"></i>
+                    <Button class="remove-instance" :flat @button-clicked="store.metadata[field.id].splice(index,1)">
+                        <i class="fa-solid fa-trash"></i>
                     </Button>
                     <template v-for="subfield in field.fields">
                         <template v-if="store.checkConditions(instance, subfield)">
