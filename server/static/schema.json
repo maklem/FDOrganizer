@@ -32,13 +32,6 @@
                             "en": "Other",
                             "de": "Sonstige"
                         }
-                    },
-                    {
-                        "id": "unpublished",
-                        "label": {
-                            "en": "Unpublished",
-                            "de": "Unveröffentlicht"
-                        }
                     }
                 ]
             },
@@ -106,11 +99,11 @@
         "min":1,
           "fields": [
             {
-                "id":"creatorNameType",
+                "id":"creatorType",
                 "alias":["datacite:Creator:nameType"],
                 "label": {
-                    "en":"Name type",
-                    "de":"Namen-Typ"
+                    "en":"Creator Type",
+                    "de":"Art des Autors"
                 },
                 "min":1,
                 "max":1,
@@ -130,66 +123,112 @@
                 ]
             },
             {
-                "id":"creatorNameOrganizational",
-                "alias":["datacite:Creator:creatorName", "dcterms:creator"],
-                "conditions":[
-                    ["creatorNameType", "is","organizational"]
-                ],
-                "label": "Name",
-                "placeholder": "e.g. GeoForschungsZentrum Potsdam (GFZ)",
-                "min":1,
-                "max":1,
-                "type":"text"
-                
-            },
-            {
-                "id":"creatorOrganizationalIdentifierName",
+                "id":"organisationIdentifierType",
                 "alias":["datacite:Creator:nameIdentifierScheme"],
-                "conditions":[
-                    ["creatorNameType", "is","organizational"]
-                ],
                 "label": {
-                    "en": "Type of identifier",
-                    "de": "Art des Identifikators"
+                    "en":"Organisational identifier",
+                    "de":"Art der Institutions-ID"
                 },
-                "placeholder": "e.g. ROR",
+                "conditions":[
+                    ["creatorType", "is","organizational"]
+                ],
                 "min":1,
                 "max":1,
-                "type":"text"
-            
+                "type":"monoselect",
+                "options":[
+                    {
+                        "id": "ror",
+                        "label": "ROR"
+                    },
+                    {
+                        "id":"name",
+                        "label": {
+                            "en":"name",
+                            "de":"Name"
+                        }
+                    },
+                    {
+                        "id": "gnd",
+                        "label": "GND"
+                    }
+                ]
             },
             {
-                "id":"creatorOrganizationalIdentifier",
-                "alias":["datacite:Creator:nameIdentifier", "dcterms:identifier"],
-                "conditions":[
-                    ["creatorNameType", "is", "organizational"]
-                ],
-                "label": {
-                    "en":"Identifier",
-                    "de":"Identifikator"
-                },
-                "placeholder": "e.g. https://ror.org/04z8jg394",
-                "min":1,
-                "max":1,
-                "type":"text"
-            },
-            {
-                "id": "creatorNamePersonal",
+                "id":"organizationROR",
                 "alias":["datacite:Creator:creatorName", "dcterms:creator"],
                 "conditions":[
-                    ["creatorNameType", "is", "personal"]
+                    ["creatorType", "is", "organizational"],
+                    ["organisationIdentifierType", "is","ror"]
+                ],
+                "label": "ROR",
+                "placeholder": "e.g. 01eezs655",
+                "min":1,
+                "max":1,
+                "type":"ror"
+            },
+            {
+                "id":"organizationName",
+                "alias":["datacite:Creator:creatorName", "dcterms:creator"],
+                "conditions":[
+                    ["creatorType", "is", "organizational"],
+                    ["organisationIdentifierType", "is","name"]
+                ],
+                "label": {
+                    "en":"Organisation Name",
+                    "de":"Name der Institution"
+                },
+                "placeholder": "e.g. University of Regensburg",
+                "min":1,
+                "max":1,
+                "type":"text"
+            },
+            {
+                "id":"organizationGND",
+                "alias":["datacite:Creator:creatorName", "dcterms:creator"],
+                "conditions":[
+                    ["creatorType", "is", "organizational"],
+                    ["organisationIdentifierType", "is","gnd"]
+                ],
+                "label": {
+                    "en":"GND number",
+                    "de":"GND-Nummer"
+                },
+                "placeholder": "e.g. 1012048-8",
+                "min":1,
+                "max":1,
+                "type":"gnd"
+            },
+            {
+                "id": "personIdentifierType",
+                "alias":["datacite:Creator:nameIdentifierScheme", "dcterms:creator"],
+                "conditions":[
+                    ["creatorType", "is", "personal"]
                 ],
                 "label": "Name",
                 "placeholder": "e.g. Arendt, Hannah",
                 "min": 1,
                 "max": 1,
-                "type": "letter-string"
+                "type":"monoselect",
+                "options":[
+                    {
+                        "id":"name",
+                        "label": {
+                            "en":"name",
+                            "de":"Name"
+                        }
+                    },
+                    {
+                        "id": "orcid",
+                        "label": "ORCiD"
+                    }
+                ]
             },
             {
                 "id": "creatorLastName",
                 "alias": ["datacite:Creator:familyName"],
                 "conditions": [
-                    ["creatorNameType", "is", "personal"]
+                    ["creatorType", "is", "personal"],
+                    ["personIdentifierType", "is", "name"]
                 ],
                 "label": {
                     "en": "Last Name",
@@ -204,7 +243,8 @@
                 "id": "creatorFirstName",
                 "alias": ["datacite:Creator:givenName"],
                 "conditions": [
-                    ["creatorNameType", "is", "personal"]
+                    ["creatorType", "is", "personal"],
+                    ["personIdentifierType", "is", "name"]
                 ],
                 "label": {
                     "en": "First Name",
@@ -216,10 +256,11 @@
                 "type": "letter-string"
             },
             {
-                "id":"creatorIdentifier",
-                "alias":[""],
+                "id":"creatorOrcid",
+                "alias":["datacite:Creator:nameIdentifier"],
                 "conditions":[
-                    ["creatorNameType", "is","personal"]
+                    ["creatorType", "is","personal"],
+                    ["personIdentifierType", "is", "orcid"]
                 ],
                 "label": "ORCiD",
                 "placeholder": "e.g. 0000-0001-2345-6789",
@@ -228,45 +269,76 @@
                 "type": "orcid"
             },
             {
-                "id": "creatorAffiliationName",
-                "alias": ["datacite:Creator:affiliation", "dcterms:contributor"],
-                "conditions":[
-                    ["creatorNameType", "is", "personal"]
-                ],
-                "label": "Affiliation",
-                "placeholder": "e.g. Universität Bayreuth",
-                "min": 1,
-                "max": 1,
-                "type": "letter-string"
-            },
-            {
                 "id": "creatorAffiliationIdentifierType",
                 "conditions": [
-                    ["creatorNameType", "is", "personal"]
+                    ["creatorType", "is", "personal"]
                 ],
                 "label": {
-                    "en": "Type of identifier of affiliation",
-                    "de": "Art des Identifikators der Affiliation"
+                    "en": "Affiliated institution",
+                    "de": "Institutszugehörigkeit"
                 },
-                "placeholder": "e.g. ROR",
-                "min": 1,
                 "max": 1,
+                "min": 1,
+                "type":"monoselect",
+                "options":[
+                    {
+                        "id": "ror",
+                        "label": "ROR"
+                    },
+                    {
+                        "id":"name",
+                        "label": {
+                            "en":"name",
+                            "de":"Name"
+                        }
+                    },
+                    {
+                        "id": "gnd",
+                        "label": "GND"
+                    }
+                ]
+            },
+            {
+                "id": "creatorAffiliationName",
+                "alias": ["datacite:Creator:affiliation"],
+                "conditions":[
+                    ["creatorType", "is", "personal"],
+                    ["creatorAffiliationIdentifierType", "is", "name"]
+                ],
+                "label": "Name",
+                "placeholder": "e.g. Universität Bayreuth",
+                "max": 1,
+                "min": 1,
                 "type": "letter-string"
             },
             {
-                "id": "creatorAffiliationIdentifier",
-                "alias": ["datacite:Creator:affiliationIdentifier", "dcterms:identifier"],
+                "id": "creatorAffiliationROR",
+                "alias": ["datacite:Creator:affiliationIdentifier"],
                 "conditions": [
-                    ["creatorNameType", "is", "personal"]
+                    ["creatorType", "is", "personal"],
+                    ["creatorAffiliationIdentifierType", "is", "ror"]
                 ],
-                "label": {
-                    "en": "Identifier of affiliation",
-                    "de": "Identifikator der Affiliation"
-                },
-                "placeholder": "e.g. https://ror.org/0234wmv40",
+                "label": "ROR",
+                "placeholder": "e.g. 0234wmv40",
                 "min": 1,
                 "max": 1,
-                "type": "letter-string"
+                "type": "ror"
+            },
+            {
+                "id":"creatorAffiliationGND",
+                "alias":["datacite:Creator:creatorName", "dcterms:creator"],
+                "conditions":[
+                    ["creatorType", "is", "personal"],
+                    ["creatorAffiliationIdentifierType", "is","gnd"]
+                ],
+                "label": {
+                    "en":"GND number",
+                    "de":"GND-Nummer"
+                },
+                "placeholder": "e.g. 1012048-8",
+                "min":1,
+                "max":1,
+                "type":"gnd"
             }
           ]
     },
@@ -344,121 +416,133 @@
                 },
                 "max":1,
                 "type": "text",
-                "placeholder": "e.g. Vita activa oder Vom tätigen Leben"
+                "placeholder": "e.g. Herr der Ringe"
             }
         ]
     },
     {
-        "id": "publisher",
-        "alias":["datacite:Publisher","dcterms:publisher"],
+        "id": "publishing",
         "label": {
-            "en": "Publisher",
-            "de": "Herausgeber*in"
+            "en": "Publishing",
+            "de": "Veröffentlichung"
         },
         "min": 1,
+        "max": 1,
           "fields": [
             {
-                "id": "publisherName",
-                "label": "Name",
-                "placeholder": "e.g. GeoForschungsZentrum Potsdam (GFZ)",
-                "type": "text"
-            },
-            {
-                "id": "publisherIdentifierScheme",
+                "id": "isPublished",
                 "label": {
-                    "en": "Type of identifier",
-                    "de": "Art des Identifikators"
+                    "en": "Published resource?",
+                    "de": "Ressource publiziert?"
                 },
                 "min":1,
                 "max":1,
                 "type": "monoselect",
                 "options":[
                     {
-                        "id": "publisherOrcid",
-                        "label": "ORCiD"
-                    },
-                    {
-                        "id": "publisherRor",
-                        "label": "ROR"
-                    },
-                    {
-                        "id": "customPublisher",
+                        "id": "true",
                         "label": {
-                            "en": "Other",
-                            "de": "Sonstige"
+                            "en": "Yes",
+                            "de": "Ja"
+                        }
+                    },
+                    {
+                        "id": "false",
+                        "label": {
+                            "en": "No",
+                            "de": "Nein"
                         }
                     }
                 ]
             },
             {
-                "id": "publisherIdentifierOrcid",
-                "conditions":[
-                    ["publisherIdentifierScheme", "is", "publisherOrcid"]
+                "id": "publisher",
+                "alias":["datacite:Publisher","dcterms:publisher"],
+                "conditions": [
+                    ["isPublished", "is", "true"]
                 ],
-                "label": "ORCiD",
-                "min":1,
-                "max":1,
-                "type":"orcid",
-                "placeholder":"e.g. 0000-0001-2345-6789"
-            },
-            {
-               "id":"publisherIdentifierRor",
-               "conditions":[
-                    ["publisherIdentifierScheme", "is", "publisherRor"]
-               ],
-               "label": "ROR",
-               "min":1,
-               "max":1,
-               "type":"ror" ,
-               "placeholder":"e.g. https://ror.org/0234wmv40"
-            },
-            {
-                "id":"publisherCustomNameIdentifier",
-                "conditions":[
-                    ["publisherIdentifierScheme", "is", "customPublisher"]
-                ],
-                "label":{
-                    "en": "Type of identifier",
-                    "de": "Art des Identifikators"
-                },
-                "min":1,
-                "max":1,
-                "type": "text"
-            },
-            {
-                "id":"publisherIdentifierCustom",
-                "conditions":[
-                    ["publisherIdentifierScheme", "is","customPublisher"]
-                ],
-                "label":{
-                    "en":"Identifier",
-                    "de":"Identifikator"
-                },
-                "min":1,
-                "max":1,
-                "type":"text"
-            }
-          ]
-    },
-    {
-        "id": "publicationYear",
-        "alias":["datacite:PublicationYear", "dcterms:issued"],
-        "label": {
-            "en": "Publication Year",
-            "de": "Publikationsjahr"
-        },
-        "min": 1,
-         "fields":[
-            {
-                "id": "publicationYear",
                 "label": {
-                    "en": "Publication Year",
-                    "de": "Publikationsjahr"
+                    "en": "Publisher",
+                    "de": "Herausgeber*in"
                 },
-                "placeholder": "e.g. 2021",
-                "type": "decimal"
+                "min": 1,
+                  "fields": [
+                    {
+                        "id": "publisherIdentifierScheme",
+                        "label": {
+                            "en": "Type of identifier",
+                            "de": "Art des Identifikators"
+                        },
+                        "min":1,
+                        "max":1,
+                        "type": "monoselect",
+                        "options":[
+                            {
+                                "id": "orcid",
+                                "label": "ORCiD"
+                            },
+                            {
+                                "id": "ror",
+                                "label": "ROR"
+                            },
+                            {
+                                "id": "name",
+                                "label": "Name"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "publisherIdentifierOrcid",
+                        "alias":["datacite:Publisher","dcterms:publisher"],
+                        "conditions":[
+                            ["isPublished", "is", "true"],
+                            ["publisherIdentifierScheme", "is", "orcid"]
+                        ],
+                        "label": "ORCiD",
+                        "min":1,
+                        "max":1,
+                        "type":"orcid",
+                        "placeholder":"e.g. 0000-0001-2345-6789"
+                    },
+                    {
+                       "id":"publisherIdentifierRor",
+                       "alias":["datacite:Publisher","dcterms:publisher"],
+                       "conditions":[
+                            ["isPublished", "is", "true"],
+                            ["publisherIdentifierScheme", "is", "ror"]
+                       ],
+                       "label": "ROR",
+                       "min":1,
+                       "max":1,
+                       "type":"ror" ,
+                       "placeholder":"e.g. https://ror.org/0234wmv40"
+                    },
+                    {
+                        "id": "publisherName",
+                        "alias": ["datacite:Publisher","dcterms:publisher"],
+                        "conditions":[
+                            ["publisherIdentifierScheme", "is", "name"]
+                       ],
+                        "label": "Name",
+                        "placeholder": "e.g. GeoForschungsZentrum Potsdam (GFZ)",
+                        "type": "text"
+                    }
+                  ]
+            },
+            {
+                "id": "publicationDate",
+                "alias":["datacite:Date", "dcterms:issued"],
+                "conditions":[
+                    ["isPublished", "is", "true"]
+                ],
+                "min": 1,
+                "max":1,
+                "label": {
+                    "en": "Publication Date",
+                    "de": "Veröffentlichungsdatum"
+                },
+                "type": "date"
             }
-
         ]
     },
     {
@@ -467,41 +551,14 @@
             "en": "Subject & Keywords",
             "de": "Fachgebiet & Keywords"
         },
-        "min": 1,
         "fields": [
-            {
-                "id": "subjectScheme",
-                "label": {
-                    "en": "Type of subject",
-                    "de": "Art des Themas"
-                },
-                "type": "monoselect",
-                "min": 1,
-                "max": 1,
-                "options": [
-                    {
-                        "id": "classification",
-                        "label": {
-                            "en": "Classification",
-                            "de": "Klassifikation"
-                        }
-                    },
-                    {
-                        "id": "keyword",
-                        "label": "Keyword"
-                    }
-                ]
-            },
             {
                 "id": "subjectIdentifierType",
                 "alias":["datacite:Subject:subjectScheme"],
                 "label": {
-                    "en": "Type of Identifier",
-                    "de": "Art des Identifikators"
+                    "en": "Subject descriptor",
+                    "de": "Themenklassifikation"
                 },
-                "conditions": [
-                    ["subjectScheme", "is", "classification"]
-                ],
                 "type": "monoselect",
                 "min": 1,
                 "max": 1,
@@ -511,26 +568,6 @@
                         "label": "DDC"
                     },
                     {
-                        "id": "customClassification",
-                        "label": {
-                            "en": "Other",
-                            "de": "Sonstige"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "subjectIdentifierType",
-                "alias":["datacite:Subject:subjectScheme"],
-                "label": "Type of Keyword",
-                "conditions":[
-                    ["subjectScheme", "is", "keyword"]
-                ],
-                "type": "monoselect",
-                "min": 1,
-                "max": 1,
-                "options": [
-                    {
                         "id": "gnd",
                         "label": "GND"
                     },
@@ -539,10 +576,10 @@
                         "label": "Wikidata"
                     },
                     {
-                        "id": "customKeyword",
+                        "id": "csv",
                         "label": {
-                            "en": "Other",
-                            "de": "Sonstige"
+                            "en": "Keyword list",
+                            "de": "Keyword-Liste"
                         }
                     }
                 ]
@@ -553,66 +590,23 @@
                 "conditions": [
                     ["subjectIdentifierType", "is", "ddc"]
                 ],
-                "label": {
-                    "en": "Identifier",
-                    "de": "Identifikator"
-                },
+                "label": "DDC-Code",
                 "min": 1,
                 "max": 1,
                 "type": "ddc",
                 "placeholder": "e.g. 551.6"
             },
             {
-                "id": "subjectKeywordDdc",
-                "alias":["datacite:Subject", "dcterms:subject"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "ddc"]
-                ],
-                "label": "Keyword",
-                "min": 1,
-                "max": 1,
-                "type": "letter-string",
-                "placeholder": "e.g. Klimatologie und Wetter"
-
-            },
-            {
-                "id": "subjectIdentifierCustomType",
-                "alias":["datacite:Subject:subjectScheme"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "customClassification"]
-                ],
-                "label": {
-                    "en": "Type of Identifier",
-                    "de": "Art des Identifikators"
-                },
-                "min": 1,
-                "max": 1,
-                "type": "letter-string"
-            },
-            {
-                "id": "subjectIdentifierCustom",
-                "alias":["datacite:Subject:classificationCode","dcterms:subject"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "customClassification"]
-                ],
-                "label": {
-                    "en": "Identifier",
-                    "de": "Identifikator"
-                },
-                "min": 1,
-                "max": 1,
-                "type": "letter-string"
-            },
-            {
                 "id": "subjectKeywordCustom",
                 "alias":["datacite:Subject","dcterms:subject"],
                 "conditions": [
-                    ["subjectIdentifierType", "is", "customClassification"]
+                    ["subjectIdentifierType", "is", "csv"]
                 ],
                 "label": "Keyword",
                 "min": 1,
                 "max": 1,
-                "type": "letter-string"
+                "type": "csv",
+                "placeholder": "e.g. psychology, cognitive bias, Survey"
 
             },
             {
@@ -631,18 +625,6 @@
                 "placeholder": "e.g. 4031178-8"
             },
             {
-                "id": "subjectKeywordGND",
-                "alias":["datacite:Subject","dcterms:subject"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "gnd"]
-                ],
-                "label": "Keyword",
-                "min": 1,
-                "max": 1,
-                "type": "letter-string",
-                "placeholder": "e.g. Klimatologie"
-            },
-            {
                 "id": "subjectIdentifierWikidata",
                 "alias":["datacite:Subject:classificationCode","dcterms:subject"],
                 "conditions": [
@@ -656,58 +638,6 @@
                 "max": 1,
                 "type": "wikidata",
                 "placeholder": "e.g. Q52139"
-            },
-            {
-                "id": "subjectKeywordWikidata",
-                "alias":["datacite:Subject","dcterms:subject"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "wikidata"]
-                ],
-                "label": "Keyword",
-                "min": 1,
-                "max": 1,
-                "type": "text",
-                "placeholder": "e.g. climatology "
-            },
-            {
-                "id": "subjectKeywordIdentifierCustomType",
-                "alias":["datacite:Subject:subjectScheme"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "customKeyword"]
-                ],
-                "label": {
-                    "en": "Identifier type",
-                    "de": "Art des Identifikators"
-                },
-                "min": 1,
-                "max": 1,
-                "type": "text"
-            },
-            {
-                "id": "subjectKeywordIdentifierCustom",
-                "alias":["datacite:Subject:classificationCode","dcterms:subject"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "customKeyword"]
-                ],
-                "label": {
-                    "en": "Identifier",
-                    "de": "Identifikator"
-                },
-                "min": 1,
-                "max": 1,
-                "type": "letter-string"
-            },
-            {
-                "id": "subjectKeywordCustom",
-                "alias":["datacite:Subject","dcterms:subject"],
-                "conditions": [
-                    ["subjectIdentifierType", "is", "customKeyword"]
-                ],
-                "label": "Keyword",
-                "min": 1,
-                "max": 1,
-                "type": "letter-string"
-
             }
         ]
     },
@@ -1175,19 +1105,19 @@
                 "type": "monoselect",
                 "options": [
                     {
-                        "id": "eng",
-                        "label": "eng"
+                        "id": "en",
+                        "label": "English"
                     },
                     {
-                        "id": "ger",
-                        "label": "ger"
+                        "id": "de",
+                        "label": "Deutsch"
                     },
                     {
-                        "id": "fre",
-                        "label": "fre"
+                        "id": "fr",
+                        "label": "Français"
                     },
                     {
-                        "id": "customLanguage",
+                        "id": "custom",
                         "label": {
                             "en": "Other",
                             "de": "Sonstige"
@@ -1196,11 +1126,14 @@
                 ]
             },
             {
-                "id":"customLanguageText",
+                "id":"customLanguage",
                 "conditions": [
-                    ["language", "is", "customLanguage"]
+                    ["language", "is", "custom"]
                 ],
-                "label": "Language",
+                "label": {
+                    "en": "Language",
+                    "de": "Sprache"
+                },
                 "type": "letter-string"
             }
         ]
@@ -1212,6 +1145,7 @@
             "de": "Ressourcentyp"
         },
         "min": 1,
+        "max": 1,
         "fields": [
             {
                 "id": "resourceTypeGeneral",
@@ -1397,168 +1331,6 @@
                         }
                     }
                 ]
-            },
-            {
-                "id":"customResourceTypeName",
-                "alias":["datacite:ResourceType:resourceTypeGeneral", "dcterms:type"],
-                "label": {
-                    "en": "Resource type",
-                    "de": "Ressourcentyp"
-                },
-                "conditions":[
-                    ["resourceTypeGeneral", "is", "customResourceType"]
-                ],
-                "type": "text"
-            },
-            {
-                "id": "resourceTypeDescription",
-                "alias":["datacite:ResourceType","dcterms:type"],
-                "label": {
-                    "en": "Further description",
-                    "de": "Nähere Beschreibung"
-                },
-                "conditions": [
-                    ["resourceTypeGeneral", "exists"]
-                ], 
-                "placeholder": "e.g. Climate Measurements",
-                "type": "letter-string"
-            }
-        ]
-    },
-    {
-        "id": "alternateIdentifier",
-        "alias":["dcterms:identifier"],
-        "label": {
-            "en": "Alternate identifier",
-            "de": "Alternativer Identifikator"
-        }, 
-        "fields": [
-            {
-                "id": "alternateIdentifierScheme",
-                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
-                "label": {
-                    "en": "Type of alternate identifier",
-                    "de": "Art des alternativen Identifikators"
-                },
-                "type": "monoselect",
-                "options": [
-                    {
-                        "id": "institutionspecificIdent",
-                        "label": {
-                            "en": "Institution-specific identifier",
-                            "de": "Institutions-spezifischer Identifikator"
-                        }
-                    },
-                    {
-                        "id": "projectspecificIdent",
-                        "label": {
-                            "en": "Project-specific identifier",
-                            "de": "Projekt-spezifischer Identifikator"
-                        }
-                    },
-                    {
-                        "id": "customIdent",
-                        "label": {
-                            "en": "Other",
-                            "de": "Sonstige"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "institutionspecificIdentifierName",
-                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
-                "conditions": [
-                    ["alternateIdentifierScheme", "is", "institutionspecificIdent"]
-
-                ],
-                "label": {
-                    "en": "Name of identifier",
-                    "de": "Name des Identifikators"
-
-                },
-                "placeholder":"e.g. UR-ID",
-                "type": "letter-string"
-                
-            },
-            {
-                "id": "institutionspecificIdentifier",
-                "alias":["datacite:alternateIdentifier","dcterms:identifier"],
-                "conditions": [
-                    ["alternateIdentifierScheme", "is", "institutionspecificIdent"]
-                ],
-                "label": {
-                    "en": "Alternate identifier",
-                    "de": "Alternativer Identifikator"
-                },
-                "placeholder": "e.g. 53636", 
-                "type": "letter-string"
-            },
-            {
-                "id": "projectspecificIdentifierName",
-                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
-                "conditions": [
-                    ["alternateIdentifierScheme", "is", "projectspecificIdent"]
-
-                ],
-                "label": {
-                    "en": "Name of identifier",
-                    "de": "Name des Identifikators"
-
-                },
-                "placeholder":"e.g. SFB_MP-ID",
-                "type": "letter-string"
-                
-            },
-            {
-                "id": "projectspecificIdentifier",
-                "alias":["datacite:alternateIdentifier","dcterms:identifier"],
-                "conditions": [
-                    ["alternateIdentifierScheme", "is", "projectspecificIdent"]
-                ],
-                "label": {
-                    "en": "Alternate identifier",
-                    "de": "Alternativer Identifikator"
-                },
-                "placeholder": "e.g. A02_V7398", 
-                "type": "letter-string"
-            },
-            {
-                "id":"customAlternateIdentifier",
-                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
-                "conditions":[
-                    ["alternateIdentifierScheme", "is", "customIdent"]
-                ],
-                "label": {
-                    "en": "Type of alternate identifier",
-                    "de": "Art des alternativen Identifikators"
-                }, 
-                "type": "letter-string" 
-            },
-            {
-                "id": "customIdentifierName",
-                "alias":["datacite:alternateIdentifier:alternateIdentifierType"],
-                "conditions": [
-                    ["alternateIdentifierScheme", "is", "customIdent"]
-                ],
-                "label": {
-                    "en": "Name of identifier",
-                    "de": "Name des Identifikators"
-                },
-                "type": "letter-string"
-                
-            },
-            {
-                "id": "customIdentifier",
-                "alias":["datacite:alternateIdentifier","dcterms:identifier"],
-                "conditions": [
-                    ["alternateIdentifierScheme", "is", "customIdent"]
-                ],
-                "label": {
-                    "en": "Alternate identifier",
-                    "de": "Alternativer Identifikator"
-                }, 
-                "type": "letter-string"
             }
         ]
     },
@@ -1580,28 +1352,6 @@
                 "type": "text"
             }
         ]
-    },
-    {
-      "id": "format",
-      "alias":["datacite:Format","dcterms:format"],
-      "label": "Format",
-      "fields": [
-        {
-            "id": "formatFileType",
-            "label": {
-                "en": "File extension",
-                "de": "Dateiendung"
-            },
-            "placeholder": "e.g. PDF, XML,...",
-            "type": "text"
-        },
-        {
-            "id": "formatMIMEType",
-            "label": "MIME-Type",
-            "placeholder": "e.g. application/pdf, application/xml,...", 
-            "type": "text"
-        }
-      ]
     },
     {
         "id": "version",
@@ -1830,31 +1580,27 @@
                 "options": [
                     {
                         "id": "descriptionAbstract",
-                        "alias":["dcterms:abstract"],
                         "label": {
                             "en": "Abstract",
                             "de": "Zusammenfassung"
                         }
                     },
                     {
-                        "id": "descriptionMethod",
-                        "alias":["dcterms:description"],
+                        "id": "descriptionTOC",
                         "label": {
-                            "en": "Method",
-                            "de": "Methode"
+                            "en": "Table of Contents",
+                            "de": "Inhaltsverzeichnis"
                         }
                     },
                     {
-                        "id": "descriptionTechnicalInfo",
-                        "alias":["dcterms:description"],
+                        "id": "descriptionReadme",
                         "label": {
-                            "en": "Technical Info",
-                            "de": "Technische Informationen"
+                            "en": "readme file",
+                            "de": "Readme-Datei"
                         }   
                     },
                     {
-                        "id": "customDescription",
-                        "alias":["dcterms:description"],
+                        "id": "descriptionCustom",
                         "label": {
                             "en": "Other",
                             "de": "Sonstige"
@@ -1870,51 +1616,41 @@
                 ],
                 "placeholder": "e.g. Im Teilprojekt \"Biologische Effekte\" des Sonderforschungsbereich Mikroplastik an der Universität Bayreuth werden seit 2019 Mechanismen und Prozesse erforscht,...",
                 "label": "Abstract",
-                "type": "text"
+                "type": "long-text"
             },
             {
-                "id": "textMethod",
+                "id": "textTOC",
                 "alias":["datacite:Description"],
                 "conditions": [
-                    ["descriptionType", "is", "descriptionMethod"]
+                    ["descriptionType", "is", "descriptionTOC"]
                 ],
-                "placeholder": "e.g. Software development, Data Visualization, Simulation,...",
-                "label": "Keyword",
-                "type": "text"
-            },
-            {
-                "id": "textTechnicalInfo",
-                "alias":["datacite:Description"],
-                "conditions": [
-                    ["descriptionType", "is", "descriptionTechnicalInfo"]
-                ],
-                "placeholder": "e.g. Python, CSS Frameworks, PostgreSQL",
-                "label": "Keyword",
-                "type": "text"
-            },
-            {
-                "id": "customDescriptionType",
-                "alias": ["datacite:Description:descriptionType", "dcterms:description"],
-                "conditions":[
-                    ["descriptionType", "is", "customDescription"]
-                ],
+                "placeholder": "1. Einleitung\n2. Literatur\n3. Methodik\n4. Auswertung\n5. Zusammenfassung",
                 "label": {
-                    "en": "Description type",
-                    "de": "Beschreibungstyp"
+                    "en": "Table of Contents",
+                    "de": "Inhaltsverzeichnis"
                 },
-                "type": "text"
+                "type": "long-text"
+            },
+            {
+                "id": "fileReadme",
+                "alias":["datacite:Description"],
+                "conditions": [
+                    ["descriptionType", "is", "descriptionReadme"]
+                ],
+                "label": "Readme",
+                "type": "file-link"
             },
             {
                 "id": "textCustom",
                 "alias":["datacite:Description"],
                 "conditions":[
-                    ["descriptionType", "is", "customDescription"]
+                    ["descriptionType", "is", "descriptionCustom"]
                 ],
                 "label": {
                     "en": "Description",
                     "de": "Beschreibung"
                 },
-                "type": "text"
+                "type": "long-text"
 
             }
         ]
@@ -1924,7 +1660,7 @@
         "alias":["datacite:GeoLocation","dcterms:spatial"],
         "label": {
             "en": "Geolocation",
-            "de": "Geolokalisation"
+            "de": "Geolokalisierung"
         },
         "fields": [
             {
@@ -1934,39 +1670,29 @@
                     "de": "Art der Geolokalisation"
                 },
                 "max": 1,
+                "min": 1,
                 "type": "monoselect",
                 "options": [
                     {
                         "id": "geoLocationPlace",
                         "label": {
-                            "en": "Geolocation place",
-                            "de": "Geolokalisation Ort"
+                            "en": "place name",
+                            "de": "Ortsname"
                         }
                     },
                     {
                         "id": "geoLocationPoint",
                         "label": {
-                            "en": "Geolocation point",
-                            "de": "Geolokalisation Punkt"
+                            "en": "point",
+                            "de": "Punkt"
                         }
-                    },
-                    {
-                        "id": "geoLocationBox",
-                        "label":{
-                            "en": "Geolocation box",
-                            "de": "Geolokalisation Box"
-                        }   
                     },
                     {
                         "id": "geoLocationPolygon",
                         "label":{
-                            "en": "Geolocation polygon",
-                            "de": "Geolokalisation Polygon"
+                            "en": "polygon",
+                            "de": "Polygon"
                         }   
-                    },
-                    {
-                        "id": "inPolygonPoint",
-                        "label": "In polygon point"
                     }
                 ]
             },
@@ -1992,11 +1718,11 @@
                     ["geolocationType", "is", "geoLocationPoint"]
                 ],
                 "label":{
-                    "en": "Point Latitude",
+                    "en": "Latitude",
                     "de": "Breitengrad"
                 },
                 "placeholder": "e.g. 49.926789",
-                "type": "latitude"
+                "type": "coordinate"
             },
             {
                 "id": "geoLocationPointLongitude",
@@ -2005,198 +1731,54 @@
                     ["geolocationType", "is", "geoLocationPoint"]
                 ],
                 "label":{
-                    "en": "Point Longitude",
+                    "en": "Longitude",
                     "de": "Längengrad"
                 },
                 "placeholder": "e.g. 11.586352",
-                "type": "longitude"
+                "type": "coordinate"
             },
             {
-                "id": "geoLocationBoxSouthLatitude",
-                "alias":["datacite:GeoLocation:geoLocationBox:southBoundLatitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationBox"]
-                ],
-                "label": {
-                    "en": "South Latitude",
-                    "de": "südlicher Breitengrad"
-                },
-                "placeholder": "e.g. 48.048021",
-                "type": "latitude"
-            },
-            {
-                "id": "geoLocationBoxWestLongitude",
-                "alias":["datacite:GeoLocation:geoLocationBox:westBoundLongitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationBox"]
-                ],
-                "label": {
-                    "en": "West Longitude",
-                    "de": "westlicher Längengrad"
-                },
-                "placeholder": "e.g. 11.742668",
-                "type": "longitude"
-            },
-            {
-                "id": "geoLocationBoxNorthLatitude",
-                "alias":["datacite:GeoLocation:geoLocationBox:northBoundLatitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationBox"]
-                ],
-                "label": {
-                    "en": "North Latitude",
-                    "de": "nördlicher Breitengrad"
-                },
-                "placeholder": "e.g. 48.224673",
-                "type": "latitude"
-            },
-            {
-                "id": "geoLocationBoxEastLongitude",
-                "alias":["datacite:GeoLocation:geoLocationBox:eastBoundLongitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationBox"]
-                ],
-                "label": {
-                    "en": "East Longitude",
-                    "de": "östlicher Längengrad"
-                },
-                "placeholder": "e.g. 11.438484",
-                "type": "longitude"
-            },
-            {
-                "id": "geoLocationPolygonLatitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
+                "id": "geoLocationPolygonPoint",
+                "alias":["datacite:GeoLocation:geoLocationPolygon","dcterms:spatial"],
                 "conditions": [
                     ["geolocationType", "is", "geoLocationPolygon"]
                 ],
+                "min": 2,
                 "label": {
-                    "en": "Point Latitude",
-                    "de": "Breitengrad"
+                    "en": "Polygon",
+                    "de": "Polygon"
                 },
-                "placeholder": "e.g. 48.148213",
-                "type": "latitude"
-            },
-            {
-                "id": "geoLocationPolygonLongitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationPolygon"]
-                ],
-                "label": {
-                    "en": "Point Longitude",
-                    "de": "Längengrad"
-                },
-                "placeholder": "e.g. 11.580483",
-                "type":"longitude"
-            },
-            {
-                "id": "geoLocationPolygonLatitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationPolygon"]
-                ],
-                "label": {
-                    "en": "Point Latitude",
-                    "de": "Breitengrad"
-                },
-                "placeholder": "e.g. 48.147975",
-                "type": "latitude"
-            },
-            {
-                "id": "geoLocationPolygonLongitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationPolygon"]
-                ],
-                "label": {
-                    "en": "Point Longitude",
-                    "de": "Längengrad"
-                },
-                "placeholder": "e.g. 11.581485",
-                "type":"longitude"
-            },
-            {
-                "id": "geoLocationPolygonLatitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationPolygon"]
-                ],
-                "label": {
-                    "en": "Point Latitude",
-                    "de": "Breitengrad"
-                },
-                "placeholder": "e.g. 48.146629",
-                "type": "latitude"
-            },
-            {
-                "id": "geoLocationPolygonLongitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationPolygon"]
-                ],
-                "label": {
-                    "en": "Point Longitude",
-                    "de": "Längengrad"
-                },
-                "placeholder": "e.g. 11.580906",
-                "type":"longitude"
-            },
-            {
-                "id": "geoLocationPolygonLatitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationPolygon"]
-                ],
-                "label": {
-                    "en": "Point Latitude",
-                    "de": "Breitengrad"
-                },
-                "placeholder": "e.g. 48.148213",
-                "type": "latitude"
-            },
-            {
-                "id": "geoLocationPolygonLongitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "geoLocationPolygon"]
-                ],
-                "label": {
-                    "en": "Point Longitude",
-                    "de": "Längengrad"
-                },
-                "placeholder": "e.g. 11.580483",
-                "type":"longitude"
-            },
-            {
-                "id": "geoLocationinPolygonPointLatitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:inPolygonPoint:pointLatitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "inPolygonPoint"]
-                ],
-                "label": {
-                    "en": "Point Latitude",
-                    "de": "Breitengrad"
-                },
-                "placeholder": "e.g. 49.926789",
-                "type": "latitude"
-            },
-            {
-                "id":"geoLocationinPolygonPointLongitude",
-                "alias":["datacite:GeoLocation:geoLocationPolygon:inPolygonPoint:pointLongitude","dcterms:spatial"],
-                "conditions": [
-                    ["geolocationType", "is", "inPolygonPoint"]
-                ],
-                "label":{
-                    "en": "Point Longitude",
-                    "de": "Längengrad"
-                },
-                "placeholder": "e.g. 11.586352",
-                "type": "longitude"
+                "fields": [
+                    {
+                        "id": "geoLocationPolygonLongitude",
+                        "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLongitude"],
+                        "min":1,
+                        "max":1,
+                        "label": {
+                            "en": "Point Longitude",
+                            "de": "Längengrad d. Punktes"
+                        },
+                        "placeholder": "e.g. 11.580483",
+                        "type":"coordinate"
+                    },
+                    {
+                        "id": "geoLocationPolygonLatitude",
+                        "alias":["datacite:GeoLocation:geoLocationPolygon:polygonPoint:pointLatitude"],
+                        "min":1,
+                        "max":1,
+                        "label": {
+                            "en": "Point Latitude",
+                            "de": "Breitengrad d. Punktes"
+                        },
+                        "placeholder": "e.g. 48.147975",
+                        "type": "coordinate"
+                    }
+                ]
             }
         ]
     },
     {
-        "id": "fundingReference",
+        "id": "funding",
         "label": {
             "en": "Funding",
             "de": "Förderung"
@@ -2224,19 +1806,18 @@
                 "type": "monoselect",
                 "options":[
                     {
-                        "id": "crossrefFunderID",
-                        "label": "Crossref Funder ID"
+                        "id": "crossref",
+                        "label": {
+                            "en": "Crossref Funder ID",
+                            "de": "Crossref Förderer-ID"
+                        }
                     },
                     {
                         "id": "ror",
                         "label": "ROR"
                     },
                     {
-                        "id": "grid",
-                        "label": "GRID"
-                    },
-                    {
-                        "id":"customFunderIdentifier",
+                        "id":"custom",
                         "label": {
                             "en":"Other",
                             "de":"Sonstige"
@@ -2245,22 +1826,38 @@
                 ]
             },
             {
-                "id":"funderIdentifierName",
-                "alias":["datacite:FundingReference:funderIdentifierType"],
+                "id": "funderCrossref",
+                "alias":["datacite:FundingReference:funderIdentifier","dcterms:contributor"],
                 "conditions":[
-                    ["funderIdentifierType", "is", "customFunderIdentifier"]
+                    ["funderIdentifierType", "is", "crossref"]
                 ],
-                "label":{
-                    "en": "Type of identifier",
-                    "de": "Art des Identifikators"
+                "label": {
+                    "en": "Crossref Funder ID",
+                    "de": "Crossref Förderer-ID"
                 },
-                "type": "text"
+                "min": 1,
+                "type": "doi",
+                "placeholder": "e.g. 10.84823/992340"
+            },
+            {
+                "id": "funderROR",
+                "alias":["datacite:FundingReference:funderIdentifier","dcterms:contributor"],
+                "conditions":[
+                    ["funderIdentifierType", "is", "ror"]
+                ],
+                "label": {
+                    "en": "Funder ROR",
+                    "de": "ROR des Förderers"
+                },
+                "min": 1,
+                "type": "ror",
+                "placeholder": "e.g. 01eezs655"
             },
             {
                 "id": "funderIdentifier",
                 "alias":["datacite:FundingReference:funderIdentifier","dcterms:contributor"],
                 "conditions":[
-                    ["funderIdentifierType", "exists"]
+                    ["funderIdentifierType", "is", "custom"]
                 ],
                 "label": {
                     "en": "Funder Identifier",
@@ -2270,37 +1867,44 @@
                 "type": "text"
             },
             {
-                "id": "awardTitle",
-                "alias":["datacite:FundingReference:awardTitle","dcterms:description"],
+                "id": "award",
                 "label": {
-                    "en": "Award title",
-                    "de": "Projekt Titel"
+                    "en": "Award",
+                    "de": "Forschungsprojekt"
                 },
-                "min": 1,
-                "type": "letter-string",
-                "placeholder": "e.g. Forschungsdatendienst für die Ost-, Ostmittel- und Südosteuropaforschung (OstData)"
-            },
-            {
-                "id":"awardNumber",
-                "alias":["datacite:FundingReference:awardNumber","dcterms:identifier"],
-                "label": {
-                    "en": "Award number",
-                    "de": "Projektnummer"
-                }, 
-                "min": 1,
-                "type": "letter-string",
-                "placeholder": "e.g. 413708228"
-            },
-            {
-                "id": "awardURI",
-                "alias":["datacite:FundingReference:awardURI","dcterms:identifier"],
-                "label": {
-                    "en": "Award URI",
-                    "de": "Projekt URI"
-                },
-                "min": 1,
-                "type": "uri",
-                "placeholder": "e.g. https://gepris.dfg.de/gepris/projekt/413708228"
+                "fields": [
+                    {
+                        "id": "awardTitle",
+                        "alias":["datacite:FundingReference:awardTitle"],
+                        "label": {
+                            "en": "Award title",
+                            "de": "Projekttitel"
+                        },
+                        "min": 1,
+                        "type": "letter-string",
+                        "placeholder": "e.g. Forschungsdatendienst für die Ost-, Ostmittel- und Südosteuropaforschung (OstData)"
+                    },
+                    {
+                        "id":"awardNumber",
+                        "alias":["datacite:FundingReference:awardNumber"],
+                        "label": {
+                            "en": "Award number",
+                            "de": "Projektnummer"
+                        }, 
+                        "type": "letter-string",
+                        "placeholder": "e.g. 413708228"
+                    },
+                    {
+                        "id": "awardURI",
+                        "alias":["datacite:FundingReference:awardURI"],
+                        "label": {
+                            "en": "Award URI",
+                            "de": "Projekt URI"
+                        },
+                        "type": "uri",
+                        "placeholder": "e.g. https://gepris.dfg.de/gepris/projekt/413708228"
+                    }
+                ]
             }
         ]
     },
@@ -2332,27 +1936,11 @@
                         }
                     },
                     {
-                        "id": "cites",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "cites",
-                            "de": "zitiert"
-                        }
-                    },
-                    {
                         "id": "supplementTo",
                         "alias":["dcterms:relation"],
                         "label": {
                             "en": "is supplement to",
                             "de": "ist Ergänzung zu"
-                        }
-                    },
-                    {
-                        "id": "supplementedBy",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is supplemented by",
-                            "de": "wird ergänzt durch"
                         }
                     },
                     {
@@ -2372,54 +1960,6 @@
                         }
                     },
                     {
-                        "id": "describes",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "describes",
-                            "de": "beschreibt"
-                        }
-                    },
-                    {
-                        "id": "describedBy",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is described by",
-                            "de": "wird beschrieben durch"
-                        }
-                    },
-                    {
-                        "id": "hasMetadata",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "has metadata",
-                            "de": "verfügt über Metadaten"
-                        }
-                    },
-                    {
-                        "id": "isMetadataFor",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is metadata for",
-                            "de": "sind Metadaten zu"
-                        }
-                    },
-                    {
-                        "id": "hasVersion",
-                        "alias":["dcterms:hasVersion"],
-                        "label": {
-                            "en": "has version",
-                            "de": "hat die Version"
-                        }
-                    },
-                    {
-                        "id": "versionOf",
-                        "alias":["dcterms:isVersionOf"],
-                        "label": {
-                            "en": "is version of",
-                            "de": "ist eine Version von"
-                        }
-                    },
-                    {
                         "id": "newversionOf",
                         "alias":["dcterms:relation"],
                         "label": {
@@ -2428,27 +1968,11 @@
                         }
                     },
                     {
-                        "id": "previousversionOf",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is previous version of",
-                            "de": "ist eine frühere Version von"
-                        }
-                    },
-                    {
                         "id": "partOf",
                         "alias":["dcterms:isPartOf"],
                         "label": {
                             "en": "is part of",
                             "de": "ist Teil von"
-                        }
-                    },
-                    {
-                        "id": "hasPart",
-                        "alias":["dcterms:hasPart"],
-                        "label": {
-                            "en": "has part",
-                            "de": "hat Teil"
                         }
                     },
                     {
@@ -2468,83 +1992,11 @@
                         }
                     },
                     {
-                        "id": "references",
-                        "alias":["dcterms:references"],
-                        "label": {
-                            "en": "references",
-                            "de": "referenziert"
-                        }
-                    },
-                    {
-                        "id": "documentedBy",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is documented by",
-                            "de": "wird dokumentiert durch"
-                        }
-                    },
-                    {
-                        "id": "documents",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "documents",
-                            "de": "dokumentiert"
-                        }
-                    },
-                    {
-                        "id": "compiledBy",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is compiled by",
-                            "de": "wird erstellt durch"
-                        }
-                    },
-                    {
-                        "id": "compiles",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "compiles",
-                            "de": "erstellt"
-                        }
-                    },
-                    {
-                        "id": "variantformOf",
-                        "alias":["dcterms:isFormatOf"],
-                        "label": {
-                            "en": "is variant form of",
-                            "de": "ist eine Variante von"
-                        }
-                    },
-                    {
-                        "id": "originalformOf",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is original form of",
-                            "de": "ist die ursprüngliche Form von"
-                        }
-                    },
-                    {
                         "id": "identicalTo",
                         "alias":["dcterms:relation"],
                         "label": {
                             "en": "is identical to",
                             "de": "ist identisch mit"
-                        }
-                    },
-                    {
-                        "id": "reviewedBy",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "is reviewed by",
-                            "de": "wird geprüft durch"
-                        }
-                    },
-                    {
-                        "id": "reviews",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "reviews",
-                            "de": "überprüft"
                         }
                     },
                     {
@@ -2562,44 +2014,12 @@
                             "en": "is source of",
                             "de": "ist die Quelle von"
                         }
-                    },
-                    {
-                       "id": "requiredBy",
-                       "alias":["dcterms:relation"],
-                       "label": {
-                        "en": "is required by",
-                        "de": "ist erforderlich für"
-                       }
-                    },
-                    {
-                        "id": "requires",
-                        "alias":["dcterms:relation"],
-                        "label": {
-                            "en": "requires",
-                            "de": "erfordert"
-                        }
-                    },
-                    {
-                        "id": "obsoletes",
-                        "alias":["dcterms:replaces"],
-                        "label": {
-                            "en": "obsoletes",
-                            "de": "veraltete Version"
-                        }
-                    },
-                    {
-                        "id": "obsoletedBy",
-                        "alias":["dcterms:isReplacedBy"],
-                        "label": {
-                            "en": "is obsoleted by",
-                            "de": "wird überholt durch"
-                        }
                     }
                 ]
             },
             {
                 "id": "relationIdentifierScheme",
-                "alias":["datacite:RelatedIdentifier:relatedIdentifierType"],
+                "alias":["datacite:RelatedItem:relatedItemType"],
                 "label": {
                     "en": "Type of identifier",
                     "de": "Art des Identifikators"
@@ -2612,80 +2032,12 @@
                 "max": 1,
                 "options": [
                     {
-                        "id": "ark",
-                        "label": "ARK"
-                    },
-                    {
-                        "id": "arxiv",
-                        "label": "arXiv"
-                    },
-                    {
-                        "id": "bibcode",
-                        "label": "bibcode"
-                    },
-                    {
                         "id": "doi",
                         "label": "DOI"
                     },
                     {
-                        "id": "ean13",
-                        "label": "EAN13"
-                    },
-                    {
-                        "id": "eissn",
-                        "label": "EISSN"
-                    },
-                    {
-                        "id": "handle",
-                        "label": "Handle"
-                    },
-                    {
-                        "id": "igsn",
-                        "label": "IGSN"
-                    },
-                    {
-                        "id": "isbn",
-                        "label": "ISBN"
-                    },
-                    {
-                        "id": "issn",
-                        "label": "ISSN"
-                    },
-                    {
-                        "id": "istc",
-                        "label": "ISTC"
-                    },
-                    {
-                        "id": "lissn",
-                        "label": "LISSN"
-                    },
-                    {
-                        "id": "lsid",
-                        "label": "LSID"
-                    },
-                    {
-                        "id": "pmid",
-                        "label": "PMID"
-                    },
-                    {
-                        "id": "purl",
-                        "label": "PURL"
-                    },
-                    {
-                        "id": "upc",
-                        "label": "UPC"
-                    },
-                    {
-                        "id": "url",
-                        "label": "URL"
-                    },
-                    {
-                        "id": "urn",
-                        "label": "URN"
-                    },
-                    {
-                        "id": "w3id",
-                        "label": "w3id"
+                        "id": "uri",
+                        "label": "URI"
                     },
                     {
                         "id": "custom",
@@ -2697,8 +2049,32 @@
                 ]
             },
             {
-                "id":"relationIdentifierCustomName",
-                "alias":["datacite:RelatedIdentifier:relatedIdentifierType"],
+                "id": "relationURI",
+                "alias": ["datacite:RelatedItem:relatedItemIdentifier","dcterms:relation"],
+                "conditions": [
+                    ["relationIdentifierScheme", "is", "uri"]
+                ],
+                "label": "URI",
+                "min":1,
+                "max":1,
+                "type": "uri",
+                "placeholder": "e.g. https://example.com/dataset"
+            },
+            {
+                "id": "relationDoi",
+                "alias": ["datacite:RelatedItem:relatedItemIdentifier","dcterms:relation"],
+                "conditions": [
+                    ["relationIdentifierScheme", "is", "doi"]
+                ],
+                "label": "DOI",
+                "min":1,
+                "max":1,
+                "type": "doi",
+                "placeholder": "e.g. 10.1109/5.771073"
+            },
+            {
+                "id": "relationIdentifierName",
+                "alias": ["datacite:RelatedItem:relatedItemIdentifierType"],
                 "conditions":[
                     ["relationIdentifierScheme", "is", "custom"]
                 ],
@@ -2706,21 +2082,23 @@
                     "en": "Type of identifier",
                     "de": "Art des Identifikators"
                 },
-                "min": 1,
-                "max": 1
+                "min":1,
+                "max":1,
+                "type": "text"
             },
             {
-                "id": "relationIdentifier",
-                "alias":["datacite:RelatedIdentifier","dcterms:relation"],
+                "id": "resourceIdentifier",
+                "alias": ["datacite:RelatedItem:relatedItemIdentifier","dcterms:relation"],
                 "conditions": [
-                    ["relationIdentifierScheme", "exists"]
+                    ["relationIdentifierScheme", "is", "custom"]
                 ],
                 "label": {
                     "en": "Identifier",
                     "de": "Identifikator"
                 },
-                "min": 1,
-                "max": 1
+                "min":1,
+                "max":1,
+                "type": "text"
             }
         ]
     },
@@ -2741,7 +2119,7 @@
                 "options":[
                     {
                         "id": "instrument",
-                        "label": "Instrument"
+                        "label": "Messinstrument"
                     },
                     {
                         "id": "media",
@@ -2793,19 +2171,8 @@
                     ["dataSourceDetail", "is", "customDataSource"]
                 ],
                 "label": {
-                    "en": "Data source type",
-                    "de": "Datenquellen-Typ"
-                },
-                "type": "text"
-            },
-            {
-                "id": "dataSourceInformation",
-                "conditions":[
-                    ["dataSourceDetail", "exists"]
-                ],
-                "label": {
-                    "en": "Data source information",
-                    "de": "Informationen zur Datenquelle"
+                    "en": "Data source",
+                    "de": "Datenquelle"
                 },
                 "type": "text"
             }

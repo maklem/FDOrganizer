@@ -1,5 +1,5 @@
-export const CONTENT = ['geolocation', 'alternateIdentifier', 'language', 'version', 'date']
+export const CONTENT = ['language', 'version', 'date', 'subject']
 export const RELATIONS = ['relation']
-export const SCOPE = ['format', 'size']
-export const ORIGIN_AND_CREATION = ['contributor', 'datasource', 'software', 'fundingReference']
+export const SCOPE = ['geolocation', 'size']
+export const ORIGIN_AND_CREATION = ['contributor', 'datasource', 'software', 'funding']
 export const USAGE_AND_RIGHTS = ['rights']
