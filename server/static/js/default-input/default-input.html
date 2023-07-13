@@ -1,0 +1,12 @@
+<input
+:value = "value"
+:id="id"
+:name="id"
+:type="type ?? 'text'"
+:placeholder="placeholder ?? ''"
+:invalid="invalid"
+:disabled="disabled"
+@input="input"
+@focus="$emit('focus')"
+@blur ="$emit('blur')"
+/>

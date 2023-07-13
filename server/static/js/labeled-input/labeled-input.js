@@ -1,9 +1,17 @@
 import { setup } from "../setup.js";
 import { localized } from "../format-util.js";
+import DateInput from "../date-input/date-input.js";
+import DefaultInput from "../default-input/default-input.js";
+import NumberInput from "../number-input/number-input.js";
+import TextareaInput from "../textarea-input/textarea-input.js";
 const template = await setup('labeled-input');
 
 export default {
     components: {
+        DateInput,
+        DefaultInput,
+        NumberInput,
+        TextareaInput
     },
     props: {
         id: String,
@@ -19,7 +27,6 @@ export default {
             type: Boolean,
             default: false
         },
-        initialValue: String,
         value: String
     },
     data() {

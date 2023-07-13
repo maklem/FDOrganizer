@@ -1,0 +1,14 @@
+<textarea
+class="long-text"
+:value = "value"
+:id="id"
+:name="id"
+:placeholder="placeholder ?? ''"
+rows="5"
+cols="30"
+:invalid="invalid"
+:disabled="disabled"
+@input="input"
+@focus="$emit('focus')"
+@blur ="$emit('blur')"
+/>

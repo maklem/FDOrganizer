@@ -1,0 +1,11 @@
+<input
+    type="date"
+    :value="asDate(value)"
+    :id="id"
+    :name="id"
+    :invalid="invalid"
+    :disabled="disabled"
+    @input="asTimestamp"
+    @focus="$emit('focus')"
+    @blur ="$emit('blur')"
+/>

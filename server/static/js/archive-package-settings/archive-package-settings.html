@@ -113,6 +113,7 @@
                   <LabeledInput
                   :id="'cc0-license'"
                   :value="store.creativecommons"
+                  :type="'monoselect'"
                   :disabled="store.licenseType !== 'cc' ? true : undefined"
                   :options="store.LICENSES.cc"
                   @input="value => store.creativecommons = value"
@@ -130,6 +131,7 @@
                   <LabeledInput
                   :id="'cc0-license'"
                   :value="store.germandatalicense"
+                  :type="'monoselect'"
                   :disabled="store.licenseType !== 'gdl' ? true : undefined"
                   :options="store.LICENSES.gdl"
                   @input="value => store.germandatalicense = value"
