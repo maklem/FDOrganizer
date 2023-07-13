@@ -75,3 +75,8 @@
 .field-instance .remove-instance:active {
     filter: brightness(1.2);
 }
+
+.add-instance {
+    display: flex;
+    gap: 0.5rem;
+}

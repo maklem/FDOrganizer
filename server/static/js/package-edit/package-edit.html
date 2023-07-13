@@ -8,11 +8,12 @@
         <dialog ref="newFolder" class="create-folder" @keyup="enterPressed">
             <h1>New Folder</h1>
             <LabeledInput
-            :id="'new-folder'"
-            :label="'Choose a name:'"
-            :placeholder="'e.g. Supplements'"
-            :value="store.newFolderName"
-            @input="(value) => store.newFolderName = value"></LabeledInput>
+                :id="'new-folder'"
+                :label="'Choose a name:'"
+                :placeholder="'e.g. Supplements'"
+                :value="store.newFolderName"
+                @input="(value) => store.newFolderName = value"
+            ></LabeledInput>
             <form method="dialog">
                 <Button class="abort-create" @button-clicked="$refs.newFolder.close()">Abort</Button>
                 <Button class="confirm-create" @button-clicked="store.createFolder()">

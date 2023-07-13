@@ -35,6 +35,9 @@
     cursor:not-allowed;
 
     box-shadow: none;
+    border: 0.1rem solid #777;
+    color: #777;
+    background-color: transparent;
 
     opacity: 0.5;
 }
