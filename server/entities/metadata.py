@@ -8,7 +8,6 @@ from dataclasses_json import dataclass_json
 class Metadata:
     schema_version: str
     metadata: dict[str, Any]
-    resource_type: str
     id: Optional[str] = None
     url: Optional[str] = None
 
