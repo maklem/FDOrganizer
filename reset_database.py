@@ -5,6 +5,7 @@ import sys
 import requests
 import create_database
 from requests import HTTPError
+from dotenv import load_dotenv
 
 def getDatabaseName():
     if len(sys.argv) == 2:
@@ -33,6 +34,7 @@ def reset_database(name: str, token: str):
     print("Successfully reset database " + name)
 
 if __name__ == '__main__':
+    load_dotenv()
     username, password = create_database.credentials().values()
     token = create_database.authentication_token(username, password)
     if not token:
