@@ -1,16 +1,13 @@
 import { setup } from "../setup.js";
 import { store } from "../metadata/state.js"
-import LabeledInput from "../labeled-input/labeled-input.js"
-import Button from "../button/button.js"
-import { localized } from "../format-util.js";
-import { validate } from "../validation-util.js";
+import MetadataField from "../metadata-field/metadata-field.js"
+
 
 const template = await setup('metadata-section');
 
 export default {
     components: {
-        LabeledInput,
-        Button,
+        MetadataField
     },
     props: {
         id: String,
@@ -19,8 +16,6 @@ export default {
     data() {
         return {
             store,
-            localized,
-            validate,
             open: false
         }
     },
@@ -28,10 +23,6 @@ export default {
         sectionId() {
             return this.id
         }
-    },
-    watch: {
-    },
-    methods: {
     },
     template
 }

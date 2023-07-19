@@ -3,7 +3,6 @@ import { store as toastStore } from "../toast/state.js"
 import { validate } from '../validation-util.js';
 import { put, get } from "../http.js"
 import { CONTENT, RELATIONS, SCOPE, ORIGIN_AND_CREATION, USAGE_AND_RIGHTS } from './metadata-sections.js';
-import { localized } from '../format-util.js';
 
 
 export const store = reactive({
@@ -19,10 +18,9 @@ export const store = reactive({
     },
     getDocument,
     saveMetadata,
-    addField,
-    addSubfield,
     checkConditions,
     getAllFields,
+    makeTemplate,
     reset,
     sectionLabel
 });
@@ -100,19 +98,7 @@ function sectionLabel(key) {
     return LABELS[key]
 }
 
-function addField(fieldId) {
-    const field = store.getAllFields().find(field => field.id === fieldId)
-    const dummy = makeTemplate(field)
-    if (store.metadata?.[fieldId]?.length) store.metadata[fieldId].push(dummy)
-    else store.metadata[fieldId] = [dummy]
-}
 
-function addSubfield(fieldId, index, subfieldId) {
-    const field = store.getAllFields().find(field => field.id === fieldId).fields.find(subfield => subfield.id === subfieldId)
-    const dummy = makeTemplate(field)
-    if (store.metadata?.[fieldId][index][subfieldId]?.length) store.metadata[fieldId][index][subfieldId].push(dummy)
-    else store.metadata[fieldId][index][subfieldId] = [dummy]
-}
 
 function makeTemplate(field) {
     if (!!field.fields) 
@@ -120,7 +106,7 @@ function makeTemplate(field) {
             subfieldContainer[subfield.id] = makeTemplate(subfield)
             return subfieldContainer
         }, {})
-    return undefined
+    return [undefined]
 }
 
 function filterUnmetConditions(data, schema) {
@@ -170,8 +156,8 @@ function checkConditions(fieldInstance, subfield) {
         const relation = condition[1]
         const value = condition[2]
 
-        if (relation === "is") return fieldInstance[property] === value
-        if (relation === "exists") return fieldInstance[property] !== undefined
+        if (relation === "is") return fieldInstance[property]?.[0] === value
+        if (relation === "exists") return fieldInstance[property] !== undefined && fieldInstance[property] !== [] && fieldInstance[property]?.[0] !== undefined
         console.warn(`Relation '${relation}' cannot be used to test condition on '${property}'`)
         return false
     })

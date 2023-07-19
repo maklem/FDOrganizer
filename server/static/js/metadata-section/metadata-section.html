@@ -5,44 +5,10 @@
     </summary>
     <div v-if="!!store.metadata" class="section-content">
         <template v-for="field in store.schema[sectionId]">
-            <fieldset v-if="!!field.fields" class="field-group">
-                <legend>{{localized(field.label)}}</legend>
-                <div v-if="!!store.metadata[field.id]?.length" class="field-instance" v-for="(instance, index) in store.metadata[field.id]">
-                    <Button class="remove-instance" :flat @button-clicked="store.metadata[field.id].splice(index,1)">
-                        <i class="fa-solid fa-trash"></i>
-                    </Button>
-                    <template v-for="subfield in field.fields">
-                        <template v-if="store.checkConditions(instance, subfield)">
-                            <LabeledInput
-                                :id="subfield.id + index"
-                                :label="subfield.label"
-                                :type="subfield.type"
-                                :options="subfield.options ? subfield.options : false"
-                                :value="store.metadata[field.id][index][subfield.id]"
-                                :invalid="!validate(store.metadata[field.id][index][subfield.id], subfield.type)"
-                                :placeholder="subfield.placeholder ?? ''"
-                                @input="(value) => store.metadata[field.id][index][subfield.id] = value"
-                                @input="store.touched = true"
-                            ></LabeledInput>
-                            <!-- <Button
-                            v-if="!subfield.max || subfield.max > 1"
-                            class="add-instance"
-                            :disabled="!!subfield.max && store.metadata[field.id][index][subfield.id].length >= subfield.max"
-                            @button-clicked="store.addSubfield(field.id, index, subfield.id)">
-                                <i class="fa-solid fa-plus"></i>
-                            </Button> -->
-                        </template>
-                    </template>
-                </div>
-                <Button v-if="!field.max || field.max > 1 || field.min !== 1"
-                    class="add-instance"
-                    :disabled="!!field.max && store.metadata[field.id]?.length >= field.max"
-                    @button-clicked="store.addField(field.id)"
-                >
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Add {{localized(field.label)}}</span>
-                </Button>
-            </fieldset>
+            <MetadataField
+                :field="field"
+                :path="[]"
+            ></MetadataField>
         </template>
     </div>
 </details>
