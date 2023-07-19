@@ -15,6 +15,7 @@
     color: #777;
     font-size: var(--label-font);
     white-space: nowrap;
+    width: fit-content;
 }
 
 .field-label .label-text[invalid="true"]{
@@ -28,6 +29,7 @@
     padding: 0.5rem 0.5rem;
 
     font-size: 1.1rem;
+    width: 100%;
 }
 
 .field-label .input[invalid="true"] {
