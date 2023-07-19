@@ -13,17 +13,20 @@ export function validate(content, type, ignoreEmpty = true) {
             return new RegExp('^(\\d{4}\\-){3}\\d{3}(\\d|X)$').test(content)
         case "letter-string":
             return new RegExp('^[a-z][a-z\\s]+[a-z]$', 'i').test(content)
-        case "coordinate":
-            return validateCoordinate(content)
+        case "latitude":
+            return validateCoordinate(content, 'lat')
+        case "longitude":
+            return validateCoordinate(content, 'lng')
         default:
             return true
     }
 }
 
-function validateCoordinate(coord) {
+function validateCoordinate(coord, dimension) {
     const coordinates = coord.toString().split('.')
-    if (Number(coordinates[0]) > 180) return false
-    if (Number(coordinates[0]) < -180) return false
+    const limit = dimension === 'lat' ? 90 : 180
+    if (Number(coordinates[0]) > limit) return false
+    if (Number(coordinates[0]) < -limit) return false
     if (coordinates.length > 1) {
         if (coordinates[1].length > 8) return false
     }
