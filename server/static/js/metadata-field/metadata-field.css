@@ -1,0 +1,79 @@
+.field-group {
+    display: grid;
+    grid-auto-flow: row;
+    grid-auto-rows: max-content;
+    gap: 1rem;
+}
+
+.field-group .field-group {
+    margin: 0.5rem 0;
+}
+.field-group > .field-instance{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.field-group > .field-instance > .removable-field{
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.removable-field {
+    display: grid;
+    align-items: center;
+    grid-template-columns: max-content max-content max-content;
+}
+
+.removable-field .remove-field {
+    align-self: center;
+    background-color: rgba(var(--rgb-error), 0.3);
+
+    transition: opacity 200ms;
+    opacity: 0;
+
+}
+
+.remove-field.right {
+    margin-left: -2.3rem;
+}
+
+.remove-field.left {
+    margin-right: -2.3rem;
+    z-index: 20111994;
+}
+
+.removable-field:hover .remove-field {
+    opacity: 1;
+}
+
+.field-group .add-instance{
+    width: fit-container;
+}
+
+.remove {
+    width: fit-content;
+    height: fit-content;
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
+
+    border: none;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+
+    font-size: 1.2rem;
+    transition: all 200ms;
+}
+
+.remove:hover:not([disabled]) {
+    background-color: rgba(var(--rgb-error), 0.3);
+}
+
+.remove:active:not([disabled]) {
+    filter: brightness(1.2);
+}
+
+.add-instance {
+    display: flex;
+    gap: 0.5rem;
+}

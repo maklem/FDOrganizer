@@ -1,0 +1,52 @@
+<fieldset v-if="!!field.fields" class="field-group">
+    <legend>{{localized(field.label)}}</legend>
+    <div v-if="!!metadata?.length" class="field-instance" v-for="(instance, index) in metadata">
+        <Button :disabled="field.min === 1 && metadata.length === 1" class="remove remove-instance" :flat @button-clicked="metadata.splice(index,1)">
+            <i class="fa-solid fa-trash"></i>
+        </Button>
+        <template v-for="subfield in field.fields">
+            <template v-if="store.checkConditions(instance, subfield)">
+                <MetadataField
+                    :field="subfield"
+                    :path="[...path, field.id, index]"
+                ></MetadataField>
+            </template>
+        </template>
+    </div>
+    <Button v-if="!field.max || field.max > (metadata?.length ?? 0)"
+        class="add-instance"
+        :disabled="!!field.max && metadata?.length >= field.max"
+        @button-clicked="addField()"
+    >
+        <i class="fa-solid fa-plus"></i>
+        <span>Add {{localized(field.label)}}</span>
+    </Button>
+</fieldset>
+<template v-else >
+    <div class="removable-field" v-for="(instance, index) in metadata">
+        <Button v-if="!(field.min === 1 && metadata.length <= 1) && (['monoselect', 'date'].includes(field.type))" class="remove-field remove left" :flat @button-clicked="metadata.splice(index,1)">
+            <i class="fa-solid fa-minus"></i>
+        </Button>
+        <LabeledInput
+            :id="field.id + index"
+            :label="field.label"
+            :type="field.type"
+            :options="field.options ? field.options : false"
+            :value="metadata[index]"
+            :invalid="!validate(metadata[index], field.type)"
+            :placeholder="field.placeholder ?? ''"
+            @input="(value) => update(value, index)"
+            @input="store.touched = true"
+        ></LabeledInput>
+        <Button v-if="!(field.min === 1 && metadata.length <= 1) && !(['monoselect', 'date'].includes(field.type))" class="remove-field remove right" :flat @button-clicked="metadata.splice(index,1)">
+            <i class="fa-solid fa-minus"></i>
+        </Button>
+    </div>
+    <Button v-if="!field.max || field.max > (metadata?.length ?? 0)"
+        class="add-instance"
+        :disabled="!!field.max && metadata?.length >= field.max"
+        @button-clicked="addField()"
+    >
+        <i class="fa-solid fa-plus"></i>
+    </Button>
+</template>
