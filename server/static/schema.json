@@ -358,6 +358,7 @@
                     "de": "Art des Titels"
                 },
                 "max":1,
+                "min": 1,
                 "type": "monoselect",
                 "options": [
                     {
@@ -392,19 +393,6 @@
                 ]
             },
             {
-                "id":"titleTypeCustom",
-                "alias": ["datacite:Title:titleType"],
-                "conditions":[
-                    ["titleType", "is", "customTitle"]   
-                ],
-                "label": {
-                    "en": "Type of title",
-                    "de": "Art des Titels"
-                },
-                "max":1,
-                "type":"text"
-            },
-            {
                 "id": "titleText",
                 "alias":["datacite:Title","dcterms:title"],
                 "conditions": [
@@ -415,6 +403,7 @@
                     "de": "Titel"
                 },
                 "max":1,
+                "min": 1,
                 "type": "text",
                 "placeholder": "e.g. Herr der Ringe"
             }
@@ -492,10 +481,9 @@
                         ]
                     },
                     {
-                        "id": "publisherIdentifierOrcid",
+                        "id": "publisherOrcid",
                         "alias":["datacite:Publisher","dcterms:publisher"],
                         "conditions":[
-                            ["isPublished", "is", "true"],
                             ["publisherIdentifierScheme", "is", "orcid"]
                         ],
                         "label": "ORCiD",
@@ -505,10 +493,9 @@
                         "placeholder":"e.g. 0000-0001-2345-6789"
                     },
                     {
-                       "id":"publisherIdentifierRor",
+                       "id":"publisherRor",
                        "alias":["datacite:Publisher","dcterms:publisher"],
                        "conditions":[
-                            ["isPublished", "is", "true"],
                             ["publisherIdentifierScheme", "is", "ror"]
                        ],
                        "label": "ROR",
@@ -523,6 +510,8 @@
                         "conditions":[
                             ["publisherIdentifierScheme", "is", "name"]
                        ],
+                        "min": 1,
+                        "max": 1,
                         "label": "Name",
                         "placeholder": "e.g. GeoForschungsZentrum Potsdam (GFZ)",
                         "type": "text"
@@ -590,9 +579,11 @@
                 "conditions": [
                     ["subjectIdentifierType", "is", "ddc"]
                 ],
-                "label": "DDC-Code",
+                "label": {
+                    "en": "DDC code",
+                    "de": "DDC-Code"
+                },
                 "min": 1,
-                "max": 1,
                 "type": "ddc",
                 "placeholder": "e.g. 551.6"
             },
@@ -616,11 +607,10 @@
                     ["subjectIdentifierType", "is", "gnd"]
                 ],
                 "label": {
-                    "en": "Identifier",
-                    "de": "Identifikator"
+                    "en": "GND number",
+                    "de": "GND-Nummer"
                 },
                 "min": 1,
-                "max": 1,
                 "type": "gnd",
                 "placeholder": "e.g. 4031178-8"
             },
@@ -635,7 +625,6 @@
                     "de": "Identifikator"
                 },
                 "min": 1,
-                "max": 1,
                 "type": "wikidata",
                 "placeholder": "e.g. Q52139"
             }
@@ -650,11 +639,38 @@
         },
           "fields": [
             {
-                "id":"contributorScheme",
-                "alias":["datacite:Contributor:contributorType"],
+                "id":"contributorType",
+                "alias":["datacite:Contributor:nameType"],
                 "label": {
-                    "en": "Type of contributor",
-                    "de": "Art des Mitwirkens"
+                    "en":"Contributor Type",
+                    "de":"Art des Autors"
+                },
+                "min":1,
+                "max":1,
+                "type":"monoselect",
+                "options":[
+                    {
+                        "id": "personal",
+                        "label": "Person"
+                    },
+                    {
+                        "id":"organizational",
+                        "label": {
+                            "en":"Organization",
+                            "de":"Institution"
+                        }
+                    }
+                ]
+            },
+            {
+                "id":"personalContributorRole",
+                "alias":["datacite:Contributor:contributorType"],
+                "conditions": [
+                    ["contributorType", "is", "personal"]
+                ],
+                "label": {
+                    "en": "Role of contribution",
+                    "de": "Rolle des Mitwirkenden"
                 },
                 "min": 1,
                 "max": 1,
@@ -689,24 +705,10 @@
                         }
                     },
                     {
-                        "id": "distributor",
-                        "label": {
-                            "en": "Distributor",
-                            "de": "Distributor*in"
-                        }
-                    },
-                    {
                         "id": "editor",
                         "label": {
                             "en": "Editor",
                             "de": "Editor*in"
-                        }
-                    },
-                    {
-                        "id": "hostingInstitution",
-                        "label": {
-                            "en": "Hosting Institution",
-                            "de": "Aufnehmende Institution"
                         }
                     },
                     {
@@ -749,13 +751,6 @@
                         }
                     },
                     {
-                        "id": "researchGroup",
-                        "label": {
-                            "en": "Research Group",
-                            "de": "Forschungsgruppe"
-                        }
-                    }, 
-                    {
                         "id": "rightsHolder",
                         "label": {
                             "en": "Rights Holder",
@@ -779,188 +774,291 @@
                             "en": "Work Package Leader",
                             "de": "Leiter*in des Arbeitspakets"
                         }
-                    },
-                    {
-                        "id": "customContributor",
-                        "label": {
-                            "en": "Other",
-                            "de": "Sonstige"
-                        }
                     }
                 ]
             },
             {
-                "id":"contributorNameType",
-                "label": {
-                    "en":"Name type",
-                    "de":"Namen-Typ"
-                },
-                "type": "monoselect",
-                "options":[
-                    {
-                        "id": "personal",
-                        "label":"Person"
-                    },
-                    {
-                        "id":"organizational",
-                        "label": {
-                            "en":"Organization",
-                            "de": "Institution"
-                        }
-                    }
-                ]
-            },
-            {
-                "id":"customContributorScheme",
+                "id":"organizationalContributorRole",
                 "alias":["datacite:Contributor:contributorType"],
                 "conditions": [
-                    ["contributorScheme", "is", "customContributor"]
+                    ["contributorType", "is", "organizational"]
                 ],
                 "label": {
-                    "en": "Contributor type",
-                    "de": "Mitwirkende*r"
+                    "en": "Role of contribution",
+                    "de": "Rolle des Mitwirkenden"
                 },
                 "min": 1,
                 "max": 1,
-                "type": "text"
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "distributor",
+                        "label": {
+                            "en": "Distributor",
+                            "de": "Distributor*in"
+                        }
+                    },
+                    {
+                        "id": "editor",
+                        "label": {
+                            "en": "Editor",
+                            "de": "Editor*in"
+                        }
+                    },
+                    {
+                        "id": "hostingInstitution",
+                        "label": {
+                            "en": "Hosting Institution",
+                            "de": "Aufnehmende Institution"
+                        }
+                    },
+                    {
+                        "id": "producer",
+                        "label": {
+                            "en": "Producer",
+                            "de": "Produzent*in"
+                        }
+                    },
+                    {
+                        "id": "researchGroup",
+                        "label": {
+                            "en": "Research Group",
+                            "de": "Forschungsgruppe"
+                        }
+                    }, 
+                    {
+                        "id": "rightsHolder",
+                        "label": {
+                            "en": "Rights Holder",
+                            "de": "Rechteinhaber*in"
+                        }
+                    },
+                    {
+                        "id": "sponsor",
+                        "label": {
+                            "en": "Sponsor",
+                            "de": "Sponsor*in"
+                        }
+                    }
+                ]
             },
             {
-                "id": "contributorName",
-                "alias":["datacite:Contributor:contributorName","dcterms:contributor"],
-                "conditions": [
-                    ["contributorNameType", "exists"]
+                "id":"organizationalContributorIdentifierType",
+                "alias":["datacite:Contributor:nameIdentifierScheme"],
+                "label": {
+                    "en":"Organisational identifier",
+                    "de":"Art der Institutions-ID"
+                },
+                "conditions":[
+                    ["contributorType", "is","organizational"]
                 ],
-                "label": "Name",
-                "min": 1,
-                "max": 1,
-                "type": "letter-string"
+                "min":1,
+                "max":1,
+                "type":"monoselect",
+                "options":[
+                    {
+                        "id": "ror",
+                        "label": "ROR"
+                    },
+                    {
+                        "id":"name",
+                        "label": {
+                            "en":"name",
+                            "de":"Name"
+                        }
+                    },
+                    {
+                        "id": "gnd",
+                        "label": "GND"
+                    }
+                ]
             },
             {
-                "id": "contributorIdentifierTypePersonal",
+                "id":"corganizationalContributorROR",
+                "alias":["datacite:Contributor:contributorName", "dcterms:contributor"],
+                "conditions":[
+                    ["contributorType", "is", "organizational"],
+                    ["organizationalContributorIdentifierType", "is","ror"]
+                ],
+                "label": "ROR",
+                "placeholder": "e.g. 01eezs655",
+                "min":1,
+                "max":1,
+                "type":"ror"
+            },
+            {
+                "id":"organizationName",
+                "alias":["datacite:Contributor:contributorName", "dcterms:contributor"],
+                "conditions":[
+                    ["contributorType", "is", "organizational"],
+                    ["organizationalContributorIdentifierType", "is","name"]
+                ],
+                "label": {
+                    "en":"Organisation Name",
+                    "de":"Name der Institution"
+                },
+                "placeholder": "e.g. University of Regensburg",
+                "min":1,
+                "max":1,
+                "type":"text"
+            },
+            {
+                "id":"organizationGND",
+                "alias":["datacite:Contributor:contributorName", "dcterms:contributor"],
+                "conditions":[
+                    ["contributorType", "is", "organizational"],
+                    ["organizationalContributorIdentifierType", "is","gnd"]
+                ],
+                "label": {
+                    "en":"GND number",
+                    "de":"GND-Nummer"
+                },
+                "placeholder": "e.g. 1012048-8",
+                "min":1,
+                "max":1,
+                "type":"gnd"
+            },
+            {
+                "id": "personalContributorIdentifierType",
                 "alias":["datacite:Contributor:nameIdentifierScheme"],
                 "conditions":[
-                    ["contributorNameType", "is","personal"]
+                    ["contributorType", "is", "personal"]
                 ],
-                "label": {
-                    "en": "Type of identifier",
-                    "de": "Art des Identifikators"
-                },
-                "type": "monoselect",
+                "label": "Name",
+                "placeholder": "e.g. Arendt, Hannah",
+                "min": 1,
+                "max": 1,
+                "type":"monoselect",
                 "options":[
+                    {
+                        "id":"name",
+                        "label": {
+                            "en":"name",
+                            "de":"Name"
+                        }
+                    },
                     {
                         "id": "orcid",
                         "label": "ORCiD"
-                    },
-                    {
-                        "id": "customContributorIdentifier",
-                        "label": {
-                            "en": "Other",
-                            "de": "Sonstige"
-                        }
                     }
                 ]
             },
             {
-                "id": "contributorIdentifierOrganizationalName",
-                "alias":["datacite:Contributor:nameIdentifierScheme"],
-                "conditions":[
-                    ["contributorNameType", "is","organizational"]
+                "id": "personalContributorLastName",
+                "alias": ["datacite:Contributor:familyName", "dcterms:contributor"],
+                "conditions": [
+                    ["contributorType", "is", "personal"],
+                    ["personalContributorIdentifierType", "is", "name"]
                 ],
                 "label": {
-                    "en": "Type of identifier",
-                    "de": "Art des Identifikators"
+                    "en": "Last Name",
+                    "de": "Nachname"
                 },
-                "placeholder": "e.g. ROR",
-                "type":"text"
-
+                "placeholder": "e.g. Arendt",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
             },
             {
-                "id":"contributorIdentifierOrganizational",
-                "alias":["datacite:Contributor:nameIdentifier","dcterms:identifier"],
-                "conditions":[
-                    ["contributorNameType","is", "organizational"]
+                "id": "personalContributorFirstName",
+                "alias": ["datacite:Contributor:givenName", "dcterms:contributor"],
+                "conditions": [
+                    ["contributorType", "is", "personal"],
+                    ["personalContributorIdentifierType", "is", "name"]
                 ],
                 "label": {
-                    "en": "Identifier",
-                    "de": "Identifikator"
+                    "en": "First Name",
+                    "de": "Vorname"
                 },
-                "placeholder": "e.g. https://ror.org/04z8jg394",
-                "type": "text"
+                "placeholder": "e.g. Hannah",
+                "min": 1,
+                "max": 1,
+                "type": "letter-string"
             },
             {
-                "id": "contributorIdentifierPersonal",
-                "alias": ["datacite:Contributor:nameIdentifier","dcterms:identifier"],
+                "id":"personalContributorOrcid",
+                "alias":["datacite:Contributor:nameIdentifier", "dcterms:contributor"],
                 "conditions":[
-                    ["contributorIdentifierTypePersonal", "is", "orcid"]
+                    ["contributorType", "is", "personal"],
+                    ["personalContributorIdentifierType", "is", "orcid"]
                 ],
                 "label": "ORCiD",
-                "placeholder":"e.g. 0000-0001-2345-6789",
-                "type":"orcid"
+                "placeholder": "e.g. 0000-0001-2345-6789",
+                "min":1,
+                "max":1,
+                "type": "orcid"
             },
             {
-                "id": "contributorIdentifierCustomName",
-                "alias":["datacite:Contributor:nameIdentifierScheme"],
+                "id": "personalContributorAffiliationIdentifierType",
                 "conditions": [
-                    ["contributorIdentifierTypePersonal", "is", "customContributorIdentifier"]
+                    ["contributorType", "is", "personal"]
                 ],
                 "label": {
-                    "en": "Type of identifier",
-                    "de": "Art des Identifikators"
+                    "en": "Affiliated institution",
+                    "de": "Institutszugehörigkeit"
                 },
+                "max": 1,
+                "min": 1,
+                "type":"monoselect",
+                "options":[
+                    {
+                        "id": "ror",
+                        "label": "ROR"
+                    },
+                    {
+                        "id":"name",
+                        "label": {
+                            "en":"name",
+                            "de":"Name"
+                        }
+                    },
+                    {
+                        "id": "gnd",
+                        "label": "GND"
+                    }
+                ]
+            },
+            {
+                "id": "personalContributorAffiliationName",
+                "alias": ["datacite:Contributor:affiliation"],
+                "conditions":[
+                    ["contributorType", "is", "personal"],
+                    ["personalContributorAffiliationIdentifierType", "is", "name"]
+                ],
+                "label": "Name",
+                "placeholder": "e.g. Universität Bayreuth",
+                "max": 1,
+                "min": 1,
                 "type": "letter-string"
             },
             {
-                "id": "contributorIdentifierCustom",
-                "alias":["datacite:Contributor:nameIdentifier"],
+                "id": "personalContributorAffiliationROR",
+                "alias": ["datacite:Contributor:affiliationIdentifier"],
                 "conditions": [
-                    ["contributorIdentifierTypePersonal", "is", "customContributorIdentifier"]
+                    ["contributorType", "is", "personal"],
+                    ["personalContributorAffiliationIdentifierType", "is", "ror"]
                 ],
-                "label": {
-                    "en": "Identifier",
-                    "de": "Identifikator"
-                },
-                "type": "letter-string"
-            },
-            {
-               "id": "contributorAffiliation",
-               "alias":["datacite:Contributor:affiliation","dcterms:contributor"],
-               "conditions":[
-                    ["contributorNameType", "is", "personal"]
-               ],
-               "label": "Affiliation",
-               "placeholder": "e.g. Universität Bayreuth",
-               "min": 1,
-               "max": 1,
-               "type": "text"
-            },
-            {
-                "id": "contributorAffiliationIdentifierType",
-                "conditions":[
-                    ["contributorNameType", "is","personal"]
-                ],
-                "label": {
-                    "en": "Type of identifier of affiliation",
-                    "de": "Art des Identifikators der Affiliation"
-                },
-                "placeholder": "e.g. ROR",
+                "label": "ROR",
+                "placeholder": "e.g. 0234wmv40",
                 "min": 1,
                 "max": 1,
-                "type":"text"
+                "type": "ror"
             },
             {
-                "id": "contributorAffiliationIdentifier",
-                "alias":["datacite:Contributor:affiliationIdentifier","dcterms:identifier"],
+                "id":"personalContributorAffiliationGND",
+                "alias":["datacite:Contributor:affiliationIdentifier"],
                 "conditions":[
-                    ["contributorNameType", "is","personal"]
+                    ["contributorType", "is", "personal"],
+                    ["personalContributorAffiliationIdentifierType", "is", "gnd"]
                 ],
                 "label": {
-                    "en": "Identifier of affiliation",
-                    "de": "Identifikator der Affiliation"
+                    "en":"GND number",
+                    "de":"GND-Nummer"
                 },
-                "placeholder": "e.g. https://ror.org/0234wmv40",
-                "min": 1,
-                "max": 1,
-                "type":"text"
+                "placeholder": "e.g. 1012048-8",
+                "min":1,
+                "max":1,
+                "type":"gnd"
             }
           ]
     },
@@ -978,6 +1076,8 @@
                     "en": "Date type",
                     "de": "Datum-Typ"
                 },
+                "min": 1,
+                "max": 1,
                 "type": "monoselect",
                 "options": [
                     {
@@ -1062,18 +1162,6 @@
                 ]
             },
             {
-                "id": "customDateTypeName",
-                "alias":["datacite:Date:dateType"],
-                "conditions":[
-                    ["dateType", "is", "customDateType"]
-                ],
-                "label": {
-                    "en":"Date type",
-                    "de": "Datum-Typ"
-                },
-                "type":"text"
-            },
-            {
                 "id": "dateInformation",
                 "alias":["datacite:Date","dcterms:date"],
                 "conditions": [
@@ -1083,6 +1171,8 @@
                     "en": "Date",
                     "de": "Datum"
                 },
+                "min": 1,
+                "max": 1,
                 "type":"date",
                 "placeholder": "2021"
             }
@@ -1102,6 +1192,8 @@
                     "en": "Language",
                     "de": "Sprache"
                 },
+                "min": 1,
+                "max": 1,
                 "type": "monoselect",
                 "options": [
                     {
@@ -1130,6 +1222,8 @@
                 "conditions": [
                     ["language", "is", "custom"]
                 ],
+                "min": 1,
+                "max": 1,
                 "label": {
                     "en": "Language",
                     "de": "Sprache"
@@ -1348,6 +1442,7 @@
                     "en": "Size / scope",
                     "de": "Größe / Umfang"
                 },
+                "min": 1,
                 "placeholder": "e.g. 12 pages, 8 MB, 20 minutes,...",
                 "type": "text"
             }
@@ -1357,6 +1452,7 @@
         "id": "version",
         "alias":["datacite:Version"],
         "label": "Version",
+        "max":1,
         "fields": [
           {
               "id": "versionNumber",
@@ -1576,6 +1672,8 @@
                     "en": "Type of description",
                     "de": "Art der Beschreibung"
                 },
+                "min": 1,
+                "max": 1,
                 "type": "monoselect",
                 "options": [
                     {
@@ -1595,8 +1693,8 @@
                     {
                         "id": "descriptionReadme",
                         "label": {
-                            "en": "readme file",
-                            "de": "Readme-Datei"
+                            "en": "readme",
+                            "de": "Readme"
                         }   
                     },
                     {
@@ -1614,6 +1712,7 @@
                 "conditions": [
                     ["descriptionType", "is", "descriptionAbstract"]
                 ],
+                "min": 1,
                 "placeholder": "e.g. Im Teilprojekt \"Biologische Effekte\" des Sonderforschungsbereich Mikroplastik an der Universität Bayreuth werden seit 2019 Mechanismen und Prozesse erforscht,...",
                 "label": "Abstract",
                 "type": "long-text"
@@ -1624,6 +1723,7 @@
                 "conditions": [
                     ["descriptionType", "is", "descriptionTOC"]
                 ],
+                "min": 1,
                 "placeholder": "1. Einleitung\n2. Literatur\n3. Methodik\n4. Auswertung\n5. Zusammenfassung",
                 "label": {
                     "en": "Table of Contents",
@@ -1632,13 +1732,14 @@
                 "type": "long-text"
             },
             {
-                "id": "fileReadme",
+                "id": "textReadme",
                 "alias":["datacite:Description"],
                 "conditions": [
                     ["descriptionType", "is", "descriptionReadme"]
                 ],
+                "min": 1,
                 "label": "Readme",
-                "type": "file-link"
+                "type": "long-text"
             },
             {
                 "id": "textCustom",
@@ -1646,6 +1747,7 @@
                 "conditions":[
                     ["descriptionType", "is", "descriptionCustom"]
                 ],
+                "min": 1,
                 "label": {
                     "en": "Description",
                     "de": "Beschreibung"
@@ -1662,6 +1764,7 @@
             "en": "Geolocation",
             "de": "Geolokalisierung"
         },
+        "max": 1,
         "fields": [
             {
                 "id": "geolocationType",
@@ -1698,7 +1801,7 @@
             },
             {
                 "id": "geoLocationPlace",
-                "alias":["datacite:GeoLocation:geoLocationPlace","dcterms:spatial"],
+                "alias":["datacite:GeoLocation:geoLocationPlace","dcterms:spatial", "dc:coverage"],
                 "conditions": [
                     ["geolocationType", "is", "geoLocationPlace"]
                 ],
@@ -1713,40 +1816,44 @@
             },
             {
                 "id": "geoLocationPointLatitude",
-                "alias":["datacite:GeoLocation:geoLocationPoint:pointLatitude","dcterms:spatial"],
+                "alias":["datacite:GeoLocation:geoLocationPoint:pointLatitude","dcterms:spatial", "dc:coverage"],
                 "conditions": [
                     ["geolocationType", "is", "geoLocationPoint"]
                 ],
+                "max": 1,
+                "min": 1,
                 "label":{
                     "en": "Latitude",
                     "de": "Breitengrad"
                 },
                 "placeholder": "e.g. 49.926789",
-                "type": "coordinate"
+                "type": "latitude"
             },
             {
                 "id": "geoLocationPointLongitude",
-                "alias":["datacite:GeoLocation:geoLocationPoint:pointLongitude","dcterms:spatial"],
+                "alias":["datacite:GeoLocation:geoLocationPoint:pointLongitude","dcterms:spatial", "dc:coverage"],
                 "conditions": [
                     ["geolocationType", "is", "geoLocationPoint"]
                 ],
+                "max": 1,
+                "min": 1,
                 "label":{
                     "en": "Longitude",
                     "de": "Längengrad"
                 },
                 "placeholder": "e.g. 11.586352",
-                "type": "coordinate"
+                "type": "longitude"
             },
             {
                 "id": "geoLocationPolygonPoint",
-                "alias":["datacite:GeoLocation:geoLocationPolygon","dcterms:spatial"],
+                "alias":["datacite:GeoLocation:geoLocationPolygon","dcterms:spatial", "dc:coverage"],
                 "conditions": [
                     ["geolocationType", "is", "geoLocationPolygon"]
                 ],
                 "min": 2,
                 "label": {
-                    "en": "Polygon",
-                    "de": "Polygon"
+                    "en": "Polygon Points",
+                    "de": "Polygon-Punkte"
                 },
                 "fields": [
                     {
@@ -1759,7 +1866,7 @@
                             "de": "Längengrad d. Punktes"
                         },
                         "placeholder": "e.g. 11.580483",
-                        "type":"coordinate"
+                        "type":"longitude"
                     },
                     {
                         "id": "geoLocationPolygonLatitude",
@@ -1771,9 +1878,105 @@
                             "de": "Breitengrad d. Punktes"
                         },
                         "placeholder": "e.g. 48.147975",
-                        "type": "coordinate"
+                        "type": "latitude"
                     }
                 ]
+            }
+        ]
+    },
+    {
+        "id": "timeframe",
+        "label": {
+            "en": "Timeframe",
+            "de": "Zeitrahmen"
+        },
+        "fields": [
+            {
+                "id": "timeframeType",
+                "label": {
+                    "en":"Type of timeframe",
+                    "de":"Art des Zeitrahmens"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "monoselect",
+                "options":[
+                    {
+                        "id": "point",
+                        "label": {
+                            "en": "point in time",
+                            "de": "Zeitpunkt"
+                        }
+                    },
+                    {
+                        "id":"range",
+                        "label": {
+                            "en":"time range",
+                            "de":"Zeitspanne"
+                        }
+                    },
+                    {
+                        "id":"event",
+                        "label": {
+                            "en":"historical event",
+                            "de":"Geschichtliches Ereignis"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "timeframePoint",
+                "alias":["dc:coverage", "dcterms:temporal"],
+                "conditions": [
+                    ["timeframeType", "is", "point"]
+                ],
+                "label": {
+                    "en": "point in time",
+                    "de": "Zeitpunkt"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "date"
+            },
+            {
+                "id": "timeframeRangeStart",
+                "alias":["dc:coverage", "dcterms:temporal"],
+                "conditions": [
+                    ["timeframeType", "is", "range"]
+                ],
+                "label": {
+                    "en": "from",
+                    "de": "von"
+                },
+                "max": 1,
+                "type": "date"
+            },
+            {
+                "id": "timeframeRangeEnd",
+                "alias":["dc:coverage", "dcterms:temporal"],
+                "conditions": [
+                    ["timeframeType", "is", "range"]
+                ],
+                "label": {
+                    "en": "until",
+                    "de": "bis"
+                },
+                "max": 1,
+                "type": "date"
+            },
+            {
+                "id": "timeframeEvent",
+                "alias":["dc:coverage", "dcterms:temporal"],
+                "conditions": [
+                    ["timeframeType", "is", "event"]
+                ],
+                "label": {
+                    "en": "Event",
+                    "de": "Ereignis"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "string"
             }
         ]
     },
@@ -1785,17 +1988,6 @@
         },
         "fields": [
             {
-                "id": "funderName",
-                "alias":["datacite:FundingReference:funderName","dcterms:contributor"],
-                "label": {
-                    "en": "Name of funder",
-                    "de": "Name des Förderer"
-                },
-                "min": 1,
-                "type": "letter-string",
-                "placeholder": "e.g. DFG, BMBF, Volkswagenstiftung"
-            },
-            {
                 "id":"funderIdentifierType",
                 "alias":["datacite:FundingReference:funderIdentifierType"],
                 "label": {
@@ -1803,6 +1995,7 @@
                     "de":"Art des Identifikators"
                 },
                 "min": 1,
+                "max": 1,
                 "type": "monoselect",
                 "options":[
                     {
@@ -1817,13 +2010,28 @@
                         "label": "ROR"
                     },
                     {
-                        "id":"custom",
+                        "id":"name",
                         "label": {
-                            "en":"Other",
-                            "de":"Sonstige"
+                            "en":"Name",
+                            "de":"Name"
                         }
                     }
                 ]
+            },
+            {
+                "id": "funderName",
+                "alias":["datacite:FundingReference:funderName","dcterms:contributor"],
+                "conditions":[
+                    ["funderIdentifierType", "is", "name"]
+                ],
+                "label": {
+                    "en": "Name of funder",
+                    "de": "Name des Förderer"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "letter-string",
+                "placeholder": "e.g. DFG, BMBF, Volkswagenstiftung"
             },
             {
                 "id": "funderCrossref",
@@ -1836,6 +2044,7 @@
                     "de": "Crossref Förderer-ID"
                 },
                 "min": 1,
+                "max": 1,
                 "type": "doi",
                 "placeholder": "e.g. 10.84823/992340"
             },
@@ -1850,21 +2059,9 @@
                     "de": "ROR des Förderers"
                 },
                 "min": 1,
+                "max": 1,
                 "type": "ror",
                 "placeholder": "e.g. 01eezs655"
-            },
-            {
-                "id": "funderIdentifier",
-                "alias":["datacite:FundingReference:funderIdentifier","dcterms:contributor"],
-                "conditions":[
-                    ["funderIdentifierType", "is", "custom"]
-                ],
-                "label": {
-                    "en": "Funder Identifier",
-                    "de": "Identifikator des Förderers"
-                },
-                "min": 1,
-                "type": "text"
             },
             {
                 "id": "award",
@@ -1881,6 +2078,7 @@
                             "de": "Projekttitel"
                         },
                         "min": 1,
+                        "max": 1,
                         "type": "letter-string",
                         "placeholder": "e.g. Forschungsdatendienst für die Ost-, Ostmittel- und Südosteuropaforschung (OstData)"
                     },
@@ -1890,8 +2088,9 @@
                         "label": {
                             "en": "Award number",
                             "de": "Projektnummer"
-                        }, 
-                        "type": "letter-string",
+                        },
+                        "max": 1, 
+                        "type": "string",
                         "placeholder": "e.g. 413708228"
                     },
                     {
@@ -1901,6 +2100,7 @@
                             "en": "Award URI",
                             "de": "Projekt URI"
                         },
+                        "max": 1,
                         "type": "uri",
                         "placeholder": "e.g. https://gepris.dfg.de/gepris/projekt/413708228"
                     }
@@ -2115,6 +2315,8 @@
                     "en": "Type of data source",
                     "de": "Art der Datenquelle"
                 },
+                "max": 1,
+                "min": 1,
                 "type": "monoselect",
                 "options":[
                     {
@@ -2188,6 +2390,8 @@
                     "en": "Software type",
                     "de": "Software-Typ"
                 },
+                "min": 1,
+                "max": 1,
                 "type": "monoselect",
                 "options":[
                     {
@@ -2225,6 +2429,8 @@
                 "conditions":[
                     ["softwareType", "is", "customSoftware"]
                 ],
+                "min": 1,
+                "max": 1,
                 "label": {
                     "en": "Software type",
                     "de": "Software-Typ"
@@ -2236,6 +2442,8 @@
                 "conditions": [
                     ["softwareType", "exists"]
                 ],
+                "min": 1,
+                "max": 1,
                 "label": {
                     "en": "Software name",
                     "de": "Name der Software"
@@ -2247,6 +2455,7 @@
                 "conditions":[
                     ["softwareType", "exists"]
                 ],
+                "max": 1,
                 "label": {
                     "en": "Software version",
                     "de": "Version der Software"
@@ -2262,7 +2471,7 @@
                     "en": "Additional information",
                     "de": "Weitere Informationen"
                 },
-                "type": "text"
+                "type": "long-text"
             }
         ]
     }

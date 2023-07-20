@@ -1,5 +1,5 @@
 export const CONTENT = ['language', 'version', 'date', 'subject']
 export const RELATIONS = ['relation']
-export const SCOPE = ['geolocation', 'size']
+export const SCOPE = ['geolocation', 'size', 'timeframe']
 export const ORIGIN_AND_CREATION = ['contributor', 'datasource', 'software', 'funding']
 export const USAGE_AND_RIGHTS = ['rights']
