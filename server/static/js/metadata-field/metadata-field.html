@@ -48,5 +48,6 @@
         @button-clicked="addField()"
     >
         <i class="fa-solid fa-plus"></i>
+        <span v-if="!metadata?.length">Add {{localized(field.label)}}</span>
     </Button>
 </template>
