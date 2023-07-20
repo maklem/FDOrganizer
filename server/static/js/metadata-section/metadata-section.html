@@ -1,4 +1,4 @@
-<details class="metadata-section" @toggle="open = !open">
+<details v-if="!!store.schema[sectionId].length" class="metadata-section" @toggle="open = !open">
     <summary class="section-header">
         <i class="icon fa-solid" :class="open ? 'fa-plus':'fa-minus'"></i>
         <h2>{{label}}</h2>
