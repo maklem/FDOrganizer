@@ -1,4 +1,4 @@
-<div @click="store.openDocument(id)" class="package-content-document" :class="{editable}">
+<div @click="store.openMetadata('document', id)" class="package-content-document" :class="{editable}">
     <i class="fa-solid icon" :class="'fa-' + filetypeIcon(type)"></i>
     <div class="name">{{name}}</div>
     <div class="size">{{formatFilesize(size)}}</div>

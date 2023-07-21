@@ -32,9 +32,7 @@ const packageEdit = createApp({
         const packageId = location.pathname.split('/').at(-1)
         this.store.getPackage(packageId)
 
-        const params = new URLSearchParams(location.search);
-        const documentId = params.get("document");
-        if (!!documentId) this.store.openDocument(documentId)
+        this.store.checkMetadataParameters()
     },
     methods: {
         enterPressed(event) {

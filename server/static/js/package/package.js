@@ -29,9 +29,7 @@ const pkg = createApp({
 async mounted() {
         this.store.getPackages()
 
-        const params = new URLSearchParams(location.search);
-        const documentId = params.get("document");
-        if (!!documentId) this.editStore.openDocument(documentId)
+        this.editStore.checkMetadataParameters()
     },
     methods: {
     },

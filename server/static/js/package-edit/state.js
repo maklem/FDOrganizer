@@ -15,6 +15,7 @@ export const store = reactive({
     packagePath: [],
     activeTab: 'upload',
     newFolderName: undefined,
+    metadataEntity: undefined,
     climbPackagePath,
     createFolder,
     currentPath,
@@ -24,23 +25,39 @@ export const store = reactive({
     getPackage,
     getPackageContent,
     openFolder,
-    openDocument,
+    checkMetadataParameters,
+    openMetadata,
     closeDocument,
     pathNames
 });
 
-function openDocument(documentId) {
-    history.pushState({document: documentId}, '', `?document=${documentId}`)
+function openMetadata(entityType, entityId) {
+    history.pushState({[entityType]: entityId}, '', `?${entityType}=${entityId}`)
     addEventListener('popstate', function close() {
-        store.closeDocument()
+        store.closeDocument(entityType)
         removeEventListener('popstate', close)
     })
+    store.metadataEntity = entityType
     store.modalOpen = true
 }
 
-function closeDocument() {
-    history.pushState({document: null}, '', `${location.origin}${location.pathname}`)
+function closeDocument(entityType) {
+    history.pushState({[entityType]: null}, '', `${location.origin}${location.pathname}`)
     store.modalOpen = false
+    store.metadataEntity = undefined
+}
+
+function checkMetadataParameters() {
+    const params = new URLSearchParams(location.search);
+    const entityId = getParameter(params)
+    if (!!entityId.length) store.openMetadata(entityId[0], entityId[1])
+}
+
+function getParameter(params) {
+    if (!!params.get('document')) return ["document", params.get('document')]
+    if (!!params.get('folder')) return ["folder", params.get('folder')]
+    if (!!params.get('package')) return ["package", params.get('package')]
+    return []
 }
 
 function pathNames() {

@@ -35,8 +35,7 @@ const archive = createApp({
         const params = new URLSearchParams(location.search);
         const packageId = params.get("package");
         if (!!packageId) return this.store.openSettings(packageId)
-        const documentId = params.get("document");
-        if (!!documentId) return this.editStore.openDocument(documentId)
+        return this.editStore.checkMetadataParameters()
     },
     methods: {
     },
