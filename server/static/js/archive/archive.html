@@ -17,7 +17,7 @@
             <div class="loading" v-else></div>
         </aside>
         <PackageContent v-if="!!store.selectedPackage" @back="store.climbPackagePath()"></PackageContent>
-        <Metadata :open="editStore.modalOpen" @close="editStore.closeDocument()"></Metadata>
+        <Metadata :open="editStore.modalOpen" :metadataEntity="editStore.metadataEntity" @close="editStore.closeDocument()"></Metadata>
         <ArchivePackageSettings :open="store.modalOpen" @close="store.closeSettings()"></ArchivePackageSettings>
     </main>
 </App>

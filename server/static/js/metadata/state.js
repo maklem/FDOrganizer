@@ -9,27 +9,29 @@ export const store = reactive({
     metadata: undefined,
     metadataId: undefined,
     touched: false,
-    document: undefined,
+    entity: undefined,
+    entityType: undefined,
     schema: undefined,
     schemaVersion: "1",
     subject: undefined,
     loading: {
-        document: true,
+        entity: true,
     },
-    getDocument,
     saveMetadata,
     checkConditions,
     getAllFields,
     makeTemplate,
+    getParameterValue,
     reset,
     sectionLabel
 });
 
-async function getDocument(documentId) {
-    store.loading.document = true
-    const json = await get(`/document/${documentId}/metadata`)
+async function getEntity(entityType, entityId) {
+    store.loading.entity = true
+    const json = await get(`/${entityType}/${entityId}/metadata`)
 
-    store.document = json.document
+    store.entity = json[entityType]
+    store.entityType = entityType
 
     if (!!json.metadata) {
         store.metadata = json.metadata.metadata
@@ -39,7 +41,15 @@ async function getDocument(documentId) {
         store.metadata = {}
         store.schema = await getSchema(store.schemaVersion)
     }
-    store.loading.document = false
+    store.loading.entity = false
+}
+
+function getParameterValue(entityType) {
+    const params = new URLSearchParams(location.search);
+    const entityId = params.get(entityType);
+    // TODO: Throw more sensible error here
+    if (!entityId) new Error(`No valid ${entityType}-ID as parameter value`)
+    getEntity(entityType, entityId)
 }
 
 async function getSchema(version) {
@@ -59,7 +69,7 @@ async function saveMetadata() {
         toastStore.addMessage("error", "Manche Felder enthalten fehlerhafte Angaben")
         return false
     }
-    await put(`/document/${store.document.id}/metadata`, {
+    await put(`/${store.entityType}/${store.entity.id}/metadata`, {
             metadata: filteredData,
             schema_version: store.schemaVersion,
         }
@@ -176,7 +186,7 @@ function validateAll(metadata, schema) {
 function reset() {
     store.metadata = undefined
     store.touched = false
-    store.document = undefined
+    store.entity = undefined
 }
 
 const LABELS = {

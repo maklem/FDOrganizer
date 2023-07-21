@@ -15,7 +15,14 @@ export default {
         Toast
     },
     props: {
-        open: String
+        open: String,
+        metadataEntity:{
+            type: String,
+            validator(value) {
+                // The value must match one of these strings
+                return ['document', 'folder', 'package'].includes(value)
+            }
+        },
     },
     data() {
         return {
@@ -32,10 +39,7 @@ export default {
                 return this.$refs.modal.close()
             }
             if (now) {
-                const params = new URLSearchParams(location.search);
-                const documentId = params.get("document");
-                if (!documentId) return
-                this.store.getDocument(documentId)
+                this.store.getParameterValue(this.metadataEntity)
                 this.$refs.modal.showModal()
             }
         }
