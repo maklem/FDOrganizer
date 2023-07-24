@@ -28,8 +28,7 @@ createApp({
             this.password = event.currentTarget.value
             this.showErrorText = false
         },
-        async login(event) {
-            event.preventDefault();
+        async login() {
             if (! await login(this.username, this.password)) this.setLoginFailed()
         },
         setLoginFailed() {

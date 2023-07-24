@@ -11,7 +11,7 @@
         <div class="error-text" :class="{visible: showErrorText}">
             Wrong username or password!
         </div>
-        <Button type="submit">Login</Button>
+        <Button @button-clicked="login">Login</Button>
     </form>
 
 </div>
