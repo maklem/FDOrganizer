@@ -1,10 +1,10 @@
 .package-content-folder{
     display: inline-grid;
-    grid-template-columns: max-content minmax(auto, max-content) auto;
-    grid-template-rows: auto;
+    grid-template-columns: max-content minmax(auto, max-content) auto max-content;
+    grid-template-rows: auto auto;
     grid-template-areas:
-        "icon name size"
-        "icon count count";
+        "icon name size action"
+        "icon count count action";
     justify-items: start;
     align-items: center;
     grid-gap: 0.3rem 1rem;
@@ -15,13 +15,6 @@
     cursor:pointer
 }
 
-.package-content-folder.editable {
-    grid-template-columns: max-content minmax(auto, max-content) auto max-content;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-        "icon name size action"
-        "icon count count action";
-}
 .package-content-folder:hover {
     color: var(--primary-color);
 }
