@@ -6,29 +6,31 @@ from . import APP
 
 from .entities.databases import Databases
 from .entities.document import Document
+from .entities.folder import Folder
+from .entities.package import Package
 from .entities.metadata import Metadata
 
 from .services.authentication import user
 from .services.database import get, post, update
 
-from .util import owner, web_error, web_response
+from .util import get_database_from_string, owner, web_error, web_response
 
 
-@APP.route("/document/<document_id>/metadata", methods=["GET"])
-def get_document_metadata(document_id):
-    # Get document from DB
+@APP.route("/<entity_type>/<entity_id>/metadata", methods=["GET"])
+def get_entity_with_metadata(entity_type, entity_id):
+    # Get entity from DB
     try:
-        document = get(Databases.DOCUMENTS, document_id).json()
+        entity = get(get_database_from_string(entity_type), entity_id).json()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")      
     # Check ownership
     username = user(request)
-    if document.get('owner') != username:
+    if entity.get('owner') != username:
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Init return value with document info
-    result = {'document': Document.convert(document)}
+    result = convert_entity(entity_type, entity)
     # Check if document already has metadata
-    metadata_id = document.get('metadata')
+    metadata_id = entity.get('metadata')
     if metadata_id is None:
         return web_response(206, details = result)
     # Get metadata from DB
@@ -71,3 +73,12 @@ def update_document_metadata(document_id):
             return web_error(error.response.status_code, error.response.reason, component= "DATABASE")    
     # Return metadata
     return web_response(200, details = metadata)
+
+def convert_entity(entity_type, entity) -> dict[str, dict[str, any]]:
+    if entity_type == 'document':
+        return {'document': Document.convert(entity)}
+    if entity_type == 'package':
+        return {'package': Package.convert(entity)}
+    if entity_type == 'folder':
+        return {'folder': Folder.convert(entity)}
+    raise ValueError(f'Entity type {entity_type} is unknown')
