@@ -3,9 +3,9 @@
         <header class="package-settings-header">
             <i class="fa-solid fa-file-lines"></i>
             <h1>{{store.package.name}}</h1>
-            <button class="back-button" @click="$emit('close')">
+            <Button :flat class="back-button" @button-clicked="$emit('close')">
                 <i class="fa-solid fa-xmark"></i>
-            </button>
+            </Button>
         </header>
         <div class="introduction">
             You can choose the future distribution of this package and its contents according to the <dfn title="Findability, Accessibility, Interoperability, Reusability">FAIR</dfn> Principles: Findability, Accessibility, Interoperability, Reusability. 

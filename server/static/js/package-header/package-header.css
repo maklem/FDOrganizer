@@ -11,21 +11,9 @@
 .package-header .back-button {
     flex: 0 0 0;
     font-size: 1.5rem;
-    background-color: transparent;
-    border-radius: 0.2rem;
-    border: none;
+    --rgb-button-color: var(--rgb-font-color);
+    --button-color: var(--font-color);
     padding: 0.25rem 0.5rem;
-    cursor: pointer;
-}
-
-.package-header .back-button:hover {
-    background-color: #ccc;
-    transition: all 300ms;
-}
-
-.package-header .back-button:active {
-    background-color: #eee;
-    transition: all 300ms;
 }
 
 .package-header .package-name {

@@ -45,4 +45,15 @@
 .button-component.flat {
     border: none;
     box-shadow: none;
+    transition: all 200ms;
+    outline: 0;
+}
+
+.button-component.flat:hover:not([disabled]),
+.button-component.flat:focus:not([disabled]) {
+    background-color: rgba(var(--rgb-button-color, var(--rgb-secondary-color)), 0.3);
+}
+
+.button-component.flat:active:not([disabled]) {
+    filter: brightness(1.2);
 }

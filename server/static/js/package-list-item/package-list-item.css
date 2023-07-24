@@ -49,23 +49,10 @@
 }
 
 .action .delete {
-    background-color: transparent;
-    color: var(--error);
-    border: none;
-    border-radius: 0.2rem;
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
     padding: 0.5rem;
-
     font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 200ms;
-}
-
-.action .delete:hover {
-    background-color: rgba(var(--rgb-error), 0.3);
-}
-
-.action .delete:active {
-    filter: brightness(1.1);
 }
 
 .delete-package {

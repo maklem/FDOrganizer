@@ -7,9 +7,9 @@
     <div class="primary">{{name}}</div>
     <div class="secondary">{{status}}</div>
     <div class="action">
-        <button class="delete" @click="openDialog">
+        <Button class="delete" :flat @button-clicked="openDialog">
             <i class="fa-solid fa-trash"></i>
-        </button>
+        </Button>
     </div>
 </div>
 <dialog ref="confirmDelete" class="delete-package">

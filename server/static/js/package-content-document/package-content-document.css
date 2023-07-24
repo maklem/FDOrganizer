@@ -60,24 +60,10 @@
 }
 
 .action .delete {
-    background-color: transparent;
-    color: var(--error);
-    border: none;
-    border-radius: 0.2rem;
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
     padding: 0.5rem;
-
     font-size: 1.2rem;
-    cursor: pointer;
-}
-
-.action .delete:hover {
-    background-color: rgba(var(--rgb-error), 0.3);
-    transition: all 300ms;
-}
-
-.action .delete:active {
-    background-color: rgba(var(--rgb-error), 0.1);
-    transition: all 300ms;
 }
 
 .delete-document {

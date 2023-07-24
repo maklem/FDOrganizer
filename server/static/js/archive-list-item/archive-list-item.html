@@ -7,9 +7,9 @@
     <div class="name">{{name}}</div>
     <div class="date">{{formatRelativeDate(last_changed)}}</div>
     <div class="action" v-if="status === 'active'">
-        <button class="settings" @click="openSettings">
+        <Button class="settings" @button-clicked="store.openSettings(id)">
             <i class="fa-solid fa-cog"></i>
-        </button>
+        </Button>
     </div>
 </div>
 

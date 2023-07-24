@@ -49,22 +49,8 @@
 }
 
 .action .settings {
-    background-color: transparent;
-    color: var(--font-color);
-    border: none;
-    border-radius: 0.2rem;
+    --button-color: var(--font-color);
+    --rgb-button-color: var(--rgb-font-color);
     padding: 0.5rem;
-
     font-size: 1.2rem;
-    cursor: pointer;
-}
-
-.action .settings:hover {
-    background-color: rgba(var(--rgb-font-color), 0.3);
-    transition: all 300ms;
-}
-
-.action .settings:active {
-    background-color: rgba(var(--rgb-font-color), 0.1);
-    transition: all 300ms;
 }

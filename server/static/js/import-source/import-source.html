@@ -1,9 +1,9 @@
 <div class="import-source">
     <div class="source-header" @click="store.activateSource(id)">
         <i v-if="!authenticated" class="fa-solid fa-lock"></i>
-        <button v-else v-if="!!store.remotePath.length" class="back-button" @click="store.climbRemotePath()">
+        <Button v-else v-if="!!store.remotePath.length" :flat class="back-button" @button-clicked="store.climbRemotePath()">
             <i class="fa-solid fa-arrow-left"></i>
-        </button>
+        </Button>
         <header class="source-name">
             <h2 class="text">{{name}}</h2>
             <template v-else
@@ -34,7 +34,7 @@
                     :placeholder="'Your ' + name + ' password'"
                     :value="store.password"
                     @input="(value) => store.password = value"></LabeledInput>
-                <Button @click="authenticate">Login</Button>
+                <Button @button-clicked="authenticate">Login</Button>
             </form>
             <div v-else class="import-content">
                 <div v-for="folder in store.getFolders()" class="import-folder" @click="store.openFolder(folder.id)">

@@ -1,7 +1,7 @@
 <div class="package-header">
-    <button class="back-button" @click="$emit('back')">
+    <Button class="back-button" :flat @button-clicked="$emit('back')">
         <i class="fa-solid fa-arrow-left"></i>
-    </button>
+    </Button>
     <div class="package-name">
         {{store.package.name}}
         <template

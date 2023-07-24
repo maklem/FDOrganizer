@@ -57,21 +57,11 @@
     --button-color: var(--error);
     --rgb-button-color: var(--rgb-error);
 
-    border: none;
-    border-radius: 0.2rem;
     padding: 0.5rem;
 
     font-size: 1.2rem;
-    transition: all 200ms;
 }
 
-.remove:hover:not([disabled]) {
-    background-color: rgba(var(--rgb-error), 0.3);
-}
-
-.remove:active:not([disabled]) {
-    filter: brightness(1.2);
-}
 
 .add-instance {
     display: flex;

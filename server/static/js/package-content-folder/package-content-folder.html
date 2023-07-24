@@ -4,9 +4,9 @@
     <div class="size">{{formattedSize}}</div>
     <div class="count">{{count}} {{count === 1 ? "content" : "contents"}}</div>
     <div v-if=editable class="action">
-        <button class="delete" @click="openDialog">
+        <Button class="delete" :flat @button-clicked="openDialog">
             <i class="fa-solid fa-trash"></i>
-        </button>
+        </Button>
     </div>
     <div v-if=!editable class="action">
         <Button :flat class="metadata-edit" @button-clicked="store.openMetadata('folder', id)">

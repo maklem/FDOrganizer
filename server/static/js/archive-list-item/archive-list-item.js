@@ -21,11 +21,5 @@ export default {
             formatRelativeDate
         }
     },
-    methods: {
-        openSettings(event) {
-            event.stopPropagation()
-            this.store.openSettings(this.id)
-        }
-    },
     template
 }

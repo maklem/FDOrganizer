@@ -57,7 +57,7 @@
     gap: 0.5rem;
 
     border-radius: 1rem;
-    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(0.1rem) brightness(0.8);
     transition: opacity 0.4s;
 
     opacity: 0;
@@ -69,8 +69,6 @@
 }
 
 .file .overlay .delete-file {
-
-    background-color: rgba(210, 210, 210);
-
-    color: var(--error);
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
 }

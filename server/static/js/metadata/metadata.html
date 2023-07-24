@@ -3,9 +3,9 @@
         <header class="metadata-header">
             <i class="fa-solid fa-file-lines"></i>
             <h1 v-if="!!store.entity">{{store.entity.name}}</h1>
-            <button class="back-button" @click="$emit('close')">
+            <Button class="back-button" :flat @button-clicked="$emit('close')">
                 <i class="fa-solid fa-xmark"></i>
-            </button>
+            </Button>
         </header>
         <main class="metadata-sections">
             <MetadataSection v-for="key in Object.keys(store.schema)" :id="key" :label="store.sectionLabel(key)" :selectedSection="selectedSection" @select-section=selectSection(key)></MetadataSection>

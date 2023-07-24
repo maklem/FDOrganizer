@@ -3,7 +3,7 @@
     <span class="name">{{name}}</span>
     <span class="size">{{formatFilesize(size)}}</span>
     <div class="overlay">
-        <Button class="delete-file" @button-clicked="store.removeFile(name)" :flat="true">
+        <Button class="delete-file" @button-clicked="store.removeFile(name)">
             <i class="fa-solid fa-trash"></i>
         </Button>
     </div>
