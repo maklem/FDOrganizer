@@ -14,17 +14,13 @@
                 </div>
             </template>
             <div class="loading" v-else></div>
-            <dialog ref="newPackage" class="create-package">
+            <dialog ref="newPackage" class="create-package" @keyup="enterPressed">
                 <h1>Create a new project</h1>
-                <label for="package-name">
-                    <div>Choose a name:</div>
-                    <input
-                    name="package-name"
-                    v-model="packageName"
-                    placeholder="e.g. Dataset 1"
-                    required
-                    :invalid="showErrorText">
-                </label>
+                <LabeledInput
+                    :label="'Choose a name:'"
+                    :placeholder="'e.g. Dataset 1'"
+                    @input="name => packageName = name"
+                ></LabeledInput>
                 <form method="dialog">
                     <Button class="abort-create" @button-clicked="$refs.newPackage.close()">Abort</Button>
                     <Button class="confirm-create" @button-clicked="createPackage(packageName)">
