@@ -20,9 +20,9 @@ export default {
         }
     },
     methods: {
-        openDialog(event) {
-            event.stopPropagation()
-            this.$refs.folderDelete.showModal()
+        deleteFolder(id) {
+            this.store.deleteFolder(id)
+            this.$refs.folderDelete.close()
         }
     },
     template

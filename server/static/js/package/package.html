@@ -27,7 +27,7 @@
                 </label>
                 <form method="dialog">
                     <Button class="abort-create" @button-clicked="$refs.newPackage.close()">Abort</Button>
-                    <Button class="confirm-create" @button-clicked="store.createPackage(packageName)">
+                    <Button class="confirm-create" @button-clicked="createPackage(packageName)">
                         <div>Create project</div>
                     </Button>
                 </form>

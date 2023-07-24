@@ -32,6 +32,10 @@ async mounted() {
         this.editStore.checkMetadataParameters()
     },
     methods: {
+        createPackage(packageName) {
+            store.createPackage(packageName)
+            this.$refs.newPackage.close()
+        }
     },
     template
 })

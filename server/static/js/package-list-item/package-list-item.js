@@ -19,13 +19,16 @@ export default {
         }
     },
     methods: {
-        openDialog(event) {
-            event.stopPropagation()
+        openDialog() {
             this.$refs.confirmDelete.showModal()
         },
         closeDialog() {
             this.$refs.confirmDelete.close()
         },
+        deletePackage(id) {
+            this.store.deletePackage(id)
+            this.$refs.confirmDelete.close()
+        }
     },
     template
 }

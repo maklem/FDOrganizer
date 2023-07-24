@@ -25,9 +25,12 @@ export default {
     },
     inject: ['editable'],
     methods: {
-        openDialog(event) {
-            event.stopPropagation()
+        openDialog() {
             this.$refs.documentDelete.showModal()
+        },
+        deleteDocument(id) {
+            this.store.deleteDocument(id)
+            this.$refs.documentDelete.close()
         }
     },
     template

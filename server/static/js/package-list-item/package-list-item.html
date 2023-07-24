@@ -20,7 +20,7 @@
     <div class="text">Do you really want to delete the project?</div>
     <form method="dialog">
         <Button class="abort-delete" @button-clicked="closeDialog">Do not delete</Button>
-        <Button class="confirm-delete" @button-clicked="store.deletePackage(id)">
+        <Button class="confirm-delete" @button-clicked="deletePackage(id)">
             <i class="fa-solid fa-trash"></i>
             <div>Delete project</div>
         </Button>

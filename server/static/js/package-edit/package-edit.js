@@ -39,6 +39,10 @@ const packageEdit = createApp({
             if (event.which !== 13) return
             this.store.createFolder()
             this.$refs.newFolder.close()
+        },
+        createFolder() {
+            this.store.createFolder()
+            this.$refs.newFolder.close()
         }
     },
     template
