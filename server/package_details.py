@@ -14,7 +14,7 @@ from .entities.couch_document import CouchDocument
 from .entities.document import Document
 from .entities.package import Package
 
-from .util import owner, web_error, web_response
+from .util import owner, web_error, web_response, get_database_from_string
 from .services.authentication import user
 from .services.database import attach, delete, find, get, post, update
 
@@ -68,7 +68,7 @@ def create_folder():
     parent_type = request.json.get('parentType')
 
     # Check ownership of parent, to determine if creation of subelement is valid
-    package_or_folder = get(get_parent_database(parent_type), parent).json()
+    package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not owner(package_or_folder, username):
         return web_error(401, "You don't have permission to edit this content", component= "SERVER")
     # Create new folder object
@@ -88,7 +88,7 @@ def create_folder():
         }
     }
     try:
-        update(get_parent_database(parent_type), parent, changes)
+        update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
     except HTTPError as error:
         # Delete new folder on error
@@ -108,7 +108,7 @@ def create_documents():
         return web_error(400, "Request is missing information", component= "SERVER")
 
     # Check ownership of parent, to determine if creation of subelement is valid
-    package_or_folder = get(get_parent_database(parent_type), parent).json()
+    package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not owner(package_or_folder, username):
         return web_error(401, "You don't have permission to edit this content", component="SERVER")
     
@@ -152,7 +152,7 @@ def delete_document_from_package(document_id):
         }
     }
     try:
-        update(get_parent_database(parent_type), parent, changes)
+        update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
@@ -190,7 +190,7 @@ def delete_folder_from_package(folder_id):
         }
     }
     try:
-        update(get_parent_database(parent_type), parent, changes)
+        update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
@@ -249,17 +249,3 @@ def get_content(folders: list[str], documents: list[str], username):
     ).json().get('docs')
 
     return {"folders": [Folder.convert(x) for x in found_folders], "documents": [Document.convert(x) for x in found_documents] }
-
-def get_parent_database(parent_type: str) -> Databases:
-    # Only valid code starting with Python 3.10.
-    # match parent_type:
-    #     case 'folder':
-    #         return Databases.FOLDERS
-    #     case 'package':
-    #         return Databases.PACKAGES
-    #     case _:
-    #         return Databases.PACKAGES
-    if parent_type == 'folder':
-        return Databases.FOLDERS
-    else:
-        return Databases.PACKAGES

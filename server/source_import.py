@@ -10,7 +10,7 @@ from .shared import persist_documents
 from .services.database import get
 from .entities.document import Document
 from .entities.folder import Folder
-from .util import get_parent_database, owner, web_error, web_response
+from .util import get_database_from_string, owner, web_error, web_response
 from .services.authentication import add_payload, payload, user
 
 def needs_authentication(api_method):
@@ -142,7 +142,7 @@ def serialize(content: dict[Literal["folders","documents"], List[Union[Folder, D
 
 def import_files(import_documents: List[dict], parent: str, parent_type: str):
     # Check ownership of parent, to determine if creation of subelement is valid
-    package_or_folder = get(get_parent_database(parent_type), parent).json()
+    package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not owner(package_or_folder, user(request)):
         return web_error(401, "You don't have permission to edit this content", component="SERVER")
 

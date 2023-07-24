@@ -27,7 +27,7 @@ def web_response(code: int, message:Optional[str] = None, details: Optional[Unio
 def owner(object_with_owner: dict[str, Any], owner) -> bool:
     return object_with_owner.get('owner') == owner
 
-def get_parent_database(parent_type: str) -> Databases:
+def get_database_from_string(database_type: str) -> Databases:
     # Only valid code starting with Python 3.10.
     # match parent_type:
     #     case 'folder':
@@ -36,7 +36,12 @@ def get_parent_database(parent_type: str) -> Databases:
     #         return Databases.PACKAGES
     #     case _:
     #         return Databases.PACKAGES
-    if parent_type == 'folder':
+    
+    if database_type == 'folder':
         return Databases.FOLDERS
-    else:
+    if database_type == 'document':
+        return Databases.DOCUMENTS
+    if database_type == 'package':
         return Databases.PACKAGES
+    else:
+        raise ValueError(f'Database for type {database_type} not found')

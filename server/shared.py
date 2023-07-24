@@ -5,7 +5,7 @@ from .entities.document import Document
 
 from .entities.couch_document import CouchDocument
 
-from .util import get_parent_database
+from .util import get_database_from_string
 from .entities.databases import Databases
 from .services.database import attach, delete, get, update, post
 
@@ -93,7 +93,7 @@ def persist_documents(doc_file_pairs: List, parent, parent_type):
         }
     }
     try:
-        update(get_parent_database(parent_type), parent, changes)
+        update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
     except HTTPError as error:
         # Delete new documents on error
