@@ -94,8 +94,8 @@
     display:flex;
     gap: 0.5rem;
 
-    --button-color: #333;
-    --rgb-button-color: 51, 51, 51;
+    --button-color: var(--font-color);
+    --rgb-button-color: var(--rgb-font-color);
 }
 
 .delete-folder .confirm-delete {

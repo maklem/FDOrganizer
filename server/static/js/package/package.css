@@ -88,9 +88,8 @@
     display:flex;
     gap: 0.5rem;
 
-    --primary-color: #ccc;
-    color: #000;
-    --rgb-primary-color: 204,204,204;
+    --button-color: var(--font-color);
+    --rgb-button-color: var(--rgb-font-color);
 }
 
 
