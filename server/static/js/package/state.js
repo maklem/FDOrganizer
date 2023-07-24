@@ -37,7 +37,7 @@ async function deletePackage(id) {
     store.loading.packageList = true
     await dlt(`package/${id}`)
     await store.getPackages()
-    if (store.selectedPackage.id === id) store.selectedPackage = undefined
+    if (store.selectedPackage?.id === id) store.selectedPackage = undefined
     store.loading.packageList = false
 }
 
