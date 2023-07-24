@@ -42,28 +42,28 @@ def get_entity_with_metadata(entity_type, entity_id):
     result = result | {"metadata": Metadata.convert(metadata)}
     return web_response(200, details = result)
 
-@APP.route("/document/<document_id>/metadata", methods=["PUT"])
-def update_document_metadata(document_id):
+@APP.route("/<entity_type>/<entity_id>/metadata", methods=["PUT"])
+def update_entity_metadata(entity_type, entity_id):
     # Get document from DB
     try:
-        document = get(Databases.DOCUMENTS, document_id).json()
+        entity = get(get_database_from_string(entity_type), entity_id).json()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")      
     # Check ownership
-    if not owner(document, user(request)):
+    if not owner(entity, user(request)):
         return web_error(401, "You don't have permission to change this content", component= "SERVER")
     # Get metadata from request body
     new_metadata = request.json
     # Check if document already has metadata
-    metadata_id = document.get('metadata')
+    metadata_id = entity.get('metadata')
     if metadata_id is None:
         try:
             metadata = post(Databases.METADATA, payload = json.dumps(new_metadata)).json()
         except HTTPError as error:
             return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
-        document_changes = {'metadata': metadata.get('id')}
+        changes = {'metadata': metadata.get('id')}
         try:
-            document = update(Databases.DOCUMENTS, document.get('_id'), document_changes).json()
+            entity = update(get_database_from_string(entity_type), entity.get('_id'), changes).json()
         except HTTPError as error:
             return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     else:
