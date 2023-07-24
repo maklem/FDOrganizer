@@ -27,7 +27,6 @@ export default {
     },
     methods: {
         authenticate(event) {
-            event.preventDefault()
             store.authenticate(this.id)
         }
     },

@@ -18,6 +18,8 @@ export default {
          * @param  {MouseEvent} event
          */
         buttonClicked(event) {
+            event.preventDefault()
+            event.stopImmediatePropagation()
             !this.disabled && this.$emit('button-clicked');
         }
     },
