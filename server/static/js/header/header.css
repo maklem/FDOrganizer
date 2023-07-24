@@ -21,7 +21,7 @@
 }
 
 .navbar .logout {
-    background-color: var(--on-primary-color);
-
-    color: var(--primary-color);
+    --button-color: var(--primary-color);
+    --rgb-button-color: var(--rgb-primary-color);
+    border: none;
 }
