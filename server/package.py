@@ -1,9 +1,17 @@
 import json
+import pprint
 import time
+from typing import Literal, TypedDict
+from zipfile import ZipFile, ZipInfo
 from flask import request
 from requests import HTTPError
+from werkzeug.datastructures import FileStorage
 
-from .shared import delete_document, delete_folder
+from .entities.folder import Folder
+
+from .package_details import create_file_document_pair
+
+from .shared import create_document_with_attachement, delete_document, delete_folder
 
 from .entities.package import Package
 from .entities.databases import Databases
@@ -14,6 +22,8 @@ from .services.database import delete, find, get, post
 from .util import owner, web_error, web_response
 from server import APP
 
+Structmap = TypedDict('Structmap', {'name': str, 'folders': list['Structmap'], 'files': list[ZipInfo]})
+PathedFile = TypedDict('PathedFile', {'path': list['str'], 'content': ZipInfo})
 
 @APP.route("/package/all", methods=["GET"])
 def get_packages():
@@ -95,3 +105,59 @@ def delete_package(package_id):
 
 
     return web_response(200, 'Success', package_deleted)
+
+@APP.route("/package/zip", methods=["PUT"])
+def create_package_from_zip():
+    project_zip = next(request.files.values())
+    with ZipFile(project_zip, 'r') as zip_ref:
+        files: PathedFile = [{'path': info.filename.split('/'), 'content': info} for info in zip_ref.infolist() if info.file_size > 0]
+        # if len([file for file in files if file.get('path')[0] != files[0].get('path')[0]]):
+        #     files = [{'path': file.get('path')[1:], 'content': file.get('content')} for file in files]
+        #     print(f'Removed folder {files[0].get("path")[0]} from path because it contained all the files')
+
+        structmap: Structmap = {"name": project_zip.filename.split('.')[0], "folders": [], "files": []}
+        for file in files:
+            structmap = fill_structmap_layer(structmap, file)     
+        persist_package_layer('package', structmap, zip_ref, user(request))
+    return web_response(200, 'Success')
+
+def fill_structmap_layer(structmap: Structmap, file: PathedFile) -> Structmap:
+    if len(file['path']) == 1:
+        structmap['files'].append(file['content'])
+        return structmap
+    else:
+        step = file['path'][0]
+        if len([folder for folder in structmap["folders"] if folder['name'] == step]) == 0:
+            folder_struct: Structmap = {"name": step, "folders": [], "files": [] }
+        else:
+            folder_struct = [folder for folder in structmap["folders"] if folder['name'] == step][0]
+            structmap['folders'] = [folder for folder in structmap["folders"] if folder['name'] != step]
+
+        new_file: PathedFile = {"path": file['path'][1:], 'content': file['content']}
+        branch = fill_structmap_layer(folder_struct, new_file)
+        structmap['folders'].append(branch)
+    return structmap
+
+def persist_package_layer(entityType: Literal['folder', 'package'], structmap: Structmap, zipfile: ZipFile, username):
+    folder_ids = []
+    for folder_entry in structmap['folders']:
+        folder_ids.append(persist_package_layer('folder', folder_entry, zipfile, username))
+
+    doc_ids = []
+    for file_info in structmap['files']:
+        file = zipfile.open(file_info)
+        storage = FileStorage(file)
+        storage.filename = file_info.filename.split('/')[-1]
+        file_doc_pair = create_file_document_pair(storage, username) #type: ignore
+        persisted_document = create_document_with_attachement(file_doc_pair['file'], file_doc_pair['document'])
+        doc_ids.append(persisted_document)
+    # Differ between top level (package) and nested levels (folder)
+    if entityType == 'folder':
+        folder = Folder(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username)
+        persisted_entity = post(Databases.FOLDERS, folder.to_json()).json() # type: ignore
+    else:
+        now = round(time.time()*1000)
+        package = Package(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username, status='active', created=now, last_changed=now)
+        persisted_entity = post(Databases.PACKAGES, package.to_json()).json() # type: ignore
+
+    return persisted_entity['id']

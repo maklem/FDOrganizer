@@ -61,7 +61,7 @@ def is_authorized(request: Request):
     except DecodeError:
         return False
 
-def user(request: Request):
+def user(request: Request) -> str:
     token = request.cookies['token']
     return payload(token)['username']
 
