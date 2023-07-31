@@ -5,6 +5,7 @@ import {store as editStore} from '../package-edit/state.js'
 export const store = reactive({
     packages: [],
     selectedPackage: undefined,
+    zipfile: undefined,
     loading: {
         packageList: false,
     },
@@ -13,7 +14,8 @@ export const store = reactive({
     getPackages,
     selectPackage,
     openDetails,
-    climbPackagePath
+    climbPackagePath,
+    uploadZip
 });
 
 function openDetails() {
@@ -50,4 +52,16 @@ async function selectPackage(id) {
 function climbPackagePath() {
     if (!editStore.packagePath.length) store.selectedPackage = undefined
     else editStore.climbPackagePath()
+}
+
+async function uploadZip() {
+    store.loading.packageList = true
+    const body = new FormData()
+
+    body.append(store.zipfile.name, store.zipfile)
+    const result =  await put('/package/zip', body, {"Content-Type": 'multipart/form-data'})
+    store.zipfile = undefined
+    store.getPackages()
+    store.loading.packageList = false
+    return result
 }

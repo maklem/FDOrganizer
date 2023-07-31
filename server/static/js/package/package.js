@@ -24,7 +24,9 @@ const pkg = createApp({
     data() {
         return {
             store,
-            editStore
+            editStore,
+            source: 'empty',
+            packageName: ''
         }
     },
 
@@ -36,12 +38,21 @@ async mounted() {
     methods: {
         createPackage(packageName) {
             store.createPackage(packageName)
+            this.packageName = ''
             this.$refs.newPackage.close()
         },
         enterPressed(event) {
             if (event.which !== 13) return
             this.createPackage(this.packageName)
         },
+        setZip(event) {
+            const zipfile = [...event.currentTarget.files][0]
+            this.store.zipfile = zipfile;
+        },
+        uploadZip() {
+            this.$refs.newPackage.close()
+            this.store.uploadZip()
+        }
     },
     template
 })

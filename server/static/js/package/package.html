@@ -16,15 +16,60 @@
             <div class="loading" v-else></div>
             <dialog ref="newPackage" class="create-package" @keyup="enterPressed">
                 <h1>Create a new project</h1>
-                <LabeledInput
+                <div class="source-options">
+                    <div class="radio-option">
+                        <input
+                            :ref="radio => {if (!!radio) radio.checked = source === radio.value}"
+                            type="radio"
+                            id="source-empty"
+                            name="empty"
+                            value="empty"
+                            @input="event => source = event.currentTarget.value">
+                        <label for="source-empty">Empty Package</label>
+                    </div>
+                    <div class="radio-option">
+                        <input
+                            :ref="radio => {if (!!radio) radio.checked = source === radio.value}"
+                            type="radio"
+                            id="source-zip"
+                            name="zip"
+                            value="zip"
+                            @input="event => source = event.currentTarget.value">
+                        <label for="source-zip">Import from zip</label>
+                    </div>
+                </div>
+                <LabeledInput v-if="source === 'empty'"
+                    :value="packageName"
                     :label="'Choose a name:'"
                     :placeholder="'e.g. Dataset 1'"
                     @input="name => packageName = name"
                 ></LabeledInput>
+                <template v-if="source === 'zip'">
+                    <input
+                        id="file-upload"
+                        type="file"
+                        accept=".zip"
+                        @change="setZip"/>
+                    <label for="file-upload">
+                        <template v-if="!store.zipfile">
+                            <i class="fa-solid fa-plus"></i>
+                            <div class="labeltext">zip-Datei auswählen</div>
+                        </template>
+                        <div v-else class="filename">{{store.zipfile.name}}</div>
+                    </label>
+                </template>
                 <form method="dialog">
                     <Button class="abort-create" @button-clicked="$refs.newPackage.close()">Abort</Button>
-                    <Button class="confirm-create" @button-clicked="createPackage(packageName)">
+                    <Button v-if="source === 'empty'" 
+                        :disabled="packageName === ''"
+                        class="confirm-create"
+                        @button-clicked="createPackage(packageName)"
+                    >
                         <div>Create project</div>
+                    </Button>
+                    <Button v-if="source === 'zip'" class="confirm-create" @button-clicked="uploadZip()" :disabled="!store.zipfile">
+                        <i class="fa-regular fa-file-zipper"></i>
+                        <div>Import zip</div>
                     </Button>
                 </form>
             </dialog>

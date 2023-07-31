@@ -66,6 +66,7 @@
 .create-package h1 {
     font-weight: 700;
 }
+
 .create-package .text {
     font-size: 1.1rem;
     padding: 0.1rem 1rem;
@@ -84,6 +85,18 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
+.source-options {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.create-package .radio-option {
+    display: grid;
+    grid-template-columns: max-content max-content;
+}
+
 .create-package .abort-create {
     display:flex;
     gap: 0.5rem;
@@ -92,33 +105,40 @@
     --rgb-button-color: var(--rgb-font-color);
 }
 
-
-.create-package input {
-    outline: none;
-    border: 0.1rem solid var(--secondary-color);
-    border-radius: 0.2rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem 0.5rem;
-
-    font-size: 1.1rem;
+.create-package .confirm-create {
+    display:flex;
+    gap: 0.5rem;
 }
 
-.create-package input[invalid=true] {
-    border-color: var(--error);
-    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-error), 0.20), 0px 0px 0px 1px rgba(var(--rgb-error), 0.20);
+input[type="file"] {
+    display: none;
 }
 
-.create-package input:focus,
-.create-package input:active {
-    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-secondary-color), 0.20), 0px 0px 0px 1px rgba(var(--rgb-secondary-color), 0.20);
+label[for="file-upload"] {
+    display: grid;
+    align-items: center;
+    grid-template-columns: min-content max-content;
+    gap: 0.5rem;
+
+    border: 1px dashed #aaa;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem 0;
+    border-radius: 0.5rem;
+
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 600;
+
 }
 
-.create-package label {
-    font-weight: 700;
-    color: grey;
+label[for="file-upload"] > i,
+label[for="file-upload"] > .labeltext {
+    color: rgba(var(--rgb-font-color), 0.7);
 }
 
-
+label[for="file-upload"] .filename {
+    color: var(--font);
+}
 
 .package-content {
     min-height: 0;
