@@ -25,14 +25,14 @@
                   <label for="open-metadata">Make the Metadata of this package visible for the public</label>
                 </div>
                 <div class="radio-option">
-                <input
-                    :ref="radio => {if (!!radio) radio.checked = store.findability === radio.value}"
-                    type="radio"
-                    id="closed-metadata"
-                    name="findability"
-                    value="closed"
-                    @input="event => store.findability = event.currentTarget.value">
-                <label for="closed-metadata">Use the metadata of this package for preservation only</label>
+                  <input
+                      :ref="radio => {if (!!radio) radio.checked = store.findability === radio.value}"
+                      type="radio"
+                      id="closed-metadata"
+                      name="findability"
+                      value="closed"
+                      @input="event => store.findability = event.currentTarget.value">
+                  <label for="closed-metadata">Use the metadata of this package for preservation only</label>
                 </div>
             </fieldset>
             <fieldset class="settings-group accessibility" :class="{'disabled': store.findability === 'closed'}">
