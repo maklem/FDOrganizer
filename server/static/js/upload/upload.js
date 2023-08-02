@@ -12,7 +12,15 @@ export default {
     },
     data() {
         return {
-            store        }
+            store
+        }
+    },
+    computed: {
+        dialogText() {
+            if (this.store.loading.upload) return `Currently uploading ${this.store.files.length} files!`
+            if (this.store.failedUploads.length) return `Upload finished! ${this.store.failedUploads.length} files could not be uploaded!`
+            return `Do you really want to upload ${this.store.files.length} selected files?`
+        }
     },
     methods: {
         selectFiles(event) {
@@ -45,6 +53,14 @@ export default {
 
             this.store.draggedFiles = []
             this.store.addFilesFromDragging(event);
+        },
+        closeDialog() {
+            this.$refs.uploadFiles.close()
+            this.store.failedUploads = []
+        },
+        async startUpload() {
+            await this.store.startUpload()
+            if (!this.store.failedUploads.length) this.closeDialog()
         }
     },
     template

@@ -124,7 +124,7 @@ def create_documents():
     #Persist documents and files in DB
     persisted_documents = persist_documents(file_document_pairs, parent, parent_type)
     
-    persisted_documents['failed'].append(failed_files)
+    persisted_documents['failed'] = failed_files
     return web_response(200, 'Success', persisted_documents)
 
 @APP.route("/package/document/<document_id>", methods=["DELETE"])

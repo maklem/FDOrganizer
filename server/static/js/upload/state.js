@@ -9,7 +9,6 @@ export const store = reactive({
     loading: {
         upload: false
     },
-    dialogText: undefined,
     startUpload,
     removeFile,
     addFilesFromDragging,
@@ -27,18 +26,12 @@ function displayFiles() {
 }
 async function startUpload() {
     store.loading.upload = true
-    store.dialogText = `Currently uploading ${store.files.length} files!`
     
     const uploads = await uploadFiles()
-
     await editStore.getPackageContent()
-
-    const failedUploads = uploads.failed
-    if (failedUploads.length)
-        store.dialogText = `Upload finished! ${failedUploads.length} files could not be uploaded!`
-    else store.dialogText = undefined
+    store.failedUploads = uploads.failed
     
-    store.files = store.files.filter(file => failedUploads.map(upload => upload.file).includes(file.name))
+    store.files = store.files.filter(file => store.failedUploads.map(upload => upload.file).includes(file.name))
     store.loading.upload = false
 }
 

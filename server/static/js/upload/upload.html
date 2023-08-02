@@ -25,11 +25,12 @@
     class="upload-dialog" 
     @close="store.failedUploads = []">
         <div>
+            <h1>Upload Files</h1>
             <div v-if="store.loading.upload" class="loading"></div>
-            <p>{{store.dialogText ?? `Do you really want to upload ${store.files.length} selected files?`}}</p>
+            <p class="text">{{dialogText}}</p>
             <form method="dialog">
-                <Button class="close-button" @button-clicked="$refs.uploadFiles.close()">Abort</Button>
-                <Button @button-clicked="store.startUpload()">{{store.failedUploads.length ? 'Try Again': 'Yes'}}</Button>
+                <Button class="close-button" :disabled="store.loading.upload" @button-clicked="closeDialog">Abort</Button>
+                <Button :disabled="store.loading.upload" @button-clicked="startUpload">{{store.failedUploads.length ? 'Try Again': 'Yes'}}</Button>
             </form>
         </div>
     </dialog>

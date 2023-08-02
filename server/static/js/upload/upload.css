@@ -86,9 +86,15 @@ form[method="dialog"] {
     justify-content: space-between;
 }
 
-.upload-dialog p {
+.upload-dialog h1 {
     font-weight: 700;
 }
+
+.upload-dialog .text {
+    font-size: 1.1rem;
+    padding: 0.1rem 1rem;
+}
+
 .upload-dialog .loading {
     width: 100%;
     height: 1rem;
@@ -106,9 +112,9 @@ form[method="dialog"] {
     gap: 0.5rem;
 
     flex: 0 0 0;
-    --primary-color: #ccc;
-    color: #000;
-    --rgb-primary-color: 204,204,204;
+
+    --button-color: var(--font-color);
+    --rgb-button-color: var(--rgb-font-color);
 }
 
 @keyframes gradient {
