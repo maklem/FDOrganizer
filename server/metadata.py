@@ -4,11 +4,7 @@ from flask import request
 
 from . import APP
 
-from .entities.databases import Databases
-from .entities.document import Document
-from .entities.folder import Folder
-from .entities.package import Package
-from .entities.metadata import Metadata
+from .entities import Databases, Document, Folder, Package, Metadata
 
 from .services.authentication import user
 from .services.database import get, post, update

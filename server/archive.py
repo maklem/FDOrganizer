@@ -3,8 +3,7 @@ from flask import request
 from requests import HTTPError
 
 
-from .entities.package import Package
-from .entities.databases import Databases
+from .entities import Package, Databases
 
 from .services.authentication import user
 from .services.database import find, get, update

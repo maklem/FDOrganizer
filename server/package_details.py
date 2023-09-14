@@ -8,11 +8,7 @@ from requests import HTTPError
 from server import APP
 from .shared import delete_folder, persist_documents
 
-from .entities.folder import Folder
-from .entities.databases import Databases
-from .entities.couch_document import CouchDocument
-from .entities.document import Document
-from .entities.package import Package
+from .entities import Folder, Databases, Document, Package
 
 from .util import owner, web_error, web_response, get_database_from_string
 from .services.authentication import user

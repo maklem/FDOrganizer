@@ -8,8 +8,7 @@ from pkg_resources import resource_listdir, resource_isdir, resource_filename
 from server import APP
 from .shared import persist_documents
 from .services.database import get
-from .entities.document import Document
-from .entities.folder import Folder
+from .entities import Document, Folder
 from .util import get_database_from_string, owner, web_error, web_response
 from .services.authentication import add_payload, payload, user
 

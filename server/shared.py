@@ -1,12 +1,9 @@
 from typing import List
 from requests import HTTPError, Response
 
-from .entities.document import Document
-
-from .entities.couch_document import CouchDocument
+from .entities import Document, Databases, CouchDocument
 
 from .util import get_database_from_string
-from .entities.databases import Databases
 from .services.database import attach, delete, get, update, post
 
 def delete_folder(id: str) -> bool:
