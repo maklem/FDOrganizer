@@ -8,20 +8,50 @@
     flex: 0 0 0;
 
     background-color: var(--primary-color);
-}
 
-.navbar .right-content {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    .right-content {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
 
-    height: 100%;
-    flex: 1 1 auto;
-    padding-right: 1rem;
-}
+        height: 100%;
+        flex: 1 1 auto;
 
-.navbar .logout {
-    --button-color: var(--primary-color);
-    --rgb-button-color: var(--rgb-primary-color);
-    border: none;
+        .shard {
+            background-color: white;
+            width: 3rem;
+            height: 100%;
+            rotate: -42deg;
+            scale: 2.6;
+            translate: 8px -91px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            background-color: white;
+            padding: 0.5rem;
+            border-bottom: 1rem solid var(--primary-color);
+            z-index: 10000000;
+
+            img {
+                height: 2.5rem;
+            }
+
+            .logotext {
+                color: var(--secondary-color);
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .logout {
+        --button-color: var(--primary-color);
+        --rgb-button-color: var(--rgb-primary-color);
+        border: none;
+        margin-right: 2rem;
+    }
 }
