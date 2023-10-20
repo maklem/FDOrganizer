@@ -56,3 +56,4 @@ urllib3==1.26.12
 Werkzeug==2.2.2
 wrapt==1.14.1
 xmlschema==2.5.0
+requests_oauth2client
