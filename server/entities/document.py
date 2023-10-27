@@ -22,3 +22,10 @@ class Document:
         document_out: Document = Document.from_dict(document_in) 
         document_out.id = document_in.get('_id')
         return document_out.to_dict() # type: ignore
+    
+    @staticmethod
+    def from_db(document_in: dict[str, Any]) -> "Document":
+        document_out: Document = Document.from_dict(document_in) 
+        document_out.id = document_in.get('_id')
+        return document_out
+    

@@ -25,3 +25,9 @@ class Package:
         package_out: Package = Package.from_dict(package_in)
         package_out.id = package_in.get('_id')
         return package_out.to_dict()
+    
+    @staticmethod
+    def from_db(package_in: dict[str, Any]) -> "Package":
+        package_out: Package = Package.from_dict(package_in)
+        package_out.id = package_in.get('_id')
+        return package_out
