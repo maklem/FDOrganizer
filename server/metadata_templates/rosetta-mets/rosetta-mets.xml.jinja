@@ -1,0 +1,181 @@
+<mets:mets xmlns:mets="http://www.loc.gov/METS/">
+  <mets:dmdSec ID="ie-dmd">
+    <mets:mdWrap MDTYPE="DC">
+      <mets:xmlData>
+            {% set metadata = package.metadata %}
+            {% include 'dublincore.xml.jinja' %}
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+  <mets:amdSec ID="ie-amd">
+    <mets:techMD ID="ie-amd-tech">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx">
+            <section id="generalIECharacteristics">
+              <record>
+                <key id="submissionReason">LZV Bayern</key>
+                <key id="status">ACTIVE</key>
+                <key id="IEEntityType">Dataset</key>
+              </record>
+            </section>
+            <section id="objectIdentifier">
+              <record>
+                <key id="objectIdentifierType">fdorganizer</key>
+              </record>
+            </section>
+          </dnx>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="ie-amd-rights">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="ie-amd-source">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="ie-amd-digiprov">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+  <mets:amdSec ID="rep1-amd">
+    <mets:techMD ID="rep1-amd-tech">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx">
+            <section id="generalRepCharacteristics">
+              <record>
+                <key id="preservationType">PRESERVATION_MASTER</key>
+                <key id="usageType">VIEW</key>
+                <key id="DigitalOriginal">true</key>
+                <key id="RevisionNumber">1</key>
+              </record>
+            </section>
+          </dnx>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="rep1-amd-rights">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="rep1-amd-source">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="rep1-amd-digiprov">
+      <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+        <mets:xmlData>
+          <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+  {% for file in files %}
+    <mets:amdSec ID="fl{{file.id}}-amd">
+      <mets:techMD ID="fl{{file.id}}-amd-tech">
+        <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+          <mets:xmlData>
+            <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx">
+              <section id="generalFileCharacteristics">
+                <record>
+                  <key id="label"></key>
+                  <key id="note"></key>
+                  <key id="fileOriginalName">{{file.fileOriginalName}}</key>
+                  <key id="fileOriginalPath">{{file.fileOriginalPath}}</key>
+                  <key id="fileSizeBytes">{{file.fileSizeBytes}}</key>
+                  <key id="fileCreationDate">{{file.fileCreationDate}}</key>
+                  <key id="fileModificationDate">{{file.fileModificationDate}}</key>
+                </record>
+              </section>
+              <section id="fileFixity">
+                <record>
+                  <key id="fixityType">MD5</key>
+                  <key id="fixityValue">{{file.MD5}}</key>
+                </record>
+              </section>
+            </dnx>
+          </mets:xmlData>
+        </mets:mdWrap>
+      </mets:techMD>
+      <mets:rightsMD ID="fl{{file.id}}-amd-rights">
+        <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+          <mets:xmlData>
+            <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+          </mets:xmlData>
+        </mets:mdWrap>
+      </mets:rightsMD>
+      <mets:sourceMD ID="fl{{file.id}}-amd-source">
+        <mets:mdWrap MDTYPE="DC">
+          <mets:xmlData>
+            {% if file.metadata is not none %}
+              {% set metadata = file.metadata %}
+              {% include 'dublincore.xml.jinja' %}
+            {% else %}
+              <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+            {% endif %}
+          </mets:xmlData>
+        </mets:mdWrap>
+      </mets:sourceMD>
+      <mets:digiprovMD ID="fl{{file.id}}-amd-digiprov">
+        <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="dnx">
+          <mets:xmlData>
+            <dnx xmlns="http://www.exlibrisgroup.com/dps/dnx"/>
+          </mets:xmlData>
+        </mets:mdWrap>
+      </mets:digiprovMD>
+    </mets:amdSec>
+  {% endfor %}
+  <mets:fileSec>
+    <mets:fileGrp ID="rep1" ADMID="rep1-amd">
+      {% for file in files %}
+        <mets:file ID="{{file.id}}" ADMID="fl{{file.id}}-amd">
+          <mets:FLocat xmlns:xlin="http://www.w3.org/1999/xlink" LOCTYPE="URL" xlin:href="{{file.fileOriginalPath}}"/>
+        </mets:file>
+      {% endfor %}
+    </mets:fileGrp>
+  </mets:fileSec>
+  <mets:structMap ID="structmap-1" TYPE="LOGICAL">
+    <mets:div LABEL="Preservation Master">
+      <mets:div LABEL="Table of Contents">
+        <mets:div LABEL="{{structmap.name}}">
+          {% for file in structmap.files %}
+            <mets:div LABEL="{{file.name}}" TYPE="FILE">
+              <mets:fptr FILEID="{{file.id}}"/>
+            </mets:div>
+          {% endfor %}
+          {% for folder in structmap.folders recursive %}
+            <mets:div LABEL="{{folder.name}}">
+              {% for file in folder.files %}
+                <mets:div LABEL="{{file.name}}" TYPE="FILE">
+                  <mets:fptr FILEID="{{file.id}}"/>
+                </mets:div>
+              {% endfor %}
+              {% if folder.folders %}
+                {{ loop(folder.folders) }}
+              {% endif %}
+            </mets:div>
+          {% endfor %}
+        </mets:div>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+</mets:mets>
