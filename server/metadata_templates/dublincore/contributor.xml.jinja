@@ -1,0 +1,17 @@
+{% for contributor in (metadata.contributor | default([], true)) %}
+    {% if contributor.contributorType[0] == "personal" %}
+        {% if contributor.personalContributorIdentifierType[0] == "name" %}
+            <dc:contributor>{{contributor.personalContributorLastName | first }}, {{contributor.personalContributorFirstName | first}}</dc:contributor>
+        {% elif contributor.personalContributorIdentifierType[0] == "orcid" %}
+            <dc:contributor>https://orcid.org/{{contributor.personalContributorOrcid | first }}</dc:contributor>
+        {% endif %}
+    {% elif contributor.contributorType[0] == "organizational" %}
+        {% if contributor.organizationalContributorIdentifierType[0] == "name" %}
+            <dc:contributor>{{ contributor.organizationName | first }}</dc:contributor>
+        {% elif contributor.organizationalContributorIdentifierType[0] == "gnd" %}
+            <dc:contributor>http://d-nb.info/gnd/{{ contributor.organizationGND | first }}</dc:contributor>
+        {% elif contributor.organizationalContributorIdentifierType[0] == "ror" %}
+            <dc:contributor>https://ror.org/{{ contributor.organizationalContributorROR | first }}</dc:contributor>
+        {% endif %}
+    {% endif %}
+{% endfor %}

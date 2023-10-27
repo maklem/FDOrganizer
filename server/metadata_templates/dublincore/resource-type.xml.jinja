@@ -1,0 +1,3 @@
+{% for resourceType in (metadata.resourceType | default([], true)) %}
+    <dc:type>{{resourceType.resourceTypeGeneral | first}}</dc:type>
+{% endfor %}

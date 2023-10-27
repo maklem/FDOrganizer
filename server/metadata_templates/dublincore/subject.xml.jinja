@@ -1,0 +1,19 @@
+{% for subject in (metadata.subject | default([], true)) %}
+    {% if subject.subjectIdentifierType[0] == "wikidata" %}
+        {% for keyword in subject.subjectIdentifierWikidata %}
+            <dc:subject>{{ keyword }}</dc:subject>
+        {% endfor %}
+    {% elif subject.subjectIdentifierType[0] == "gnd" %}
+        {% for keyword in subject.subjectIdentifierGND %}
+            <dc:subject>{{ keyword }}</dc:subject>
+        {% endfor %}
+    {% elif subject.subjectIdentifierType[0] == "ddc" %}
+        {% for keyword in subject.subjectIdentifierDdc %}
+            <dc:subject>{{ keyword }}</dc:subject>
+        {% endfor %}
+    {% elif subject.subjectIdentifierType[0] == "csv" %}
+        {% for keyword in subject.subjectIdentifierCSV %}
+            <dc:subject>{{ keyword }}</dc:subject>
+        {% endfor %}
+    {% endif %}
+{% endfor %}

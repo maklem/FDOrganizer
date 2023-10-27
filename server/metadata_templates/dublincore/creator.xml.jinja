@@ -1,0 +1,17 @@
+{% for creator in (metadata.creator | default([], true)) %}
+    {% if creator.creatorType[0] == "personal" %}
+        {% if creator.personIdentifierType[0] == "name" %}
+            <dc:creator>{{creator.creatorLastName | first }}, {{creator.creatorFirstName | first | safe}}</dc:creator>
+        {% elif creator.personIdentifierType[0] == "orcid" %}
+            <dc:creator>https://orcid.org/{{creator.creatorOrcid | first }}</dc:creator>
+        {% endif %}
+    {% elif creator.creatorType[0] == "organizational" %}
+        {% if creator.organisationIdentifierType[0] == "name" %}
+            <dc:creator>{{ creator.organizationName | first }}</dc:creator>
+        {% elif creator.organisationIdentifierType[0] == "gnd" %}
+            <dc:creator>http://d-nb.info/gnd/{{ creator.organizationGND | first }}</dc:creator>
+        {% elif creator.organisationIdentifierType[0] == "ror" %}
+            <dc:creator>https://ror.org/{{ creator.organizationROR | first }}</dc:creator>
+        {% endif %}
+    {% endif %}
+{% endfor %}

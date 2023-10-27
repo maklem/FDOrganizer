@@ -1,0 +1,3 @@
+{% for date in (metadata.date | default([], true)) %}
+    <dc:date>{{date.dateInformation | first | timestamp_to_date }}</dc:date>
+{% endfor %}

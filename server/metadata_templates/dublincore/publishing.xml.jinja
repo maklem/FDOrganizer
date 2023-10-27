@@ -1,0 +1,14 @@
+{% for publishing in (metadata.publishing | default([], true)) %}
+    {% if publishing.isPublished[0] == "true" %}
+        {% for publisher in (publishing.publisher | default([], true)) %}
+            {% if publisher.publisherIdentifierScheme[0] == "name" %}
+                <dc:publisher>{{publisher.publisherName | first}}</dc:publisher>
+            {% elif publisher.publisherIdentifierScheme[0] == "orcid" %}
+                <dc:publisher>https://orcid.org/{{publisher.publisherOrcid | first}}</dc:publisher>
+            {% elif publisher.publisherIdentifierScheme[0] == "ror" %}
+                <dc:publisher>https://ror.org/{{publisher.publisherRor | first }}</dc:publisher>
+            {% endif %}
+        {% endfor %}
+        <dc:date>{{publishing.publicationDate | first}}</dc:date>
+    {% endif %}
+{% endfor %}

@@ -1,0 +1,9 @@
+{% for timeframe in (metadata.timeframe | default([], true)) %}
+    {% if timeframe.timeframeType[0] == "point" %}
+        <dc:coverage>{{timeframe.timeframePoint}}</dc:coverage>
+    {% elif timeframe.timeframeType[0] == "range" %}
+        <dc:coverage>{{timeframe.timeframeRangeStart}} - {{timeframe.timeframeRangeEnd}}</dc:coverage>
+    {% elif timeframe.timeframeType[0] == "event" %}
+        <dc:coverage>{{timeframe.timeframeEvent}}</dc:coverage>
+    {% endif %}
+{% endfor %}

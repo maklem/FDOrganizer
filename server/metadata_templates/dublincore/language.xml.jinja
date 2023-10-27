@@ -1,0 +1,7 @@
+{% for language in (metadata.language | default([], true)) %}
+    {% if language.languageCode[0] == "custom" %}
+        <dc:language>{{language.customLanguage | first}}</dc:language>
+    {% else %}
+        <dc:language>{{language.languageCode | first}}</dc:language>
+    {% endif %}
+{% endfor %}

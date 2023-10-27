@@ -1,0 +1,9 @@
+{% for identifier in (metadata.identifier | default([], true)) %}
+    {% if identifier.resourceIdentifierScheme[0] == "doi" %}
+        <dc:identifier>https://www.doi.org/{{identifier.resourceIdentifierDoi | first}}</dc:identifier>
+    {% elif identifier.resourceIdentifierScheme[0] == "uri" %}
+        <dc:identifier>{{identifier.resourceIdentifierUri | first}}</dc:identifier>
+    {% elif identifier.resourceIdentifierScheme[0] == "customResourceIdentifier" %}
+        <dc:identifier>{{identifier.resourceIdentifierName | first}}</dc:identifier>
+    {% endif %}
+{% endfor %}

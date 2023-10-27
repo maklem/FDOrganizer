@@ -1,0 +1,9 @@
+{% for relation in (metadata.relation | default([], true)) %}
+    {% if relation.relationIdentifierScheme[0] == "doi" %}
+        <dc:relation>https://www.doi.org/{{relation.relationDoi | first}}</dc:relation>
+    {% elif relation.relationIdentifierScheme[0] == "uri" %}
+        <dc:relation>{{relation.relationURI | first}}</dc:relation>
+    {% elif relation.relationIdentifierScheme[0] == "custom" %}
+        <dc:relation>{{relation.relationIdentifier | first}}</dc:relation>
+    {% endif %}
+{% endfor %}

@@ -1,0 +1,7 @@
+{% for datasource in (metadata.datasource | default([], true)) %}
+    {% if datasource.dataSourceDetail[0] == "customDataSource" %}
+        <dc:source>{{datasource.customDataSourceType | first}}</dc:source>
+    {% else %}
+        <dc:source>{{datasource.dataSourceDetail | first}}</dc:source>
+    {% endif %}
+{% endfor %}
