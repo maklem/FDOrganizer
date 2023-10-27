@@ -54,6 +54,9 @@ def attach(database: Databases, document: CouchDocument, file_content, filename,
 
     return requests.put(f'{doc_url(database, document.id, parameters)}/{urllib.parse.quote(filename)}', headers=headers, data=file_content, timeout=20)
 
+def get_attachment(document_id: str, document_name: str):
+    headers = auth_header()
+    return requests.get(f'{doc_url(Databases.DOCUMENTS, document=document_id)}/{document_name}', headers=headers)
 
 def post(database: Databases, payload: str, parameters: Optional[dict[str, str]] = None) -> requests.Response:
     headers = auth_header() | {
