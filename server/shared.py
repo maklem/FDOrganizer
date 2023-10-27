@@ -1,4 +1,5 @@
-from typing import List
+from datetime import datetime
+from typing import List, Literal
 from requests import HTTPError, Response
 
 from .entities import Document, Databases, CouchDocument
@@ -110,3 +111,10 @@ def create_document_with_attachement(file, document: Document) -> str:
     attach(Databases.DOCUMENTS, response_document, file_content = file, filename = document.name, mimetype=document.type)
 
     return response_document.id
+
+def update_package_state(package_id: str, package_state: Literal['active', 'archived']):
+    changes = {
+        'status': package_state,
+        'last_changed': int(datetime.now().timestamp())
+    }
+    update(Databases.PACKAGES, package_id, changes=changes)
