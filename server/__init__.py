@@ -8,6 +8,7 @@ from .util import web_error
 APP = Flask(__name__)
 APP.config["UPLOAD_FOLDER"] = './uploads'
 APP.config["MAX_CONTENT_LENGTH"] = 1_000_000_000
+APP.config["APPLICATION_ROOT"] = "/fdorganizer"
 
 load_dotenv(dotenv_path="../.env")
 
@@ -24,3 +25,4 @@ import server.package_details
 import server.package
 import server.source_import
 import server.archive
+import server.export
