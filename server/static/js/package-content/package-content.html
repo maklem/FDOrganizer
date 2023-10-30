@@ -1,7 +1,8 @@
 <div class="package-content">
     <PackageHeader
     @new-folder="$emit('new-folder')"
-    @back="$emit('back')"></PackageHeader>
+    @back="$emit('back')"
+    @open-submit="$emit('open-submit')"></PackageHeader>
     <div v-if="!store.loading.content" class="files" >
         <PackageContentFolder
             v-for="folder in store.folders()"

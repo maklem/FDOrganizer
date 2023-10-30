@@ -1,5 +1,5 @@
 import {reactive} from '../vue.js';
-import {put, get, dlt} from "../http.js"
+import {get, post} from "../http.js"
 import {store as editStore} from '../package-edit/state.js'
 import {store as settingsStore} from '../archive-package-settings/state.js'
 
@@ -33,7 +33,8 @@ export const store = reactive({
     climbPackagePath,
     openSettings,
     closeSettings,
-    packagesWithStatus
+    packagesWithStatus,
+    exportPackage
 });
 
 function packagesWithStatus(status) {
@@ -75,4 +76,8 @@ function closeSettings() {
     history.pushState({package: null}, '', `${location.origin}${location.pathname}`)
     settingsStore.package = undefined
     store.modalOpen = false
+}
+
+function exportPackage() {
+    post(`/export/${store.selectedPackage.id}`)
 }
