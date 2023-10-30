@@ -36,7 +36,7 @@
         <div>Add folder</div>
     </Button>
     <Button
-    v-if="archive"
+    v-if="archive && archiveStore.selectedPackage.status === 'active'"
     class="side-button"
     @button-clicked="$emit('open-submit')">
         <i class="fa-solid fa-file-import"></i>
