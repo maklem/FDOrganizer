@@ -104,7 +104,9 @@ def build_sip_metadata(package_data, file_list, structmap):
     templateEnv.filters["timestamp_to_date"] = timestamp_to_date
     template = templateEnv.get_template('rosetta-mets.xml.jinja')
     rendered_xml = template.render(files = file_list, package = package_data, structmap = structmap)
-    schema = XMLSchema11('https://developers.exlibrisgroup.com/wp-content/uploads/2022/06/mets_rosetta.xsd')
+    schema_path = os.path.join('server', 'metadata_templates', 'rosetta-mets', 'schema')
+    schema_file = open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd'))
+    schema = XMLSchema11(schema_file, base_url=schema_path)
     schema.validate(rendered_xml)
     return BeautifulSoup(rendered_xml, "html.parser").prettify()
 
