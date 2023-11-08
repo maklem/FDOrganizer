@@ -1,4 +1,4 @@
-<mets:mets xmlns:mets="http://www.loc.gov/METS/">
+<mets:mets xmlns:mets="http://www.exlibrisgroup.com/xsd/dps/rosettaMets">
   <mets:dmdSec ID="ie-dmd">
     <mets:mdWrap MDTYPE="DC">
       <mets:xmlData>
@@ -22,6 +22,7 @@
             <section id="objectIdentifier">
               <record>
                 <key id="objectIdentifierType">fdorganizer</key>
+                <key id="objectIdentifierValue">{{package.id}}</key>
               </record>
             </section>
           </dnx>
@@ -147,7 +148,7 @@
   <mets:fileSec>
     <mets:fileGrp ID="rep1" ADMID="rep1-amd">
       {% for file in files %}
-        <mets:file ID="{{file.id}}" ADMID="fl{{file.id}}-amd">
+        <mets:file ID="fl{{file.id}}" ADMID="fl{{file.id}}-amd">
           <mets:FLocat xmlns:xlin="http://www.w3.org/1999/xlink" LOCTYPE="URL" xlin:href="{{file.fileOriginalPath}}"/>
         </mets:file>
       {% endfor %}
@@ -159,14 +160,14 @@
         <mets:div LABEL="{{structmap.name}}">
           {% for file in structmap.files %}
             <mets:div LABEL="{{file.name}}" TYPE="FILE">
-              <mets:fptr FILEID="{{file.id}}"/>
+              <mets:fptr FILEID="fl{{file.id}}"/>
             </mets:div>
           {% endfor %}
           {% for folder in structmap.folders recursive %}
             <mets:div LABEL="{{folder.name}}">
               {% for file in folder.files %}
                 <mets:div LABEL="{{file.name}}" TYPE="FILE">
-                  <mets:fptr FILEID="{{file.id}}"/>
+                  <mets:fptr FILEID="fl{{file.id}}"/>
                 </mets:div>
               {% endfor %}
               {% if folder.folders %}

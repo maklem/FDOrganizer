@@ -2,10 +2,11 @@ from datetime import datetime
 import shutil
 from bs4 import BeautifulSoup
 from flask import make_response
+from pathlib import Path
+from xmlschema import XMLSchema11
 import hashlib
 import jinja2
 import os
-from pathlib import Path
 
 from .shared import update_package_state
 
@@ -79,7 +80,8 @@ def delete_temp_package(package_name: str):
 def create_package_data(package: Package):
     metadata = Metadata.from_dict(get(Databases.METADATA, package.metadata).json())
     return {
-        'metadata': metadata.metadata
+        'metadata': metadata.metadata,
+        'id': package.id
     }
 
 def create_structmap(entity: Package | Folder):
@@ -102,6 +104,8 @@ def build_sip_metadata(package_data, file_list, structmap):
     templateEnv.filters["timestamp_to_date"] = timestamp_to_date
     template = templateEnv.get_template('rosetta-mets.xml.jinja')
     rendered_xml = template.render(files = file_list, package = package_data, structmap = structmap)
+    schema = XMLSchema11('https://developers.exlibrisgroup.com/wp-content/uploads/2022/06/mets_rosetta.xsd')
+    schema.validate(rendered_xml)
     return BeautifulSoup(rendered_xml, "html.parser").prettify()
 
 def create_ie_directory(structmap, structpath = ""):
