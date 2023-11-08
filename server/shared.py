@@ -115,6 +115,6 @@ def create_document_with_attachement(file, document: Document) -> str:
 def update_package_state(package_id: str, package_state: Literal['active', 'archived']):
     changes = {
         'status': package_state,
-        'last_changed': int(datetime.now().timestamp())
+        'last_changed': int(datetime.now().timestamp() * 1000)
     }
     update(Databases.PACKAGES, package_id, changes=changes)
