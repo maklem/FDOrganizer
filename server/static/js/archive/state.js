@@ -78,6 +78,9 @@ function closeSettings() {
     store.modalOpen = false
 }
 
-function exportPackage() {
-    post(`/export/${store.selectedPackage.id}`)
+async function exportPackage() {
+    const request = post(`/export/${store.selectedPackage.id}`)
+    store.selectedPackage = undefined
+    await request;
+    store.getPackages()
 }
