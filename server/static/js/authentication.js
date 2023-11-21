@@ -1,4 +1,4 @@
-import { post } from "./http.js"
+import { post, get } from "./http.js"
 
 /**
  * @param  {string} username
@@ -55,17 +55,13 @@ export async function loginSource(source, credentials) {
 }
 
 export async function login_oidc_response(url = 'Null') {
-	const state = getCookie('state')
-	const json = await post('/login_oidc', {url, state} );
+	const json = await post('/login_oidc', {url});
 	if (!json.success) return false;
-	setCookie("token", json.token);
-	
 	window.history.go();
 	return true;
 }
 
 export async function login_oidc_request() {
 	const json = await get('/login_oidc');
-	setCookie("state", json.state)
 	window.location.href = json.redirect;
 }
