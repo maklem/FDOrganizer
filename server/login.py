@@ -7,6 +7,9 @@ from server import APP
 from .util import web_error, web_response
 from .services.authentication import authorize
 
+import time
+from datetime import datetime, timedelta, timezone
+from binapy import BinaPy
 
 @APP.route("/login", methods=["POST"])
 def login_lzv():
@@ -26,68 +29,86 @@ def login_oidc():
         auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET')),
         redirect_uri=os.getenv('REDIRECT_URI')
     )
-    if request.method == 'GET':
-        #redirect to sso
-        az_request = client.authorization_request(scope=os.getenv('SCOPE'))
-        session['code_verifier'] = az_request.code_verifier
-        session['state'] = az_request.state
-        session['nonce'] = az_request.nonce
-        return web_response(200, details={'success':True, 'redirect':az_request.uri})
+
+    #redirect to sso
+    az_request = client.authorization_request(scope=os.getenv('SCOPE'))
+    session['code_verifier'] = az_request.code_verifier
+    session['state'] = az_request.state
+    session['nonce'] = az_request.nonce
+    return web_response(200, details={'success':True, 'redirect':az_request.uri})
     
-    else: 
-        #check response
-        url = json.loads(request.data).get('url')
-        #print(url)
-        #if not session.get('code_verifier') or not session.get('state') or not session.get('nonce'):
-        #    return web_response(200, details={'success':False})
- 
-        az_request = client.authorization_request(scope=os.getenv('SCOPE'),
-                                                  state=session['state'],
-                                                  code_verifier=session['code_verifier'],
-                                                  nonce=session['nonce']
-                                                  )
+@APP.route("/login_oidc/response")
+def oidc_response():
+    client = OAuth2Client.from_discovery_endpoint(
+        issuer=os.getenv("OIDC_IDP"),
+        auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET')),
+        redirect_uri=os.getenv('REDIRECT_URI')
+    )
+    url= request.url
+    #print("hallo", flush=True)
+    #print(url, flush=True)
+    az_request = client.authorization_request(scope=os.getenv('SCOPE'),
+                                              state=session['state'],
+                                              code_verifier=session['code_verifier'],
+                                              nonce=session['nonce']
+                                              )
+    az_response = az_request.validate_callback(url)
+    token = client.authorization_code(az_response)
+                                            
+    print(token, flush=True)
+    userinfo = client.userinfo(token)
+    email = userinfo['email']
+    given_name = userinfo['given_name']
+    family_name = userinfo['family_name']
+    sub = userinfo['sub']
+    print ('{} \n {} \n {} \n {}'.format(email, given_name, family_name, sub), flush=True)
 
-        az_response = az_request.validate_callback(url)
-        token = client.authorization_code(az_response)
-                                                
-        print(token, flush=True)
-        userinfo = client.userinfo(token)
-        email = userinfo['email']
-        given_name = userinfo['given_name']
-        family_name = userinfo['family_name']
-        sub = userinfo['sub']
+    session.pop('code_verifier')
+    session.pop('state')
+    session.pop('nonce')
 
-        print ('{} \n {} \n {} \n {}'.format(email, given_name, family_name, sub), flush=True)
-
-        session.pop('code_verifier')
-        session.pop('state')
-        session.pop('nonce')
-
-        serialize_bearertoken = BearerTokenSerializer()
-        token_serialized = serialize_bearertoken.default_dumper(token)
-        session["bearer_token"] = token_serialized
-        return web_response(200, details = {'success': True})
-    
-
+    serialize_bearertoken = BearerTokenSerializer()
+    token_serialized = serialize_bearertoken.default_dumper(token)
+    session["bearer_token"] = token_serialized
+    return redirect("/start")
 
 def is_authorized(abc):
     if session.get('bearer_token') is None:
         return False
 
     serialize_bearertoken = BearerTokenSerializer()
-    token = serialize_bearertoken.default_loader(session['bearer_token'])
+    #token = serialize_bearertoken.default_loader(session['bearer_token'])
+    token = load(session['bearer_token'])
 
-    client = OAuth2Client.from_discovery_endpoint(
-        issuer=os.getenv("OIDC_IDP"),
-        auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET'))
-    )
-
+    #print(token.expires_in, flush=True)
+    print(token.expires_at, flush=True)
+    
     print("old \n", flush=True)
     print(token, flush=True)
+    
+    if token.is_expired(leeway=540):
+        
+        client = OAuth2Client.from_discovery_endpoint(
+            issuer=os.getenv("OIDC_IDP"),
+            auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET'))
+        )
 
-    token = client.refresh_token(
-        refresh_token = token
-    )
-    print("new \n", flush=True)
-    print(token, flush=True)
+
+
+        token = client.refresh_token(
+            refresh_token = token
+        )
+        print("new \n", flush=True)
+        print(token, flush=True)
+        session["bearer_token"] = serialize_bearertoken.default_dumper(token)
+
     return True
+
+def load(serialized):
+    attrs = BinaPy(serialized).decode_from("b64u").decode_from("deflate").parse_from("json")
+    #print(attrs, flush=True)
+    # if expire_in exist in atters
+    del attrs['expires_in']
+    attrs["expires_at"] = datetime.fromtimestamp(attrs.get("expires_at"))
+    #print(attrs, flush=True)
+    return BearerToken(**attrs)

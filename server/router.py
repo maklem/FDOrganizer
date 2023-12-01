@@ -5,7 +5,7 @@ from .login import is_authorized
 
 
 def needs_authentication(route: str) -> bool:
-    return route not in [url_for("navlogin"), url_for('login_lzv'), url_for('navtest'), url_for('login_oidc'), url_for('login_oidc_res')] and "static" not in route
+    return route not in [url_for("navlogin"), url_for('login_lzv'), url_for('navtest'), url_for('login_oidc'), url_for("oidc_response")] and "static" not in route
 
 @APP.before_request
 def auth_guard():
@@ -54,9 +54,3 @@ def navtest():
     if is_authorized(request):
         return redirect(url_for("navhome"))
     return render_template("test.html")
-
-@APP.route("/login_oidc/response")
-def login_oidc_res():
-    if is_authorized(request):
-        return redirect(url_for("navhome"))
-    return render_template("login_oidc_response.html")
