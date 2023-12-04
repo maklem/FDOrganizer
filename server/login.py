@@ -44,9 +44,8 @@ def oidc_response():
         auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET')),
         redirect_uri=os.getenv('REDIRECT_URI')
     )
+
     url= request.url
-    #print("hallo", flush=True)
-    #print(url, flush=True)
     az_request = client.authorization_request(scope=os.getenv('SCOPE'),
                                               state=session['state'],
                                               code_verifier=session['code_verifier'],
@@ -67,6 +66,7 @@ def oidc_response():
     session.pop('state')
     session.pop('nonce')
 
+    token.expires_in = None
     serialize_bearertoken = BearerTokenSerializer()
     token_serialized = serialize_bearertoken.default_dumper(token)
     session["bearer_token"] = token_serialized
@@ -77,8 +77,7 @@ def is_authorized(abc):
         return False
 
     serialize_bearertoken = BearerTokenSerializer()
-    #token = serialize_bearertoken.default_loader(session['bearer_token'])
-    token = load(session['bearer_token'])
+    token = serialize_bearertoken.default_loader(session['bearer_token'])
 
     #print(token.expires_in, flush=True)
     print(token.expires_at, flush=True)
@@ -93,22 +92,18 @@ def is_authorized(abc):
             auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET'))
         )
 
-
-
-        token = client.refresh_token(
+        try:
+           token = client.refresh_token(
             refresh_token = token
-        )
+        ) 
+        except InvalidGrant:
+            session.clear()
+            return False
+
         print("new \n", flush=True)
         print(token, flush=True)
+        
+        token.expires_in = None
         session["bearer_token"] = serialize_bearertoken.default_dumper(token)
 
     return True
-
-def load(serialized):
-    attrs = BinaPy(serialized).decode_from("b64u").decode_from("deflate").parse_from("json")
-    #print(attrs, flush=True)
-    # if expire_in exist in atters
-    del attrs['expires_in']
-    attrs["expires_at"] = datetime.fromtimestamp(attrs.get("expires_at"))
-    #print(attrs, flush=True)
-    return BearerToken(**attrs)
