@@ -75,31 +75,29 @@ def is_authorized(abc):
     serialize_bearertoken = BearerTokenSerializer()
     token = serialize_bearertoken.default_loader(session['bearer_token'])
 
-    #print(token.expires_in, flush=True)
-    print(token.expires_at, flush=True)
+    #print(token.expires_at, flush=True)
+    #print(token, flush=True)
     
-    print("old \n", flush=True)
-    print(token, flush=True)
+    if not token.is_expired(leeway=180):
+        return True
+
+
+    client = OAuth2Client.from_discovery_endpoint(
+        issuer=os.getenv("OIDC_IDP"),
+        auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET'))
+    )
+
+    try:
+        token = client.refresh_token(
+        refresh_token = token
+    ) 
+    except InvalidGrant:
+        session.clear()
+        return False
+
+    #print(token, flush=True)
     
-    if token.is_expired(leeway=540):
-        
-        client = OAuth2Client.from_discovery_endpoint(
-            issuer=os.getenv("OIDC_IDP"),
-            auth=ClientSecretJwt(os.getenv('OIDC_CLIENT_ID'), os.getenv('OIDC_CLIENT_SECRET'))
-        )
-
-        try:
-           token = client.refresh_token(
-            refresh_token = token
-        ) 
-        except InvalidGrant:
-            session.clear()
-            return False
-
-        print("new \n", flush=True)
-        print(token, flush=True)
-        
-        token.expires_in = None
-        session["bearer_token"] = serialize_bearertoken.default_dumper(token)
+    token.expires_in = None
+    session["bearer_token"] = serialize_bearertoken.default_dumper(token)
 
     return True
