@@ -54,13 +54,6 @@ export async function loginSource(source, credentials) {
 	setCookie("token", json.token);
 }
 
-export async function login_oidc_response(url = 'Null') {
-	const json = await post('/login_oidc', {url});
-	if (!json.success) return false;
-	window.history.go();
-	return true;
-}
-
 export async function login_oidc_request() {
 	const json = await get('/login_oidc');
 	window.location.href = json.redirect;
