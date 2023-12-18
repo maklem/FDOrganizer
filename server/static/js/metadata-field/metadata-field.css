@@ -1,5 +1,6 @@
 .field-group {
     display: grid;
+    position: relative;
     grid-auto-flow: row;
     grid-auto-rows: max-content;
     gap: 1rem;
@@ -66,4 +67,40 @@
 .add-instance {
     display: flex;
     gap: 0.5rem;
+    margin-top: 0.35rem;
+}
+
+.tooltip-container {
+    display: block;
+    position: absolute;
+    top: -0.8rem;
+    right: 0;
+    float: right;
+    cursor: pointer;
+    color:  var(--secondary-color);
+    margin: 0.2rem;
+    margin-left: 2rem;
+}
+
+.tooltip-text {
+   visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    width: max-content;
+    max-width: 20vw;
+    hyphens: auto;
+    top: 0;
+    right: 100%;
+    color:  var(--secondary-color);
+    background-color: #fff;
+    border: thin solid #ddd;
+    border-radius: 0.5rem;
+    padding: 0.5rem
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+}
+.fa-circle-info:hover {
+    opacity: 0.5;
 }

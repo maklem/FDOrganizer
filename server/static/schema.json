@@ -5,6 +5,10 @@
             "en": "Identifier",
             "de": "Eindeutiger Identifikator"
           },
+        "tooltip": {
+            "en": "Persistent identifier that uniquely identifies the resource.",
+            "de": "Persistenter Identifikator, welcher die Ressource eindeutig identifiziert."
+        },
           "min":1,
           "fields": [
             {
@@ -95,6 +99,10 @@
         "label": {
             "en": "Creator",
             "de": "Autor*in"
+        },
+        "tooltip": {
+            "en": "Main researcher or organization that is responsible for the data. May be the researcher involved in producing the data or the authors of a publication.",
+            "de": "Person oder Institution, welche für die Daten verantwortlich ist. Kann zum Beispiel ein Forschender sein, welcher an der Erstellung der Daten beteiligt war oder die Autor*innen einer Veröffentlichung."
         },
         "min":1,
           "fields": [
@@ -348,6 +356,10 @@
             "en": "Title",
             "de": "Titel"
         },
+        "tooltip": {
+            "en": "Title or name by which the resource is known.", 
+            "de": "Titel oder Name der Ressource."
+        },
         "min":1,
         "fields": [
             {
@@ -415,6 +427,10 @@
             "en": "Publishing",
             "de": "Veröffentlichung"
         },
+        "tooltip": {
+            "en": "Indicates whether a resource has been published and records additional information about the publishing. Publisher is the entity that holds, archives, publishes, prints, distributes, releases, issues or produces the resource.",
+            "de": "Gibt an, ob eine Ressource veröffentlicht wurde und erfasst zusätzliche Informationen über die Veröffentlichung. Verantwortliche*r, welche*r die Ressource aufbewahrt, archiviert, veröffentlicht, druckt, vertreibt, herausgibt oder produziert."
+        }, 
         "min": 1,
         "max": 1,
           "fields": [
@@ -540,6 +556,10 @@
             "en": "Subject & Keywords",
             "de": "Fachgebiet & Keywords"
         },
+        "tooltip":{
+        "en": "Classification or keyword describing the resource.",
+        "de": "Klassifikation oder Schlagwörter zur Beschreibung der Ressource."
+        },
         "fields": [
             {
                 "id": "subjectIdentifierType",
@@ -621,8 +641,8 @@
                     ["subjectIdentifierType", "is", "wikidata"]
                 ],
                 "label": {
-                    "en": "Identifier",
-                    "de": "Identifikator"
+                    "en": "Wikidata identifier",
+                    "de": "Wikidata Identifikator"
                 },
                 "min": 1,
                 "type": "wikidata",
@@ -636,6 +656,10 @@
         "label": {
             "en": "Contributor",
             "de": "Mitwirkende*r"
+        },
+        "tooltip": {
+            "en": "Person or institution contributing to the creation or development of the resource.",
+            "de": "Person oder Institution, welche an der Erstellung oder Entwicklung der Ressource beteiligt ist."
         },
           "fields": [
             {
@@ -1068,6 +1092,10 @@
             "en": "Date",
             "de": "Datum"
         },
+        "tooltip": {
+            "en": "Dates relevant to the resource.",
+            "de": "Relevante Datumsangaben für die Ressource." 
+        },
         "fields": [
             {
                 "id": "dateType",
@@ -1185,6 +1213,10 @@
             "en": "Language",
             "de": "Sprache"
         },
+        "tooltip": {
+            "en": "Primary language of the resource.",
+            "de": "Hauptsprache der Ressource."
+        },
         "fields": [
             {
                 "id": "languageCode",
@@ -1220,7 +1252,7 @@
             {
                 "id":"customLanguage",
                 "conditions": [
-                    ["language", "is", "custom"]
+                    ["languageCode", "is", "custom"]
                 ],
                 "min": 1,
                 "max": 1,
@@ -1237,6 +1269,10 @@
         "label": {
             "en": "Resource Type",
             "de": "Ressourcentyp"
+        },
+        "tooltip": {
+        "en": "The general object type of the resource.", 
+        "de": "Allgemeiner Objekttyp der Ressource."
         },
         "min": 1,
         "max": 1,
@@ -1435,6 +1471,10 @@
             "en": "Size",
             "de": "Größe"
         },
+        "tooltip": {
+            "en": "Size or duration of the resource.",
+            "de": "Größe oder Umfang der Ressource."
+        },
         "fields":[
             {
                 "id":"size",
@@ -1452,6 +1492,10 @@
         "id": "version",
         "alias":["datacite:Version"],
         "label": "Version",
+        "tooltip": {
+            "en": "Version number of the resource.",
+            "de": "Versionsnummer der Ressource."
+        },
         "max":1,
         "fields": [
           {
@@ -1473,6 +1517,11 @@
         "label": {
             "en": "Rights",
             "de": "Rechte"
+        },
+        "tooltip": {
+            "en": "Rights information for the resource.",
+            "de": "Informationen zu den Nutzungsrechten der Ressource."
+
         },
         "fields": [
             {
@@ -1663,6 +1712,10 @@
             "en": "Description",
             "de": "Inhaltsbeschreibung"
         },
+        "tooltip": {
+        "en": "Additional information for describing the resource.",
+        "de": "Zusätzliche Informationen zur Beschreibung der Ressource."
+        },
         "min": 1,
         "fields": [
             {
@@ -1763,6 +1816,10 @@
         "label": {
             "en": "Geolocation",
             "de": "Geolokalisierung"
+        },
+        "tooltip": {
+            "en": "Geographical location or area where the data was collected or about which the data is focused.",
+            "de": "Geografischer Ort oder Gebiet, in dem die Daten erhoben wurden oder auf das sich die Daten beziehen."
         },
         "max": 1,
         "fields": [
@@ -1890,6 +1947,10 @@
             "en": "Timeframe",
             "de": "Zeitrahmen"
         },
+        "tooltip": {
+            "en": "Information about the temporal properties or the temporal topic of the resource.",
+            "de": "Informationen über die zeitlichen Eigenschaften oder das zeitliche Thema der Ressource."
+        },
         "fields": [
             {
                 "id": "timeframeType",
@@ -1985,6 +2046,10 @@
         "label": {
             "en": "Funding",
             "de": "Förderung"
+        },
+        "tooltip": {
+            "en": "Information about the research funding.",
+            "de": "Informationen über die Forschungsfinanzierung."
         },
         "fields": [
             {
@@ -2113,6 +2178,10 @@
         "label": {
             "en": "Related Works",
             "de": "Beziehung zu anderen Werken"
+        },
+        "tooltip": {
+            "en": "Information about a related resource and their relationship.",
+            "de": "Informationen über eine verwandte Ressource und deren Beziehung zueinander."
         },
         "fields": [
             {
@@ -2294,6 +2363,10 @@
             "en": "Data Source",
             "de": "Datenquelle"
         },
+        "tooltip": {
+            "en": "Type or category of the data source.",
+            "de": "Art oder Kategorie der Datenquelle."
+        },
         "fields": [
             {
                 "id":"dataSourceDetail",
@@ -2307,7 +2380,10 @@
                 "options":[
                     {
                         "id": "instrument",
-                        "label": "Messinstrument"
+                        "label": {
+                            "en": "Instrument",
+                            "de": "Messinstrument"
+                        }
                     },
                     {
                         "id": "media",
@@ -2369,6 +2445,10 @@
     {
         "id": "software",
         "label": "Software",
+        "tooltip": {
+            "en": "Information about the used software.",
+            "de": "Informationen über die verwendete Software."
+        },
         "fields": [
             {
                 "id": "softwareType",
