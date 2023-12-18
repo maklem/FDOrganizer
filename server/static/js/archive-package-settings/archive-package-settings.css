@@ -26,7 +26,7 @@
 
 .package-settings-header {
     display: grid;
-    grid-template-columns: max-content minmax(max-content, auto) min-content;
+    grid-template-columns: max-content auto min-content;
     align-items: center;
     gap: 1rem;
 
