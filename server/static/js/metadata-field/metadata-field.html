@@ -2,7 +2,7 @@
     <legend>{{localized(field.label)}}</legend> 
     <div v-if="field.tooltip" class="tooltip-container">
         <i class="fa-solid fa-circle-info"></i>
-    <div class="tooltip-text">{{field.tooltip["de"]}}</div>
+    <div class="tooltip-text">{{field.tooltip["en"]}}</div>
     </div>
     <div v-if="!!metadata?.length" class="field-instance" v-for="(instance, index) in metadata">
         <Button :disabled="field.min === 1 && metadata.length === 1" class="remove remove-instance" :flat @button-clicked="metadata.splice(index,1)">
