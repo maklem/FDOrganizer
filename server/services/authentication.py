@@ -7,8 +7,9 @@ from flask.wrappers import Request
 from jwt import InvalidSignatureError, encode, decode, DecodeError
 from requests import HTTPError
 import ldap
-from .database import find
-from ..entities.databases import Databases
+
+from .database import get
+from ..entities import Databases, Organisation
 
 class TokenPayload(TypedDict):
     username: str
@@ -66,21 +67,17 @@ def user(request: Request) -> str:
     return payload(token)['username']
 
 
-def credentials_valid(username: str, password: str, organisation: str):
-    return True
-    org = get_organisation(organisation)
-    if org.authorization_method == "ldap":
-        return auth_ldap(username, password, org.ldap_server, org.ldap_base)
-
-
-def get_organisation(organisation: str):
-    query = {"selector": {"name": organisation}}
-    org = find(Databases.ORGANISATIONS, query = dumps(query))
-    return loads(org.json())
-
-def auth_ldap(username, password, ldap_server, ldap_base):
-    user_dn = "cn=" + username + "," + ldap_base
-    connect = ldap.initialize(ldap_server)
+def credentials_valid(username: str, password: str, organisation_id: str):
+    organisation = Organisation.from_db(get(Databases.ORGANISATIONS, organisation_id).json())
+    if organisation.identity_provider.type == "LDAP":
+        return True
+        return auth_ldap(username, password, organisation.identity_provider.url, organisation.identity_provider.scope)
+    else:
+        return True
+    
+def auth_ldap(username: str, password: str, url: str, scope:[str]):
+    user_dn = f'cn={username},{",".join(str(element) for element in scope)}'
+    connect = ldap.initialize(url)
     try:
         connect.bind_s(user_dn, password)
         connect.unbind_s()

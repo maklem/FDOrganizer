@@ -76,6 +76,17 @@ def find(database: Databases, query: str, parameters: Optional[dict[str, str]] =
     return requests.post(url, headers=headers, data=query, timeout=20)
 
 
+def getall(database: Databases) -> requests.Response:
+    url = f'{db_url(database)}/_all_docs?include_docs=true'
+    
+    headers = auth_header() | {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    results = requests.get(url, headers=headers, timeout=20).json().get('rows')
+    return [result.get('doc') for result in results]
+
+
 def get(database: Databases, id: str) -> requests.Response:
     url = f'{db_url(database)}/{id}'
     

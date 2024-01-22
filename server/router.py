@@ -1,18 +1,17 @@
 from flask import render_template, request, url_for, redirect
 from server import APP
-#from .services.authentication import is_authorized
-from .login import is_authorized
+from .services.authentication import is_authorized
 
 
 def needs_authentication(route: str) -> bool:
-    return route not in [url_for("navlogin"), url_for('login_lzv'), url_for('navtest'), url_for('login_oidc'), url_for("oidc_response")] and "static" not in route
+    return route not in [url_for("navlogin"), url_for('get_organisations')] and "static" not in route and "/login-oidc" not in route and "/login-ldap" not in route
 
 @APP.before_request
 def auth_guard():
     if not needs_authentication(request.path):
         return None
     if not is_authorized(request):
-        return redirect(url_for("navtest"))
+        return redirect(url_for("navlogin"))
     return None
 
 @APP.route("/")
