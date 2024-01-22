@@ -4,6 +4,7 @@ import DateInput from "../date-input/date-input.js";
 import DefaultInput from "../default-input/default-input.js";
 import NumberInput from "../number-input/number-input.js";
 import TextareaInput from "../textarea-input/textarea-input.js";
+import PasswordInput from "../password-input/password-input.js";
 const template = await setup('labeled-input');
 
 export default {
@@ -11,7 +12,8 @@ export default {
         DateInput,
         DefaultInput,
         NumberInput,
-        TextareaInput
+        TextareaInput,
+        PasswordInput
     },
     props: {
         id: String,
@@ -19,6 +21,7 @@ export default {
         label: String,
         type: String,
         placeholder: String,
+        required: String,
         invalid: {
             type: Boolean,
             default: undefined

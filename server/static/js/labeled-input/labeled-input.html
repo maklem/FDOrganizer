@@ -55,6 +55,17 @@
         @focus="focus = true"
         @blur="focus = false"
     ></TextareaInput>
+    <PasswordInput v-else-if="type === 'password'"
+        :value="value"
+        :id="id"
+        :invalid="!focus && invalid"
+        :disabled="disabled"
+        :placeholder="placeholder"
+        class="input"
+        @input="(value) => $emit('input', value)"
+        @focus="focus = true"
+        @blur="focus = false"
+    ></PasswordInput>
     <DefaultInput v-else
         :value="value"
         :id="id"
@@ -62,6 +73,7 @@
         :disabled="disabled"
         :type="'text'"
         :placeholder="placeholder"
+        :required="required"
         class="input"
         @input="(value) => $emit('input', value)"
         @focus="focus = true"
