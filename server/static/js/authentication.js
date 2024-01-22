@@ -1,18 +1,6 @@
 import { post, get } from "./http.js"
 
 /**
- * @param  {string} username
- * @param  {string} password
- * @returns {Promise<void>}
- */
-export async function login(username, password) {
-	const json = await post('/login', { username, password })
-	if (!json.success) return false
-	setCookie("token", json.token);
-	window.history.go();
-	return true
-}
-/**
  * @returns {Promise<void>}
  */
 export function logout() {
@@ -52,9 +40,4 @@ export function getSessionToken() {
 export async function loginSource(source, credentials) {
 	const json = await post(`/import/${source}/login`, credentials)
 	setCookie("token", json.token);
-}
-
-export async function login_oidc_request() {
-	const json = await get('/login_oidc');
-	window.location.href = json.redirect;
 }

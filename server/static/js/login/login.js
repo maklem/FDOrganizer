@@ -1,8 +1,9 @@
 import { createApp } from "../vue.js";
-import { login } from "../authentication.js";
 import Button from "../button/button.js";
 import { setup } from "../setup.js";
+import { store } from "./state.js";
 import TopBanner from "../top-banner/top-banner.js";
+import LabeledInput from "../labeled-input/labeled-input.js";
 
 
 const template = await setup('login');
@@ -10,30 +11,21 @@ const template = await setup('login');
 createApp({
     components: {
         TopBanner,
-        Button
+        Button,
+        LabeledInput
     },
     data() {
         return {
-            username: '',
-            password: '',
-            showErrorText: false
+            store
         }
     },
-    methods: {
-        setUsername(event) {
-            this.username = event.currentTarget.value
-            this.showErrorText = false
-        },
-        setPassword(event) {
-            this.password = event.currentTarget.value
-            this.showErrorText = false
-        },
-        async login() {
-            if (! await login(this.username, this.password)) this.setLoginFailed()
-        },
-        setLoginFailed() {
-            this.showErrorText = true
+    computed: {
+        organisations() {
+            return store.organisations.map(organisation => ({id: organisation.id, label: organisation.name}))
         }
+    },
+    async mounted() {
+        await store.getOrganisations()
     },
     template
 }).mount('#app-container')

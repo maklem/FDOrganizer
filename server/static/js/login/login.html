@@ -1,17 +1,58 @@
 <div class="login">
     <TopBanner></TopBanner>
     <h2>Anmeldung</h2>
-    <form @submit="login">
-        <label for="username">Username</label>
-        <input name="username" type="text" @input="setUsername" placeholder="Enter Username (btxxxxxx)" required
-            :invalid="showErrorText">
-        <label for="password">Password</label>
-        <input name="password" type="password" @input="setPassword" placeholder="Enter Password" required
-            :invalid="showErrorText">
-        <div class="error-text" :class="{visible: showErrorText}">
-            Wrong username or password!
-        </div>
-        <Button @button-clicked="login">Login</Button>
+    <form v-if="store.selectedOrganisation !== undefined && !store.loading.organisations">
+        <!-- <select>
+            <option v-for="organisation in store.organisations" :value="organisation.id" :selected="organisation.id = store.selectedOrganisation.id">{{organisation.name}}</option>
+        </select> -->
+        <LabeledInput
+            id="organisation-selector"
+            :label="'Choose your organisation'"
+            :type="'monoselect'"
+            :options="organisations"
+            :value="store.selectedOrganisation.id"
+            @input="(value) => store.selectOrganisation(value)"
+         ></LabeledInput>
+        <fieldset v-if="store.selectedOrganisation.authType === 'LDAP'">
+            <LabeledInput
+                id="auth-username"
+                :label="'Username'"
+                :placeholder="'Your username for ' + store.selectedOrganisation.name"
+                :value="store.username"
+                :invalid="store.failedLogin"
+                @input="(value) => store.username = value"
+                :required="true"
+            ></LabeledInput>
+            <LabeledInput
+                id="auth-password"
+                :label="'Password'"
+                :placeholder="'The password for ' + store.selectedOrganisation.name"
+                :type="'password'"
+                :value="store.password"
+                :invalid="store.failedLogin"
+                @input="(value) => store.password = value"
+                :required="true"
+            ></LabeledInput>
+            <div class="error-text" :class="{visible: store.failedLogin}">
+                Wrong username or password!
+            </div>
+            <Button @button-clicked="store.loginLDAP()">Login</Button>
+        </fieldset>
+        <Button v-if="store.selectedOrganisation.authType === 'OIDC'" @button-clicked="store.loginOIDC()">Go To Login</Button>
+        <Button v-if="store.selectedOrganisation.authType === 'SAML'" @button-clicked="store.loginSAML()">Go To Login</Button>
     </form>
-
+    <div v-else class="lds-spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
 </div>

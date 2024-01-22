@@ -19,34 +19,18 @@
     display: flex;
     flex-direction: column;
     padding: 1rem 1rem;
+    gap: 1rem;
 
     width: 30%;
     min-width: 20rem;
 }
 
-input {
-    outline: none;
-    border: 0.1rem solid var(--secondary-color);
-    border-radius: 0.2rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem 0.5rem;
+.login fieldset {
+    display: flex;
+    flex-direction: column;
+    border: none;
 
-    font-size: 1.1rem;
-}
-
-input[invalid=true] {
-    border-color: var(--error);
-    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-error), 0.20), 0px 0px 0px 1px rgba(var(--rgb-error), 0.20);
-}
-
-input:focus,
-input:active {
-    box-shadow: 0px 6px 24px 0px rgba(var(--rgb-secondary-color), 0.20), 0px 0px 0px 1px rgba(var(--rgb-secondary-color), 0.20);
-}
-
-form label {
-    font-weight: 700;
-    color: grey;
+    width: 100%;
 }
 
 .login .error-text {
