@@ -6,8 +6,8 @@
             "de": "Eindeutiger Identifikator"
           },
         "tooltip": {
-            "en": "Persistent identifier that uniquely identifies the resource.",
-            "de": "Persistenter Identifikator, welcher die Ressource eindeutig identifiziert."
+            "en": "This field is mandatory. A persistent identifier that uniquely identifies the resource. The identifier can be a DOI (Digital Object Identifier) or an URI (Uniform Resource Identifier). If neither exists, a custom identifier, if unique, is also possible.",
+            "de": "Dieses Feld ist verpflichtend. Ein persistenter Identifikator, der die Ressource eindeutig identifiziert. Der Identifikator kann ein DOI (Digital Object Identifier) oder ein URI (Uniform Resource Identifier) sein. Ist keiner der beiden vorhanden, kann auch ein benutzerdefinierter Identifikator verwendet werden, sofern dieser eindeutig ist."
         },
           "min":1,
           "fields": [
@@ -101,8 +101,8 @@
             "de": "Autor*in"
         },
         "tooltip": {
-            "en": "Main researcher or organization that is responsible for the data. May be the researcher involved in producing the data or the authors of a publication.",
-            "de": "Person oder Institution, welche für die Daten verantwortlich ist. Kann zum Beispiel ein Forschender sein, welcher an der Erstellung der Daten beteiligt war oder die Autor*innen einer Veröffentlichung."
+            "en": "This field is mandatory. The main researcher or organization that is responsible for the data. This can be the researcher involved in the creation of the data, the responsible research institution, or the authors of a publication.",
+            "de": "Dieses Feld ist verpflichtend. Die Person oder Institution, die für die Daten verantwortlich ist. Dies kann zum Beispiel ein*e an der Erstellung der Daten beteiligte*r Forschende*r, die verantwortliche Forschungsinstitution oder die Autor*innen einer Veröffentlichung sein."
         },
         "min":1,
           "fields": [
@@ -357,8 +357,8 @@
             "de": "Titel"
         },
         "tooltip": {
-            "en": "Title or name by which the resource is known.", 
-            "de": "Titel oder Name der Ressource."
+            "en": "This field is mandatory. The title or name by which the resource is known. It is recommended to enter the main title. In addition, and if necessary, subtitle and alternative titles can also be added.", 
+            "de": "Dieses Feld ist verpflichtend. Der Titel oder Name der Ressource. Es wird empfohlen, den Haupttitel anzugeben. Zusätzlich und falls erforderlich können auch Untertitel sowie alternative Titel hinzugefügt werden."
         },
         "min":1,
         "fields": [
@@ -428,8 +428,8 @@
             "de": "Veröffentlichung"
         },
         "tooltip": {
-            "en": "Indicates whether a resource has been published and records additional information about the publishing. Publisher is the entity that holds, archives, publishes, prints, distributes, releases, issues or produces the resource.",
-            "de": "Gibt an, ob eine Ressource veröffentlicht wurde und erfasst zusätzliche Informationen über die Veröffentlichung. Verantwortliche*r, welche*r die Ressource aufbewahrt, archiviert, veröffentlicht, druckt, vertreibt, herausgibt oder produziert."
+            "en": "This field is mandatory. Indicates whether a resource has been published and records additional information about the publishing. Publisher is the entity that holds, archives, publishes, prints, distributes, releases, issues or produces the resource.",
+            "de": "Dieses Feld ist verpflichtend. Gibt an, ob eine Ressource veröffentlicht wurde und erfasst zusätzliche Informationen über die Veröffentlichung. Herausgeber*in, ist die Person oder Institution, die die Ressource aufbewahrt, archiviert, veröffentlicht, druckt, vertreibt, herausgibt oder produziert."
         }, 
         "min": 1,
         "max": 1,
@@ -557,8 +557,8 @@
             "de": "Fachgebiet & Keywords"
         },
         "tooltip":{
-        "en": "Classification or keyword describing the resource.",
-        "de": "Klassifikation oder Schlagwörter zur Beschreibung der Ressource."
+        "en": "The classification or keywords describing the resource. For the classification suitable identifiers from the Dewey Decimal Classification (DDC), the Gemeinsame Normdatei (GND) or Wikidata can be specified.",
+        "de": "Die Klassifikation oder Schlagwörter zur Beschreibung der Ressource. Für die klassifikatorische Einordnung können geeignete Identifikatoren aus der Dewey Decimal Classification (DDC), der Gemeinsamen Normdatei (GND) oder aus Wikidata angegeben werden."
         },
         "fields": [
             {
@@ -658,8 +658,8 @@
             "de": "Mitwirkende*r"
         },
         "tooltip": {
-            "en": "Person or institution contributing to the creation or development of the resource.",
-            "de": "Person oder Institution, welche an der Erstellung oder Entwicklung der Ressource beteiligt ist."
+            "en": "Information about people or institutions that are or have been involved in the creation, development, or management of the resource.",
+            "de": "Angaben zu Personen oder Institutionen, die an der Erstellung, der Entwicklung oder an der Verwaltung der Ressource beteiligt sind oder waren."
         },
           "fields": [
             {
@@ -1093,8 +1093,8 @@
             "de": "Datum"
         },
         "tooltip": {
-            "en": "Dates relevant to the resource.",
-            "de": "Relevante Datumsangaben für die Ressource." 
+            "en": "The dates relevant to the resource. Various dates can be specified for the creation or the publication process.",
+            "de": "Relevante Datumsangaben für die Ressource. Es können verschiedene Daten für den Entstehungs- oder Veröffentlichungsprozess angegeben werden." 
         },
         "fields": [
             {
@@ -1214,8 +1214,8 @@
             "de": "Sprache"
         },
         "tooltip": {
-            "en": "Primary language of the resource.",
-            "de": "Hauptsprache der Ressource."
+            "en": "The primary language of the resource.",
+            "de": "Angabe der Hauptsprache der Ressource."
         },
         "fields": [
             {
@@ -1271,8 +1271,8 @@
             "de": "Ressourcentyp"
         },
         "tooltip": {
-        "en": "The general object type of the resource.", 
-        "de": "Allgemeiner Objekttyp der Ressource."
+        "en": "This field is mandatory. The general object type of the resource have to be selected from the predefined vocabulary.", 
+        "de": "Dieses Feld ist verpflichtend. Der allgemeine Objekttyp der Ressource ist aus dem vorgegebenen Vokabular auszuwählen."
         },
         "min": 1,
         "max": 1,
@@ -1472,8 +1472,8 @@
             "de": "Größe"
         },
         "tooltip": {
-            "en": "Size or duration of the resource.",
-            "de": "Größe oder Umfang der Ressource."
+            "en": "The size or scope of the resource. This can be, for example, the data size in general or the temporal scope of a resource. The unit should always be specified in addition to the value.",
+            "de": "Die Größe oder der Umfang der Ressource. Dies kann beispielsweise die Datengröße im Allgemeinen oder der zeitliche Umfang einer Ressource sein. Neben dem Wert sollte immer auch die Einheit angegeben werden."
         },
         "fields":[
             {
@@ -1493,8 +1493,8 @@
         "alias":["datacite:Version"],
         "label": "Version",
         "tooltip": {
-            "en": "Version number of the resource.",
-            "de": "Versionsnummer der Ressource."
+            "en": "If different versions of the data exist, the version number of the resource can be specified in this field.",
+            "de": "Falls verschiedene Versionen der Daten existieren, kann in diesem Feld die Versionsnummer der Ressource angegeben werden."
         },
         "max":1,
         "fields": [
@@ -1713,8 +1713,8 @@
             "de": "Inhaltsbeschreibung"
         },
         "tooltip": {
-        "en": "Additional information for describing the resource.",
-        "de": "Zusätzliche Informationen zur Beschreibung der Ressource."
+        "en": "This field is mandatory. Additional information for describing the resource. Further information can be provided in the form of an abstract, the table of contents, or the readme.",
+        "de": "Dieses Feld ist verpflichtend. Angabe von Informationen, die die Ressource näher beschreiben. Hier können weitere Informationen beispielsweise in Form des Abstracts, der Table of Contents oder des Readmes angegeben werden."
         },
         "min": 1,
         "fields": [
@@ -1818,8 +1818,8 @@
             "de": "Geolokalisierung"
         },
         "tooltip": {
-            "en": "Geographical location or area where the data was collected or about which the data is focused.",
-            "de": "Geografischer Ort oder Gebiet, in dem die Daten erhoben wurden oder auf das sich die Daten beziehen."
+            "en": "The geographical location or geographical area where the data was collected or on which the data is focused. The geographical area may be represented by a polygon. The geographical data shall be provided in the decimal format of the latitude and longitude.",
+            "de": "Der geografische Ort oder das geografische Gebiet, in dem die Daten erhoben wurden oder auf das sich die Daten beziehen. Das geografische Gebiet kann mithilfe eines Polygons angegeben werden. Die geografischen Daten sind in Längen- und Breitengraden im Dezimalformat anzugeben."
         },
         "max": 1,
         "fields": [
@@ -1948,8 +1948,8 @@
             "de": "Zeitrahmen"
         },
         "tooltip": {
-            "en": "Information about the temporal properties or the temporal topic of the resource.",
-            "de": "Informationen über die zeitlichen Eigenschaften oder das zeitliche Thema der Ressource."
+            "en": "Information about the temporal properties or the temporal topic of the resource. This can be a specific point in time, a historical event or a fixed period of time.",
+            "de": "Informationen über die zeitlichen Eigenschaften oder das zeitliche Thema der Ressource. Es kann entweder ein spezifischer Zeitpunkt, ein historisches Ereignis oder eine festgelegte Zeitspanne angegeben werden."
         },
         "fields": [
             {
@@ -2048,8 +2048,8 @@
             "de": "Förderung"
         },
         "tooltip": {
-            "en": "Information about the research funding.",
-            "de": "Informationen über die Forschungsfinanzierung."
+            "en": "Information about the research funding. Additional information can be provided about both the research sponsor and the research project itself.",
+            "de": "Informationen über die Forschungsfinanzierung. Es können sowohl zusätzliche Angaben zum Forschungsfördernden als auch zum Forschungsprojekt selbst gemacht werden."
         },
         "fields": [
             {
@@ -2180,8 +2180,8 @@
             "de": "Beziehung zu anderen Werken"
         },
         "tooltip": {
-            "en": "Information about a related resource and their relationship.",
-            "de": "Informationen über eine verwandte Ressource und deren Beziehung zueinander."
+            "en": "Indication of the identifier of a related resource and indication of the relationship between the current resource and the related resource.",
+            "de": "Angabe des Identifikators einer verwandten Ressource und Angabe der Beziehung zwischen der vorliegenden Ressource und der verwandten Ressource."
         },
         "fields": [
             {
@@ -2364,8 +2364,8 @@
             "de": "Datenquelle"
         },
         "tooltip": {
-            "en": "Type or category of the data source.",
-            "de": "Art oder Kategorie der Datenquelle."
+            "en": "The type or category of the data source. For example, that can be an instrument, a trial or a survey.",
+            "de": "Art oder Kategorie der Datenquelle. Es kann sich dabei zum Beispiel um ein Messinstrument, einen Versuch oder eine Umfrage handeln."
         },
         "fields": [
             {
@@ -2446,8 +2446,8 @@
         "id": "software",
         "label": "Software",
         "tooltip": {
-            "en": "Information about the used software.",
-            "de": "Informationen über die verwendete Software."
+            "en": "Information about the used software. In addition to the software type, the name, version, and other information can be specified.",
+            "de": "Informationen über die verwendete Software. Neben dem Softwaretyp können der Name, die Version sowie weitere Informationen angegeben werden."
         },
         "fields": [
             {
