@@ -1,0 +1,42 @@
+main {
+  overflow: auto;
+}
+
+.index-page {
+  padding: 2rem;
+}
+
+.index {
+  margin-left: 2.5rem;
+}
+
+.grid-container{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+}
+
+.item{
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 2rem;
+  margin: 1.5rem;
+  padding: 2rem;
+  hyphens: auto;
+  text-align: justify;
+}
+
+.flex{
+  display: flex;
+  gap: 1rem;
+}
+
+i {
+  font-size: 2.5rem;
+  color: var(--secondary-color);
+  padding-top: 1rem;
+}
+
+.item h2 {
+  text-align: center;
+  margin: 0;
+  padding-bottom: 1.5rem;
+}
