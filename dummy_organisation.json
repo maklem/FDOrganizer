@@ -1,0 +1,15 @@
+{
+    "reviewers": [],
+    "plugins": [],
+    "identity_provider": {
+      "type": "SAML",
+      "url": "https://localhost.local",
+      "scope": [
+        "scope1",
+        "scope2"
+      ],
+      "client_id": "fdo",
+      "client_secret": "lsdkjflksdjlfsdp42oi5498dfjkwdf"
+    },
+    "name": "Uni Testheim"
+  }

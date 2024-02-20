@@ -53,6 +53,20 @@ Projekt LZV des Bibliotheksverbund Bayern
     Wird kein Name beim Start des Skripts übergeben, wird dieser nachträglich abgefragt.
     Die Namen der benötigten Datenbanken können in der Datei `server/entities/databases.py` eingesehen werden.
 
+1. Hinzufügen einer Organisation
+
+    Eine einzelne Installation des FDOrganizer kann von einer oder mehreren Organisationen (Universitäten, Forschungseinrichtungen, etc.) genutzt werden.
+    Um den FDOrganizer zu nutzen muss mindestens eine Organisation mit dazugehöriger Authentifizierung in der Datenbank hinterlegt werden.
+    Dazu kann das Script *create_organisation* genutzt werden:
+
+    ```python
+        python create_organisation.py <file_path>
+    ```
+
+    Wenn der Parameter *file_path* genutzt wird, wird die organisation anhand der JSON-Struktur in der referenzierten Datei aufgebaut (siehe Datei *dummy_organisation*).
+    Ansonsten wird eine interaktive Abfrage nach den Eigenschaften der Organisation gestartet.
+    In beiden Fällen wird die Organisation in der Datenbank angelegt.
+    
 ## Betrieb
 
 ### Lokal
@@ -100,6 +114,9 @@ Für das Setup via docker wird eine funktionierende Installation der Docker Engi
     ```
 
     Wird der Name beim Start des Skripts nicht übergeben, wird dieser nachträglich abgefragt.
+
+### Organisationen anlegen
+
 
 ## Struktur
 
