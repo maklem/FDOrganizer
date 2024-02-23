@@ -17,6 +17,7 @@ services:
       - sh
       - -c
       - /server/init_db.sh && /server/start.sh
+    restart: always
 
   db:
     image: couchdb:latest
@@ -26,6 +27,7 @@ services:
     environment:
       - COUCHDB_USER=${COUCHDB_USER}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+    restart: always
 
   nginx:
     build: ./nginx
@@ -34,6 +36,7 @@ services:
       - fdorganizer
     ports:
       - "34000:80"
+    restart: always
 
   cron:
     build: ./cron_clean
@@ -45,3 +48,4 @@ services:
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
       - COUCHDB_HOST=db
       - COUCHDB_PORT=5984
+    restart: always
