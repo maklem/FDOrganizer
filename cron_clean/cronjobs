@@ -1,1 +1,1 @@
-0,30 * * * * /usr/local/reset_dbs.sh
+0 0-8,20-23 * * * /usr/local/reset_dbs.sh
