@@ -16,7 +16,7 @@ services:
     command:
       - sh
       - -c
-      - /server/init_db.sh && /server/start.sh
+      - /server/init_db.sh && /server/init_organisation.sh && /server/start.sh
     restart: always
 
   db:

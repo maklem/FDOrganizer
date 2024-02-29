@@ -7,6 +7,7 @@ build-essential \
 libsasl2-dev \
 libldap2-dev \
 libssl-dev \
+iputils-ping \
 && \
 apt-get clean \
 && \
@@ -17,3 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN chmod +x /server/init_db.sh
 RUN chmod +x /server/start.sh
+RUN chmod +x /server/init_organisation.sh
