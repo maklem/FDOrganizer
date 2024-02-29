@@ -13,6 +13,9 @@ services:
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
       - COUCHDB_HOST=db
       - COUCHDB_PORT=5984
+      - EXPORT_DIR=/server/export
+    volumes:
+      - ${EXPORT_DIR}:/server/export:rw
     command:
       - sh
       - -c
