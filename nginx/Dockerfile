@@ -5,8 +5,8 @@ WORKDIR /
 # RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx
 
-COPY /ssl/ca.crt /etc/ssl/
-COPY /ssl/ca.key /etc/ssl/
+COPY ssl/ca.crt /etc/ssl/
+COPY ssl/ca.key /etc/ssl/
 
 RUN chown -R root:root /etc/ssl/ca.crt
 RUN chown -R root:root /etc/ssl/ca.key
