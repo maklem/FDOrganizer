@@ -1214,12 +1214,42 @@
             "de": "Sprache"
         },
         "tooltip": {
-            "en": "The primary language of the resource.",
-            "de": "Angabe der Hauptsprache der Ressource."
+            "en": "The primary natural or programming language of the resource.",
+            "de": "Angabe der natürlichen Hauptsprache oder Programmiersprache der Ressource."
         },
         "fields": [
             {
+                "id": "languageType",
+                "alias": ["datacite:Language", "dcterms:language"],
+                "label": {
+                    "en": "Type of language",
+                    "de": "Art der Sprache"
+                },
+                "min": 1,
+                "max": 1,
+                "type": "monoselect",
+                "options": [
+                    {
+                        "id": "naturalLanguage",
+                        "label": {
+                            "en": "Natural language",
+                            "de": "Natürliche Sprache"
+                        }
+                    },
+                    {
+                        "id": "programmingLanguage",
+                        "label": {
+                            "en": "Programming language",
+                            "de": "Programmiersprache"
+                        }
+                    }
+                ]
+            },
+            {
                 "id": "languageCode",
+                "conditions": [
+                    ["languageType", "is", "naturalLanguage"]
+                ],
                 "label": {
                     "en": "Language",
                     "de": "Sprache"
@@ -1252,6 +1282,7 @@
             {
                 "id":"customLanguage",
                 "conditions": [
+                    ["languageType", "is", "naturalLanguage"],
                     ["languageCode", "is", "custom"]
                 ],
                 "min": 1,
@@ -1261,6 +1292,20 @@
                     "de": "Sprache"
                 },
                 "type": "letter-string"
+            },
+            {
+                "id": "customProgrammingLanguage",
+                "conditions": [
+                    ["languageType", "is", "programmingLanguage"]
+                ],
+                "min": 1,
+                "max": 1,
+                "label": {
+                    "en": "Language",
+                    "de": "Sprache"
+                },
+                "type": "letter-string",
+                "placeholder": "e.g. Python"
             }
         ]
     },
