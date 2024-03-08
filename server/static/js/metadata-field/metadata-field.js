@@ -27,7 +27,8 @@ export default {
         return {
             localized,
             validate,
-            store
+            store,
+            toggle: false
         }
     },
     methods: {

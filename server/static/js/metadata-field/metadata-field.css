@@ -83,7 +83,6 @@
 }
 
 .tooltip-text {
-   visibility: hidden;
     position: absolute;
     z-index: 1;
     width: max-content;
@@ -93,14 +92,12 @@
     right: 100%;
     color:  var(--secondary-color);
     background-color: #fff;
-    border: thin solid #ddd;
+    border: thin solid var(--secondary-color);
+    border-width: 0.15rem;
     border-radius: 0.5rem;
     padding: 0.5rem
 }
 
-.tooltip-container:hover .tooltip-text {
-    visibility: visible;
-}
 .fa-circle-info:hover {
     opacity: 0.5;
 }
