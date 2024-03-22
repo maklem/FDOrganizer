@@ -67,35 +67,35 @@
 .add-instance {
     display: flex;
     gap: 0.5rem;
-    margin-top: 0.35rem;
+    margin: 0.35rem 1.5rem 0 1.5rem;
 }
 
 .tooltip-container {
-    display: block;
+    display: flex;
     position: absolute;
-    top: -0.8rem;
+    top: -0.7rem;
     right: 0;
-    float: right;
     cursor: pointer;
+    padding: 0.5rem;
+}
+
+.tooltip-container i {
+    font-size: 1.3rem;
     color:  var(--secondary-color);
-    margin: 0.2rem;
-    margin-left: 2rem;
 }
 
 .tooltip-text {
     position: absolute;
-    z-index: 1;
     width: max-content;
-    max-width: 20vw;
+    max-width: 25rem;
     hyphens: auto;
-    top: 0;
+    top: -1rem;
     right: 100%;
-    color:  var(--secondary-color);
     background-color: #fff;
     border: thin solid var(--secondary-color);
-    border-width: 0.15rem;
+    border-width: 0.1rem;
     border-radius: 0.5rem;
-    padding: 0.5rem
+    padding: 0.5rem;
 }
 
 .fa-circle-info:hover {
