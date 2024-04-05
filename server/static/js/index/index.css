@@ -29,6 +29,15 @@ main {
   gap: 1rem;
 }
 
+.flex h4 {
+  margin-bottom: 0;
+  margin-top: 1.5rem;
+}
+
+.flex p {
+  margin-top: 0;
+}
+
 i {
   font-size: 2.5rem;
   color: var(--secondary-color);
