@@ -110,7 +110,7 @@ def build_sip_metadata(package_data, file_list, structmap):
     schema_file = open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd'))
     schema = XMLSchema11(schema_file, base_url=schema_path)
     schema.validate(rendered_xml)
-    return BeautifulSoup(rendered_xml, "html.parser").prettify()
+    return BeautifulSoup(rendered_xml, "xml").prettify()
 
 def create_ie_directory(structmap, structpath = ""):
     for document in structmap.get('files'):
