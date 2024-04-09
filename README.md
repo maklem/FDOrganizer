@@ -66,6 +66,17 @@ Projekt LZV des Bibliotheksverbund Bayern
     Wenn der Parameter *file_path* genutzt wird, wird die organisation anhand der JSON-Struktur in der referenzierten Datei aufgebaut (siehe Datei *dummy_organisation*).
     Ansonsten wird eine interaktive Abfrage nach den Eigenschaften der Organisation gestartet.
     In beiden Fällen wird die Organisation in der Datenbank angelegt.
+
+1. Setzen von Umgebungsvariablen für den export von Datenpaketen in der .env-Datei
+
+    1. Erstellen eines linux-Nutzers für das Handling von exportierten Datenpaketen (Optional)
+
+    1. Setzen eines Target-Verzeichnisses und des Linux-Nutzers in den Umgebungsvariablen
+    
+        ```
+        EXPORT_DIR=/directory/for/exported/packages
+        EXPORT_USER=root
+        ```
     
 ## Betrieb
 
