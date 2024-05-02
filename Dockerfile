@@ -13,7 +13,9 @@ apt-get clean \
 && \
 rm -rf /var/lib/apt/lists/*
 
-COPY . .
+ARG EXPORT_USER
+RUN chown $EXPORT_USER /server
+COPY --chown=$EXPORT_USER . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN chmod +x /server/init_db.sh

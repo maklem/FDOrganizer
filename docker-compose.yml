@@ -2,7 +2,10 @@ version: '3.3'
 
 services:
   fdorganizer:
-    build: .
+    build:
+      context: .
+      args:
+        - EXPORT_USER=${EXPORT_USER}
     container_name: fdorganizer
     expose:
       - "8080"
@@ -21,6 +24,7 @@ services:
       - -c
       - /server/init_db.sh && /server/init_organisation.sh && /server/start.sh
     restart: always
+    user: ${EXPORT_USER}
 
   db:
     image: couchdb:latest

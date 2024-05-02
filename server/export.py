@@ -70,7 +70,7 @@ def create_sip(package: Package, mets):
     source = os.path.join(TEMP_DIR, package.name)
     target = os.path.join(os.getenv("EXPORT_DIR"), sipname, 'content')
     linuxuser = int(os.getenv("EXPORT_USER"))
-    shutil.chown(source, linuxuser, linuxuser)
+    shutil.chown(source, linuxuser)
     shutil.copytree(source, os.path.join(target, 'streams', package.name))
     Path(os.path.join(target, 'mets.xml')).write_text(mets, encoding='utf-8')
 
