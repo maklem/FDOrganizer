@@ -1,16 +1,57 @@
 # LZV 
 
 Projekt LZV des Bibliotheksverbund Bayern
-## Installation
-### Voraussetzungen
 
-* Python in Version >=3.9 ist installiert
+## Konfiguration
+
+1. Konfigurieren der CouchDB Zugangsdaten in `.env`-Datei
+
+    1. Erstellen einer Datei im Projektverzeichnis mit dem Namen `.env`
+
+    2. Setzen von Umgebungsvariablen, die für die Interaktion des FDOrganizer mit der Datenbank nötig sind (hier mit Beispielwerten)
+
+        ```
+        COUCHDB_USER=admin
+        COUCHDB_PASSWORD=admin
+        COUCHDB_HOST=127.0.0.1
+        COUCHDB_PORT=5984
+        ```
+
+1. Setzen von Umgebungsvariablen für den export von Datenpaketen in der .env-Datei
+
+    1. Setzen eines Target-Verzeichnisses für exportierte Datenpakete in den Umgebungsvariablen
+
+        ```
+        EXPORT_DIR=/directory/for/exported/packages
+        ```
+
+    1. Erstellen eines linux-Nutzers für das Handling von exportierten Datenpaketen (Optional). Für das Einrichten eines sicheren Zugriffs auf die exportierten Daten via **SFTP** siehe z.B. [hier](https://thunderysteak.github.io/sftp-user-chroot)
+
+    1. Überprüfe die ID des neu erstellten Linux-Nutzers
+
+        ```bash
+        id -u NUTZERNAME
+        ```
+
+    1. Setzen der Linux-Nutzer-ID in den Umgebungsvariablen
+    
+        ```
+        EXPORT_USER=NUTZER_ID
+        ```
+    
+## Betrieb
+
+### Lokal
+
+#### Voraussetzungen
+
+* Python in Version >=3.10 ist installiert
 * pip ist installiert
 * Virtual Environment für die App ist vorhanden
 * CouchDB-Instanz ist vorhanden
 * CouchDB-Nutzer mit Berechtigung zum Anlegen von Datenbanken ist verfügbar
 
-### Schritte
+#### Schritte
 
 1. Aktivieren des venv 
 
@@ -28,20 +69,9 @@ Projekt LZV des Bibliotheksverbund Bayern
 
 1. Installation der Abhängigkeiten am Server (siehe `requirements.txt`)
 
-    `pip install -r requirements.txt`
-
-1. Konfigurieren der CouchDB Zugangsdaten in `.env`-Datei
-
-    1. Erstellen einer Datei im Projektverzeichnis mit dem Namen `.env`
-
-    2. Setzen von Umgebungsvariablen, die für die Interaktion des FDOrganizer mit der Datenbank nötig sind (hier mit Beispielwerten)
-
-        ```
-        COUCHDB_USER=admin
-        COUCHDB_PASSWORD=admin
-        COUCHDB_HOST=127.0.0.1
-        COUCHDB_PORT=5984
-        ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 1. Erstellen von Datenbanken
 
@@ -67,23 +97,8 @@ Projekt LZV des Bibliotheksverbund Bayern
     Ansonsten wird eine interaktive Abfrage nach den Eigenschaften der Organisation gestartet.
     In beiden Fällen wird die Organisation in der Datenbank angelegt.
 
-1. Setzen von Umgebungsvariablen für den export von Datenpaketen in der .env-Datei
-
-    1. Erstellen eines linux-Nutzers für das Handling von exportierten Datenpaketen (Optional)
-
-    1. Setzen eines Target-Verzeichnisses und des Linux-Nutzers in den Umgebungsvariablen
-    
-        ```
-        EXPORT_DIR=/directory/for/exported/packages
-        EXPORT_USER=root
-        ```
-    
-## Betrieb
-
-### Lokal
-
-Zum lokalen Ausführen der App können entweder das [Flask CLI](https://flask.palletsprojects.com/en/2.2.x/cli/) oder die Startskripte benutzt werden.
-Die Startskripte starten die App im Debug-Modus und nutzen die mitgelieferten Self-Signed-Certificates zur ssl-Verschlüsselung.
+1. Zum lokalen Ausführen der App können entweder das [Flask CLI](https://flask.palletsprojects.com/en/2.2.x/cli/) oder die Startskripte benutzt werden.
+Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://localhost:5000) und nutzen die mitgelieferten Self-Signed-Certificates zur SSL-Verschlüsselung.
 
 * Windows
 
@@ -91,25 +106,32 @@ Die Startskripte starten die App im Debug-Modus und nutzen die mitgelieferten Se
 
 * Linux
 
-    Start via `./start.sh` oder `sh start.sh`
+    Start via `./start_local.sh` oder `sh start_local.sh`
 
 ### Docker
 
-Für das Setup via docker wird eine funktionierende Installation der Docker Engine sowie des Docker Compose Plugins benötigt.
+#### Voraussetzungen
 
-1. Setzen von Datenbanknutzer und -passwort wie unter [Installation -> Schritte](#schritte) beschrieben.
+* Installiertes Docker-CLI (empfohlen: >= 23.0.6)
+* Docker Compose Plugin (empfohlen: >= 2.17.3)
 
-2. Port Mapping für Datenbank und FDO in `docker-compose.yml` anpassen
+#### Schritte
+
+1. Setzen von Datenbanknutzer und -passwort wie unter [Konfiguration](#konfiguration) beschrieben.
+
+1. Port Mapping für Datenbank und FDO in `docker-compose.yml` anpassen
 
     * Die Syntax für die Ports ist *hostsystem:container*.
 
-    * Standardmäßig nutzt CouchDB Port **5984**, der FDO nutzt Port **5000**.
+    * Standardmäßig nutzt der FDO Port **34000** auf dem Hostsystem.
 
-3. Die benötigten Datenbanken und deren Setup wird beim ersten Starten des FDO-Containers ausgeführt (siehe [`init.sh`](./init.sh))
+1. Das Anlegen der benötigten Datenbanken wird beim ersten Starten des FDO-Containers ausgeführt (siehe [`init_db.sh`](./init_db.sh))
 
-4. Wird das compose plugin für Docker zum Starten genutzt, kann der Cluster über `docker compose up` gestartet werden.
+1. Ebenfalls wird mit den Daten aus [`dummy_organisation.json`](./dummy_organisation.json) eine default-organisation angelegt, deren Daten für die Authentifizierung genutzt werden (siehe [`init_organisation.sh`](./init_organisation.sh))
 
-5. Die Default-Namen der Container können auch in `docker-compose.yml` angepasst werden mit dem Property `container_name`.
+1. Wird das compose plugin für Docker zum Starten genutzt, kann der Cluster über `docker compose up` gestartet werden.
+
+1. Die Default-Namen der Container können auch in `docker-compose.yml` angepasst werden mit dem Property `container_name`.
 
 ## Wartung
 
@@ -125,9 +147,6 @@ Für das Setup via docker wird eine funktionierende Installation der Docker Engi
     ```
 
     Wird der Name beim Start des Skripts nicht übergeben, wird dieser nachträglich abgefragt.
-
-### Organisationen anlegen
-
 
 ## Struktur
 
