@@ -11,7 +11,7 @@ from typing import Literal, Union
 
 import requests
 from flask.wrappers import Request, Response
-from pkg_resources import resource_filename
+import pathlib
 
 from .plugin_document import PluginDocument
 
@@ -22,7 +22,7 @@ from ...entities.document import Document
 from ...util import web_error, web_response
 
 def get_config():
-    config_filepath = resource_filename(__name__, f'config.json')
+    config_filepath = pathlib.Path(__file__).parent.resolve().joinpath('config.json')
     with open(config_filepath, encoding="utf-8") as file:
         return json.load(file)
 
@@ -137,6 +137,7 @@ def get_collection(collection_id: str, request: Request, auth):
     return {'documents': files, 'folders': []}
 
 def get_files_with_metadata(file_ids, request, auth):
+    print(file_ids)
     search_query = {
         "type" : "object",
         "search" : [
@@ -146,7 +147,7 @@ def get_files_with_metadata(file_ids, request, auth):
                 "fields" : [
                     "_system_object_id"
                 ],
-                "in" : file_ids
+                "in" : [int(file) for file in file_ids]
             }
         ]
     }

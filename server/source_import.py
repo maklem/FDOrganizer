@@ -1,9 +1,11 @@
 import importlib
 import json
 from functools import wraps
+from pathlib import Path
 from typing import List, Literal, Union
 from flask import request, Response
-from pkg_resources import resource_listdir, resource_isdir, resource_filename
+# from pkg_resources import resource_listdir, resource_isdir, resource_filename
+from importlib_resources import as_file, files
 
 from server import APP
 from .shared import persist_documents
@@ -11,6 +13,8 @@ from .services.database import get
 from .entities import Document, Folder
 from .util import get_database_from_string, owner, web_error, web_response
 from .services.authentication import add_payload, payload, user
+
+SERVERNAME = __name__.split('.')[0]
 
 def needs_authentication(api_method):
     @wraps(api_method)
@@ -102,29 +106,30 @@ def list_import_sources():
     return web_response(200, details = info)
 
 
-def plugin_info(plugin: str):
-    try:
-        config = get_config(plugin)
-    except Exception:
-        return {
-            "id": plugin,
-            "error": f'{plugin}: Config file not found'
-        }
+def plugin_info(plugin_path: Path):
+    # try:
+    config = get_config(plugin_path)
+    # except Exception:
+        # return {
+        #     "id": plugin,
+        #     "error": f'{plugin}: Config file not found'
+        # }
+    plugin_id = str(plugin_path).split('/')[-1]
     return {
-        "id": plugin,
+        "id": plugin_id,
         "name": config.get("displayName"),
         "needsAuthentication": config.get("needsAuthentication"),
         "authenticationType": config.get('authenticationType')
     }
 
-def get_config(plugin: str):
-    config_filepath = resource_filename(__name__, f'plugins/{plugin}/config.json')
+def get_config(plugin_path: Path) -> dict:
+    config_filepath = plugin_path.joinpath('config.json')
     with open(config_filepath, encoding="utf-8") as file:
         return json.load(file)
 
 def get_plugins() -> list[str]:
-    plugins = resource_listdir(__name__, "plugins")
-    return [x for x in plugins if resource_isdir(__name__, f'plugins/{x}')]
+    plugins = files(f'{SERVERNAME}.plugins').iterdir()
+    return [x for x in plugins if files(f'{SERVERNAME}.plugins').joinpath(x).is_dir()]
 
 
 def get_plugin_auth(source: str):
