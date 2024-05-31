@@ -55,7 +55,7 @@ def get_organisation_data():
 def get_idp_data():
     identity_provider = {}
 
-    options = ["OIDC", "SAML", "LDAP"]
+    options = ["OIDC", "SAML", "LDAP", "LOCAL"]
     terminal_menu = TerminalMenu(options)
     identity_provider['type'] = options[terminal_menu.show()]
 
@@ -73,11 +73,12 @@ def get_idp_data():
         identity_provider['client_id'] = input("Registrierte ID des Clients beim IDP:\n")
         identity_provider['client_secret'] = input("Secret des Clients beim IDP:\n")
     return identity_provider
-def create(url: str, token: str, organisation_data: dict):
+
+def create(url: str, token: str, data: dict):
     couch_header = {"Accept": "application/json",
                     "Content-Type" : "application/json",
                     "Cookie" :  token}
-    return requests.post(url, data=json.dumps(organisation_data), headers=couch_header)
+    return requests.post(url, data=json.dumps(data), headers=couch_header)
 
 def create_organisation(organisation_data: dict, token: str):
     print(f'Creating organisation "{organisation_data["name"]}"')
@@ -88,6 +89,19 @@ def create_organisation(organisation_data: dict, token: str):
         print(f'{response.json()["reason"]}')
         return
     print(f'Successfully created organisation "{organisation_data["name"]}"')
+    return response.json()['id']
+
+def create_users(users: list[dict], token: str):
+    print(f'Creating users')
+    url = f'{base_url()}/users'
+    users = [create(url, token, user).json()['id'] for user in users]
+    print(f'Successfully created users')
+    return users
+
+def get_users(organisation_id):
+    with open('dummy_users.json', 'r') as file:
+        users = json.load(file)
+    return [{"username": user['username'],"password": user['password'], "organisation": organisation_id} for user in users]
 
 #Run
 if __name__ == '__main__':
@@ -96,5 +110,8 @@ if __name__ == '__main__':
     token = authentication_token(username, password)
     if not token:
         sys.exit()
-    identity_provider = get_organisation_data()
-    create_organisation(identity_provider, token)
+    org_data = get_organisation_data()
+    organisation_id = create_organisation(org_data, token)
+    if org_data['identity_provider']['type'] == "LOCAL":
+        users = get_users(organisation_id)
+        create_users(users, token)

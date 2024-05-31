@@ -2,7 +2,7 @@
     "reviewers": [],
     "plugins": [],
     "identity_provider": {
-      "type": "SAML",
+      "type": "LOCAL",
       "url": "https://localhost.local",
       "scope": [
         "scope1",
@@ -11,5 +11,5 @@
       "client_id": "fdo",
       "client_secret": "lsdkjflksdjlfsdp42oi5498dfjkwdf"
     },
-    "name": "Uni Testheim"
+    "name": "BiblioCon"
   }
