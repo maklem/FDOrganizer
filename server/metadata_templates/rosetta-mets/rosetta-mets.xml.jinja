@@ -146,9 +146,9 @@
     </mets:amdSec>
   {% endfor %}
   <mets:fileSec>
-    <mets:fileGrp ID="rep1" ADMID="rep1-amd">
+    <mets:fileGrp ID="rep1">
       {% for file in files %}
-        <mets:file ID="fl{{file.id}}" ADMID="fl{{file.id}}-amd">
+        <mets:file ID="fl{{file.id}}">
           <mets:FLocat xmlns:xlin="http://www.w3.org/1999/xlink" LOCTYPE="URL" xlin:href="{{file.fileOriginalPath}}"/>
         </mets:file>
       {% endfor %}
