@@ -13,6 +13,31 @@
             :value="store.selectedOrganisation.id"
             @input="(value) => store.selectOrganisation(value)"
          ></LabeledInput>
+         <fieldset v-if="store.selectedOrganisation.authType === 'LOCAL'">
+            <LabeledInput
+                id="auth-username"
+                :label="'Username'"
+                :placeholder="'Your username for ' + store.selectedOrganisation.name"
+                :value="store.username"
+                :invalid="store.failedLogin"
+                @input="(value) => store.username = value"
+                :required="true"
+            ></LabeledInput>
+            <LabeledInput
+                id="auth-password"
+                :label="'Password'"
+                :placeholder="'The password for ' + store.selectedOrganisation.name"
+                :type="'password'"
+                :value="store.password"
+                :invalid="store.failedLogin"
+                @input="(value) => store.password = value"
+                :required="true"
+            ></LabeledInput>
+            <div class="error-text" :class="{visible: store.failedLogin}">
+                Wrong username or password!
+            </div>
+            <Button @button-clicked="store.loginLocal()">Login</Button>
+        </fieldset>
         <fieldset v-if="store.selectedOrganisation.authType === 'LDAP'">
             <LabeledInput
                 id="auth-username"

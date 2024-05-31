@@ -1,5 +1,6 @@
 SECRET = 'In nomine domini est pax et salvatio'
 
+import json
 from time import time
 from json import dumps, loads
 from typing import TypedDict
@@ -8,7 +9,7 @@ from jwt import InvalidSignatureError, encode, decode, DecodeError
 from requests import HTTPError
 import ldap
 
-from .database import get
+from .database import find, get
 from ..entities import Databases, Organisation
 
 class TokenPayload(TypedDict):
@@ -72,6 +73,18 @@ def credentials_valid(username: str, password: str, organisation_id: str):
     if organisation.identity_provider.type == "LDAP":
         return True
         return auth_ldap(username, password, organisation.identity_provider.url, organisation.identity_provider.scope)
+    elif organisation.identity_provider.type == "LOCAL":
+        query =  {
+            "selector": {
+                "organisation": organisation_id,
+                "username": username
+            }
+        }
+        user = find(Databases.USERS, json.dumps(query)).json().get('docs')[0]
+        if user is not None:
+            return True
+        else:
+            return False
     else:
         return True
     

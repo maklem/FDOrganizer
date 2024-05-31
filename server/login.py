@@ -15,6 +15,18 @@ def get_organisations():
     organisation_stubs = [{'id': organisation.id, 'name': organisation.name, 'authType': organisation.identity_provider.type} for organisation in organisations]
     return web_response(200, details=organisation_stubs)
 
+@APP.route("/login-local/<organisation_id>", methods=["POST"])
+def login_local(organisation_id: str):
+    username = json.loads(request.data).get('username')
+    password = json.loads(request.data).get('password')
+    try:
+        token = authorize(username, password, organisation_id)
+    except RuntimeError:
+        return web_response(200, details = {'success': False, 'reason': "wrong credentials"})
+    auth_response =  web_response(200, details = {'success': True})
+    auth_response.set_cookie('token', token)
+    return auth_response
+
 @APP.route("/login-ldap/<organisation_id>", methods=["POST"])
 def login_ldap(organisation_id: str):
     username = json.loads(request.data).get('username')

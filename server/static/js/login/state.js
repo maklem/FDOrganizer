@@ -16,6 +16,7 @@ export const store = reactive({
     loginLDAP,
     loginOIDC,
     loginSAML,
+    loginLocal,
     getOrganisations,
     selectOrganisation
 });
@@ -39,6 +40,16 @@ function setUsername(value) {
 function setPassword(value) {
     store.password = value
     store.failedLogin = false
+}
+
+async function loginLocal() {
+    const {username, password} = store
+    try {
+        await post(`/login-local/${store.selectedOrganisation.id}`, { username, password })
+        window.history.go();
+    } catch {
+        store.failedLogin = true;
+    }
 }
 
 async function loginLDAP() {
