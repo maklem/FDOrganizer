@@ -1,7 +1,5 @@
 from datetime import datetime
 import shutil
-from bs4 import BeautifulSoup
-from flask import make_response
 from pathlib import Path
 from xmlschema import XMLSchema11
 import hashlib
@@ -110,7 +108,7 @@ def build_sip_metadata(package_data, file_list, structmap):
     schema_file = open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd'))
     schema = XMLSchema11(schema_file, base_url=schema_path)
     schema.validate(rendered_xml)
-    return BeautifulSoup(rendered_xml, "xml").prettify()
+    return rendered_xml
 
 def create_ie_directory(structmap, structpath = ""):
     for document in structmap.get('files'):
