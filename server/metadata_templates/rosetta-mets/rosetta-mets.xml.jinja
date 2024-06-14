@@ -148,7 +148,7 @@
   <mets:fileSec>
     <mets:fileGrp ID="rep1">
       {% for file in files %}
-        <mets:file ID="fl{{file.id}}">
+        <mets:file ID="fl{{file.id}}">  {# ADMID needed with more than one Representation in SIP #}
           <mets:FLocat xmlns:xlin="http://www.w3.org/1999/xlink" LOCTYPE="URL" xlin:href="{{file.fileOriginalPath}}"/>
         </mets:file>
       {% endfor %}
