@@ -1,5 +1,5 @@
 sys_dbs='_user _replicator _global_changes'
-data_dbs='documents packages metadata folders users'
+data_dbs='documents packages metadata folders'
 
 for i in $data_dbs; do
     echo "Resetting db: $i"
