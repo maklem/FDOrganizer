@@ -2,6 +2,26 @@
 
 Projekt LZV des Bibliotheksverbund Bayern
 
+## Beschreibung
+
+Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, die genutzt werden kann, um
+
+1. Daten von einem Computer hochzuladen oder
+
+1. mithilfe eines Plugins aus einem Storage-System (elektronisches Laborbuch, Gitlab) zu importieren und
+
+3. die Daten mit Metadaten für die Archivierung anzureichern, um sie dann
+
+4. von einem Datenkurator prüfen zu lassen (in Arbeit). Sind die Daten geprüft, werden
+
+5. die Daten für die Archivierung paketiert und für das Archivsystem (z.B. Rosetta) zum Import bereitgestellt
+
+## Struktur
+
+### Aufbau der Applikation
+
+![Aufbau FD Organizer](structure.svg)
+
 ## Konfiguration
 
 1. Konfigurieren der CouchDB Zugangsdaten in `.env`-Datei
@@ -51,7 +71,7 @@ Projekt LZV des Bibliotheksverbund Bayern
 * CouchDB-Instanz ist vorhanden
 * CouchDB-Nutzer mit Berechtigung zum Anlegen von Datenbanken ist verfügbar
 
-#### Schritte
+#### Installation
 
 1. Aktivieren des venv 
 
@@ -108,6 +128,19 @@ Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://l
 
     Start via `./start_local.sh` oder `sh start_local.sh`
 
+#### Wartung
+
+* Zurücksetzen von Datenbanken
+
+    Während der Entwicklung in einer Testinstanz kann es Sinn machen, die Datenbanken des FDOrganizer zu leeren um keine überholten Daten zu nutzen.
+    Dazu kann das Skript zum zurücksetzen der Datenbanken genutzt werden.
+
+    ```python
+        python reset_database.py <database_name>
+    ```
+
+    Wird der Name der Datenbank beim Start des Skripts nicht übergeben, wird dieser nachträglich abgefragt.
+
 ### Docker
 
 #### Voraussetzungen
@@ -115,7 +148,7 @@ Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://l
 * Installiertes Docker-CLI (empfohlen: >= 23.0.6)
 * Docker Compose Plugin (empfohlen: >= 2.17.3)
 
-#### Schritte
+#### Installation
 
 1. Setzen von Datenbanknutzer und -passwort wie unter [Konfiguration](#konfiguration) beschrieben.
 
@@ -133,23 +166,12 @@ Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://l
 
 1. Die Default-Namen der Container können auch in `docker-compose.yml` angepasst werden mit dem Property `container_name`.
 
-## Wartung
+#### Wartung
 
-### Datenbanken verwalten
+* Ein cronjob führt per default eine zeitgesteuerte Löschung aller Dokumente in der Datenbank zwischen **20 Uhr und 8 Uhr des Folgetags** durch.
+Angelegte Organisationen und Nutzer bleiben hiervon unberührt.
+Für eine Nutzung im Produktionsmodus kann
 
-* Zurücksetzen von Datenbanken
+    * ein anderer Zeitraum gewählt werden, indem `./cron_clean/cronjobs` angepasst wird
 
-    Während der Entwicklung in einer Testinstanz kann es Sinn machen, die Datenbanken des FDOrganizer zu leeren um keine überholten Daten zu nutzen.
-    Dazu kann das Skript zum zurücksetzen der Datenbanken genutzt werden.
-
-    ```python
-        python reset_database.py <database_name>
-    ```
-
-    Wird der Name beim Start des Skripts nicht übergeben, wird dieser nachträglich abgefragt.
-
-## Struktur
-
-### Aufbau der Applikation
-
-![Aufbau FD Organizer](structure.svg)
+    * der container `cron` aus `docker-compose.yaml` entfernt werden
