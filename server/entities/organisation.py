@@ -1,25 +1,25 @@
 from dataclasses import dataclass, field
-from typing import Literal, Optional, Union, Any
-from dataclasses_json import config, dataclass_json
+from typing import Literal, Any
+from dataclasses_json import DataClassJsonMixin, config
 
-@dataclass_json
+shouldBeExcluded = lambda x: x is None
+
 @dataclass
-class IdentityProvider:
+class IdentityProvider(DataClassJsonMixin):
     type: Literal["SAML", "OIDC", "LDAP"]
     url: str
     scope: list[str]
-    client_id: str | None = field(default=None, metadata=config(exclude=lambda x: x is None))
-    client_secret: str | None = field(default=None, metadata=config(exclude=lambda x: x is None))
+    client_id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
+    client_secret: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
 
-@dataclass_json
 @dataclass
-class Organisation:
+class Organisation(DataClassJsonMixin):
     name: str
     reviewers: list[str]
     # rosetta_token: str
     plugins: list[str]
     identity_provider: IdentityProvider
-    id: Optional[str] = field(default=None, metadata=config(exclude=lambda x: x is None))
+    id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
 
     @staticmethod
     def from_db(organisation_in: dict[str, Any]) -> "Organisation":

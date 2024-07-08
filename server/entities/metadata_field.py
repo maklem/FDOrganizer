@@ -1,18 +1,17 @@
 from dataclasses import dataclass
-from typing import Literal, Optional, Union
-from dataclasses_json import dataclass_json
+from typing import Literal
+from dataclasses_json import DataClassJsonMixin
 
 
-@dataclass_json
 @dataclass
-class MetadataField:
+class MetadataField(DataClassJsonMixin):
     id: str
-    label: Union[str, dict[str, str]]
+    label: str | dict[str, str]
     alias: list[str]
     type: Literal["text", "decimal", "integer", "boolean", "monoselect", "date", "doi", "uri", "letter-string", "orcid", "ror", "ddc", "wikidata", "latitude", "longitude"]
-    fields: Optional[list['MetadataField']]
-    min: Optional[int]
-    max: Optional[int]
-    options: Optional[list[dict[Literal["id", "label"], str]]]
-    conditions: Optional[list[tuple[str, str, str]]]
-    applicable: Optional[list[str]]
+    fields: list['MetadataField'] | None
+    min: int | None
+    max: int | None
+    options: list[dict[Literal["id", "label"], str]] | None
+    conditions: list[tuple[str, str, str]] | None
+    applicable: list[str] | None

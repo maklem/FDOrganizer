@@ -1,18 +1,18 @@
-from dataclasses import dataclass
-from typing import Any, Optional
-from dataclasses_json import dataclass_json
+from dataclasses import dataclass, field
+from typing import Any
+from dataclasses_json import DataClassJsonMixin, config
 
+shouldBeExcluded = lambda x: x is None
 
-@dataclass_json
 @dataclass
-class Metadata:
+class Metadata(DataClassJsonMixin):
     schema_version: str
     metadata: dict[str, Any]
-    id: Optional[str] = None
-    url: Optional[str] = None
+    id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
+    url: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
 
     @staticmethod
     def convert(metadata_in: dict[str, Any]) -> dict[str, Any]:
         metadata_out: Metadata = Metadata.from_dict(metadata_in) 
         metadata_out.id = metadata_in.get('_id')
-        return metadata_out.to_dict() # type: ignore
+        return metadata_out.to_dict()
