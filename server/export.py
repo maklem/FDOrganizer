@@ -6,10 +6,9 @@ import hashlib
 import jinja2
 import os
 
+from .entities.errors import ExportUserError, PathError
 from .shared import update_package_state
-
 from .util import web_error, web_response
-
 from .entities import Folder, Document, Package, Databases, Metadata
 from .services.database import get, get_attachment
 from . import APP
@@ -21,7 +20,7 @@ def timestamp_to_date(value, format="%Y-%m-%d"):
 
 
 @APP.route("/check-export-requirements", methods=["GET"])
-def check_export_requirements(package_id: str) -> None:
+def check_export_requirements(package_id: str):
     package: Package = Package.from_dict(get(Databases.PACKAGES, package_id).json())
     requirements = {
         'contains_files': True,
@@ -34,7 +33,7 @@ def check_export_requirements(package_id: str) -> None:
     return web_response(200, details = requirements)
 
 @APP.route("/export/<package_id>", methods=["POST"])
-def build_export_package(package_id: str) -> None:
+def build_export_package(package_id: str):
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
 
     # Refuse packages that are already archived
@@ -49,7 +48,11 @@ def build_export_package(package_id: str) -> None:
 
     # Create data for mets generation (depends on downloaded files)
     file_list = create_file_list(structmap, package.name)
-    package_data = create_package_data(package)
+
+    try:
+        package_data = create_package_data(package)
+    except ValueError as error:
+        return web_error(400, message=error.args[0])
     # ie_structure = create_ie_structure(structmap)
     ie_structure = structmap
 
@@ -57,7 +60,12 @@ def build_export_package(package_id: str) -> None:
     mets = build_sip_metadata(package_data, file_list, ie_structure)
 
     # Copy files and METS to correct dir for Rosetta Ingest
-    create_sip(package, mets)
+    try:
+        create_sip(package, mets)
+    except PathError as error:
+        return web_error(500, message=error.args[0])
+    except ExportUserError as error:
+        return web_error(500, message=error.args[0])
 
     delete_temp_package(package.name)
     # Set package_status to "archived" in DB
@@ -67,9 +75,15 @@ def build_export_package(package_id: str) -> None:
 
 def create_sip(package: Package, mets):
     sipname = f'{package.id}-{round(datetime.now().timestamp())}'
-    source = os.path.join(TEMP_DIR, package.name)
-    target = os.path.join(os.getenv("EXPORT_DIR"), sipname, 'content')
-    linuxuser = int(os.getenv("EXPORT_USER"))
+    source = Path(TEMP_DIR, package.name)
+    if not os.path.exists(source):
+        raise PathError(f'Configured source path {source} does not exist')
+    export_dir = os.getenv("EXPORT_DIR")
+    export_user = os.getenv("EXPORT_USER")
+    if export_dir is None or export_user is None:
+        raise ExportUserError('No export user for SIP transfer configured. Check server environment variables')
+    target = Path(export_dir, sipname, 'content')
+    linuxuser = int(export_user)
     shutil.chown(source, linuxuser)
     shutil.copytree(source, os.path.join(target, 'streams', package.name))
     Path(os.path.join(target, 'mets.xml')).write_text(mets, encoding='utf-8')
@@ -78,6 +92,8 @@ def delete_temp_package(package_name: str):
     shutil.rmtree(os.path.join(TEMP_DIR, package_name))
 
 def create_package_data(package: Package):
+    if package.metadata is None:
+        raise ValueError('Package has no metadata')
     metadata = Metadata.from_dict(get(Databases.METADATA, package.metadata).json())
     return {
         'metadata': metadata.metadata,
@@ -118,7 +134,7 @@ def create_ie_directory(structmap, structpath = ""):
 
 def download_file(document: Document, structpath:str):
     try:
-        file_data = get_attachment(document.id, document.name).content
+        file_data = get_attachment(document.id, document.name).content # type: ignore
     except:
         print(f'No attachment found for document {document.name} with ID {document.id}')
     doc_file = Path(os.path.join(TEMP_DIR, structpath, document.name))
@@ -136,7 +152,7 @@ def create_file_list(structmap, structpath = ""):
 def document_data(document: Document, structpath: str):
     label = ""
     note = ""
-    metadata: Metadata = None
+    metadata: Metadata | None = None
     if document.metadata is not None:
         metadata = Metadata.from_dict(get(Databases.METADATA, document.metadata).json())
         label = add_label(metadata)
