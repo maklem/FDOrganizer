@@ -8,7 +8,7 @@ from .entities import Package, Databases
 from .services.authentication import organisation, user
 from .services.database import find, get, update
 
-from .util import owner, web_error, web_response
+from .util import can_update_metadata, web_error, web_response
 from server import APP
 
 
@@ -36,7 +36,7 @@ def change_package_settings(package_id):
 
     package_settings = request.json.get('settings')
     package = get(Databases.PACKAGES, package_id).json()
-    if not owner(package, user(request)):
+    if not can_update_metadata(package, request):
         return web_error(401, "You don't have permission to delete this content", component= "SERVER")
     try:
         updated_package = update(Databases.PACKAGES, package_id, {'archive_settings': package_settings}).json()

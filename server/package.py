@@ -17,7 +17,7 @@ from .entities import Package, Databases, Folder
 from .services.authentication import user, organisation
 from .services.database import delete, find, get, post
 
-from .util import owner, web_error, web_response
+from .util import can_delete_packages, web_error, web_response
 from server import APP
 
 Structmap = TypedDict('Structmap', {'name': str, 'folders': list['Structmap'], 'files': list[ZipInfo]})
@@ -59,7 +59,7 @@ def create_package():
 def delete_package(package_id):
     #TODO delete dependent folders + documents
     package = get(Databases.PACKAGES, package_id).json()
-    if not owner(package, user(request)):
+    if not can_delete_packages(package, request):
         return web_error(401, "You don't have permission to delete this content", component= "SERVER")
 
     failed_folders = []

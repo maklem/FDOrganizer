@@ -4,14 +4,13 @@ from functools import wraps
 from pathlib import Path
 from typing import List, Literal, Union
 from flask import request, Response
-# from pkg_resources import resource_listdir, resource_isdir, resource_filename
-from importlib_resources import as_file, files
+from importlib_resources import files
 
 from server import APP
 from .shared import persist_documents
 from .services.database import get
 from .entities import Document, Folder
-from .util import get_database_from_string, owner, web_error, web_response
+from .util import can_add_files, get_database_from_string, web_error, web_response
 from .services.authentication import add_payload, payload, user
 
 SERVERNAME = __name__.split('.')[0]
@@ -127,9 +126,10 @@ def get_config(plugin_path: Path) -> dict:
     with open(config_filepath, encoding="utf-8") as file:
         return json.load(file)
 
-def get_plugins() -> list[str]:
+def get_plugins() -> list[Path]:
     plugins = files(f'{SERVERNAME}.plugins').iterdir()
-    return [x for x in plugins if files(f'{SERVERNAME}.plugins').joinpath(x).is_dir()]
+    paths = [Path(f'{SERVERNAME}', 'plugins', str(plugin)) for plugin in plugins]
+    return [path for path in paths if path.is_dir()]
 
 
 def get_plugin_auth(source: str):
@@ -142,12 +142,12 @@ def get_plugin(source: str):
 def serialize(content: dict[Literal["folders","documents"], List[Union[Folder, Document]]]) -> dict[str, List]:
     folders = [Folder.to_dict(x) for x in content['folders']] # type: ignore
     documents = [Document.to_dict(x) for x in content['documents']] # type: ignore
-    return{'folders':folders, 'documents': documents}
+    return {'folders':folders, 'documents': documents}
 
 def import_files(import_documents: List[dict], parent: str, parent_type: str):
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
-    if not owner(package_or_folder, user(request)):
+    if not can_add_files(package_or_folder, request):
         return web_error(401, "You don't have permission to edit this content", component="SERVER")
 
     return persist_documents(import_documents, parent, parent_type)

@@ -4,13 +4,13 @@ import os
 import time
 from werkzeug.datastructures import FileStorage
 from flask import request
-from requests import HTTPError
+from requests import HTTPError #type: ignore
 from server import APP
 from .shared import delete_folder, persist_documents
 
 from .entities import Folder, Databases, Document, Package
 
-from .util import owner, web_error, web_response, get_database_from_string
+from .util import can_add_files, can_delete_files, can_read, web_error, web_response, get_database_from_string
 from .services.authentication import user
 from .services.database import attach, delete, find, get, post, update
 
@@ -23,7 +23,7 @@ def get_package(package_id):
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Check if user has rights to view the package
-    if not owner(package, user(request)):
+    if not can_read(package, request):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get package content from DB
     try:
@@ -42,7 +42,7 @@ def get_folder_content(folder_id):
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Check if user has rights to view the folder contents
-    if not owner(folder, user(request)):
+    if not can_read(folder, request):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get folder content from DB
     try:
@@ -58,16 +58,16 @@ def create_folder():
     if not request.json:
         return web_error(400, "Request is missing information", component= "SERVER")
     # Get Infos from request header and body
-    username = user(request)
     name = request.json.get('name')
     parent = request.json.get('parent')
     parent_type = request.json.get('parentType')
 
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
-    if not owner(package_or_folder, username):
+    if not can_add_files(package_or_folder, request):
         return web_error(401, "You don't have permission to edit this content", component= "SERVER")
     # Create new folder object
+    username = user(request)
     folder = Folder(name=name, documents=[], folders=[], owner=username)
     #Persist folder
     try:
@@ -105,7 +105,7 @@ def create_documents():
 
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
-    if not owner(package_or_folder, username):
+    if not can_add_files(package_or_folder, request):
         return web_error(401, "You don't have permission to edit this content", component="SERVER")
     
     #Create documents for uploaded files
@@ -133,7 +133,7 @@ def delete_document_from_package(document_id):
     document = get(Databases.DOCUMENTS, document_id).json()
     if document is None:
         return web_error(400, f'Document with id {document_id} does not exist', component= "SERVER")
-    if not owner(document, user(request)):
+    if not can_delete_files(document, request):
         return web_error(401, "You don't have permission to delete this content", component= "SERVER")
     
     # Get Infos from request header and body
@@ -171,7 +171,7 @@ def delete_folder_from_package(folder_id):
 
     if folder is None: 
         return web_error(400, f'Folder with id {folder_id} does not exist', component= "SERVER")
-    if not owner(folder, user(request)):
+    if not can_delete_files(folder, request):
         return web_error(401, "You don't have permission to delete this content", component= "SERVER")
     
     # Get Infos from request header and body

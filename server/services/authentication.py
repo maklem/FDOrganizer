@@ -73,7 +73,7 @@ def user(request: Request) -> str:
     token = request.cookies['token']
     return payload(token)['username']
 
-def organisation(request) -> str:
+def organisation(request: Request) -> str:
     token = request.cookies['token']
     return payload(token)['organisation']
 

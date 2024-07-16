@@ -1,5 +1,6 @@
 import json
-from requests import HTTPError
+from typing import Any
+from requests import HTTPError #type: ignore
 from flask import request
 
 from . import APP
@@ -9,7 +10,7 @@ from .entities import Databases, Document, Folder, Package, Metadata
 from .services.authentication import user
 from .services.database import get, post, update
 
-from .util import get_database_from_string, owner, web_error, web_response
+from .util import can_update_metadata, get_database_from_string, web_error, web_response
 
 
 @APP.route("/<entity_type>/<entity_id>/metadata", methods=["GET"])
@@ -46,10 +47,13 @@ def update_entity_metadata(entity_type, entity_id):
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")      
     # Check ownership
-    if not owner(entity, user(request)):
+    if not can_update_metadata(entity, request):
         return web_error(401, "You don't have permission to change this content", component= "SERVER")
     # Get metadata from request body
     new_metadata = request.json
+    if new_metadata is None:
+        return web_error(400, "Request is missing updated metadata", component= "SERVER")
+    # Update document in DB
     # Check if document already has metadata
     metadata_id = entity.get('metadata')
     if metadata_id is None:
@@ -70,7 +74,7 @@ def update_entity_metadata(entity_type, entity_id):
     # Return metadata
     return web_response(200, details = metadata)
 
-def convert_entity(entity_type, entity) -> dict[str, dict[str, any]]:
+def convert_entity(entity_type: str, entity: dict[str, Any]) -> dict[str, dict[str, Any]]:
     if entity_type == 'document':
         return {'document': Document.convert(entity)}
     if entity_type == 'package':
