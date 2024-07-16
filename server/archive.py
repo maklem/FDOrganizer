@@ -1,11 +1,11 @@
 import json
 from flask import request
-from requests import HTTPError
+from requests import HTTPError #type: ignore
 
 
 from .entities import Package, Databases
 
-from .services.authentication import user
+from .services.authentication import organisation, user
 from .services.database import find, get, update
 
 from .util import owner, web_error, web_response
@@ -15,10 +15,10 @@ from server import APP
 @APP.route("/archive/packages", methods=["GET"])
 def get_archive_packages():
 
-    username = user(request)
     query = {
         "selector": {
-            "owner": username,
+            "owner": user(request),
+            "organisation": organisation(request)
         }
     }
 
@@ -38,9 +38,8 @@ def change_package_settings(package_id):
     package = get(Databases.PACKAGES, package_id).json()
     if not owner(package, user(request)):
         return web_error(401, "You don't have permission to delete this content", component= "SERVER")
-
     try:
         updated_package = update(Databases.PACKAGES, package_id, {'archive_settings': package_settings}).json()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
-    return web_response(200, message="Update successful")
+    return web_response(200, message="Update successful", details = updated_package)

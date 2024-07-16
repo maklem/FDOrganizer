@@ -3,3 +3,6 @@ class PathError(Exception):
 
 class ExportUserError(Exception):
     '''No export user configured'''
+
+class OrganisationError(Exception):
+    '''Organisation not found'''

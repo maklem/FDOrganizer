@@ -2,9 +2,11 @@ import json
 import time
 from typing import Literal, TypedDict
 from zipfile import ZipFile, ZipInfo
-from flask import request
-from requests import HTTPError
+from flask import Response, request
+from requests import HTTPError #type: ignore
 from werkzeug.datastructures import FileStorage
+
+from .entities.errors import OrganisationError
 
 from .package_details import create_file_document_pair
 
@@ -12,7 +14,7 @@ from .shared import create_document_with_attachement, delete_document, delete_fo
 
 from .entities import Package, Databases, Folder
 
-from .services.authentication import user
+from .services.authentication import user, organisation
 from .services.database import delete, find, get, post
 
 from .util import owner, web_error, web_response
@@ -24,11 +26,11 @@ PathedFile = TypedDict('PathedFile', {'path': list['str'], 'content': ZipInfo})
 @APP.route("/package/all", methods=["GET"])
 def get_packages():
 
-    username = user(request)
     query = {
         "selector": {
-            "owner": username,
-            "status": "active"
+            "owner": user(request),
+            "status": "active",
+            "organisation": organisation(request)
         }
     }
 
@@ -41,11 +43,12 @@ def get_packages():
 @APP.route("/package", methods=["PUT"])
 def create_package():
     username = user(request)
+    organisation_name = organisation(request)
     now = round(time.time()*1000)
     if not request.json:
         return web_error(400, "Not a valid package name", component= "SERVER")
     name = request.json.get('name')
-    package = Package(name=name, status='active', documents=[], folders=[], owner=username, created=now, last_changed=now)
+    package = Package(name=name, status='active', documents=[], folders=[], owner=username, organisation=organisation_name, created=now, last_changed=now)
     try:
         package_created = post(Databases.PACKAGES, package.to_json())
     except HTTPError as error:
@@ -103,18 +106,19 @@ def delete_package(package_id):
     return web_response(200, 'Success', package_deleted)
 
 @APP.route("/package/zip", methods=["PUT"])
-def create_package_from_zip():
+def create_package_from_zip() -> Response:
     project_zip = next(request.files.values())
-    with ZipFile(project_zip, 'r') as zip_ref:
-        files: PathedFile = [{'path': info.filename.split('/'), 'content': info} for info in zip_ref.infolist() if info.file_size > 0]
+    with ZipFile(project_zip.stream, 'r') as zip_ref:
+        files: list[PathedFile] = [{'path': info.filename.split('/'), 'content': info} for info in zip_ref.infolist() if info.file_size > 0]
         # if len([file for file in files if file.get('path')[0] != files[0].get('path')[0]]):
         #     files = [{'path': file.get('path')[1:], 'content': file.get('content')} for file in files]
         #     print(f'Removed folder {files[0].get("path")[0]} from path because it contained all the files')
-
+        if project_zip.filename is None:
+            return web_error(400, "Not a valid zip package name", component= "SERVER")
         structmap: Structmap = {"name": project_zip.filename.split('.')[0], "folders": [], "files": []}
         for file in files:
             structmap = fill_structmap_layer(structmap, file)     
-        persist_package_layer('package', structmap, zip_ref, user(request))
+        persist_package_layer('package', structmap, zip_ref, user(request), organisation = organisation(request))
     return web_response(200, 'Success')
 
 def fill_structmap_layer(structmap: Structmap, file: PathedFile) -> Structmap:
@@ -134,7 +138,7 @@ def fill_structmap_layer(structmap: Structmap, file: PathedFile) -> Structmap:
         structmap['folders'].append(branch)
     return structmap
 
-def persist_package_layer(entityType: Literal['folder', 'package'], structmap: Structmap, zipfile: ZipFile, username):
+def persist_package_layer(entityType: Literal['folder', 'package'], structmap: Structmap, zipfile: ZipFile, username, organisation =  None):
     folder_ids = []
     for folder_entry in structmap['folders']:
         folder_ids.append(persist_package_layer('folder', folder_entry, zipfile, username))
@@ -144,16 +148,18 @@ def persist_package_layer(entityType: Literal['folder', 'package'], structmap: S
         file = zipfile.open(file_info)
         storage = FileStorage(file)
         storage.filename = file_info.filename.split('/')[-1]
-        file_doc_pair = create_file_document_pair(storage, username) #type: ignore
+        file_doc_pair = create_file_document_pair(storage, username)
         persisted_document = create_document_with_attachement(file_doc_pair['file'], file_doc_pair['document'])
         doc_ids.append(persisted_document)
     # Differ between top level (package) and nested levels (folder)
     if entityType == 'folder':
         folder = Folder(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username)
-        persisted_entity = post(Databases.FOLDERS, folder.to_json()).json() # type: ignore
+        persisted_entity = post(Databases.FOLDERS, folder.to_json()).json()
     else:
         now = round(time.time()*1000)
-        package = Package(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username, status='active', created=now, last_changed=now)
+        if organisation is None:
+            raise OrganisationError('Organisation of current user not found. Package cannot be created from zip')
+        package = Package(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username, organisation=organisation, status='active', created=now, last_changed=now)
         persisted_entity = post(Databases.PACKAGES, package.to_json()).json() # type: ignore
 
     return persisted_entity['id']
