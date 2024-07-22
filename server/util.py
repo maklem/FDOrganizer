@@ -15,7 +15,7 @@ def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]
         error_data['stacktrace'] = stacktrace
     return make_response(json.dumps(error_data), code)
 
-def web_response(code: int, message:Optional[str] = None, details: Optional[Union[dict[str, Any],list]] = None):
+def web_response(code: int, message:Optional[str] = None, details: dict[str, Any] | list[Any] | None = None):
     if message is None and details is None:
         return make_response(code)
     if details is None:
@@ -54,6 +54,11 @@ def can_delete_packages(restricted_object: dict[str, Any], request: Request) -> 
     return False
 
 def can_update_metadata(restricted_object: dict[str, Any], request: Request) -> bool:
+    if is_owner(restricted_object, user(request)):
+        return True
+    return False
+
+def can_submit_package(restricted_object: dict[str, Any], request: Request) -> bool:
     if is_owner(restricted_object, user(request)):
         return True
     return False

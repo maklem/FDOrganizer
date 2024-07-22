@@ -11,8 +11,13 @@ export const STATUS = [
     },
     {
         id: "review",
-        name: "Review",
+        name: "In Review",
         icon: 'fa-list-check'
+    },
+    {
+        id: "rework",
+        name: "Needs Rework",
+        icon: 'fa-wrench'
     },
     {
         id: "archived",
@@ -34,7 +39,7 @@ export const store = reactive({
     openSettings,
     closeSettings,
     packagesWithStatus,
-    exportPackage
+    requestReview
 });
 
 function packagesWithStatus(status) {
@@ -78,8 +83,8 @@ function closeSettings() {
     store.modalOpen = false
 }
 
-async function exportPackage() {
-    const request = post(`/export/${store.selectedPackage.id}`)
+async function requestReview() {
+    const request = post(`/archive/submit/${store.selectedPackage.id}`)
     store.selectedPackage = undefined
     await request;
     store.getPackages()

@@ -10,7 +10,7 @@ shouldBeExcluded = lambda x: x is None
 @dataclass
 class Package(DataClassJsonMixin):
     name: str
-    status: Literal["active", "archived"]
+    status: Literal["active", "archived", "review", "rework"]
     documents: list[str]
     folders: list[str]
     created: int

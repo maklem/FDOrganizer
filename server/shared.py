@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Literal
-from requests import HTTPError, Response
+from requests import HTTPError #type: ignore
 
 from .entities import Document, Databases, CouchDocument
 
@@ -71,7 +71,7 @@ def delete_document(id: str) -> bool:
     return True
 
 def persist_documents(doc_file_pairs: List, parent, parent_type):    
-    documents = {
+    documents: dict[str, list[dict[str, str]]] = {
         'failed': [],
         'success': []
     }
@@ -83,7 +83,7 @@ def persist_documents(doc_file_pairs: List, parent, parent_type):
             documents['failed'].append({'file': pair['document'].name, 'error': error.args[0]})
 
     #Update parent to include documents
-    new_documents = [x.get('document_id') for x in documents['success']]
+    new_documents = [x['document_id'] for x in documents['success'] if x.get('document_id') is not None]
     changes = {
         "documents": {
             "method": 'extend',
@@ -96,10 +96,10 @@ def persist_documents(doc_file_pairs: List, parent, parent_type):
     except HTTPError as error:
         # Delete new documents on error
         for doc in new_documents:
-            delete_document(doc['document_id'])
+            delete_document(doc)
         for document in documents['success']:
-            document['document_id': None]
-            document.set('error', 'Parent Entity could not be updated')
+            del document['document_id']
+            document['error'] = 'Parent Entity could not be updated'
         return {'failed': [documents['failed'], documents['success']], 'success': []}
     return documents
 
@@ -112,7 +112,7 @@ def create_document_with_attachement(file, document: Document) -> str:
 
     return response_document.id
 
-def update_package_state(package_id: str, package_state: Literal['active', 'archived']):
+def update_package_state(package_id: str, package_state: Literal['active', 'archived', 'review', 'rework']):
     changes = {
         'status': package_state,
         'last_changed': int(datetime.now().timestamp() * 1000)

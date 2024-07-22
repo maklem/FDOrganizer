@@ -18,20 +18,6 @@ TEMP_DIR = os.path.join('server','tmp')
 def timestamp_to_date(value, format="%Y-%m-%d"):
     return datetime.fromtimestamp(value / 1000).strftime(format)
 
-
-@APP.route("/check-export-requirements", methods=["GET"])
-def check_export_requirements(package_id: str):
-    package: Package = Package.from_dict(get(Databases.PACKAGES, package_id).json())
-    requirements = {
-        'contains_files': True,
-        'has_metadata': True,
-    }
-    if package.metadata is None:
-        requirements['has_metadata'] = False
-    if not package.documents and not package.folders:
-        requirements['contains_files'] = False
-    return web_response(200, details = requirements)
-
 @APP.route("/export/<package_id>", methods=["POST"])
 def build_export_package(package_id: str):
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
