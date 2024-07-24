@@ -12,7 +12,7 @@ export function validate(content, type, ignoreEmpty = true) {
         case "orcid":
             return new RegExp('^(\\d{4}\\-){3}\\d{3}(\\d|X)$').test(content)
         case "letter-string":
-            return new RegExp('^[a-z][a-zäöü\\s]+[a-z]$', 'i').test(content)
+            return new RegExp('^[a-zA-ZäöüÄÖÜß]+([-\\s]?[a-zA-ZäöüÄÖÜß])*$', 'i').test(content)
         case "latitude":
             return validateCoordinate(content, 'lat')
         case "longitude":
