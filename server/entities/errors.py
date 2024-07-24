@@ -6,3 +6,6 @@ class ExportUserError(Exception):
 
 class OrganisationError(Exception):
     '''Organisation not found'''
+
+class IdentityProviderError(Exception):
+    '''Identity provider is missing information'''

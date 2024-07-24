@@ -3,6 +3,7 @@ import json
 from requests_oauth2client import OAuth2Client, ClientSecretJwt
 
 from server import APP
+from .entities.errors import IdentityProviderError
 from .entities.organisation import IdentityProvider, Organisation
 from .entities.databases import Databases
 from .services.database import get, getall
@@ -41,7 +42,10 @@ def login_ldap(organisation_id: str, username: str, password: str) -> Response:
 @APP.route("/login-oidc/<organisation_id>", methods=["GET"])
 def redirect_oidc(organisation_id: str):
     organisation = get_organisation_from_db(organisation_id)
-    client = oidc_client(organisation)
+    try:
+        client = oidc_client(organisation)
+    except IdentityProviderError as error:
+        return web_error(500, error.args[0], component = "SERVER")
     # create auth request for OIDC-IDP
     az_request = client.authorization_request(scope=organisation.identity_provider.scope)
     # save current login attempt data
@@ -90,6 +94,8 @@ def login_oidc(organisation_id: str):
 def oidc_client(organisation: Organisation):
     # OIDC declaration
     provider = organisation.identity_provider
+    if provider.client_id is None or provider.client_secret is None:
+        raise IdentityProviderError("Missing client id or secret")
     return OAuth2Client.from_discovery_endpoint(
         issuer=provider.url, #https://sso-test.hm.edu  https://shibboleth-idp.uni-regensburg.de/idp/profile/SAML2/POST/SSO?execution=e1s1
         auth=ClientSecretJwt(provider.client_id, provider.client_secret),
