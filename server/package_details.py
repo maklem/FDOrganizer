@@ -3,14 +3,14 @@ import json
 import os
 import time
 from werkzeug.datastructures import FileStorage
-from flask import request
+from flask import Response, request
 from requests import HTTPError #type: ignore
 from server import APP
 from .shared import delete_folder, persist_documents
 
 from .entities import Folder, Databases, Document, Package
 
-from .util import can_add_files, can_delete_files, can_read, web_error, web_response, get_database_from_string
+from .util import can_add_files, can_delete_files, can_read, json_body, web_error, web_response, get_database_from_string
 from .services.authentication import user
 from .services.database import attach, delete, find, get, post, update
 
@@ -53,14 +53,8 @@ def get_folder_content(folder_id):
     return web_response(200, details = content)
 
 @APP.route("/package/folder", methods=["PUT"])
-def create_folder():
-    # Check incoming request for errors
-    if not request.json:
-        return web_error(400, "Request is missing information", component= "SERVER")
-    # Get Infos from request header and body
-    name = request.json.get('name')
-    parent = request.json.get('parent')
-    parent_type = request.json.get('parentType')
+@json_body
+def create_folder(name: str, parent: str, parent_type: str) -> Response:
 
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()

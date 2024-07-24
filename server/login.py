@@ -1,4 +1,4 @@
-from flask import request, redirect, session, url_for
+from flask import Response, request, redirect, session, url_for
 import json
 from requests_oauth2client import OAuth2Client, ClientSecretJwt
 
@@ -6,7 +6,7 @@ from server import APP
 from .entities.organisation import IdentityProvider, Organisation
 from .entities.databases import Databases
 from .services.database import get, getall
-from .util import web_error, web_response
+from .util import json_body, web_error, web_response
 from .services.authentication import authorize, create_token
 
 @APP.route("/organisations", methods=["GET"])
@@ -16,9 +16,8 @@ def get_organisations():
     return web_response(200, details=organisation_stubs)
 
 @APP.route("/login-local/<organisation_id>", methods=["POST"])
-def login_local(organisation_id: str):
-    username = json.loads(request.data).get('username')
-    password = json.loads(request.data).get('password')
+@json_body
+def login_local(organisation_id: str, username: str, password: str) -> Response:
     try:
         token = authorize(username, password, organisation_id)
     except RuntimeError:
@@ -28,9 +27,8 @@ def login_local(organisation_id: str):
     return auth_response
 
 @APP.route("/login-ldap/<organisation_id>", methods=["POST"])
-def login_ldap(organisation_id: str):
-    username = json.loads(request.data).get('username')
-    password = json.loads(request.data).get('password')
+@json_body
+def login_ldap(organisation_id: str, username: str, password: str) -> Response:
     try:
         token = authorize(username, password, organisation_id)
     except RuntimeError:

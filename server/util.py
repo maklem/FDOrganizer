@@ -1,6 +1,8 @@
+from functools import wraps
 import json
+import re
 from typing import Any, Optional, Union
-from flask import Request, make_response
+from flask import Request, make_response, request
 
 from .services.authentication import is_reviewer, organisation, user
 
@@ -74,3 +76,18 @@ def get_database_from_string(database_type: str) -> Databases:
             return Databases.DOCUMENTS
         case _:
             raise ValueError(f'Database for type {database_type} not found')
+        
+def json_body(api_method):
+  @wraps(api_method)
+  def unpack_json_body(*args, **kwargs):
+    # Do something with your request here
+    data = request.get_json()
+    if not data:
+      return web_error(400, "Request is missing body", component= "SERVER")
+    for key, value in data.items():
+        if value is None:
+            return web_error(400, f'Request is missing information for {key}', component= "SERVER")
+        snake_case_key = re.sub(r'[A-Z]', lambda x: f'_{x.group(0).lower()}', key)
+        kwargs[snake_case_key] = value
+    return api_method(*args, **kwargs)
+  return unpack_json_body

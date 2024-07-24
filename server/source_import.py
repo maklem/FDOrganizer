@@ -10,7 +10,7 @@ from server import APP
 from .shared import persist_documents
 from .services.database import get
 from .entities import Document, Folder
-from .util import can_add_files, get_database_from_string, web_error, web_response
+from .util import can_add_files, get_database_from_string, json_body, web_error, web_response
 from .services.authentication import add_payload, payload, user
 
 SERVERNAME = __name__.split('.')[0]
@@ -45,16 +45,8 @@ def get_toplevel(source: str):
 
 @APP.route('/import/<source>', methods=['POST'])
 @needs_authentication
-def import_documents_from(source: str):
-    # Get data from request body
-    if request.json is None:
-        return web_error(400, f'Request does not contain data', component="SERVER")
-    source_ids = request.json.get('sourceIds')
-    parent = request.json.get('parent')
-    parent_type = request.json.get('parentType')
-    if source_ids is None or parent is None or parent_type is None:
-        return web_error(400, f'Request does not contain correct data in body', component="SERVER")
-    
+@json_body
+def import_documents_from(source: str, source_ids: list[str], parent: str, parent_type: Literal['folder', 'document']):
     # Get selected files and their metadata from the plugin source
     plugin = get_plugin(source)
     auth = get_plugin_auth(source)

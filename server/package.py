@@ -17,7 +17,7 @@ from .entities import Package, Databases, Folder
 from .services.authentication import user, organisation
 from .services.database import delete, find, get, post
 
-from .util import can_delete_packages, web_error, web_response
+from .util import can_delete_packages, json_body, web_error, web_response
 from server import APP
 
 Structmap = TypedDict('Structmap', {'name': str, 'folders': list['Structmap'], 'files': list[ZipInfo]})
@@ -41,13 +41,11 @@ def get_packages():
     return web_response(200, details = [Package.convert(x) for x in packages])
 
 @APP.route("/package", methods=["PUT"])
-def create_package():
+@json_body
+def create_package(name: str) -> Response:
     username = user(request)
     organisation_name = organisation(request)
     now = round(time.time()*1000)
-    if not request.json:
-        return web_error(400, "Not a valid package name", component= "SERVER")
-    name = request.json.get('name')
     package = Package(name=name, status='active', documents=[], folders=[], owner=username, organisation=organisation_name, created=now, last_changed=now)
     try:
         package_created = post(Databases.PACKAGES, package.to_json())
