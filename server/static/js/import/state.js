@@ -127,6 +127,7 @@ async function importSelected() {
         sourceIds
     })
     await editStore.getPackageContent()
+    store.selectedDocuments = []
     store.loading.content = false
 }
 
