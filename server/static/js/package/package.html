@@ -74,7 +74,14 @@
                 </form>
             </dialog>
         </aside>
-        <PackageContent v-if="!!store.selectedPackage" @back="store.climbPackagePath()"></PackageContent>
+        <PackageContent v-if="!!store.selectedPackage" @back="store.climbPackagePath()">
+            <Button
+            class="side-button"
+            @button-clicked="store.openDetails()">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <div>Edit project</div>
+            </Button>
+        </PackageContent>
         <Metadata :open="editStore.modalOpen" :metadataEntity="editStore.metadataEntity" @close="editStore.closeDocument()"></Metadata>
     </main>
 </App>

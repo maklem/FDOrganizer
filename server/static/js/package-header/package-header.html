@@ -21,25 +21,5 @@
         <i class="fa-solid fa-book-medical"></i>
         <div>Edit Metadata</div>
     </Button>
-    <Button
-    v-if="!editable && !archive"
-    class="side-button"
-    @button-clicked="overviewStore.openDetails()">
-        <i class="fa-solid fa-pen-to-square"></i>
-        <div>Edit project</div>
-    </Button>
-    <Button
-    v-if="editable"
-    class="side-button"
-    @button-clicked="$emit('new-folder')">
-        <i class="fa-solid fa-folder-plus"></i>
-        <div>Add folder</div>
-    </Button>
-    <Button
-    v-if="archive && archiveStore.selectedPackage.status === 'active'"
-    class="side-button"
-    @button-clicked="$emit('open-submit')">
-        <i class="fa-solid fa-file-import"></i>
-        <div>Submit package</div>
-    </Button>
+    <slot></slot>
 </div>

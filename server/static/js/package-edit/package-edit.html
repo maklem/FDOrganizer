@@ -2,9 +2,14 @@
     <main class="package-details">
         <PackageContent
         v-if="!!store.package"
-        @new-folder = "$refs.newFolder.showModal()"
-        @back = "store.climbPackagePath()"
-        ></PackageContent>
+        @back = "store.climbPackagePath()">
+            <Button
+            class="side-button"
+            @button-clicked="$refs.newFolder.showModal()">
+                <i class="fa-solid fa-folder-plus"></i>
+                <div>Add folder</div>
+            </Button>
+        </PackageContent>
         <dialog ref="newFolder" class="create-folder" @keyup="enterPressed">
             <h1>New Folder</h1>
             <LabeledInput

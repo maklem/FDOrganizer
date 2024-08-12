@@ -18,8 +18,14 @@
         </aside>
         <PackageContent
             v-if="!!store.selectedPackage"
-            @back="store.climbPackagePath()"
-            @open-submit="store.requestReview()">
+            @back="store.climbPackagePath()">
+            <Button
+            v-if="store.selectedPackage.status === 'active'"
+            class="side-button"
+            @button-clicked="store.requestReview()">
+                <i class="fa-solid fa-file-import"></i>
+                <div>Submit package</div>
+            </Button>
         </PackageContent>
         <Metadata :open="editStore.modalOpen" :metadataEntity="editStore.metadataEntity" @close="editStore.closeDocument()"></Metadata>
         <ArchivePackageSettings :open="store.modalOpen" @close="store.closeSettings()"></ArchivePackageSettings>
