@@ -47,9 +47,3 @@ def navlogin():
     if is_authorized(request):
         return redirect(url_for("navhome"))
     return render_template("login.html")
-
-@APP.route("/test")
-def navtest():
-    if is_authorized(request):
-        return redirect(url_for("navhome"))
-    return render_template("test.html")
