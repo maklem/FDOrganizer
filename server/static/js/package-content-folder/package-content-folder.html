@@ -1,5 +1,8 @@
 <div class="package-content-folder" @click="store.openFolder(id)">
-    <i class="fa-solid fa-folder icon"></i>
+    <a href="#" class="icon">
+        <i class="fa-solid fa-folder hover-show"></i>
+        <i class="fa-regular fa-folder hover-hidden"></i>
+    </a>
     <div class="name">{{name}}</div>
     <div class="size">{{formattedSize}}</div>
     <div class="count">{{count}} {{count === 1 ? "content" : "contents"}}</div>

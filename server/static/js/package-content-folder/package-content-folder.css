@@ -44,8 +44,18 @@
 
 .package-content-folder .icon {
     grid-area: icon;
-
     font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.icon .hover-show,
+.package-content-folder:hover .icon .hover-hidden {
+    display: none;
+    transition: display 300ms;
+}
+
+.package-content-folder:hover .icon .hover-show {
+    display: inline-block;
 }
 
 .package-content-folder .action {
