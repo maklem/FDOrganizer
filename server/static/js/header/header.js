@@ -1,4 +1,4 @@
-import { logout } from "../authentication.js";
+import { getSessionToken, logout } from "../authentication.js";
 import NavbarTab from "../navbar-tab/navbar-tab.js";
 import { setup } from "../setup.js";
 import TopBanner from "../top-banner/top-banner.js";
@@ -12,9 +12,10 @@ export default {
         TopBanner,
         Button
     },
-    data() {
-        return {
-            tabs: tabs
+    computed: {
+        tabs() {
+           if (!getSessionToken().reviewer) return tabs.filter(tab => tab.url !== "review")
+           return tabs
         }
     },
     methods: {
@@ -38,5 +39,9 @@ const tabs = [
         title: "Archive",
         url: "archive"
     },
+    {
+        title: "Review",
+        url: "review"
+    }
 
 ]

@@ -1,6 +1,6 @@
 from flask import render_template, request, url_for, redirect
 from server import APP
-from .services.authentication import is_authorized
+from .services.authentication import is_authorized, is_reviewer
 
 
 def needs_authentication(route: str) -> bool:
@@ -41,6 +41,12 @@ def navpackageedit(id):
 @APP.route("/archive")
 def navarchive():
     return render_template("archive.html")
+
+@APP.route("/review")
+def navreview():
+    if not is_reviewer(request):
+        return redirect(url_for("navhome"))
+    return render_template("review.html")
 
 @APP.route("/login")
 def navlogin():
