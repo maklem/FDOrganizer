@@ -31,8 +31,6 @@ const packageEdit = createApp({
     async mounted() {
         const packageId = location.pathname.split('/').at(-1)
         this.store.getPackage(packageId)
-
-        this.store.checkMetadataParameters()
     },
     methods: {
         enterPressed(event) {

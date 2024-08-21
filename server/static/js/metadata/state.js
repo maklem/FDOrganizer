@@ -17,13 +17,17 @@ export const store = reactive({
     loading: {
         entity: true,
     },
+    modalRef: undefined,
     saveMetadata,
     checkConditions,
     getAllFields,
     makeTemplate,
     getParameterValue,
     reset,
-    sectionLabel
+    sectionLabel,
+    openMetadata,
+    closeDocument,
+    checkMetadataParameters
 });
 
 async function getEntity(entityType, entityId) {
@@ -167,7 +171,7 @@ function checkConditions(fieldInstance, subfield) {
         const value = condition[2]
 
         if (relation === "is") return fieldInstance[property]?.[0] === value
-        if (relation === "exists") return fieldInstance[property] !== undefined && fieldInstance[property] !== [] && fieldInstance[property]?.[0] !== undefined
+        if (relation === "exists") return fieldInstance[property] !== undefined && fieldInstance[property]?.[0] !== undefined
         console.warn(`Relation '${relation}' cannot be used to test condition on '${property}'`)
         return false
     })
@@ -187,6 +191,7 @@ function reset() {
     store.metadata = undefined
     store.touched = false
     store.entity = undefined
+    store.entityType = undefined
 }
 
 const LABELS = {
@@ -197,3 +202,33 @@ const LABELS = {
     provenance: 'Data Creation & Acquisition',
     rights: 'Usage & Rights'
 }
+
+function openMetadata(entityType, entityId) {
+    history.pushState({[entityType]: entityId}, '', `?${entityType}=${entityId}`)
+    addEventListener('popstate', function close() {
+        store.closeDocument(entityType)
+        removeEventListener('popstate', close)
+    })
+    store.getParameterValue(entityType)
+    store.modalRef.showModal()
+}
+
+function closeDocument(entityType) {
+    history.pushState({[entityType]: null}, '', `${location.origin}${location.pathname}`)
+    store.reset()
+    return store.modalRef.close()
+}
+
+function checkMetadataParameters() {
+    const params = new URLSearchParams(location.search);
+    const entityId = getParameter(params)
+    if (!!entityId.length) store.openMetadata(entityId[0], entityId[1])
+}
+
+function getParameter(params) {
+    if (!!params.get('document')) return ["document", params.get('document')]
+    if (!!params.get('folder')) return ["folder", params.get('folder')]
+    if (!!params.get('package')) return ["package", params.get('package')]
+    return []
+}
+

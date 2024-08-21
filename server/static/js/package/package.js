@@ -7,7 +7,7 @@ import LabeledInput from "../labeled-input/labeled-input.js"
 import Metadata from "../metadata/metadata.js"
 
 import {store} from './state.js'
-import {store as editStore} from "../package-edit/state.js"
+import {store as metadataStore} from "../metadata/state.js"
 import { setup } from "../setup.js";
 
 const template = await setup('package');
@@ -24,7 +24,7 @@ const pkg = createApp({
     data() {
         return {
             store,
-            editStore,
+            metadataStore,
             source: 'empty',
             packageName: ''
         }
@@ -32,8 +32,6 @@ const pkg = createApp({
 
 async mounted() {
         this.store.getPackages()
-
-        this.editStore.checkMetadataParameters()
     },
     methods: {
         createPackage(packageName) {

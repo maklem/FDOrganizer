@@ -1,9 +1,9 @@
 <dialog class="metadata-modal" ref="modal">
     <div class="content" v-if="!store.loading.entity">
         <header class="metadata-header">
-            <i class="fa-solid fa-file-lines"></i>
+            <i class="fa-solid" :class="iconClass"></i>
             <h1 v-if="!!store.entity">{{store.entity.name}}</h1>
-            <Button class="back-button" :flat @button-clicked="$emit('close')">
+            <Button class="back-button" :flat @button-clicked="store.closeDocument()">
                 <i class="fa-solid fa-xmark"></i>
             </Button>
         </header>
@@ -11,7 +11,7 @@
             <MetadataSection v-for="key in Object.keys(store.schema)" :id="key" :label="store.sectionLabel(key)" :selectedSection="selectedSection" @select-section=selectSection(key)></MetadataSection>
         </main>
         <div class="button-row">
-            <Button class="close-button" @button-clicked="$emit('close')">Abort</Button>
+            <Button class="close-button" @button-clicked="store.closeDocument()">Abort</Button>
             <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched">Save</Button>
         </div>
         <!-- <div class="help-overlay">

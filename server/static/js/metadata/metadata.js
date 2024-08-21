@@ -15,14 +15,6 @@ export default {
         Toast
     },
     props: {
-        open: String,
-        metadataEntity:{
-            type: String,
-            validator(value) {
-                // The value must match one of these strings
-                return ['document', 'folder', 'package'].includes(value)
-            }
-        },
     },
     data() {
         return {
@@ -31,22 +23,27 @@ export default {
             JSON,
         }
     },
-    watch: {
-        open(now, before) {
-            if (now === before) return
-            if (before) {
-                store.reset()
-                return this.$refs.modal.close()
-            }
-            if (now) {
-                this.store.getParameterValue(this.metadataEntity)
-                this.$refs.modal.showModal()
+    computed: {
+        iconClass() {
+            switch (store.entityType) {
+                case "document":
+                    return "fa-file-lines"
+                case "folder":
+                    return "fa-folder"
+                case "package":
+                    return "fa-box"
+                default:
+                    return "fa-file-lines"
             }
         }
     },
+    async mounted() {
+        store.modalRef = this.$refs.modal
+        this.store.checkMetadataParameters()
+    },
     methods: {
         async save() {
-            if (await this.store.saveMetadata()) this.$emit('close')
+            if (await this.store.saveMetadata()) this.store.closeDocument()
         }
     },
     template

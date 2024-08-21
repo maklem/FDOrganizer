@@ -4,6 +4,7 @@
             <template v-if="!store.loading.packageList">
                 <PackageListItem
                     v-for="pkg in store.packages"
+                    @open-metadata="metadataStore.openMetadata('package', pkg.id)"
                     v-bind="pkg"
                 ></PackageListItem>
                 <div class="add-package">
@@ -82,6 +83,6 @@
                 <div>Edit project</div>
             </Button>
         </PackageContent>
-        <Metadata :open="editStore.modalOpen" :metadataEntity="editStore.metadataEntity" @close="editStore.closeDocument()"></Metadata>
+        <Metadata></Metadata>
     </main>
 </App>

@@ -7,6 +7,12 @@
     <div class="primary">{{name}}</div>
     <div class="secondary">{{status}}</div>
     <div class="action">
+        <Button
+        :flat
+        class="open-metadata"
+        @button-clicked="$emit('open-metadata')">
+            <i class="fa-solid fa-book-medical"></i>
+        </Button>
         <Button class="delete" :flat @button-clicked="openDialog">
             <i class="fa-solid fa-trash"></i>
         </Button>

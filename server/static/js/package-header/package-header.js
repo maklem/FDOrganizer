@@ -12,7 +12,6 @@ export default {
             store
         }
     },
-    inject: ['editable', 'archive'],
     methods: {
     },
     template

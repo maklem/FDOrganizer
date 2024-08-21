@@ -40,6 +40,6 @@
             <Import v-if="store.activeTab === 'import'"></Import>
             <Upload v-if="store.activeTab === 'upload'"></Upload>
         </aside>
-        <Metadata :open="store.modalOpen" :metadataEntity="store.metadataEntity" @close="store.closeDocument()"></Metadata>
+        <Metadata></Metadata>
     </main>
 </App>

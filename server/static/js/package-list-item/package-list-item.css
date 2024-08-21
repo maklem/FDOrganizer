@@ -45,12 +45,19 @@
 
 .package-list-item .action {
     grid-area: action;
-
+    display: grid;
+    grid-auto-flow: column;
+    gap: 1rem;
 }
 
 .action .delete {
     --button-color: var(--error);
     --rgb-button-color: var(--rgb-error);
+    padding: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.action .open-metadata {
     padding: 0.5rem;
     font-size: 1.2rem;
 }

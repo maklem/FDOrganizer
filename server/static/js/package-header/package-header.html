@@ -14,12 +14,5 @@
             <div class="folder-name">{{path}}</div>
         </template>
     </div>
-    <Button
-    v-if="!editable"
-    class="side-button"
-    @button-clicked="store.openMetadata('package', store.package.id)">
-        <i class="fa-solid fa-book-medical"></i>
-        <div>Edit Metadata</div>
-    </Button>
     <slot></slot>
 </div>
