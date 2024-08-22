@@ -4,7 +4,7 @@ from typing import Any, Literal, Optional
 import urllib.parse
 from base64 import b64encode
 
-import requests
+import requests # type: ignore
 
 from ..entities.databases import Databases
 from ..entities.couch_document import CouchDocument
@@ -76,7 +76,7 @@ def find(database: Databases, query: str, parameters: Optional[dict[str, str]] =
     return requests.post(url, headers=headers, data=query, timeout=20)
 
 
-def getall(database: Databases) -> requests.Response:
+def getall(database: Databases) -> list[dict[str, Any]]:
     url = f'{db_url(database)}/_all_docs?include_docs=true'
     
     headers = auth_header() | {
@@ -131,24 +131,14 @@ def patch(obj: dict[str, Any], changes: dict[str, Any]):
             obj[key] = patch_array(obj[key], value)
     return obj
 
-def patch_array(list_property: list, change: dict[Literal["method","value"], Any]):
-    value = change.get('value')
-    # Only valid code starting with Python 3.10.
-    # match change.get('method'):
-    #     case "replace":
-    #         return value
-    #     case "append":
-    #         return list_property + [value]
-    #     case "remove":
-    #         return [x for x in list_property if x != value]
-    #     case "extend":
-    #         return list_property + value # type: ignore
-    method = change.get('method')
-    if method == "replace":
-        return value
-    elif method == "append":
-        return list_property + [value]
-    elif method == "remove":
-        return [x for x in list_property if x != value]
-    elif method == "extend":
-        return list_property + value # type: ignore
+def patch_array(list_property: list[Any], change: dict[Literal["method","value"], Any]):
+    value = change['value']
+    match change.get('method'):
+        case "replace":
+            return value
+        case "append":
+            return list_property + [value]
+        case "remove":
+            return [x for x in list_property if x != value]
+        case "extend":
+            return list_property + value
