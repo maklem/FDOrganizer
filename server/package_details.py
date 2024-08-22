@@ -216,8 +216,7 @@ def content_query(id_array, username):
         "selector": {
             "_id": {
                 "$in": id_array
-            },
-            "owner": username
+            }
         }
     }
 
