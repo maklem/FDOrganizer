@@ -5,3 +5,5 @@ from .metadata import Metadata
 from .databases import Databases
 from .organisation import Organisation
 from .couch_document import CouchDocument
+from .review import Review
+from .comment import Comment
