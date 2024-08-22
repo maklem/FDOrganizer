@@ -9,6 +9,7 @@ import ArchivePackageSettings from "../archive-package-settings/archive-package-
 
 import {store, STATUS} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"
+import {store as settingsStore} from "../archive-package-settings/state.js"
 import { setup } from "../setup.js";
 
 const template = await setup('archive');
@@ -26,15 +27,12 @@ const archive = createApp({
         return {
             store,
             metadataStore,
+            settingsStore,
             STATUS
         }
     },
     mounted() {
         this.store.getPackages()
-
-        const params = new URLSearchParams(location.search);
-        const packageId = params.get("package");
-        if (!!packageId) return this.store.openSettings(packageId)
      },
     methods: {
     },

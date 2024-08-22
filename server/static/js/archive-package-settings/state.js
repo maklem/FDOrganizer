@@ -49,9 +49,12 @@ export const store = reactive({
     checkTerms: false,
     checkDSGVO: false,
     personalData: 'none',
+    modalRef: undefined,
     readyToSaveSettings,
     savePackageSettings,
     setPackage,
+    openSettings,
+    closeSettings,
     LICENSES
 });
 
@@ -130,4 +133,14 @@ function readyToSaveSettings() {
     (!!store.creativecommons || store.germandatalicense) &&
     (store.accessibility === 'embargo' ? !!store.embargodate : true) &&
     (store.accessibility === 'request' ? !!store.contactemail : true)
+}
+
+function openSettings(settingsPackage) {
+    setPackage(settingsPackage)
+    store.modalRef.showModal()
+}
+
+function closeSettings() {
+    store.package = undefined
+    store.modalRef.close()
 }

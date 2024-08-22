@@ -12,31 +12,17 @@ export default {
         LabeledInput,
         Toast,
     },
-    props: {
-        open: String
-    },
     data() {
         return {
             store,
         }
     },
-    watch: {
-        open(now, before) {
-            if (now === before) return
-            if (before) {
-                return this.$refs.modal.close()
-            }
-            if (now) {
-                const params = new URLSearchParams(location.search);
-                const packageId = params.get("package");
-                if (!packageId) return
-                this.$refs.modal.showModal()
-            }
-        }
+    async mounted() {
+        store.modalRef = this.$refs.modal
     },
     methods: {
         async save() {
-            if (await this.store.savePackageSettings()) this.$emit('close')
+            if (await this.store.savePackageSettings()) this.store.closeSettings()
         }
     },
     template

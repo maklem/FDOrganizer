@@ -3,7 +3,7 @@
         <header class="package-settings-header">
             <i class="fa-solid fa-file-lines"></i>
             <h1>{{store.package.name}}</h1>
-            <Button :flat class="back-button" @button-clicked="$emit('close')">
+            <Button :flat class="back-button" @button-clicked="store.closeSettings()">
                 <i class="fa-solid fa-xmark"></i>
             </Button>
         </header>
@@ -233,7 +233,7 @@
             </fieldset>
         </form>
         <div class="button-row">
-            <Button class="close-button" @button-clicked="$emit('close')">Abort</Button>
+            <Button class="close-button" @button-clicked="store.closeSettings()">Abort</Button>
             <Button class="save-metadata" :disabled="!store.readyToSaveSettings()" @button-clicked="save">Save</Button>
         </div>
     </div>

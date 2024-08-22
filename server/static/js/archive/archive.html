@@ -11,6 +11,7 @@
                         v-for="pkg in store.packagesWithStatus(status.id)"
                         v-bind="pkg"
                         @open-metadata="metadataStore.openMetadata('package', pkg.id)"
+                        @open-settings="settingsStore.openSettings(pkg)"
                     ></ArchiveListItem>
                     <div v-else class="no-data-placeholder">No packages with status "{{status.name}}"</div>
                 </template>
@@ -29,6 +30,6 @@
             </Button>
         </PackageContent>
         <Metadata></Metadata>
-        <ArchivePackageSettings :open="store.modalOpen" @close="store.closeSettings()"></ArchivePackageSettings>
+        <ArchivePackageSettings></ArchivePackageSettings>
     </main>
 </App>
