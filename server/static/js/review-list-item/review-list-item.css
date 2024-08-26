@@ -1,0 +1,63 @@
+.review-list-item{
+    display: inline-grid;
+    grid-template-columns: min-content auto min-content;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "icon name action"
+        "icon date action";
+    justify-items: start;
+    align-items: center;
+    grid-gap: 0.3rem 1rem;
+
+    border-bottom: 0.05rem solid #eeeeee;
+    padding: 1rem;
+
+    cursor:pointer
+}
+
+.review-list-item:hover {
+    transition: all 300ms;
+    color: var(--primary-color);
+}
+
+.review-list-item.active {
+    transition: all 300ms;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.review-list-item .name {
+    grid-area: name;
+    line-break: anywhere;
+}
+
+.review-list-item .date {
+    grid-area: date;
+
+    color: #666666
+}
+
+.review-list-item .icon {
+    grid-area: icon;
+
+    font-size: 2rem;
+}
+
+.review-list-item .action {
+    grid-area: action;
+    display: grid;
+    grid-auto-flow: column;
+    gap: 1rem;
+}
+
+.action .settings {
+    --button-color: var(--font-color);
+    --rgb-button-color: var(--rgb-font-color);
+    padding: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.action .open-metadata {
+    padding: 0.5rem;
+    font-size: 1.2rem;
+}

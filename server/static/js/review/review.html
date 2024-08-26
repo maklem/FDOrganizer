@@ -1,0 +1,35 @@
+<App>
+    <main class="review-page">
+        <aside class="left-sidebar">
+            <template v-if="!store.loading.packageList">
+                <template v-for="status in STATUS">
+                    <header class="package-status-header">
+                        <i class="icon fa-solid" :class="status.icon"></i>
+                        <h2 class="text">{{status.name}}</h2>
+                    </header>
+                    <ReviewListItem v-if="!!store.packagesWithStatus(status.id).length"
+                        v-for="pkg in store.packagesWithStatus(status.id)"
+                        v-bind="pkg"
+                       @open-metadata="metadataStore.openMetadata('package', pkg.id)"
+                       @open-settings="settingsStore.openSettings(pkg, 'reviews')"
+                    ></ReviewListItem>
+                    <div v-else class="no-data-placeholder">No packages with status "{{status.name}}"</div>
+                </template>
+            </template>
+            <div class="loading" v-else></div>
+        </aside>
+        <PackageContent
+            v-if="!!store.selectedPackage"
+            @back="store.climbPackagePath()">
+                <Button
+                v-if="store.selectedPackage.status === 'review'"
+                class="side-button"
+                @button-clicked="store.acceptReview()">
+                    <i class="fa-solid fa-check"></i>
+                    <div>Accept&Archive</div>
+                </Button>
+        </PackageContent>
+        <Metadata></Metadata>
+        <ArchivePackageSettings></ArchivePackageSettings>
+    </main>
+</App>
