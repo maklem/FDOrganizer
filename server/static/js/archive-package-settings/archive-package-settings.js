@@ -1,6 +1,7 @@
 import Button from "../button/button.js"
 import LabeledInput from "../labeled-input/labeled-input.js"
 import Toast from "../toast/toast.js"
+import ArchiveSettingsTab from "../archive-settings-tab/archive-settings-tab.js"
 import { store } from "./state.js"
 
 import { setup } from "../setup.js";
@@ -11,12 +12,14 @@ export default {
         Button,
         LabeledInput,
         Toast,
+        ArchiveSettingsTab
     },
     data() {
         return {
             store,
         }
     },
+    inject: ['pageContext'],
     async mounted() {
         store.modalRef = this.$refs.modal
     },

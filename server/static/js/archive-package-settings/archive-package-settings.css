@@ -17,7 +17,7 @@
 
 .package-settings-modal .content {
     display:grid;
-    grid-template-rows: min-content max-content minmax(0, auto) max-content;
+    grid-template-rows: min-content min-content minmax(0, auto) max-content;
     gap: 1rem;
 
     width: 100%;
@@ -30,6 +30,7 @@
     align-items: center;
     gap: 1rem;
 
+    
 }
 
 .package-settings-header > h1 {
@@ -39,7 +40,18 @@
 .package-settings-header > i {
     font-size: 2rem;
 }
+    
 
+.settings-tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    border-top: #bbbbbb 0.125rem solid;
+}
+
+section.hidden {
+    display: none;
+}
 .package-settings-header .back-button {
     font-size: 1.5rem;
     --rgb-button-color: var(--rgb-font-color);

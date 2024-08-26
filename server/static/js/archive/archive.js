@@ -38,5 +38,6 @@ const archive = createApp({
     },
     template
 })
-
+archive.provide("pageContext", "archive")
 archive.mount('#app-container')
+archive.config.globalProperties.console = console

@@ -1,6 +1,20 @@
 import {reactive} from '../vue.js';
 import {patch} from "../http.js"
 
+const TABS = [
+    {
+        id: 'access',
+        title: 'Access'
+    },
+    {
+        id: 'legal',
+        title: 'Legal'
+    },
+    {
+        id: 'reviews',
+        title: 'Reviews'
+    }
+]
 const LICENSES = {
     cc: [
         {
@@ -50,12 +64,14 @@ export const store = reactive({
     checkDSGVO: false,
     personalData: 'none',
     modalRef: undefined,
+    activeTab: 'access',
     readyToSaveSettings,
     savePackageSettings,
     setPackage,
     openSettings,
     closeSettings,
-    LICENSES
+    LICENSES,
+    TABS
 });
 
 async function savePackageSettings() {
@@ -135,8 +151,9 @@ function readyToSaveSettings() {
     (store.accessibility === 'request' ? !!store.contactemail : true)
 }
 
-function openSettings(settingsPackage) {
+function openSettings(settingsPackage, tab = 'access') {
     setPackage(settingsPackage)
+    store.activeTab = tab
     store.modalRef.showModal()
 }
 
