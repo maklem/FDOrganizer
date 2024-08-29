@@ -9,3 +9,6 @@ class OrganisationError(Exception):
 
 class IdentityProviderError(Exception):
     '''Identity provider is missing information'''
+
+class PatchError(Exception):
+    '''Patch failed'''

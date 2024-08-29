@@ -6,6 +6,8 @@ from base64 import b64encode
 
 import requests # type: ignore
 
+from ..entities.errors import PatchError
+
 from ..entities.databases import Databases
 from ..entities.couch_document import CouchDocument
 
@@ -122,23 +124,29 @@ def delete(database: Databases, doc_id: str) -> requests.Response:
 
 
 def patch(obj: dict[str, Any], changes: dict[str, Any]):
-    for key, value in changes.items():
-        if key not in obj:
-            obj[key] = value
-        elif not isinstance(obj.get(key), list):
-            obj[key] = value
+    for key, change in changes.items():
+        if not isinstance(change, dict) or not change.get('method'):
+            change_with_method: dict[Literal["method","value"], Any] = {
+                'method': 'replace',
+                'value': change 
+            }
+            obj[key] =  apply_change(obj.get(key), change_with_method)
         else:
-            obj[key] = patch_array(obj[key], value)
+            obj[key] = apply_change(obj.get(key), change)
     return obj
 
-def patch_array(list_property: list[Any], change: dict[Literal["method","value"], Any]):
+def apply_change(object_property: Any, change: dict[Literal["method","value"], Any]):
     value = change['value']
     match change.get('method'):
         case "replace":
             return value
         case "append":
-            return list_property + [value]
+            if object_property is None:
+                return [value]
+            elif isinstance(object_property, list):
+                return object_property + [value]
+            raise PatchError("Cannot append to non-list property")
         case "remove":
-            return [x for x in list_property if x != value]
+            return [x for x in object_property if x != value]
         case "extend":
-            return list_property + value
+            return object_property + value
