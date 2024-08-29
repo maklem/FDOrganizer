@@ -1,5 +1,5 @@
 import json
-from typing import Literal
+from typing import Any, Literal
 from flask import Response, request
 from requests import HTTPError #type: ignore
 from server import APP
@@ -29,11 +29,13 @@ def get_review_packages():
 @APP.route("/review/<package_id>", methods=["GET"])
 def get_package_reviews(package_id) -> Response:
     package = get(Databases.PACKAGES, package_id).json()
-    if not can_read(package, request) or is_reviewer(request):
+    if not can_read(package, request) and not is_reviewer(request):
         return web_error(401, "You don't have permission to view this package", component= "SERVER")
     query = {
         "selector": {
-            "package_id": package_id
+            "_id": {
+                "$in": package.get("reviews")
+            }
        }
     }
 
@@ -41,54 +43,69 @@ def get_package_reviews(package_id) -> Response:
         reviews = find(Databases.REVIEWS, json.dumps(query)).json().get('docs')
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+    if reviews is None:
+        reviews = []
     if not is_reviewer(request):
         reviews = [review for review in reviews if review.status != "open"]
-        return web_error(401, "You don't have permission to view this content", component= "SERVER") 
     return web_response(200, details = [Review.convert(x) for x in reviews])
 
 @APP.route("/review/<package_id>", methods=["PUT"])
 @json_body
-def post_new_review(package_id: str, comments: list[dict[str, str]] | None = None) -> Response:
+def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = None) -> Response:
     if not is_reviewer(request):
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
-    review = Review(package_id=package_id, status="open", comments=[])
+    review = Review(status="open", comments=[])
     if comments is not None:
         review.comments = [Comment(index = comment['index'], content=comment['content'], owner=user(request)) for comment in comments]
     try:
-        review_created = post(Databases.REVIEWS, review.to_json())
+        post_response = post(Databases.REVIEWS, review.to_json()).json()
+        created_review = get(Databases.REVIEWS, post_response.get('id')).json()
+        created_review = Review.from_db(created_review)
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
-    return web_response(200, 'Success', review_created.json())
+    # Update package with new review
+    try:
+        update(Databases.PACKAGES, package_id, {
+            "reviews": {
+                "method": 'append',
+                "value": created_review.id
+            }
+        })
+    except HTTPError as error:
+        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+    return web_response(200, 'Success', created_review.to_dict())
 
 @APP.route("/review/<review_id>/comment/", methods=["PUT"])
-def post_new_comment(review_id: str, comment: dict[str, str]) -> Response:
+@json_body
+def post_new_comment(review_id: str, index: int, content: str) -> Response:
     if not is_reviewer(request):
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
+    new_comment = Comment(index = index, content=content, owner=user(request))
     changes = {
         "comments": {
             "method": 'append',
-            "value": Comment(index = comment['index'], content=comment['content'], owner=user(request))
+            "value": new_comment.to_dict()
         }
     }
     try:
         update(Databases.REVIEWS, review_id, changes)
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
-    return web_response(200, 'Success')
+    return web_response(200, details = Comment.convert(new_comment.to_dict()))
 
 @APP.route("/review/<review_id>/<comment_index>", methods=["DELETE"])
-def delete_comment(review_id, comment_index):
+def delete_comment(review_id: str, comment_index: int):
     if not is_reviewer(request):
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     review = Review.from_db(get(Databases.REVIEWS, review_id).json())
-    comment_to_delete = [comment for comment in review.comments if comment.index == comment_index][0]
-    if not is_owner(comment_to_delete.to_dict(), request):
+    comment_to_delete = [comment for comment in review.comments if comment.index == int(comment_index)][0]
+    if not is_owner(comment_to_delete.to_dict(), user(request)):
         return web_error(401, "You don't have permission to delete this comment", component= "SERVER")
-    updated_comments = [comment for comment in review.comments if comment.index != comment_index]
+    updated_comments = [comment for comment in review.comments if comment.index != int(comment_index)]
     changes = {
         "comments": {
             "method": 'replace',
-            "value": updated_comments
+            "value": json.loads(Comment.schema().dumps(updated_comments, many=True))
         }
     }
     try:

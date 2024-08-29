@@ -21,6 +21,8 @@ class Package(DataClassJsonMixin):
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     archive_id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     archive_settings: ArchiveSettings | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
+    reviews: list | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
+
 
     @staticmethod
     def convert(package_in: dict[str, Any]) -> dict[str, Any]:

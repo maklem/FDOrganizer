@@ -1,5 +1,5 @@
 import {reactive} from '../vue.js';
-import {patch} from "../http.js"
+import {patch, get, put, dlt} from "../http.js"
 
 const TABS = [
     {
@@ -47,7 +47,8 @@ const LICENSES = {
 }
 export const store = reactive({
     loading: {
-        packageSettings: false
+        packageSettings: false,
+        reviews: false
     },
     package: undefined,
     findability: 'open',
@@ -63,6 +64,9 @@ export const store = reactive({
     checkTerms: false,
     checkDSGVO: false,
     personalData: 'none',
+    reviews: [],
+    currentReview: undefined,
+    currentComment: "",
     modalRef: undefined,
     activeTab: 'access',
     readyToSaveSettings,
@@ -70,10 +74,11 @@ export const store = reactive({
     setPackage,
     openSettings,
     closeSettings,
+    addComment,
+    deleteComment,
     LICENSES,
     TABS
 });
-
 async function savePackageSettings() {
     store.loading.packageSettings = true
     const settings = (({
@@ -151,7 +156,16 @@ function readyToSaveSettings() {
     (store.accessibility === 'request' ? !!store.contactemail : true)
 }
 
+async function getReviews(pkg) {
+    store.loading.reviews = true
+    const reviews = await get(`/review/${pkg.id}`)
+    store.reviews = reviews.filter(review => review.status !== 'open')
+    store.currentReview = reviews.find(review => review.status === 'open')
+    store.loading.reviews = false
+}
 function openSettings(settingsPackage, tab = 'access') {
+    store.loading.reviews = true
+    getReviews(settingsPackage)
     setPackage(settingsPackage)
     store.activeTab = tab
     store.modalRef.showModal()
@@ -160,4 +174,32 @@ function openSettings(settingsPackage, tab = 'access') {
 function closeSettings() {
     store.package = undefined
     store.modalRef.close()
+}
+
+async function addComment() {
+    if (!store.currentComment) return
+    const comment = {
+        content: store.currentComment,
+    }
+    if (!store.currentReview) {
+        comment.index = 1
+        await addReview({comments: [comment]})
+    } else {
+        comment.index = store.currentReview.comments.length + 1
+        const new_comment = await put(`/review/${store.currentReview.id}/comment`, comment)
+        store.currentReview.comments.push(new_comment)
+    }
+    store.currentComment = ""
+}
+
+async function addReview(comments = undefined) {
+    const review = await put(`/review/${store.package.id}`, comments)
+    store.currentReview = review
+}
+
+async function deleteComment(index) {
+    store.loading.reviews = true
+    await dlt(`/review/${store.currentReview.id}/${index}`)
+    store.currentReview.comments = store.currentReview.comments.filter(comment => comment.index !== index)
+    store.loading.reviews = false
 }

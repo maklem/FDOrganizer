@@ -9,7 +9,6 @@ shouldBeExcluded = lambda x: x is None
 
 @dataclass
 class Review(DataClassJsonMixin):
-    package_id: str
     status: Literal["open", "accepted", "rejected"]
     comments: list[Comment]
     creation_date: int | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
