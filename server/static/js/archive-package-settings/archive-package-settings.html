@@ -3,14 +3,14 @@
         <header class="package-settings-header">
             <i class="fa-solid fa-file-lines"></i>
             <h1>{{store.package.name}}</h1>
+            <nav class="settings-tabs">
+                <ArchiveSettingsTab v-for="tab in store.TABS" v-bind="tab" :active="tab.id === store.activeTab" @change-tab="(tabId) => store.activeTab = tabId"></ArchiveSettingsTab>
+            </nav>
             <Button :flat class="back-button" @button-clicked="store.closeSettings()">
                 <i class="fa-solid fa-xmark"></i>
             </Button>
         </header>
-        <nav class="settings-tabs">
-            <ArchiveSettingsTab v-for="tab in store.TABS" v-bind="tab" :active="tab.id === store.activeTab" @change-tab="(tabId) => store.activeTab = tabId"></ArchiveSettingsTab>
-        </nav>
-        <section :class="{hidden: store.activeTab !== 'access'}">
+        <section class="access-tab" :class="{hidden: store.activeTab !== 'access'}">
           <div class="introduction">
               You can choose the future distribution of this package and its contents according to the <dfn title="Findability, Accessibility, Interoperability, Reusability">FAIR</dfn> Principles: Findability, Accessibility, Interoperability, Reusability.
           </div>
@@ -114,7 +114,7 @@
                       value="cc"
                       @input="event => store.licenseType = event.currentTarget.value">
                     <label for="cc-reuse">Usage is allowed under the <a href="https://creativecommons.org/choose/" target="_blank" rel="noopener noreferrer">Creative Commons </a>license</label>
-                    <LabeledInput
+                    <LabeledInput :disabled="pageContext === 'review'"
                     :id="'cc0-license'"
                     :value="store.creativecommons"
                     :type="'monoselect'"
@@ -132,7 +132,7 @@
                       value="gdl"
                       @input="event => store.licenseType = event.currentTarget.value">
                     <label for="gdl-reuse">Usage is allowed under the <a href="https://www.govdata.de/web/guest/lizenzen" target="_blank" rel="noopener noreferrer">German Data License</a></label>
-                    <LabeledInput
+                    <LabeledInput :disabled="pageContext === 'review'"
                     :id="'cc0-license'"
                     :value="store.germandatalicense"
                     :type="'monoselect'"
@@ -165,7 +165,7 @@
               </fieldset>
           </form>
         </section>
-        <section :class="{hidden: store.activeTab !== 'legal'}">
+        <section class="legal-tab" :class="{hidden: store.activeTab !== 'legal'}">
           <div class="introduction">
               Please consider the following legal requirements for archival and check the applicable boxes below.
           </div>
@@ -244,14 +244,62 @@
               </fieldset>
           </form>
         </section>
-        <section :class="{hidden: store.activeTab !== 'reviews'}">
-          <div class="introduction">
+        <section class="review-tab" :class="{hidden: store.activeTab !== 'reviews'}">
+          <div v-if="store.loading.reviews" class="introduction">
               Here will soon be reviews.
           </div>
+          <template v-if="pageContext === 'review'">
+            <div class="add-comment">
+              <LabeledInput
+                :type="'long-text'"
+                :value="store.currentComment"
+                :id="'write-comment'"
+                :label="'New Comment'"
+                @input="(value) => store.currentComment = value"
+              ></LabeledInput>
+              <Button
+                @button-clicked="store.addComment()"
+                :disabled="store.currentComment === ''"
+              >
+                Add to review
+              </Button>
+            </div>
+            <div class="current-review">
+              <h2>Current Review</h2>
+              <ul class="comment-list" v-if="store.currentReview?.comments?.length">
+                <li v-for="comment in store.currentReview.comments">
+                  <div class="comment-text">{{comment.content}} - {{comment.owner}}</div>
+                  <Button class="delete" :flat @button-clicked="store.deleteComment(comment.index)">
+                      <i class="fa-solid fa-trash"></i>
+                  </Button>
+                </li>
+              </ul>
+              <div v-else class="no-review">No comments yet. Please add a comment to start a new review.</div>
+            </div>
+          </template>
+          <template v-else>
+            <div
+              v-if="!store.reviews.length"
+              class="no-review">
+              There are no reviews for this package yet.
+            </div>
+          </template>
+          <div v-for="review in store.reviews"
+          class="past-review">
+            <h2>Review from {{formatRelativeDate(review.creation_date * 1000)}}</h2>
+            <ul class="comment-list">
+              <li v-for="comment in review.comments">
+                <div class="comment-text">{{comment.content}} - {{comment.owner}}</div>
+              </li>
+            </ul>
+          </div>
         </section>
-        <div class="button-row">
+        <div v-if="pageContext === 'archive'" class="button-row">
             <Button class="close-button" @button-clicked="store.closeSettings()">Abort</Button>
             <Button class="save-metadata" :disabled="!store.readyToSaveSettings()" @button-clicked="save">Save</Button>
+        </div>
+        <div v-else class="button-row">
+            <Button class="close-button" @button-clicked="store.closeSettings()">Close</Button>
         </div>
     </div>
 </dialog>

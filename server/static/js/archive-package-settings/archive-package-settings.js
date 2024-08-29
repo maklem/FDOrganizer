@@ -2,6 +2,7 @@ import Button from "../button/button.js"
 import LabeledInput from "../labeled-input/labeled-input.js"
 import Toast from "../toast/toast.js"
 import ArchiveSettingsTab from "../archive-settings-tab/archive-settings-tab.js"
+import { formatRelativeDate } from "../format-util.js"
 import { store } from "./state.js"
 
 import { setup } from "../setup.js";
@@ -17,6 +18,7 @@ export default {
     data() {
         return {
             store,
+            formatRelativeDate: formatRelativeDate
         }
     },
     inject: ['pageContext'],

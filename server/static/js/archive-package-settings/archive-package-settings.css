@@ -17,7 +17,7 @@
 
 .package-settings-modal .content {
     display:grid;
-    grid-template-rows: min-content min-content minmax(0, auto) max-content;
+    grid-template-rows: min-content minmax(0, auto) max-content;
     gap: 1rem;
 
     width: 100%;
@@ -26,11 +26,12 @@
 
 .package-settings-header {
     display: grid;
-    grid-template-columns: max-content auto min-content;
+    grid-template-columns: max-content max-content auto min-content;
     align-items: center;
     gap: 1rem;
 
-    
+    padding-bottom: 0.5rem;
+    border-bottom: #eee solid 0.125rem;
 }
 
 .package-settings-header > h1 {
@@ -46,11 +47,34 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: max-content;
-    border-top: #bbbbbb 0.125rem solid;
 }
 
-section.hidden {
-    display: none;
+section {
+    display:grid;
+
+    width: 100%;
+
+    &.hidden {
+        display: none;
+    }
+
+    &.review-tab {
+        grid-auto-flow: row;
+        grid-template-rows: repeat(auto-fit, minmax(min-content, 30%));
+        justify-content: stretch;
+
+        overflow-y: scroll;
+    }
+
+    &.legal-tab {
+        gap: 1rem;
+        grid-template-rows: min-content minmax(0, auto);
+    }
+
+    &.access-tab {
+        gap: 1rem;
+        grid-template-rows: min-content minmax(0, auto);
+    }
 }
 .package-settings-header .back-button {
     font-size: 1.5rem;
@@ -64,7 +88,7 @@ section.hidden {
     grid-template-rows: auto auto auto;
     grid-template-columns: auto auto;
     gap: 1rem;
-
+    align-items: stretch;
     overflow-y: auto;
 }
 
@@ -100,6 +124,7 @@ section.hidden {
     display: flex;
     gap: 1rem;
     justify-content: end;
+    align-items: end;
 }
 
 .button-row .close-button {
@@ -123,4 +148,60 @@ section.hidden {
     grid-template-rows: max-content;
     gap:0.5rem;
     padding-left: 2rem;
+}
+.add-comment {
+    display: grid;
+    grid-template-columns: auto min-content;
+    gap: 1rem;
+    align-items: center;
+}
+
+.no-review {
+    display: flex;
+    justify-content: center;
+
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #777;
+}
+
+.comment-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: row;
+    align-items: center;
+    justify-items: stretch;
+    row-gap: 1rem;
+    column-gap: 3rem;
+    padding: 0;
+}
+
+.comment-list li {
+    display: grid;
+    grid-template-columns: auto min-content;
+    align-items: center;
+    gap: 1rem;
+
+    background-color: #eee;
+    padding: 1rem 1rem 1rem 2rem;
+    list-style-type: none;
+    border-radius: 0.25rem;
+
+    .text {
+        font-size: 1.1rem;
+    }
+
+    .delete {
+        --button-color: var(--error);
+        --rgb-button-color: var(--rgb-error);
+        padding: 0.5rem;
+        font-size: 1.2rem;
+        
+        opacity: 0;
+        transition: opacity 300ms;
+    }
+
+    &:hover .delete {
+        opacity: 1;
+    }
 }
