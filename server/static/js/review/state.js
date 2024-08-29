@@ -68,15 +68,18 @@ async function requestReview() {
 }
 
 async function acceptReview() {
-    const request = post(`/export/${store.selectedPackage.id}`)
+    store.loading.packageList = true
+    await post(`/export/${store.selectedPackage.id}`)
+    await post(`/review/submit/${store.selectedPackage.id}`, {status: "accepted"})
     store.selectedPackage = undefined
-    await request;
-    store.getPackages()
+    await store.getPackages()
+    store.loading.packageList = false
 }
 
 async function rejectReview() {
-    const request = post(`/reject/${store.selectedPackage.id}`)
+    store.loading.packageList = true
+    await post(`/review/submit/${store.selectedPackage.id}`, {status: "rejected"})
     store.selectedPackage = undefined
-    await request;
-    store.getPackages()
+    await store.getPackages()
+    store.loading.packageList = false
 }

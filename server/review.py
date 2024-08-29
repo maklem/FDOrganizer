@@ -1,8 +1,10 @@
+from datetime import datetime
 import json
 from typing import Any, Literal
 from flask import Response, request
 from requests import HTTPError #type: ignore
 from server import APP
+from .shared import update_package_state
 from .entities import Review, Comment, Package, Databases
 from .services.database import find, get, post, update
 from .services.authentication import is_reviewer, organisation, user
@@ -114,9 +116,36 @@ def delete_comment(review_id: str, comment_index: int):
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     return web_response(200, 'Success')
 
-@APP.route("/review/<package_id>/<review_id>", methods=["POST"])
-def submit_review(package_id: str, review_id: str, status: Literal["accepted", "rejected"]) -> Response:
+@APP.route("/review/submit/<package_id>", methods=["POST"])
+@json_body
+def submit_review(package_id: str, status: Literal["accepted", "rejected"]) -> Response:
     if not is_reviewer(request):
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
-    
-    return web_error(501, "Not implemented", component= "SERVER")
+    package = Package.from_db(get(Databases.PACKAGES, package_id).json())
+    query = {
+        "selector": {
+            "_id": {
+                "$in": package.reviews
+            },
+            "status": "open"
+       }
+    }
+    result = find(Databases.REVIEWS, json.dumps(query)).json().get('docs')[0]
+    print(result)
+    review = Review.from_db(result)
+    if status == "accepted":
+        # try:
+        #     requests.post('/export/' + package_id)
+        # except Exception:
+        #     return web_error(500, "Failed to export package to Rosetta", component= "SERVER")
+        update(Databases.REVIEWS, review.id, {
+            "status": "accepted",
+            "creation_date": datetime.now().timestamp()
+        })
+    elif status == "rejected":
+        update(Databases.REVIEWS, review.id, {
+            "status": "rejected",
+            "creation_date": datetime.now().timestamp()
+        })
+        update_package_state(package_id, 'rework')
+    return web_response(200, 'Success')
