@@ -180,18 +180,37 @@ section {
     display: grid;
     grid-template-columns: auto min-content;
     align-items: center;
-    gap: 1rem;
-
+    column-gap: 1rem;
+    
     background-color: #eee;
-    padding: 1rem 1rem 1rem 2rem;
+    padding: 1rem;
     list-style-type: none;
     border-radius: 0.25rem;
+    
+    .author {
+        display: none;
+    }
+    
+    &.external {
+        grid-template-rows: auto min-content;
+        background-color: rgba(var(--rgb-primary-color), 0.2);
+        
+        .author {
+            display: block;
+            grid-row: 2/2;
+            grid-column: 2/2;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+    }
 
     .text {
         font-size: 1.1rem;
     }
 
     .delete {
+        justify-self: end;
         --button-color: var(--error);
         --rgb-button-color: var(--rgb-error);
         padding: 0.5rem;

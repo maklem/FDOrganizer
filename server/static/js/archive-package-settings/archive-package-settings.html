@@ -267,11 +267,13 @@
             <div class="current-review">
               <h2>Current Review</h2>
               <ul class="comment-list" v-if="store.currentReview?.comments?.length">
-                <li v-for="comment in store.currentReview.comments">
-                  <div class="comment-text">{{comment.content}} - {{comment.owner}}</div>
+                <li v-for="comment in store.currentReview.comments"
+                :class="{external: showAuthor(comment)}">
+                  <div class="comment-text">{{comment.content}}</div>
                   <Button class="delete" :flat @button-clicked="store.deleteComment(comment.index)">
                       <i class="fa-solid fa-trash"></i>
                   </Button>
+                  <div class="author" v-if="showAuthor(comment)">{{comment.owner}}</div>
                 </li>
               </ul>
               <div v-else class="no-review">No comments yet. Please add a comment to start a new review.</div>
@@ -288,8 +290,10 @@
           class="past-review">
             <h2>Review from {{formatRelativeDate(review.creation_date * 1000)}}</h2>
             <ul class="comment-list">
-              <li v-for="comment in review.comments">
-                <div class="comment-text">{{comment.content}} - {{comment.owner}}</div>
+              <li v-for="comment in review.comments"
+              :class="{external: showAuthor(comment)}">
+                <div class="comment-text">{{comment.content}}</div>
+                <div class="author" v-if="showAuthor(comment)">{{comment.owner}}</div>
               </li>
             </ul>
           </div>

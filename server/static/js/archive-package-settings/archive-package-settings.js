@@ -6,6 +6,7 @@ import { formatRelativeDate } from "../format-util.js"
 import { store } from "./state.js"
 
 import { setup } from "../setup.js";
+import { getSessionToken } from "../authentication.js"
 const template = await setup('archive-package-settings');
 
 export default {
@@ -28,6 +29,11 @@ export default {
     methods: {
         async save() {
             if (await this.store.savePackageSettings()) this.store.closeSettings()
+        },
+        showAuthor(comment) {
+            // Don't show author to non-reviewers
+            if (this.pageContext === 'archive') return false
+            return comment.owner !== getSessionToken().username
         }
     },
     template
