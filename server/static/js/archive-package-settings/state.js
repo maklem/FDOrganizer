@@ -160,6 +160,7 @@ async function getReviews(pkg) {
     store.loading.reviews = true
     const reviews = await get(`/review/${pkg.id}`)
     store.reviews = reviews.filter(review => review.status !== 'open')
+    store.reviews.sort((r1, r2) => r2.creation_date - r1.creation_date)
     store.currentReview = reviews.find(review => review.status === 'open')
     store.loading.reviews = false
 }
