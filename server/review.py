@@ -48,7 +48,7 @@ def get_package_reviews(package_id) -> Response:
     if reviews is None:
         reviews = []
     if not is_reviewer(request):
-        reviews = [review for review in reviews if review.status != "open"]
+        reviews = [review for review in reviews if review.get('status') != "open"]
     return web_response(200, details = [Review.convert(x) for x in reviews])
 
 @APP.route("/review/<package_id>", methods=["PUT"])
