@@ -13,7 +13,8 @@ export default {
         id: String,
         name: String,
         last_changed: String,
-        status: String
+        status: String,
+        owner: String
     },
     data() {
         return {
