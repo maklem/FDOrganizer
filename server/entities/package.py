@@ -21,7 +21,7 @@ class Package(DataClassJsonMixin):
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     archive_id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     archive_settings: ArchiveSettings | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
-    reviews: list | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
+    reviews: list[str] | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
 
 
     @staticmethod

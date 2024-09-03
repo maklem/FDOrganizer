@@ -64,5 +64,7 @@ def submit_for_review(package_id: str) -> Response:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     if not can_submit_package(package, request):
         return web_error(401, "You don't have permission to submit this package", component= "SERVER")
+    if not package.get('status') in ['active', 'rework']:
+        return web_error(400, "Package cannot be submitted for review in status {}".format(package.get('status')), component= "SERVER")
     update_package_state(package_id, "review")
     return web_response(200, message="Package submitted for review")
