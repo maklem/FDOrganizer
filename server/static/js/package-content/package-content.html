@@ -7,10 +7,12 @@
         <PackageContentFolder
             v-for="folder in store.folders()"
             v-bind="folder"
+            @metadata="$emit('metadata', $event)"
         ></PackageContentFolder>
         <PackageContentDocument
             v-for="document in store.content.documents"
             v-bind="document"
+            @metadata="$emit('metadata', $event)"
         ></PackageContentDocument>
     </div>
     <div class="loading" v-else></div>

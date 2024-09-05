@@ -5,7 +5,7 @@
         <div v-show="toggle" class="tooltip-text">{{field.tooltip["en"]}}</div>
     </div>
     <div v-if="!!metadata?.length" class="field-instance" v-for="(instance, index) in metadata">
-        <Button :disabled="field.min === 1 && metadata.length === 1" class="remove remove-instance" :flat @button-clicked="metadata.splice(index,1)">
+        <Button v-if="!store.readonly" :disabled="field.min === 1 && metadata.length === 1" class="remove remove-instance" :flat @button-clicked="metadata.splice(index,1)">
             <i class="fa-solid fa-trash"></i>
         </Button>
         <template v-for="subfield in field.fields">
@@ -17,7 +17,7 @@
             </template>
         </template>
     </div>
-    <Button v-if="!field.max || field.max > (metadata?.length ?? 0)"
+    <Button v-if="(!field.max || field.max > (metadata?.length ?? 0)) && !store.readonly"
         class="add-instance"
         :disabled="!!field.max && metadata?.length >= field.max"
         @button-clicked="addField()"
@@ -25,10 +25,13 @@
         <i class="fa-solid fa-plus"></i>
         <span>Add {{localized(field.label)}}</span>
     </Button>
+    <div class="no-data" v-else-if="!metadata?.length && store.readonly">
+        Keine Daten
+    </div>
 </fieldset>
 <template v-else >
     <div class="removable-field" v-for="(instance, index) in metadata">
-        <Button v-if="!(field.min === 1 && metadata.length <= 1) && (['monoselect', 'date'].includes(field.type))" class="remove-field remove left" :flat @button-clicked="metadata.splice(index,1)">
+        <Button v-if="!(field.min === 1 && metadata.length <= 1) && (['monoselect', 'date'].includes(field.type)) && !store.readonly" class="remove-field remove left" :flat @button-clicked="metadata.splice(index,1)">
             <i class="fa-solid fa-minus"></i>
         </Button>
         <LabeledInput
@@ -36,6 +39,7 @@
             :label="field.label"
             :type="field.type"
             :tooltip="field.tooltip"
+            :disabled="store.readonly"
             :options="field.options ? field.options : false"
             :value="metadata[index]"
             :invalid="!validate(metadata[index], field.type)"
@@ -43,11 +47,11 @@
             @input="(value) => update(value, index)"
             @input="store.touched = true"
         ></LabeledInput>
-        <Button v-if="!(field.min === 1 && metadata.length <= 1) && !(['monoselect', 'date'].includes(field.type))" class="remove-field remove right" :flat @button-clicked="metadata.splice(index,1)">
+        <Button v-if="!(field.min === 1 && metadata.length <= 1) && !(['monoselect', 'date'].includes(field.type)) && !store.readonly" class="remove-field remove right" :flat @button-clicked="metadata.splice(index,1)">
             <i class="fa-solid fa-minus"></i>
         </Button>
     </div>
-    <Button v-if="!field.max || field.max > (metadata?.length ?? 0)"
+    <Button v-if="!field.max || field.max > (metadata?.length ?? 0) && !store.readonly"
         class="add-instance"
         :disabled="!!field.max && metadata?.length >= field.max"
         @button-clicked="addField()"

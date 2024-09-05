@@ -39,7 +39,6 @@ export default {
     },
     async mounted() {
         store.modalRef = this.$refs.modal
-        this.store.checkMetadataParameters()
     },
     methods: {
         async save() {

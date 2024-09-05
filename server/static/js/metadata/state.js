@@ -18,16 +18,15 @@ export const store = reactive({
         entity: true,
     },
     modalRef: undefined,
+    readonly: false,
     saveMetadata,
     checkConditions,
     getAllFields,
     makeTemplate,
-    getParameterValue,
     reset,
     sectionLabel,
     openMetadata,
-    closeDocument,
-    checkMetadataParameters
+    closeDocument
 });
 
 async function getEntity(entityType, entityId) {
@@ -46,14 +45,6 @@ async function getEntity(entityType, entityId) {
         store.schema = await getSchema(store.schemaVersion)
     }
     store.loading.entity = false
-}
-
-function getParameterValue(entityType) {
-    const params = new URLSearchParams(location.search);
-    const entityId = params.get(entityType);
-    // TODO: Throw more sensible error here
-    if (!entityId) new Error(`No valid ${entityType}-ID as parameter value`)
-    getEntity(entityType, entityId)
 }
 
 async function getSchema(version) {
@@ -203,32 +194,13 @@ const LABELS = {
     rights: 'Usage & Rights'
 }
 
-function openMetadata(entityType, entityId) {
-    history.pushState({[entityType]: entityId}, '', `?${entityType}=${entityId}`)
-    addEventListener('popstate', function close() {
-        store.closeDocument(entityType)
-        removeEventListener('popstate', close)
-    })
-    store.getParameterValue(entityType)
+function openMetadata(entityType, entityId, readonly = false) {
+    store.readonly = readonly
+    getEntity(entityType, entityId)
     store.modalRef.showModal()
 }
 
-function closeDocument(entityType) {
-    history.pushState({[entityType]: null}, '', `${location.origin}${location.pathname}`)
+function closeDocument() {
     store.reset()
     return store.modalRef.close()
 }
-
-function checkMetadataParameters() {
-    const params = new URLSearchParams(location.search);
-    const entityId = getParameter(params)
-    if (!!entityId.length) store.openMetadata(entityId[0], entityId[1])
-}
-
-function getParameter(params) {
-    if (!!params.get('document')) return ["document", params.get('document')]
-    if (!!params.get('folder')) return ["folder", params.get('folder')]
-    if (!!params.get('package')) return ["package", params.get('package')]
-    return []
-}
-

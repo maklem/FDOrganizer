@@ -1,7 +1,6 @@
 import { setup } from "../setup.js";
 import  Button  from '../button/button.js'
 import {formatFilesize, filetypeIcon} from '../format-util.js';
-import { store as metadataStore} from '../metadata/state.js';
 
 const template = await setup('package-content-document');
 
@@ -19,8 +18,7 @@ export default {
     data() {
         return {
             formatFilesize,
-            filetypeIcon,
-            metadataStore
+            filetypeIcon
         }
     },
     inject: ['editable'],

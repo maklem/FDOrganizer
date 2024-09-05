@@ -2,7 +2,8 @@
     <main class="package-details">
         <PackageContent
         v-if="!!store.package"
-        @back = "store.climbPackagePath()">
+        @back = "store.climbPackagePath()"
+        @metadata="metadataStore.openMetadata($event.type, $event.id)">
             <Button
             class="side-button"
             @button-clicked="$refs.newFolder.showModal()">

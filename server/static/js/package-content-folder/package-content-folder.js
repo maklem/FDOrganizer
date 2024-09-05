@@ -1,6 +1,5 @@
 import { setup } from "../setup.js";
 import { store } from '../package-edit/state.js'
-import { store as metadataStore} from '../metadata/state.js'
 import Button from "../button/button.js";
 const template = await setup('package-content-folder');
 
@@ -17,8 +16,7 @@ export default {
     inject:['editable'],
     data() {
         return {
-            store,
-            metadataStore
+            store
         }
     },
     methods: {

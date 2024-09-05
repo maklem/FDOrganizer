@@ -75,7 +75,9 @@
                 </form>
             </dialog>
         </aside>
-        <PackageContent v-if="!!store.selectedPackage" @back="store.climbPackagePath()">
+        <PackageContent v-if="!!store.selectedPackage"
+        @back="store.climbPackagePath()"
+        @metadata="metadataStore.openMetadata($event.type, $event.id)">
             <Button
             class="side-button"
             @button-clicked="store.openDetails()">
