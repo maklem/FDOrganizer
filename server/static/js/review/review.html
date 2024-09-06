@@ -24,14 +24,14 @@
             @metadata="metadataStore.openMetadata($event.type, $event.id, true)">
                 <Button
                 v-if="store.selectedPackage.status === 'review'"
-                class="side-button"
+                class="accept-button side-button"
                 @button-clicked="store.acceptReview()">
                     <i class="fa-solid fa-check"></i>
                     <div>Accept & Archive</div>
                 </Button>
                 <Button
                 v-if="store.selectedPackage.status === 'review'"
-                class="side-button"
+                class="reject-button side-button"
                 @button-clicked="store.rejectReview()">
                     <i class="fa-solid fa-xmark"></i>
                     <div>Reject</div>

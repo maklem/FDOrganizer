@@ -90,16 +90,12 @@
     padding: 0 1rem 1rem 1rem;
 }
 
-.right-sidebar {
-    display:grid;
-    grid-template-rows: auto max-content;
-    gap:0.25rem;
-
-    padding: 1rem;
+.accept-button {
+    --button-color: green;
+    --rgb-button-color: 0,128,0;
 }
 
-.right-sidebar Button{
-    display:grid;
-    grid-template-columns: max-content auto;
-    gap: 0.5rem;
+.reject-button{
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
 }
