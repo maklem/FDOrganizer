@@ -19,7 +19,7 @@
                   <legend>Findability</legend>
                   <div class="description">Who can find information (e.g. by using databases) about this data package through the metadata you provided for the files and folders?</div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.findability === radio.value}"
                       type="radio"
                       id="open-metadata"
@@ -29,7 +29,7 @@
                     <label for="open-metadata">Make the Metadata of this package visible for the public</label>
                   </div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                         :ref="radio => {if (!!radio) radio.checked = store.findability === radio.value}"
                         type="radio"
                         id="closed-metadata"
@@ -43,7 +43,7 @@
                   <legend>Accessibility <span v-if="store.findability === 'closed'" class="disabled-text">(Only effective with public metadata)</span></legend>
                   <div class="description">Who has access to the content of this package (e.g. a Download of the files)?</div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
                       type="radio"
                       id="open-data"
@@ -54,7 +54,7 @@
                     <label for="open-data">Everyone can access the content</label>
                   </div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
                       type="radio"
                       id="embargo-data"
@@ -72,7 +72,7 @@
                       ></LabeledInput>
                   </div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
                       type="radio"
                       id="request-data"
@@ -89,7 +89,7 @@
                     ></LabeledInput>
                   </div>
                   <div class="radio-option">
-                      <input :disabled="pageContext === 'review'"
+                      <input :disabled="store.settingsReadonly"
                         :ref="radio => {if (!!radio) radio.checked = store.accessibility === radio.value}"
                         type="radio"
                         id="closed-data"
@@ -106,7 +106,7 @@
                     </legend>
                   <div class="description">Under which terms (license) can someone use this data for their purposes?</div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.licenseType === radio.value}"
                       type="radio"
                       id="cc-reuse"
@@ -114,7 +114,7 @@
                       value="cc"
                       @input="event => store.licenseType = event.currentTarget.value">
                     <label for="cc-reuse">Usage is allowed under the <a href="https://creativecommons.org/choose/" target="_blank" rel="noopener noreferrer">Creative Commons </a>license</label>
-                    <LabeledInput :disabled="pageContext === 'review'"
+                    <LabeledInput :disabled="store.settingsReadonly"
                     :id="'cc0-license'"
                     :value="store.creativecommons"
                     :type="'monoselect'"
@@ -124,7 +124,7 @@
                     ></LabeledInput>
                   </div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.licenseType === radio.value}"
                       type="radio"
                       id="gdl-reuse"
@@ -132,7 +132,7 @@
                       value="gdl"
                       @input="event => store.licenseType = event.currentTarget.value">
                     <label for="gdl-reuse">Usage is allowed under the <a href="https://www.govdata.de/web/guest/lizenzen" target="_blank" rel="noopener noreferrer">German Data License</a></label>
-                    <LabeledInput :disabled="pageContext === 'review'"
+                    <LabeledInput :disabled="store.settingsReadonly"
                     :id="'cc0-license'"
                     :value="store.germandatalicense"
                     :type="'monoselect'"
@@ -143,7 +143,7 @@
                   </div>
                   <div class="description">When should the chosen license be applied?</div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.licenseTiming === radio.value}"
                       type="radio"
                       id="license-now"
@@ -153,7 +153,7 @@
                     <label for="license-now">As soon as the data is archived</label>
                   </div>
                   <div class="radio-option">
-                  <input :disabled="pageContext === 'review'"
+                  <input :disabled="store.settingsReadonly"
                       :ref="radio => {if (!!radio) radio.checked = store.licenseTiming === radio.value}"
                       type="radio"
                       id="license-later"
@@ -173,7 +173,7 @@
               <fieldset class="settings-group terms-and-conditions">
                 <legend>Terms & Conditions</legend>
                 <div class="radio-option">
-                  <input :disabled="pageContext === 'review'"
+                  <input :disabled="store.settingsReadonly"
                   :ref="box => {if(!!box) box.checked = store.checkTerms}"
                   type="checkbox"
                   id="check-terms"
@@ -181,7 +181,7 @@
                   <label for="check-terms">I have read and understood the <a href="https://www.example.com/" target="_blank" rel="noopener noreferrer">Data Submission Agreement</a> and request the processing of the submitted data in accordance with the options chosen above.</label>
                 </div>
                 <div class="radio-option">
-                  <input :disabled="pageContext === 'review'"
+                  <input :disabled="store.settingsReadonly"
                   :ref="box => {if(!!box) box.checked = store.checkDuration}"
                   type="checkbox"
                   id="check-duration"
@@ -190,7 +190,7 @@
                     <LabeledInput
                       class="duration-input"
                       :value="store.duration"
-                      :disabled="(!store.checkDuration ? true : undefined) || pageContext === 'review'"
+                      :disabled="(!store.checkDuration ? true : undefined) || store.settingsReadonly"
                       :placeholder="'yy'"
                       @input="value => store.duration = value"
                     ></LabeledInput>
@@ -198,7 +198,7 @@
                   </label>
                   </div>
                 <div class="radio-option">
-                  <input :disabled="pageContext === 'review'"
+                  <input :disabled="store.settingsReadonly"
                   :ref="box => {if(!!box) box.checked = store.checkDSGVO}"
                   type="checkbox"
                   id="check-dsgvo"
@@ -208,7 +208,7 @@
                 </div>
                 <div class="dsgvo-options">
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                     :ref="radio => {if (!!radio) radio.checked = store.personalData === radio.value}"
                     type="radio"
                     id="none-personal-data"
@@ -219,7 +219,7 @@
                     <label for="none-personal-data">All existing personal data in this package was removed</label>
                   </div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                     :ref="radio => {if (!!radio) radio.checked = store.personalData === radio.value}"
                     type="radio"
                     id="anonymous-personal-data"
@@ -230,7 +230,7 @@
                     <label for="anonymous-personal-data">All existing personal data in this package was anonymised using standard procedures</label>
                   </div>
                   <div class="radio-option">
-                    <input :disabled="pageContext === 'review'"
+                    <input :disabled="store.settingsReadonly"
                     :ref="radio => {if (!!radio) radio.checked = store.personalData === radio.value}"
                     type="radio"
                     id="consent-personal-data"
@@ -248,7 +248,7 @@
           <div v-if="store.loading.reviews" class="introduction">
               Here will soon be reviews.
           </div>
-          <template v-if="pageContext === 'review'">
+          <template v-if="!store.reviewReadonly">
             <div class="add-comment">
               <LabeledInput
                 :type="'long-text'"

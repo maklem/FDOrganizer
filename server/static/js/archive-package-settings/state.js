@@ -69,6 +69,8 @@ export const store = reactive({
     currentComment: "",
     modalRef: undefined,
     activeTab: 'access',
+    reviewReadonly: false,
+    settingsReadonly: false,
     readyToSaveSettings,
     savePackageSettings,
     setPackage,
@@ -115,17 +117,17 @@ function setPackage(pkg) {
     store.loading.packageSettings = true
     store.package = pkg
     const {
-        findability = 'open',
-        accessibility = 'open',
+        findability = '',
+        accessibility = '',
         embargodate = undefined,
-        licenseType = 'cc',
-        licenseTiming = 'now',
+        licenseType = '',
+        licenseTiming = '',
         contactemail = undefined,
         checkDuration = false,
         duration = undefined,
         checkDSGVO = false,
         checkTerms = false,
-        personalData = 'none',
+        personalData = '',
         license = undefined
     } = pkg.archive_settings ?? {}
     store.findability = findability
@@ -164,17 +166,28 @@ async function getReviews(pkg) {
     store.currentReview = reviews.find(review => review.status === 'open')
     store.loading.reviews = false
 }
-function openSettings(settingsPackage, tab = 'access') {
+
+function reset() {
+    store.settingsReadonly = false
+    store.reviewReadonly = false
+    store.activeTab = 'access'
+}
+
+function openSettings(settingsPackage, tab = 'access', settingsReadonly = false, reviewReadonly = false) {
     store.loading.reviews = true
     getReviews(settingsPackage)
     setPackage(settingsPackage)
     store.activeTab = tab
+    store.settingsReadonly = settingsReadonly
+    store.reviewReadonly = reviewReadonly
     store.modalRef.showModal()
+
 }
 
 function closeSettings() {
     store.package = undefined
     store.modalRef.close()
+    reset()
 }
 
 async function addComment() {

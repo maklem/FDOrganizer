@@ -11,7 +11,7 @@
                         v-for="pkg in store.packagesWithStatus(status.id)"
                         v-bind="pkg"
                         @open-metadata="metadataStore.openMetadata('package', pkg.id, store.metadataReadonly(pkg))"
-                        @open-settings="settingsStore.openSettings(pkg, 'access')"
+                        @open-settings="settingsStore.openSettings(pkg, 'access', store.settingsReadonly(pkg), true)"
                     ></ArchiveListItem>
                     <div v-else class="no-data-placeholder">No packages with status "{{status.name}}"</div>
                 </template>

@@ -38,7 +38,8 @@ export const store = reactive({
     climbPackagePath,
     packagesWithStatus,
     requestReview,
-    metadataReadonly
+    metadataReadonly,
+    settingsReadonly
 });
 
 function packagesWithStatus(status) {
@@ -74,5 +75,9 @@ async function requestReview() {
 }
 
 function metadataReadonly(pkg) {
+    return ['review', 'archived'].includes(pkg.status)
+}
+
+function settingsReadonly(pkg) {
     return ['review', 'archived'].includes(pkg.status)
 }

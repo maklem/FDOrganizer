@@ -33,7 +33,8 @@ export const store = reactive({
     packagesWithStatus,
     requestReview,
     acceptReview,
-    rejectReview
+    rejectReview,
+    reviewReadonly
 });
 
 function packagesWithStatus(status) {
@@ -82,4 +83,8 @@ async function rejectReview() {
     store.selectedPackage = undefined
     await store.getPackages()
     store.loading.packageList = false
+}
+
+function reviewReadonly(pkg) {
+    return ['rework', 'archived'].includes(pkg.status)
 }
