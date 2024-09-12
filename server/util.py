@@ -50,6 +50,11 @@ def can_delete_files(restricted_object: dict[str, Any], request: Request) -> boo
         return True
     return False
 
+def can_edit_name(restricted_object: dict[str, Any], request: Request) -> bool:
+    if is_owner(restricted_object, user(request)):
+        return True
+    return False
+
 def can_delete_packages(restricted_object: dict[str, Any], request: Request) -> bool:
     if is_owner(restricted_object, user(request)):
         return True

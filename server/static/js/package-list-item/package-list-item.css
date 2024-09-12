@@ -28,8 +28,38 @@
 
 .package-list-item .primary {
     grid-area: primary;
-    line-break: anywhere;
+    display: grid;
+    grid-auto-flow: column;
+    gap: 0.5rem;
+    grid-template-columns: auto min-content;
+    align-items: center;
+    
+    span {
+        line-break: anywhere;
+    }
+
+    .edit-name {
+        padding: 0.25rem;
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: opacity 150ms;
+        
+    }
+
+    .edit-confirm, .edit-abort {
+        padding: 0.25rem;
+        font-size: 1rem;
+    }
+    .edit-confirm {
+        --button-color: var(--success);
+        --rgb-button-color: var(--rgb-success);
+    }
 }
+
+.package-list-item:hover .edit-name{
+    opacity: 1;
+}
+
 
 .package-list-item .secondary {
     grid-area: secondary;

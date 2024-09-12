@@ -1,12 +1,14 @@
 import { setup } from "../setup.js";
 import { store } from "../package/state.js";
 import Button from "../button/button.js";
+import LabeledInput from "../labeled-input/labeled-input.js";
 
 const template = await setup('package-list-item');
 
 export default {
     components: {
-        Button
+        Button,
+        LabeledInput
     },
     props: {
         id: String,
@@ -15,7 +17,9 @@ export default {
     },
     data() {
         return {
-            store: store
+            store: store,
+            newName: this.name,
+            editMode: false
         }
     },
     methods: {

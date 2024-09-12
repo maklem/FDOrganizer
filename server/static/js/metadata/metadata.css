@@ -33,6 +33,7 @@
 
 .metadata-header > h1 {
     margin: 0;
+    line-break: anywhere;
 }
 
 .metadata-header > i {

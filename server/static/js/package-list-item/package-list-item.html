@@ -1,10 +1,40 @@
 <div
     class="package-list-item"
     :class="{active: store.selectedPackage?.id === id}"
-    @click="store.selectPackage(id)"
+    @click="!active && store.selectPackage(id)"
 >
     <i class="fa-solid fa-box icon"></i>
-    <div class="primary">{{name}}</div>
+    <div class="primary">
+        <template v-if="!editMode">
+            <span>{{name}}</span>
+            <Button :flat class="edit-name" @button-clicked="editMode = true">
+                <i class="fa-solid fa-pencil"></i>
+            </Button>
+        </template>
+        <template v-else>
+            <LabeledInput
+                :id="'rename-' + id"
+                :type="text"
+                :value="newName"
+                @click="$event.stopPropagation()"
+                @input="newName = $event"
+                @keyup.enter="store.changePackageName(id, newName)"
+                @keyup.esc="editMode = false"
+            />
+            <Button
+                :flat
+                class="edit-abort"
+                @button-clicked="editMode = false">
+                <i class="fa-solid fa-xmark"></i>
+            </Button>
+            <Button
+                :flat
+                class="edit-confirm"
+                @button-clicked="store.changePackageName(id, newName)">
+                <i class="fa-solid fa-check"></i>
+            </Button>
+        </template>
+    </div>
     <div class="secondary">{{status}}</div>
     <div class="action">
         <Button

@@ -1,5 +1,5 @@
 import {reactive} from '../vue.js';
-import {put, get, dlt} from "../http.js"
+import {put, get, dlt, patch} from "../http.js"
 import {store as editStore} from '../package-edit/state.js'
 
 export const store = reactive({
@@ -15,7 +15,8 @@ export const store = reactive({
     selectPackage,
     openDetails,
     climbPackagePath,
-    uploadZip
+    uploadZip,
+    changePackageName
 });
 
 function openDetails() {
@@ -64,4 +65,11 @@ async function uploadZip() {
     store.getPackages()
     store.loading.packageList = false
     return result
+}
+
+async function changePackageName(id, newName) {
+   store.loading.packageList = true
+   await patch(`package/${id}/rename`, {name: newName})
+   await store.getPackages()
+   store.loading.packageList = false
 }

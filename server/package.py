@@ -15,9 +15,9 @@ from .shared import create_document_with_attachement, delete_document, delete_fo
 from .entities import Package, Databases, Folder
 
 from .services.authentication import user, organisation
-from .services.database import delete, find, get, post
+from .services.database import delete, find, get, post, update
 
-from .util import can_delete_packages, json_body, web_error, web_response
+from .util import can_delete_packages, can_edit_name, json_body, web_error, web_response
 from server import APP
 
 Structmap = TypedDict('Structmap', {'name': str, 'folders': list['Structmap'], 'files': list[ZipInfo]})
@@ -102,6 +102,21 @@ def delete_package(package_id):
 
 
     return web_response(200, 'Success', package_deleted)
+
+@APP.route("/package/<package_id>/rename", methods=["PATCH"])
+@json_body
+def rename_package(package_id: str, name: str) -> Response:
+    package = get(Databases.PACKAGES, package_id).json()
+    if not can_edit_name(package, request):
+        return web_error(401, "You don't have permission to change the name of this package", component= "SERVER")
+    changes = {
+        "name": name
+    }
+    try:
+        update(Databases.PACKAGES, package_id, changes)
+    except HTTPError as error:
+        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+    return web_response(200, 'Success')
 
 @APP.route("/package/zip", methods=["PUT"])
 def create_package_from_zip() -> Response:
