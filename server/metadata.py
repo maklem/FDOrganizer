@@ -10,7 +10,7 @@ from .entities import Databases, Document, Folder, Package, Metadata
 from .services.authentication import user
 from .services.database import get, post, update
 
-from .util import can_update_metadata, get_database_from_string, web_error, web_response
+from .util import can_read_metadata, can_update_metadata, get_database_from_string, web_error, web_response
 
 
 @APP.route("/<entity_type>/<entity_id>/metadata", methods=["GET"])
@@ -20,9 +20,8 @@ def get_entity_with_metadata(entity_type, entity_id):
         entity = get(get_database_from_string(entity_type), entity_id).json()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")      
-    # Check ownership
-    username = user(request)
-    if entity.get('owner') != username:
+    # Check permissions
+    if not can_read_metadata(entity, request):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Init return value with document info
     result = convert_entity(entity_type, entity)

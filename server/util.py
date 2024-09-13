@@ -65,6 +65,13 @@ def can_update_metadata(restricted_object: dict[str, Any], request: Request) -> 
         return True
     return False
 
+def can_read_metadata(restricted_object: dict[str, Any], request: Request) -> bool:
+    if is_owner(restricted_object, user(request)):
+        return True
+    if is_reviewer(request):
+        return True
+    return False
+
 def can_submit_package(restricted_object: dict[str, Any], request: Request) -> bool:
     if is_owner(restricted_object, user(request)):
         return True
