@@ -10,7 +10,7 @@ from .shared import delete_folder, persist_documents
 
 from .entities import Folder, Databases, Document, Package
 
-from .util import can_add_files, can_delete_files, can_read, json_body, web_error, web_response, get_database_from_string
+from .util import can_add_files, can_delete_files, can_read, can_read_folder, json_body, web_error, web_response, get_database_from_string
 from .services.authentication import user
 from .services.database import attach, delete, find, get, post, update
 
@@ -27,7 +27,7 @@ def get_package(package_id):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get package content from DB
     try:
-        content = get_content(package.get('folders'), package.get('documents'), username = user(request))
+        content = get_content(package.get('folders'), package.get('documents'))
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Return package and its content
@@ -42,11 +42,11 @@ def get_folder_content(folder_id):
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Check if user has rights to view the folder contents
-    if not can_read(folder, request):
+    if not can_read_folder(folder, request):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     # Get folder content from DB
     try:
-        content = get_content(folder.get('folders'), folder.get('documents'), username = user(request))
+        content = get_content(folder.get('folders'), folder.get('documents'))
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     # Return folder contents
@@ -62,7 +62,11 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
         return web_error(401, "You don't have permission to edit this content", component= "SERVER")
     # Create new folder object
     username = user(request)
-    folder = Folder(name=name, documents=[], folders=[], owner=username)
+    if parent_type == 'package':
+        package_id =package_or_folder.get('id')
+    else:
+        package_id = package_or_folder.get('package_id')
+    folder = Folder(name=name, documents=[], folders=[], owner=username, package_id=package_id)
     #Persist folder
     try:
         folder_created = post(Databases.FOLDERS, folder.to_json()).json() # type: ignore
@@ -211,7 +215,7 @@ def create_file_document_pair(file: FileStorage, username: str):
     return {'document': document, 'file': outfile }
 
             
-def content_query(id_array, username):
+def content_query(id_array):
     return {
         "selector": {
             "_id": {
@@ -227,14 +231,14 @@ def modify_package(package_id: str):
     }
     return update(Databases.PACKAGES, package_id, changes)
 
-def get_content(folders: list[str], documents: list[str], username):
+def get_content(folders: list[str], documents: list[str]):
     found_folders =find(
         Databases.FOLDERS,
-        json.dumps(content_query(folders, username))
+        json.dumps(content_query(folders))
     ).json().get('docs')
     found_documents = find(
         Databases.DOCUMENTS,
-        json.dumps(content_query(documents, username))
+        json.dumps(content_query(documents))
     ).json().get('docs')
 
     return {"folders": [Folder.convert(x) for x in found_folders], "documents": [Document.convert(x) for x in found_documents] }

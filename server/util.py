@@ -4,9 +4,11 @@ import re
 from typing import Any, Optional, Union
 from flask import Request, make_response, request
 
-from .services.authentication import is_reviewer, organisation, user
+from .entities import Package, Databases
 
-from .entities.databases import Databases
+from .services.database import get
+
+from .services.authentication import is_reviewer, organisation, user
 
 def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]] = None, component = "SERVER"):
     error_data: dict[str, Union[str, list[str]]] = {
@@ -34,9 +36,19 @@ def is_owner(object_with_owner: dict[str, Any], owner) -> bool:
 def can_read(restricted_object: dict[str, Any], request: Request) -> bool:
     if is_owner(restricted_object, user(request)):
         return True
-    if not organisation(request) == restricted_object.get('organisation'):
-        return False
     if is_reviewer(request):
+        if not organisation(request) == restricted_object.get('organisation'):
+            return False
+        return True
+    return False
+
+def can_read_folder(folder: dict[str, Any], request: Request) -> bool:
+    if is_owner(folder, user(request)):
+        return True
+    if is_reviewer(request):
+        package = Package.from_db(get(Databases.PACKAGES, folder['package_id']).json())
+        if not organisation(request) == package.organisation:
+            return False
         return True
     return False
 

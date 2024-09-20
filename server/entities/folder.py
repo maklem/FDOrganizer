@@ -9,6 +9,7 @@ shouldBeExcluded = lambda x: x is None
 class Folder(DataClassJsonMixin):
     name: str
     owner: str
+    package_id: str
     folders: list[str]
     documents: list[str]
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
