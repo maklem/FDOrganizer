@@ -90,7 +90,7 @@ async function openFolder(id) {
 
 async function climbPackagePath() {
     if (!store.packagePath.length)
-        return location.assign(`${location.origin}/package`)
+        return history.back()
     store.packagePath.pop()
     resetContent()
     getPackageContent()

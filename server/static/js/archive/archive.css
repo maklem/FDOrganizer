@@ -88,6 +88,11 @@
     min-height: 0;
     min-width: 0;
     padding: 0 1rem 1rem 1rem;
+
+    .edit-button {
+        --rgb-button-color: var(--rgb-primary-color);
+        --button-color: var(--primary-color);
+    }
 }
 
 .right-sidebar {

@@ -23,6 +23,13 @@
             @back="store.climbPackagePath()"
             @metadata="metadataStore.openMetadata($event.type, $event.id, store.metadataReadonly(store.selectedPackage))">
             <Button
+            v-if="['rework'].includes(store.selectedPackage.status)"
+            class="side-button edit-button"
+            @button-clicked="store.openDetails()">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <div>Edit project</div>
+            </Button>
+            <Button
             v-if="['active', 'rework'].includes(store.selectedPackage.status)"
             class="side-button"
             @button-clicked="store.requestReview()">

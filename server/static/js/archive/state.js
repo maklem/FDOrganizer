@@ -39,11 +39,16 @@ export const store = reactive({
     packagesWithStatus,
     requestReview,
     metadataReadonly,
-    settingsReadonly
+    settingsReadonly,
+    openDetails
 });
 
 function packagesWithStatus(status) {
         return store.packages.filter(pkg => pkg.status === status)
+}
+
+function openDetails() {
+    location.assign(`${location.origin}/package/${store.selectedPackage.id}`)
 }
 
 async function getPackages() {
