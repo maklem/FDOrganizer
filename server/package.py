@@ -130,8 +130,15 @@ def create_package_from_zip() -> Response:
             return web_error(400, "Not a valid zip package name", component= "SERVER")
         structmap: Structmap = {"name": project_zip.filename.split('.')[0], "folders": [], "files": []}
         for file in files:
-            structmap = fill_structmap_layer(structmap, file)     
-        persist_package_layer('package', structmap, zip_ref, user(request), organisation = organisation(request))
+            structmap = fill_structmap_layer(structmap, file)
+        # Build new package for zip content
+        username = user(request)
+        package_id = create_package_in_db(structmap['name'], username, organisation(request))
+        # Create folders and documents
+        folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in structmap['folders']]
+        doc_ids = [create_document_from_zip(file_entry, zip_ref, username) for file_entry in structmap['files']]
+        # Update package with new folder and document ids
+        update(Databases.PACKAGES, package_id, {'folders': folder_ids, 'documents': doc_ids})
     return web_response(200, 'Success')
 
 def fill_structmap_layer(structmap: Structmap, file: PathedFile) -> Structmap:
@@ -151,28 +158,26 @@ def fill_structmap_layer(structmap: Structmap, file: PathedFile) -> Structmap:
         structmap['folders'].append(branch)
     return structmap
 
-def persist_package_layer(entityType: Literal['folder', 'package'], structmap: Structmap, zipfile: ZipFile, username, organisation =  None):
-    folder_ids = []
-    for folder_entry in structmap['folders']:
-        folder_ids.append(persist_package_layer('folder', folder_entry, zipfile, username))
-
-    doc_ids = []
-    for file_info in structmap['files']:
-        file = zipfile.open(file_info)
-        storage = FileStorage(file)
-        storage.filename = file_info.filename.split('/')[-1]
-        file_doc_pair = create_file_document_pair(storage, username)
-        persisted_document = create_document_with_attachement(file_doc_pair['file'], file_doc_pair['document'])
-        doc_ids.append(persisted_document)
+def create_folder_from_zip(structmap: Structmap, zipfile: ZipFile, username: str, package_id: str):
+    
+    folder_ids = [create_folder_from_zip(folder_entry, zipfile, username, package_id) for folder_entry in structmap['folders']]
+    doc_ids = [create_document_from_zip(file_entry, zipfile, username) for file_entry in structmap['files']]
+    
     # Differ between top level (package) and nested levels (folder)
-    if entityType == 'folder':
-        folder = Folder(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username)
-        persisted_entity = post(Databases.FOLDERS, folder.to_json()).json()
-    else:
-        now = round(time.time()*1000)
-        if organisation is None:
-            raise OrganisationError('Organisation of current user not found. Package cannot be created from zip')
-        package = Package(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username, organisation=organisation, status='active', created=now, last_changed=now)
-        persisted_entity = post(Databases.PACKAGES, package.to_json()).json() # type: ignore
+    folder = Folder(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username, package_id=package_id)
+    persisted_entity = post(Databases.FOLDERS, folder.to_json()).json()
 
     return persisted_entity['id']
+
+def create_document_from_zip(file_info, zipfile: ZipFile, username):
+    file = zipfile.open(file_info)
+    storage = FileStorage(file)
+    storage.filename = file_info.filename.split('/')[-1]
+    file_doc_pair = create_file_document_pair(storage, username)
+    return create_document_with_attachement(file_doc_pair['file'], file_doc_pair['document'])
+
+def create_package_in_db(name:str, owner: str, organisation: str) -> str:
+    now = round(time.time()*1000)
+    package = Package(name=name, status='active', documents=[], folders=[], owner=owner, organisation=organisation, created=now, last_changed=now)
+    package_created = post(Databases.PACKAGES, package.to_json())
+    return package_created.json()['id']
