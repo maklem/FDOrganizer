@@ -154,6 +154,7 @@ def submit_review(package_id: str, status: Literal["accepted", "rejected"]) -> R
             "status": "accepted",
             "creation_date": datetime.now().timestamp()
         })
+        update_package_state(package_id, 'archived')
     elif status == "rejected":
         update(Databases.REVIEWS, review.id, {
             "status": "rejected",

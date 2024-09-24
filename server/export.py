@@ -54,8 +54,6 @@ def build_export_package(package_id: str):
         return web_error(500, message=error.args[0])
 
     delete_temp_package(package.name)
-    # Set package_status to "archived" in DB
-    update_package_state(package_id, 'archived')
 
     return web_response(200, details = {'success': True})
 
