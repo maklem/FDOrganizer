@@ -1,14 +1,12 @@
 from typing import Any
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin 
 
-@dataclass_json
 @dataclass
-class InnerCollection:
+class InnerCollection(DataClassJsonMixin):
     _id: str
     displayname: dict[str, Any]
 
-@dataclass_json
 @dataclass
-class PluginFolder:
+class PluginFolder(DataClassJsonMixin):
     collection: InnerCollection

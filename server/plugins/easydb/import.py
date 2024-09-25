@@ -9,7 +9,7 @@ import json
 import mimetypes
 from typing import Literal, Union
 
-import requests
+import requests #type: ignore
 from flask.wrappers import Request, Response
 import pathlib
 
@@ -170,15 +170,15 @@ def get_files_with_metadata(file_ids, request, auth):
     return results
 
 def convert_collection(collection: dict, username: str) -> Folder:
-    outer_collection = PluginFolder.from_dict(collection) # type: ignore
+    outer_collection = PluginFolder.from_dict(collection)
     inner_collection = outer_collection.collection
     displayname = inner_collection.displayname.get('de-DE')
     collection_id = inner_collection._id
-    return Folder(name = displayname, id = collection_id, owner = username, documents=[], folders=[])
+    return Folder(name = displayname, id = collection_id, owner = username, documents=[], folders=[]) # type: ignore
 
 
 def convert_file(easydb_object: dict, username: str, is_stored: bool = False) -> Document:
-    obj: PluginDocument = PluginDocument.from_dict(easydb_object) # type: ignore
+    obj: PluginDocument = PluginDocument.from_dict(easydb_object) 
     inner_object = obj.object
     file_id = obj._system_object_id
 
@@ -191,7 +191,7 @@ def convert_file(easydb_object: dict, username: str, is_stored: bool = False) ->
     return Document(name = displayname, size = size, type = mimetype, is_stored = is_stored, owner = username, source_id= file_id, source="easy DB")
 
 def extract_file(easydb_object: dict):
-    obj: PluginDocument = PluginDocument.from_dict(easydb_object) # type: ignore
+    obj: PluginDocument = PluginDocument.from_dict(easydb_object)
     download_url = obj.object.file[0].versions['original']['download_url']
     if not obj.object.file[0].versions['original']['_download_allowed']:
         return None
