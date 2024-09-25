@@ -105,7 +105,7 @@ def persist_documents(doc_file_pairs: List, parent, parent_type):
 
 def create_document_with_attachement(file, document: Document) -> str:
     # Create initial document in DB
-    document_created = post(Databases.DOCUMENTS,document.to_json())  # type: ignore
+    document_created = post(Databases.DOCUMENTS,document.to_json())
     # Attach uploaded file to created document
     response_document = CouchDocument(document_created.json())
     attach(Databases.DOCUMENTS, response_document, file_content = file, filename = document.name, mimetype=document.type)

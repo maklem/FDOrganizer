@@ -131,9 +131,9 @@ def get_plugin_auth(source: str):
 def get_plugin(source: str):
     return importlib.import_module(f'.plugins.{source}.import', 'server')
 
-def serialize(content: dict[Literal["folders","documents"], List[Union[Folder, Document]]]) -> dict[str, List]:
-    folders = [Folder.to_dict(x) for x in content['folders']] # type: ignore
-    documents = [Document.to_dict(x) for x in content['documents']] # type: ignore
+def serialize(content: dict[Literal["folders","documents"], list]) -> dict[str, list]:
+    folders = [Folder.to_dict(x) for x in content['folders']]
+    documents = [Document.to_dict(x) for x in content['documents']]
     return {'folders':folders, 'documents': documents}
 
 def import_files(import_documents: List[dict], parent: str, parent_type: str):

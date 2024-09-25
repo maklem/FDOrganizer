@@ -5,9 +5,9 @@ import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
-import requests
+import requests #type: ignore
 import json
-from simple_term_menu import TerminalMenu
+from simple_term_menu import TerminalMenu #type: ignore
 
 def credentials():
     return {
@@ -57,7 +57,7 @@ def get_idp_data():
 
     options = ["OIDC", "SAML", "LDAP", "LOCAL"]
     terminal_menu = TerminalMenu(options)
-    identity_provider['type'] = options[terminal_menu.show()]
+    identity_provider['type'] = options[terminal_menu.show()] # type: ignore
 
     identity_provider['url'] = input("URL für Authentifizierung:\n")
     identity_provider['scope'] = []

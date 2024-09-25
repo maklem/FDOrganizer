@@ -69,7 +69,7 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
     folder = Folder(name=name, documents=[], folders=[], owner=username, package_id=package_id)
     #Persist folder
     try:
-        folder_created = post(Databases.FOLDERS, folder.to_json()).json() # type: ignore
+        folder_created = post(Databases.FOLDERS, folder.to_json()).json()
     except HTTPError as error:
         return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
     except KeyError as error:
