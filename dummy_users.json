@@ -114,5 +114,10 @@
     {
         "username": "nutzer29",
         "password": "passwort29"
+    },
+    {
+        "username": "reviewer",
+        "password": "reviewer",
+        "reviewer": true
     }
 ]

@@ -38,7 +38,7 @@ def authentication_token(username: str, password: str):
 
 #Creating Database
 def get_organisation_data():
-    if len(sys.argv) >= 1:
+    if len(sys.argv) > 1:
         return json.loads(open(Path(sys.argv[1])).read())
     # Init data structure
     organisation_data = {}
@@ -80,14 +80,14 @@ def create(url: str, token: str, data: dict):
                     "Cookie" :  token}
     return requests.post(url, data=json.dumps(data), headers=couch_header)
 
-def create_organisation(organisation_data: dict, token: str):
+def create_organisation(organisation_data: dict, token: str) -> str:
     print(f'Creating organisation "{organisation_data["name"]}"')
     url = f'{base_url()}/organisations'
     response = create(url, token, organisation_data)
     if response.status_code != 201:
         print(f'Error creating organisation "{organisation_data["name"]}":')
         print(f'{response.json()["reason"]}')
-        return
+        raise Exception
     print(f'Successfully created organisation "{organisation_data["name"]}"')
     return response.json()['id']
 
@@ -101,7 +101,26 @@ def create_users(users: list[dict], token: str):
 def get_users(organisation_id):
     with open('dummy_users.json', 'r') as file:
         users = json.load(file)
-    return [{"username": user['username'],"password": user['password'], "organisation": organisation_id} for user in users]
+    return [{"username": user['username'],"password": user['password'], "organisation": organisation_id, "reviewer": user.get('reviewer', False)} for user in users]
+
+def update_reviewers(organisation_id: str, users: list[dict], token: str):
+    print(f'Updating reviewers')
+    review_users = [user for user in users if user.get('reviewer') == True]
+    if len(review_users) == 0:
+        print(f'No reviewers found')
+        return
+    url = f'{base_url()}/organisations/{organisation_id}'
+    organisation = requests.get(url, headers={"Cookie" :  token}).json()
+    organisation['reviewers'] = [user['username'] for user in review_users]
+    headers = {
+        "If-Match": organisation.get('_rev'),
+        "Accept": "application/json",
+        "Content-Type" : "application/json",
+        "Cookie" :  token
+    }
+    response = requests.put(url, data=json.dumps(organisation), headers=headers)
+    if response.status_code != 201:
+        print(f'Error updating reviewers: {response.json()["reason"]}')
 
 #Run
 if __name__ == '__main__':
@@ -115,3 +134,4 @@ if __name__ == '__main__':
     if org_data['identity_provider']['type'] == "LOCAL":
         users = get_users(organisation_id)
         create_users(users, token)
+        update_reviewers(organisation_id, users, token)
