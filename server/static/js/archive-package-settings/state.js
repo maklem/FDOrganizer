@@ -153,7 +153,7 @@ function readyToSaveSettings() {
     store.checkTerms &&
     store.checkDSGVO &&
     !!store.duration &&
-    (!!store.creativecommons || store.germandatalicense) &&
+    ((store.licenseType === 'gdl' && !!store.germandatalicense) || (store.licenseType === 'cc' && !!store.creativecommons)) &&
     (store.accessibility === 'embargo' ? !!store.embargodate : true) &&
     (store.accessibility === 'request' ? !!store.contactemail : true)
 }

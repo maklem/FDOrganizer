@@ -114,7 +114,7 @@
                       value="cc"
                       @input="event => store.licenseType = event.currentTarget.value">
                     <label for="cc-reuse">Usage is allowed under the <a href="https://creativecommons.org/choose/" target="_blank" rel="noopener noreferrer">Creative Commons </a>license</label>
-                    <LabeledInput :disabled="store.settingsReadonly"
+                    <LabeledInput :disabled="store.settingsReadonly || store.licenseType !== 'cc'"
                     :id="'cc0-license'"
                     :value="store.creativecommons"
                     :type="'monoselect'"
@@ -132,7 +132,7 @@
                       value="gdl"
                       @input="event => store.licenseType = event.currentTarget.value">
                     <label for="gdl-reuse">Usage is allowed under the <a href="https://www.govdata.de/web/guest/lizenzen" target="_blank" rel="noopener noreferrer">German Data License</a></label>
-                    <LabeledInput :disabled="store.settingsReadonly"
+                    <LabeledInput :disabled="store.settingsReadonly || store.licenseType !== 'gdl'"
                     :id="'cc0-license'"
                     :value="store.germandatalicense"
                     :type="'monoselect'"
