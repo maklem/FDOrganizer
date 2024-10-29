@@ -63,9 +63,11 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
     # Create new folder object
     username = user(request)
     if parent_type == 'package':
-        package_id =package_or_folder.get('id')
+        package_id =package_or_folder.get('_id')
     else:
         package_id = package_or_folder.get('package_id')
+    if package_id is None:
+        return web_error(500, "Package ID for creating the folder not found", component= "SERVER")
     folder = Folder(name=name, documents=[], folders=[], owner=username, package_id=package_id)
     #Persist folder
     try:
