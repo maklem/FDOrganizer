@@ -38,6 +38,8 @@
 
 .package-name .folder-name {
     font-size: 1rem;
+    display: flex;
+    align-items: center;
 }
 
 .package-header .side-button {
