@@ -6,7 +6,7 @@ import hashlib
 import jinja2
 import os
 
-from .entities.errors import ExportUserError, PathError
+from .entities.errors import ExportUserError, PathError, XMLValidationError
 from .shared import update_package_state
 from .util import web_error, web_response
 from .entities import Folder, Document, Package, Databases, Metadata
@@ -43,8 +43,10 @@ def build_export_package(package_id: str):
     ie_structure = structmap
 
     # Create METS-File for ingest
-    mets = build_sip_metadata(package_data, file_list, ie_structure)
-
+    try:
+        mets = build_sip_metadata(package_data, file_list, ie_structure)
+    except XMLValidationError as error:
+        return web_error(500, message=error.args[0], stacktrace=error.args[1])
     # Copy files and METS to correct dir for Rosetta Ingest
     try:
         create_sip(package, mets)
@@ -107,7 +109,10 @@ def build_sip_metadata(package_data, file_list, structmap):
     schema_path = os.path.join('server', 'metadata_templates', 'rosetta-mets', 'schema')
     schema_file = open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd'))
     schema = XMLSchema11(schema_file, base_url=schema_path)
-    schema.validate(rendered_xml)
+    try:
+        schema.validate(rendered_xml)
+    except Exception as error:
+        raise XMLValidationError(f'Validation of METS-File failed: {error.args[0]}', rendered_xml)
     return rendered_xml
 
 def create_ie_directory(structmap, structpath = ""):

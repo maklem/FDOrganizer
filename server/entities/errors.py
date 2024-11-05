@@ -12,3 +12,6 @@ class IdentityProviderError(Exception):
 
 class PatchError(Exception):
     '''Patch failed'''
+
+class XMLValidationError(Exception):
+    '''XML is invalid according to schema'''
