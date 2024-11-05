@@ -1,4 +1,4 @@
-if [ ! -f /server/organized ]; then
+if [ ! -f /var/flags/orginit ]; then
   python ./create_organisation.py "dummy_organisation.json"
-  touch /server/organized
+  touch /var/flags/orginit
 fi

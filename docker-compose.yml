@@ -17,6 +17,7 @@ services:
       - EXPORT_DIR=/server/export
     volumes:
       - ${EXPORT_DIR}:/server/export:rw
+      - ./init-flags:/var/flags:rw
     command:
       - sh
       - -c
@@ -27,8 +28,10 @@ services:
   db:
     image: couchdb:latest
     container_name: db
-    expose:
-      - "5984"
+    ports:
+      - "5984:5984"
+    volumes:
+      - "./db:/opt/couchdb/data"
     environment:
       - COUCHDB_USER=${COUCHDB_USER}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}

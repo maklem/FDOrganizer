@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -f /server/initialized ]; then
+if [ ! -f /var/flags/dbinit ]; then
   # Wait for db to come up
   ping -c 10 db > /dev/null || (echo "DB unreachable";exit)
 
@@ -17,5 +17,5 @@ if [ ! -f /server/initialized ]; then
   
   # Set initialized
   echo "CouchDB initialized"
-  touch /server/initialized
+  touch /var/flags/dbinit
 fi

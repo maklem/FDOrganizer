@@ -18,3 +18,7 @@ flask_session
 
 # Environment variables
 .env
+
+#docker volumes
+db/
+init-flags/
