@@ -142,13 +142,15 @@ def submit_review(package_id: str, status: Literal["accepted", "rejected"]) -> R
             "status": "open"
        }
     }
-    result = find(Databases.REVIEWS, json.dumps(query)).json().get('docs')[0]
-    if result == None:
+    result = find(Databases.REVIEWS, json.dumps(query)).json().get('docs')
+    if not result:
         if status == "rejected":
             return web_error(400, "No open review found for package", component= "SERVER")
         elif status == "accepted":
+            update_package_state(package_id, 'archived')
             return web_response(200, 'Success')
-    review = Review.from_db(result)
+    review = result[0]
+    review = Review.from_db(review)
     if status == "accepted":
         update(Databases.REVIEWS, review.id, {
             "status": "accepted",
