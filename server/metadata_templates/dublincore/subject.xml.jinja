@@ -13,7 +13,7 @@
         {% endfor %}
     {% elif subject.subjectIdentifierType[0] == "csv" %}
         {% for keyword in subject.subjectIdentifierCSV %}
-            <dc:subject>{{ keyword }}</dc:subject>
+            <dc:subject><![CDATA[{{ keyword }}]]></dc:subject>
         {% endfor %}
     {% endif %}
 {% endfor %}

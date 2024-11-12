@@ -4,6 +4,6 @@
     {% elif identifier.resourceIdentifierScheme[0] == "uri" %}
         <dc:identifier>{{identifier.resourceIdentifierUri | first}}</dc:identifier>
     {% elif identifier.resourceIdentifierScheme[0] == "customResourceIdentifier" %}
-        <dc:identifier>{{identifier.resourceIdentifierName | first}}</dc:identifier>
+        <dc:identifier><![CDATA[{{identifier.resourceIdentifier | first}}]]></dc:identifier>
     {% endif %}
 {% endfor %}

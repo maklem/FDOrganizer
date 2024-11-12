@@ -1,11 +1,11 @@
 {% for description in (metadata.description | default([], true)) %}
     {% if description.descriptionType[0] == "descriptionAbstract" %}
-        <dc:description>{{description.textAbstract | first | safe }}</dc:description>
+        <dc:description><![CDATA[{{description.textAbstract | first | safe }}]]></dc:description>
     {% elif description.descriptionType[0] == "descriptionTOC" %}
-        <dc:description>{{description.textTOC | first | safe }}</dc:description>
+        <dc:description><![CDATA[{{description.textTOC | first | safe }}]]></dc:description>
     {% elif description.descriptionType[0] == "descriptionReadme" %}
-        <dc:description>{{description.textReadme | first | safe }}</dc:description>
+        <dc:description><![CDATA[{{description.textReadme | first | safe }}]]></dc:description>
     {% elif description.descriptionType[0] == "descriptionCustom" %}
-        <dc:description>{{description.textCustom | first | safe }}</dc:description>
+        <dc:description><![CDATA[{{description.textCustom | first | safe }}]]></dc:description>
     {% endif %}
 {% endfor %}

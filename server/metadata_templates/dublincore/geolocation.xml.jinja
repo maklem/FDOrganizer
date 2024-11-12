@@ -1,12 +1,12 @@
 {% for geolocation in (metadata.geolocation | default([], true)) %}
     {% if geolocation.geolocationType[0] == "geoLocationPlace" %}
-        <dc:coverage>{{geoLocationPlace}}</dc:coverage>
+        <dc:coverage>{{geolocation.geoLocationPlace | first}}</dc:coverage>
     {% elif geolocation.geolocationType[0] == "geoLocationPoint" %}
-        <dc:coverage>{{geoLocationPointLatitude}}°N; {{geoLocationPointLongitude}}°E;</dc:coverage>
+        <dc:coverage>{{geolocation.geoLocationPointLatitude | first}}°N; {{geolocation.geoLocationPointLongitude | first}}°E;</dc:coverage>
     {% elif geolocation.geolocationType[0] == "geoLocationPolygon" %}
         <dc:coverage>
             {% for point in geolocation.geoLocationPolygonPoint %}
-                {{geoLocationPointLatitude}}°N; {{geoLocationPointLongitude}}°E;
+                {{point.geoLocationPointLatitude | first}}°N; {{point.geoLocationPointLongitude | first}}°E;
             {% endfor %}
         </dc:coverage>
     {% endif %}

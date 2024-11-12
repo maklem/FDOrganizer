@@ -4,6 +4,6 @@
     {% elif relation.relationIdentifierScheme[0] == "uri" %}
         <dc:relation>{{relation.relationURI | first}}</dc:relation>
     {% elif relation.relationIdentifierScheme[0] == "custom" %}
-        <dc:relation>{{relation.relationIdentifier | first}}</dc:relation>
+        <dc:relation><![CDATA[{{relation.relationIdentifier | first}}]]></dc:relation>
     {% endif %}
 {% endfor %}

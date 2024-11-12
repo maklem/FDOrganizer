@@ -9,6 +9,6 @@
                 <dc:publisher>https://ror.org/{{publisher.publisherRor | first }}</dc:publisher>
             {% endif %}
         {% endfor %}
-        <dc:date>{{publishing.publicationDate | first}}</dc:date>
+        <dc:date>{{publishing.publicationDate | first | timestamp_to_date}}</dc:date>
     {% endif %}
 {% endfor %}
