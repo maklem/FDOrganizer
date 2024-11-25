@@ -172,9 +172,9 @@ def get_files_with_metadata(file_ids, request, auth):
 def convert_collection(collection: dict, username: str) -> Folder:
     outer_collection = PluginFolder.from_dict(collection)
     inner_collection = outer_collection.collection
-    displayname = inner_collection.displayname.get('de-DE')
+    displayname = inner_collection.displayname['de-DE']
     collection_id = inner_collection._id
-    return Folder(name = displayname, id = collection_id, owner = username, documents=[], folders=[]) # type: ignore
+    return Folder(name = displayname, id = collection_id, owner = username, documents=[], folders=[], package_id="")
 
 
 def convert_file(easydb_object: dict, username: str, is_stored: bool = False) -> Document:
