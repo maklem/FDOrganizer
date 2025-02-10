@@ -7,6 +7,12 @@ def needs_authentication(route: str) -> bool:
     return route not in [url_for("navlogin"), url_for('get_organisations')] and "static" not in route and "/login-oidc" not in route and "/login-ldap" not in route and "/login-local" not in route
 
 @APP.before_request
+def request_logger():
+    if "static" not in request.path:
+        APP.logger.info(f'Request')
+    return None
+
+@APP.before_request
 def auth_guard():
     if not needs_authentication(request.path):
         return None
