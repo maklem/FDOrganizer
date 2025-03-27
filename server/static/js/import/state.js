@@ -23,6 +23,7 @@ export const store = reactive({
     activateSource,
     climbRemotePath,
     importSelected,
+    importAll,
     openFolder,
     pathNames,
     getSources,
@@ -118,8 +119,22 @@ async function authenticate(sourceId) {
 
 async function importSelected() {
     store.loading.content = true
-    const {parent,parentType} = editStore.currentPath()
     const sourceIds = store.selectedDocuments.map(document => document.source_id)
+
+    await importDocuments(sourceIds)
+    store.selectedDocuments = []
+    store.loading.content = false
+}
+
+async function importAll(){
+    store.loading.content = true
+    const sourceIds = store.documents.map(document => document.source_id)
+
+    await importDocuments(sourceIds)
+    store.loading.content = false
+}
+async function importDocuments(sourceIds) {
+    const {parent,parentType} = editStore.currentPath()
 
     await post(`/import/${store.activeSource}`, {
         parent,
@@ -127,8 +142,7 @@ async function importSelected() {
         sourceIds
     })
     await editStore.getPackageContent()
-    store.selectedDocuments = []
-    store.loading.content = false
+    
 }
 
 async function getContent() {
