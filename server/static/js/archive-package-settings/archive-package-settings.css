@@ -69,7 +69,7 @@ section {
 
     &.legal-tab {
         gap: 1rem;
-        grid-template-rows: min-content minmax(0, auto);
+        grid-template-rows: min-content minmax(0, max-content);
     }
 
     &.access-tab {
