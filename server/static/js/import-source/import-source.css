@@ -100,11 +100,10 @@
 
 .import-folder{
     display: inline-grid;
-    grid-template-columns: max-content minmax(auto, max-content) auto;
+    grid-template-columns: max-content minmax(auto, max-content);
     grid-template-rows: auto;
     grid-template-areas:
-        "icon name size"
-        "icon count count";
+        "icon name";
     justify-items: start;
     align-items: center;
     grid-gap: 0.3rem 1rem;
