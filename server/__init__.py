@@ -43,8 +43,10 @@ class RequestFormatter(logging.Formatter):
             if is_authorized(request):
                 record.username = user(request)
             record.params = '---'
-            if not record.contains_credentials and request.is_json: # type: ignore
-                record.params = json.dumps(request.json)
+            if not record.contains_credentials and request.is_json: #type: ignore
+                jsondata = request.get_json(silent=True)
+                if jsondata is not None: 
+                    record.params = request.json
         else:
             record.url = None
             record.remote_addr = None
