@@ -1,6 +1,7 @@
 import json
 import logging
 import logging.handlers
+import re
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, request
 from werkzeug.exceptions import HTTPException
@@ -31,6 +32,8 @@ class CredentialFilter(logging.Filter):
             return True
         route = request.path
         if "/login-oidc" in route or "/login-ldap" in route or "/login-local" in route:
+            record.contains_credentials = True
+        if re.search("/import/.+/login",route):
             record.contains_credentials = True
         return True
 
