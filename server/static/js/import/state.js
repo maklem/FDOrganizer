@@ -11,6 +11,8 @@ export const store = reactive({
     remotePath:[],
     folders: [],
     activeSource: undefined,
+    username: undefined,
+    password: undefined,
     loading: {
         content: false,
         sources: false,
@@ -111,10 +113,14 @@ async function climbRemotePath() {
 }
 
 async function authenticate(sourceId) {
+    store.loading.content = true
     const {username, password} = {...store}
     await loginSource(sourceId, {username, password})
+    store.username = undefined
+    store.password = undefined
     store.sources = store.sources.map(source => ({...source, authenticated: source.id === sourceId ? true : source.authenticated}))
     store.getSource(sourceId)
+    store.loading.content = false
 }
 
 async function importSelected() {
