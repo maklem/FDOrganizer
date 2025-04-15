@@ -23,7 +23,7 @@
                   type="checkbox"
                   id="check-terms"
                   @input="event => store.checkTerms = !store.checkTerms">
-                  <label for="check-terms">I have read and understood the <a href="https://www.example.com/" target="_blank" rel="noopener noreferrer">Data Submission Agreement</a> and request the processing of the submitted data in accordance with the options chosen above.</label>
+                  <label for="check-terms">I have read and understood the <a href="https://lzv-bayern.de/mehr-information/f%C3%BCr-universit%C3%A4ten/daten%C3%BCbernahmevereinbarung" target="_blank" rel="noopener noreferrer">Data Submission Agreement</a> and request the processing of the submitted data in accordance with the options chosen above.</label>
                 </div>
                 <div class="radio-option">
                   <input :disabled="store.settingsReadonly"
@@ -49,7 +49,7 @@
                   id="check-dsgvo"
                   @input="event => store.checkDSGVO = !store.checkDSGVO">
                   <!-- TODO: Replace dummy link with path to DSGVO-->
-                  <label for="check-dsgvo">I attest that all personal data in this package was processed in accordance following the <a href="https://www.example.com/" target="_blank" rel="noopener noreferrer">EU General Data Protection Regulation</a>. For this purpose I have taken the following measures:</label>
+                  <label for="check-dsgvo">I attest that all personal data in this package was processed in accordance following the <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">EU General Data Protection Regulation</a>. For this purpose I have taken the following measures:</label>
                 </div>
                 <div class="dsgvo-options">
                   <div class="radio-option">
@@ -83,7 +83,7 @@
                     value="consent"
                     :disabled="!store.checkDSGVO"
                     @input="event => store.personalData = event.currentTarget.value">
-                    <label for="consent-personal-data">All existing personal data in this package was labeled accordingly. The remaining personal data is integral for its research purpose (as stated in <a href="https://www.example.com/" target="_blank" rel="noopener noreferrer">DSGVO_ARTICLE</a>). Written consent to processing and archival of the data was obtained. The physical or digital storage location of the consent documents is linked in the metadata of the respective files</label>
+                    <label for="consent-personal-data">All existing personal data in this package was labeled accordingly. The remaining personal data is integral for its research purpose (as stated in <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">Article 89 of the EU General Data Protection Regulation</a>). Written consent to processing and archival of the data was obtained. The physical or digital storage location of the consent documents is linked in the metadata of the respective files</label>
                   </div>
                 </div>
               </fieldset>
