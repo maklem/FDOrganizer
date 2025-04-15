@@ -94,8 +94,3 @@
     --button-color: green;
     --rgb-button-color: 0,128,0;
 }
-
-.reject-button{
-    --button-color: var(--error);
-    --rgb-button-color: var(--rgb-error);
-}

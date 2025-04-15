@@ -77,9 +77,9 @@ async function acceptReview() {
     store.loading.packageList = false
 }
 
-async function rejectReview() {
+async function rejectReview(id) {
     store.loading.packageList = true
-    await post(`/review/submit/${store.selectedPackage.id}`, {status: "rejected"})
+    await post(`/review/submit/${id}`, {status: "rejected"})
     store.selectedPackage = undefined
     await store.getPackages()
     store.loading.packageList = false

@@ -71,11 +71,6 @@ section {
         gap: 1rem;
         grid-template-rows: min-content minmax(0, max-content);
     }
-
-    &.access-tab {
-        gap: 1rem;
-        grid-template-rows: min-content minmax(0, auto);
-    }
 }
 .package-settings-header .back-button {
     font-size: 1.5rem;
@@ -133,6 +128,15 @@ section {
     --rgb-button-color: 51, 51, 51;
 }
 
+.button-row .reject-button {
+    --button-color: var(--error);
+    --rgb-button-color: var(--rgb-error);
+
+    display:flex;
+    gap: 0.5rem;
+
+    flex: 0 0 0;
+}
 .terms-and-conditions {
     grid-area: 3 / 1 / 3 / 3; 
 }

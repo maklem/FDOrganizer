@@ -148,6 +148,12 @@
             <Button class="save-metadata" :disabled="!store.readyToSaveSettings()" @button-clicked="save">Save</Button>
         </div>
         <div v-else class="button-row">
+            <Button v-if="store.activeTab === 'reviews'"
+            class="reject-button"
+            @button-clicked="requestChanges()">
+                <i class="fa-solid fa-xmark"></i>
+                <div>Request changes</div>
+            </Button>
             <Button class="close-button" @button-clicked="store.closeSettings()">Close</Button>
         </div>
     </div>

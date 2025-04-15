@@ -34,6 +34,10 @@ export default {
             // Don't show author to non-reviewers
             if (this.pageContext === 'archive') return false
             return comment.owner !== getSessionToken().username
+        },
+        requestChanges() {
+            this.$emit('request-changes', this.store.package.id)
+            this.store.closeSettings()
         }
     },
     template
