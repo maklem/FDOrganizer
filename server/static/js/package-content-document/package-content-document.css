@@ -1,10 +1,10 @@
 .package-content-document {
     display: inline-grid;
-    grid-template-columns: max-content minmax(auto, max-content) auto;
-    grid-template-rows: auto;
+    grid-template-columns: max-content minmax(auto, max-content) max-content;
+    grid-template-rows: auto auto;
     grid-template-areas:
-        "icon name size"
-        "icon source source";
+        "icon name action"
+        "icon size size";
     justify-items: start;
     align-items: center;
     grid-gap: 0.3rem 1rem;
@@ -15,21 +15,14 @@
     cursor:pointer
 }
 
-.package-content-document.editable {
-    grid-template-columns: max-content minmax(auto, max-content) auto max-content;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-        "icon name size action"
-        "icon source source action";
-}
-.package-content-document:hover {
+/* .package-content-document:hover {
     color: var(--primary-color);
 }
 
 .package-content-document.active {
     font-weight: 700;
     color: var(--primary-color);
-}
+} */
 
 .package-content-document .name {
     grid-area: name;

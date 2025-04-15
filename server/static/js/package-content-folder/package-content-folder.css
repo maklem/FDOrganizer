@@ -1,10 +1,10 @@
 .package-content-folder{
     display: inline-grid;
-    grid-template-columns: max-content minmax(auto, max-content) auto max-content;
+    grid-template-columns: max-content minmax(auto, max-content) max-content;
     grid-template-rows: auto auto;
     grid-template-areas:
-        "icon name size action"
-        "icon count count action";
+        "icon name action"
+        "icon count count";
     justify-items: start;
     align-items: center;
     grid-gap: 0.3rem 1rem;

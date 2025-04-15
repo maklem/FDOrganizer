@@ -4,8 +4,7 @@
         <i class="fa-regular fa-folder hover-hidden"></i>
     </a>
     <div class="name">{{name}}</div>
-    <div class="size">{{formattedSize}}</div>
-    <div class="count">{{count}} {{count === 1 ? "content" : "contents"}}</div>
+     <div class="count">{{count}} {{count === 1 ? "content" : "contents"}}</div>
     <div v-if=editable class="action">
         <Button class="delete" :flat @button-clicked="$refs.folderDelete.showModal()">
             <i class="fa-solid fa-trash"></i>
