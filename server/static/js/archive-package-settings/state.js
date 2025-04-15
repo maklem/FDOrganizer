@@ -2,10 +2,10 @@ import {reactive} from '../vue.js';
 import {patch, get, put, dlt} from "../http.js"
 
 const TABS = [
-    {
-        id: 'access',
-        title: 'Access'
-    },
+    // {
+    //     id: 'access',
+    //     title: 'Access'
+    // },
     {
         id: 'legal',
         title: 'Legal'
@@ -15,50 +15,13 @@ const TABS = [
         title: 'Reviews'
     }
 ]
-const LICENSES = {
-    cc: [
-        {
-            id: 'https://creativecommons.org/publicdomain/zero/1.0/',
-            label: 'CC0 1.0 - Public Domain'
-        },
-        {
-            id: 'https://creativecommons.org/licenses/by/4.0/',
-            label: 'CC BY 4.0 - Attribution'
-        },
-        {
-            id: 'https://creativecommons.org/licenses/by-sa/4.0/',
-            label: 'CC BY-SA 4.0 - Attribution & Share Alike'
-        },
-        {
-            id: 'https://creativecommons.org/licenses/by-nc/4.0/',
-            label: 'CC BY-NC 4.0 - Attribution & Non Commercial'
-        }
-    ],
-    gdl: [
-        {
-            id: 'https://www.govdata.de/dl-de/zero-2-0',
-            label: 'dl-zero-de 2.0 - Public Domain'
-        },
-        {
-            id: 'https://www.govdata.de/dl-de/by-2-0',
-            label: 'dl-by-de 2.0 - Attribution'
-        },
-    ]
-}
+
 export const store = reactive({
     loading: {
         packageSettings: false,
         reviews: false
     },
     package: undefined,
-    findability: 'open',
-    accessibility: 'open',
-    embargodate: undefined,
-    licenseType: 'cc',
-    licenseTiming: 'now',
-    creativecommons: undefined,
-    germandatalicense: undefined,
-    contactemail: undefined,
     checkDuration: false,
     duration: undefined,
     checkTerms: false,
@@ -68,7 +31,7 @@ export const store = reactive({
     currentReview: undefined,
     currentComment: "",
     modalRef: undefined,
-    activeTab: 'access',
+    activeTab: 'legal',
     reviewReadonly: false,
     settingsReadonly: false,
     readyToSaveSettings,
@@ -78,35 +41,23 @@ export const store = reactive({
     closeSettings,
     addComment,
     deleteComment,
-    LICENSES,
     TABS
 });
 async function savePackageSettings() {
     store.loading.packageSettings = true
     const settings = (({
-        findability,
-        licenseType,
-        licenseTiming,
         checkDuration,
         duration,
         checkDSGVO,
         checkTerms,
         personalData
     }) => ({
-        findability,
-        licenseType,
-        licenseTiming,
         checkDuration,
         duration,
         checkDSGVO,
         checkTerms,
         personalData
     }))(store)
-    if (settings.licenseType === "gdl") settings.license = store.germandatalicense
-    if (settings.licenseType === "cc") settings.license = store.creativecommons
-    if (settings.findability === 'open') settings.accessibility = store.accessibility
-    if (settings.accessibility === 'embargo') settings.embargodate = store.embargodate
-    if (settings.accessibility === 'request') settings.contactemail = store.contactemail
     
     await patch(`/archive/${store.package.id}/settings`, {settings: settings})
     store.loading.packageSettings = false
@@ -117,33 +68,17 @@ function setPackage(pkg) {
     store.loading.packageSettings = true
     store.package = pkg
     const {
-        findability = '',
-        accessibility = '',
-        embargodate = undefined,
-        licenseType = '',
-        licenseTiming = '',
-        contactemail = undefined,
         checkDuration = false,
         duration = undefined,
         checkDSGVO = false,
         checkTerms = false,
         personalData = '',
-        license = undefined
     } = pkg.archive_settings ?? {}
-    store.findability = findability
-    store.accessibility = accessibility
-    store.embargodate = embargodate
-    store.licenseType = licenseType
-    store.licenseTiming = licenseTiming
-    store.contactemail = contactemail
     store.checkDuration = checkDuration
     store.duration = duration
     store.checkDSGVO = checkDSGVO
     store.checkTerms = checkTerms
     store.personalData = personalData
-
-    if (licenseType === 'gdl') store.germandatalicense = license
-    if (licenseType === 'cc') store.creativecommons = license
     
     store.loading.packageSettings = false
 }
@@ -153,9 +88,7 @@ function readyToSaveSettings() {
     store.checkTerms &&
     store.checkDSGVO &&
     !!store.duration &&
-    ((store.licenseType === 'gdl' && !!store.germandatalicense) || (store.licenseType === 'cc' && !!store.creativecommons)) &&
-    (store.accessibility === 'embargo' ? !!store.embargodate : true) &&
-    (store.accessibility === 'request' ? !!store.contactemail : true)
+    !!store.personalData
 }
 
 async function getReviews(pkg) {
@@ -170,10 +103,10 @@ async function getReviews(pkg) {
 function reset() {
     store.settingsReadonly = false
     store.reviewReadonly = false
-    store.activeTab = 'access'
+    store.activeTab = 'legal'
 }
 
-function openSettings(settingsPackage, tab = 'access', settingsReadonly = false, reviewReadonly = false) {
+function openSettings(settingsPackage, tab = 'legal', settingsReadonly = false, reviewReadonly = false) {
     store.loading.reviews = true
     getReviews(settingsPackage)
     setPackage(settingsPackage)
