@@ -6,14 +6,14 @@
         </Button>
         <header class="source-name">
             <h2 class="text">{{name}}</h2>
-            <template v-else
+            <template v-if="store.activeSource === id"
             v-for="path in store.pathNames()"
             >
-            <div class="icons">
-                <i class="fa-solid fa-chevron-right"></i>
-                <i class="fa-solid fa-chevron-right"></i>
-            </div>
-            <div class="folder-name">{{path}}</div>
+                <div class="icons">
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="folder-name">{{path}}</div>
             </template>
         </header>
     </div>
@@ -36,7 +36,7 @@
                     @input="(value) => store.password = value"></LabeledInput>
                 <Button @button-clicked="authenticate">Login</Button>
             </form>
-            <div v-else class="import-content">
+            <template v-else>
                 <div v-for="folder in store.getFolders()" class="import-folder" @click="store.openFolder(folder.id)">
                     <i class="fa-solid fa-folder icon"></i>
                     <div class="name">{{folder.name}}</div>
@@ -51,7 +51,7 @@
                     :id="document.source_id"
                     :selected="document.selected"
                 ></ImportFile>
-            </div>
+            </template>
         </template>
     </div>
 </div>

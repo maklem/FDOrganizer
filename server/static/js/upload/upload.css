@@ -6,6 +6,8 @@
 
     overflow: hidden;
     padding: 1rem;
+
+    flex: 1 1 0;
 }
 
 input[type="file"] {

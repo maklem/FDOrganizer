@@ -1,8 +1,7 @@
 .package-details {
-    display: grid;
+    display: flex;
     align-items: stretch;
     justify-items: stretch;
-    grid-template-columns: 2fr 1fr;
 }
 
 .package-content {
@@ -11,6 +10,7 @@
     min-width: 0;
     border-right: 0.1rem solid #eee;
     padding: 0 1rem 1rem 1rem;
+    flex: 3 3 0;
 }
 
 .create-folder {
@@ -77,14 +77,16 @@
 }
 
 .right-sidebar {
-    display: grid;
-    grid-template-rows: min-content auto;
+    display: flex;
+    flex-direction: column;
     max-height: 100%;
+    flex: 2 2 0;
 }
 
 .right-sidebar .tabs {
     display: grid;
     grid-template-columns: auto auto;
+    flex: 0 0 0;
 }
 
 .tabs .tab {

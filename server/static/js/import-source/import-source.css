@@ -56,13 +56,16 @@
 
 .source-content {
     display: grid;
-    grid-template-rows: minmax(0, 1fr);
+    grid-auto-flow: row;
+    grid-auto-rows: max-content;
+    justify-items: stretch;
 
     width: 100%;
     max-width: 100%;
+    max-height: 100%;
 
     animation: show-source 1s;
-    overflow: auto;
+    overflow-y: auto;
 }
 
 @keyframes show-source {
@@ -86,16 +89,6 @@
 
 .authenticate>label>* {
     width: 100%;
-}
-
-.source-content .import-content {
-    display: grid;
-    grid-auto-flow: row;
-    grid-auto-rows: max-content;
-    justify-items: stretch;
-    overflow-y: auto;
-
-    padding: 0 0.5rem
 }
 
 .import-folder{

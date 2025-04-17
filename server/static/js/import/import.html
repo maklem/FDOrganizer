@@ -2,6 +2,7 @@
     <ImportSource
         v-for="source in store.sources"
         v-bind="source"
+        :class="{active: store.activeSource === source.id}"
     ></ImportSource>
     <div class="button-row" v-if="store.showImportButtons()">
         <Button :disabled="!store.selectedDocuments.length" @button-clicked="store.importSelected()">Import selected files</Button>
