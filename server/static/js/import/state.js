@@ -75,6 +75,7 @@ function resetContent() {
 function activateSource(sourceId) {
     if (store.activeSource === sourceId) return
     store.resetContent()
+    store.remotePath = []
     if (store.sources.find(source => source.id === sourceId).authenticated) store.getSource(sourceId)
     store.activeSource = sourceId
 }
