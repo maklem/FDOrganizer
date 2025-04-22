@@ -33,6 +33,7 @@ export default {
 }
 
 function asDate(value) {
-    if (value === undefined) return "" 
+    if (value === undefined) return ""
+    if (isNaN(value)) return ""
     return new Date(parseInt(value)).toISOString().split('T')[0]
 }
