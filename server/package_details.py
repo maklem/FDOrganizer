@@ -223,7 +223,8 @@ def content_query(id_array):
             "_id": {
                 "$in": id_array
             }
-        }
+        },
+        "limit": 1000
     }
 
 def modify_package(package_id: str):
