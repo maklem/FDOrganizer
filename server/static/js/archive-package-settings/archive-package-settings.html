@@ -149,6 +149,7 @@
         </div>
         <div v-else class="button-row">
             <Button v-if="store.activeTab === 'reviews'"
+            :disabled="!store.currentReview?.comments?.length"
             class="reject-button"
             @button-clicked="requestChanges()">
                 <i class="fa-solid fa-xmark"></i>
