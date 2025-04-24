@@ -14,7 +14,7 @@ export const store = reactive({
     modalOpen:false,
     packagePath: [],
     activeTab: 'upload',
-    newFolderName: undefined,
+    newFolderName: '',
     metadataEntity: undefined,
     climbPackagePath,
     createFolder,

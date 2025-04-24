@@ -22,7 +22,7 @@
             ></LabeledInput>
             <form method="dialog">
                 <Button class="abort-create" @button-clicked="$refs.newFolder.close()">Abort</Button>
-                <Button class="confirm-create" @button-clicked="createFolder()">
+                <Button class="confirm-create" :disabled="store.newFolderName === ''" @button-clicked="createFolder()">
                     <div>Create folder</div>
                 </Button>
             </form>
