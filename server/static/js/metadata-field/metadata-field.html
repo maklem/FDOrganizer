@@ -26,7 +26,7 @@
         <span>Add {{localized(field.label)}}</span>
     </Button>
     <div class="no-data" v-else-if="!metadata?.length && store.readonly">
-        No data available
+        No data
     </div>
 </fieldset>
 <template v-else >
@@ -51,7 +51,7 @@
             <i class="fa-solid fa-minus"></i>
         </Button>
     </div>
-    <Button v-if="!field.max || field.max > (metadata?.length ?? 0) && !store.readonly"
+    <Button v-if="(!field.max || field.max > (metadata?.length ?? 0)) && !store.readonly"
         class="add-instance"
         :disabled="!!field.max && metadata?.length >= field.max"
         @button-clicked="addField()"
