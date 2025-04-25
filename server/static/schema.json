@@ -518,7 +518,7 @@
                        "min":1,
                        "max":1,
                        "type":"ror" ,
-                       "placeholder":"e.g. https://ror.org/0234wmv40"
+                       "placeholder":"e.g. 0234wmv40"
                     },
                     {
                         "id": "publisherName",
@@ -2189,7 +2189,7 @@
                         },
                         "min": 1,
                         "max": 1,
-                        "type": "letter-string",
+                        "type": "string",
                         "placeholder": "e.g. Forschungsdatendienst für die Ost-, Ostmittel- und Südosteuropaforschung (OstData)"
                     },
                     {
