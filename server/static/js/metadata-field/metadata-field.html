@@ -5,7 +5,12 @@
         <div v-show="toggle" class="tooltip-text">{{field.tooltip["en"]}}</div>
     </div>
     <div v-if="!!metadata?.length" class="field-instance" v-for="(instance, index) in metadata">
-        <Button v-if="!store.readonly" :disabled="field.min === 1 && metadata.length === 1" class="remove remove-instance" :flat @button-clicked="metadata.splice(index,1)">
+        <Button v-if="!store.readonly"
+        :disabled="field.min === 1 && metadata.length === 1"
+        class="remove remove-instance"
+        :flat
+        @button-clicked="metadata.splice(index,1)"
+        @button-clicked="store.touched = true">
             <i class="fa-solid fa-trash"></i>
         </Button>
         <template v-for="subfield in field.fields">
@@ -31,7 +36,13 @@
 </fieldset>
 <template v-else >
     <div class="removable-field" v-for="(instance, index) in metadata">
-        <Button v-if="!(field.min === 1 && metadata.length <= 1) && (['monoselect', 'date'].includes(field.type)) && !store.readonly" class="remove-field remove left" :flat @button-clicked="metadata.splice(index,1)">
+        <Button v-if="!(field.min === 1 && metadata.length <= 1) &&
+                !(['monoselect', 'date'].includes(field.type)) && 
+                !store.readonly"
+        class="remove-field remove left"
+        :flat
+        @button-clicked="metadata.splice(index,1)"
+        @button-clicked="store.touched = true">
             <i class="fa-solid fa-minus"></i>
         </Button>
         <LabeledInput
@@ -47,7 +58,13 @@
             @input="(value) => update(value, index)"
             @input="store.touched = true"
         ></LabeledInput>
-        <Button v-if="!(field.min === 1 && metadata.length <= 1) && !(['monoselect', 'date'].includes(field.type)) && !store.readonly" class="remove-field remove right" :flat @button-clicked="metadata.splice(index,1)">
+        <Button v-if="!(field.min === 1 && metadata.length <= 1) &&
+            !(['monoselect', 'date'].includes(field.type)) &&
+            !store.readonly"
+        class="remove-field remove right"
+        :flat
+        @button-clicked="metadata.splice(index,1)"
+        @button-clicked="store.touched = true">
             <i class="fa-solid fa-minus"></i>
         </Button>
     </div>
