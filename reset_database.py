@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 from requests import HTTPError
 from dotenv import load_dotenv
 
-def getDatabaseName():
-    if len(sys.argv) == 2:
-        return str(sys.argv[1])
+def get_database_names():
+    if len(sys.argv) >= 2:
+        return sys.argv[1:]
     return input("Welche Datenbank möchten Sie zurücksetzen:\n")
 
 def delete(url: str, token: str):
@@ -40,8 +40,9 @@ if __name__ == '__main__':
     token = create_database.authentication_token(username, password)
     if not token:
         sys.exit()
-    databaseName = getDatabaseName()
-    try:
-        reset_database(databaseName, token)
-    except HTTPError as error:
-        print_reset_error(databaseName, error)
+    database_names = get_database_names()
+    for database in database_names:
+        try:
+            reset_database(database, token)
+        except HTTPError as error:
+            print_reset_error(database, error)

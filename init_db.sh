@@ -14,7 +14,9 @@ if [ ! -f /var/flags/dbinit ]; then
   dbs=$(grep -o "'.*'" ./server/entities/databases.py  | sed "s/'//g")
   echo "Creating databases "${dbs}
   python ./create_database.py ${dbs}
-  
+  echo "Resetting databases"
+  python ./reset_database.py ${dbs}
+   
   # Set initialized
   echo "CouchDB initialized"
   touch /var/flags/dbinit
