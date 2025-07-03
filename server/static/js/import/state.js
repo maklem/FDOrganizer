@@ -45,9 +45,15 @@ export const store = reactive({
  */
 async function getFolderContent(sourceId, folderId) {
     store.loading.content = true
-    const content = await get(`/import/${sourceId}/${folderId}`)
-    store.folders = content.folders
-    store.documents = content.documents
+    try {
+        const content = await get(`/import/${sourceId}/${folderId}`)
+        store.folders = content.folders
+        store.documents = content.documents
+    } catch (error) {
+        if (error.status === 401) {
+            await store.logout(sourceId)
+        }
+    }
     store.loading.content = false
 }
 
@@ -100,9 +106,15 @@ function activateSource(sourceId) {
 
 async function getSource(sourceId) {
     store.loading.content = true
-    let content = await get(`/import/${sourceId}`)
-    store.folders = content.folders
-    store.documents = content.documents
+     try {
+        const content = await get(`/import/${sourceId}`)
+        store.folders = content.folders
+        store.documents = content.documents
+    } catch (error) {
+        if (error.status === 401) {
+            await store.logout(sourceId)
+        }
+    }
     store.loading.content = false
 }
 
@@ -179,13 +191,18 @@ async function importAll(){
 }
 async function importDocuments(sourceIds) {
     const {parent,parentType} = editStore.currentPath()
-
-    await post(`/import/${store.activeSource}`, {
-        parent,
-        parentType,
-        sourceIds
-    })
-    await editStore.getPackageContent()
+     try {
+        await post(`/import/${store.activeSource}`, {
+            parent,
+            parentType,
+            sourceIds
+        })
+        await editStore.getPackageContent()
+    } catch (error) {
+        if (error.status === 401) {
+            await store.logout(store.activeSource)
+        }
+    }
     
 }
 

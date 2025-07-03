@@ -31,7 +31,7 @@ async function fetchWithType(type, url, httpBody, new_headers) {
 
     const response = await fetch(url, options);
     const json = await response.json()
-    if (response.status > 399) throw new Error(`${response.status} - ${json.message}`)
+    if (response.status > 399) throw new HTTPError(`${response.status} - ${json.message}`, response.status)
     return json
 }
 
@@ -58,4 +58,11 @@ function setHeaders(provided) {
         return headers
     }
     return defaultHeaders  
+}
+
+class HTTPError extends Error {
+ constructor(message, status) {
+  super(message)
+  this.status = status
+ }
 }
