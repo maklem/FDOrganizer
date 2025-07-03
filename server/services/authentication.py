@@ -35,6 +35,10 @@ def add_payload(token: str, key: str, value: str):
     updated_payload = payload(token) | {key: value}
     return encode(payload = updated_payload, key = SECRET)
 
+def remove_payload(token: str, key: str):
+    updated_payload = payload(token) | {key: None}
+    return encode(payload = updated_payload, key = SECRET)
+
 
 def create_token(username, organisation):
     return encode(payload = dict(create_payload(username, organisation)), key = SECRET, algorithm='HS256')

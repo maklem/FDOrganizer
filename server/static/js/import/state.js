@@ -1,6 +1,6 @@
 import {reactive} from '../vue.js';
 import { get, post } from "../http.js"
-import { loginSource, getSessionToken } from '../authentication.js';
+import { loginSource, getSessionToken, logoutSource } from '../authentication.js';
 import {store as editStore} from '../package-edit/state.js'
 
 
@@ -20,6 +20,7 @@ export const store = reactive({
     },
     getFolders,
     resetContent,
+    resetPath,
     toggleSelectFile,
     getFolderContent,
     activateSource,
@@ -31,6 +32,7 @@ export const store = reactive({
     getSources,
     getSource,
     authenticate,
+    logout,
     showImportButtons
 });
 /**
@@ -113,6 +115,10 @@ async function climbRemotePath() {
     getContent()
 }
 
+function resetPath() {
+    store.remotePath = []
+}
+
 async function authenticate(sourceId) {
     store.loading.content = true
     const {username, password} = {...store}
@@ -121,7 +127,15 @@ async function authenticate(sourceId) {
     store.password = undefined
     store.sources = store.sources.map(source => ({...source, authenticated: source.id === sourceId ? true : source.authenticated}))
     store.getSource(sourceId)
-    store.loading.content = false
+}
+
+async function logout(sourceId) {
+    store.loading.authentication = true
+    await logoutSource(sourceId)
+    store.sources = store.sources.map(source => ({...source, authenticated: source.id === sourceId ? false : source.authenticated}))
+    store.resetContent()
+    store.resetPath()
+    store.loading.authentication = false
 }
 
 async function importSelected() {

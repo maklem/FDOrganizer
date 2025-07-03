@@ -41,3 +41,8 @@ export async function loginSource(source, credentials) {
 	const json = await post(`/import/${source}/login`, credentials)
 	setCookie("token", json.token);
 }
+
+export async function logoutSource(source) {
+	const json = await post(`/import/${source}/logout`)
+	setCookie("token", json.token);
+}

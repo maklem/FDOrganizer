@@ -11,7 +11,7 @@ from .shared import persist_documents
 from .services.database import get
 from .entities import Document, Folder
 from .util import can_add_files, get_database_from_string, json_body, web_error, web_response
-from .services.authentication import add_payload, payload, user
+from .services.authentication import add_payload, payload, remove_payload, user
 
 SERVERNAME = __name__.split('.')[0]
 
@@ -88,6 +88,14 @@ def login_source(source: str):
 
     # Add plugin auth to existing JWT
     new_token = add_payload(auth_token, source, plugin_token)
+    return web_response(200, details={"token": new_token})
+
+@APP.route('/import/<source>/logout', methods=['POST'])
+def logout_source(source: str):
+    auth_token = request.cookies['token']
+
+    # Add plugin auth to existing JWT
+    new_token = remove_payload(auth_token, source)
     return web_response(200, details={"token": new_token})
 
 
