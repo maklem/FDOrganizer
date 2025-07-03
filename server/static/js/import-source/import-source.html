@@ -16,6 +16,9 @@
                 <div class="folder-name">{{path}}</div>
             </template>
         </header>
+        <Button v-if="authenticated" class="logout-button" @button-clicked="store.logout(id)">
+            <div>log out</div>
+        </Button>
     </div>
     <div v-if="store.activeSource === id" class="source-content">
         <div v-if="store.loading.content || store.loading.authentication" class="loading"></div>
@@ -26,14 +29,17 @@
                     :label="'Username'"
                     :placeholder="'Your ' + name + ' login name'"
                     :value="store.username"
-                    @input="(value) => store.username = value"></LabeledInput>
+                    :invalid="store.failedLogin"
+                    @input="(value) => store.setUsername(value)"></LabeledInput>
                 <LabeledInput
-                    :id="id + '-password'"
-                    :label="'Password'"
-                    :type="'password'"
-                    :placeholder="'Your ' + name + ' password'"
-                    :value="store.password"
-                    @input="(value) => store.password = value"></LabeledInput>
+                :id="id + '-password'"
+                :label="'Password'"
+                :type="'password'"
+                :placeholder="'Your ' + name + ' password'"
+                :value="store.password"
+                :invalid="store.failedLogin"
+                @input="(value) => store.setPassword(value)"></LabeledInput>
+                <div v-if="store.failedLogin" class="error-text">Nutzername oder Passwort nicht korrekt</div>
                 <Button @button-clicked="authenticate">Login</Button>
             </form>
             <template v-else>

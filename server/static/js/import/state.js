@@ -13,11 +13,14 @@ export const store = reactive({
     activeSource: undefined,
     username: undefined,
     password: undefined,
+    failedLogin: false,
     loading: {
         content: false,
         sources: false,
         authentication: false
     },
+    setPassword,
+    setUsername,
     getFolders,
     resetContent,
     resetPath,
@@ -72,6 +75,19 @@ function resetContent() {
     store.documents = []
     store.folders = []
     store.selectedDocuments = []
+    
+    store.setUsername(undefined)
+    store.setPassword(undefined)
+}
+
+function setPassword(password) {
+    store.password = password
+    store.failedLogin = false
+}
+
+function setUsername(username) {
+    store.username = username
+    store.failedLogin = false
 }
 
 function activateSource(sourceId) {
@@ -120,12 +136,19 @@ function resetPath() {
 }
 
 async function authenticate(sourceId) {
-    store.loading.content = true
+    store.loading.authentication = true
     const {username, password} = {...store}
-    await loginSource(sourceId, {username, password})
-    store.username = undefined
-    store.password = undefined
+    try {
+        await loginSource(sourceId, {username, password})
+    } catch {
+        store.failedLogin = true
+        store.loading.authentication = false
+        return
+    }
+    store.setUsername(undefined)
+    store.setPassword(undefined)
     store.sources = store.sources.map(source => ({...source, authenticated: source.id === sourceId ? true : source.authenticated}))
+    store.loading.authentication = false
     store.getSource(sourceId)
 }
 

@@ -91,6 +91,10 @@
     width: 100%;
 }
 
+.authenticate .error-text {
+    color: var(--error);
+}
+
 .import-folder{
     display: inline-grid;
     grid-template-columns: max-content minmax(auto, max-content);
