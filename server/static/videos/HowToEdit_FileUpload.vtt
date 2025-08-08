@@ -1,0 +1,130 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.708
+<b><font color='#000000'>If you want to edit one of your projects in general,</font></b>
+
+2
+00:00:02.708 --> 00:00:06.041
+<b><font color='#000000'>you must first select the package you want to modify. </font></b>
+
+3
+00:00:06.041 --> 00:00:08.333
+<b><font color='#000000'>The selected package becomes highlighted</font></b>
+
+4
+00:00:08.333 --> 00:00:11.416
+<b><font color='#000000'>and its contents are displayed on the right side. </font></b>
+
+5
+00:00:11.416 --> 00:00:16.583
+<b><font color='#000000'>Use the "Edit project" button located on the right to start your editing process.</font></b>
+
+6
+00:00:16.583 --> 00:00:19.541
+<b><font color='#000000'>If you want to upload your data to a specific folder, </font></b>
+
+7
+00:00:19.541 --> 00:00:22.125
+<b><font color='#000000'>you must first select that folder.</font></b>
+
+8
+00:00:22.125 --> 00:00:26.916
+<b><font color='#000000'>You can add your data in two ways, using either "File Upload" or "Import". </font></b>
+
+9
+00:00:26.916 --> 00:00:30.625
+<b><font color='#000000'>The "File Upload", allows you to add data from a local storage, </font></b>
+
+10
+00:00:30.625 --> 00:00:32.416
+<b><font color='#000000'>such as your computer. </font></b>
+
+11
+00:00:32.416 --> 00:00:36.458
+<b><font color='#000000'>To use the file upload, make sure that the "File Upload" tab is selected</font></b>
+
+12
+00:00:36.458 --> 00:00:38.583
+<b><font color='#000000'>and click on the plus symbol.</font></b>
+
+13
+00:00:38.583 --> 00:00:41.000
+<b><font color='#000000'>A file explorer will open in a new window</font></b>
+
+14
+00:00:41.000 --> 00:00:44.000
+<b><font color='#000000'>where you can select the files you want to upload. </font></b>
+
+15
+00:00:44.000 --> 00:00:46.958
+<b><font color='#000000'>Once you have selected the files, click "Open"</font></b>
+
+16
+00:00:46.958 --> 00:00:50.458
+<b><font color='#000000'>and your selected files will appear in the FDOrganizer.</font></b>
+
+17
+00:00:50.458 --> 00:00:53.083
+<b><font color='#000000'>In case you have added a file by mistake, </font></b>
+
+18
+00:00:53.083 --> 00:00:56.458
+<b><font color='#000000'>you can easily delete it by using the recycle bin.</font></b>
+
+19
+00:00:56.458 --> 00:01:01.083
+<b><font color='#000000'>To finally upload your data to the FDOrganizer, start the upload process </font></b>
+
+20
+00:01:01.083 --> 00:01:04.541
+<b><font color='#000000'> by clicking on the "Start Upload" button on the bottom right. </font></b>
+
+21
+00:01:04.541 --> 00:01:07.833
+<b><font color='#000000'>A pop-up window will appear where you can either cancel</font></b>
+
+22
+00:01:07.833 --> 00:01:10.291
+<b><font color='#000000'>or confirm the upload process. </font></b>
+
+23
+00:01:10.291 --> 00:01:13.416
+<b><font color='#000000'>If you choose "Abort" the file upload will stop</font></b>
+
+24
+00:01:13.416 --> 00:01:16.333
+<b><font color='#000000'>and you can continue with the selection of the data. </font></b>
+
+25
+00:01:16.333 --> 00:01:20.166
+<b><font color='#000000'>If you choose "Yes" your files will be uploaded to your package. </font></b>
+
+26
+00:01:20.166 --> 00:01:25.750
+<b><font color='#000000'>Of course, if necessary, you can also delete your files after they have been uploaded. </font></b>
+
+27
+00:01:25.750 --> 00:01:27.916
+<b><font color='#000000'>Just use the recycle bin.</font></b>
+
+28
+00:01:27.916 --> 00:01:32.250
+<b><font color='#000000'>When you click on the symbol, a dialogue box will offer you two options. </font></b>
+
+29
+00:01:32.250 --> 00:01:35.833
+<b><font color='#000000'>You can either keep your file by selecting "Do not delete"</font></b>
+
+30
+00:01:35.833 --> 00:01:39.291
+<b><font color='#000000'>or permanently delete it by choosing "Delete file".</font></b>
+
+31
+00:01:39.291 --> 00:01:42.875
+<b><font color='#000000'>Please note that if you delete a file that you have uploaded manually,</font></b>
+
+32
+00:01:42.875 --> 00:01:46.000
+<b><font color='#000000'>you will need to upload it again if you want to recover it.</font></b>
+

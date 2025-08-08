@@ -1,0 +1,122 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.791
+<b><font color='#000000'>As you can see, the metadata in the input form is grouped into six different categories. </font></b>
+
+2
+00:00:05.791 --> 00:00:10.166
+<b><font color='#000000'>The metadata in the first category "Required" is mandatory, </font></b>
+
+3
+00:00:10.166 --> 00:00:14.916
+<b><font color='#000000'>if this information is not provided, it will not be possible to archive your data. </font></b>
+
+4
+00:00:14.916 --> 00:00:18.000
+<b><font color='#000000'>In order to enter your metadata, click on the first category</font></b>
+
+5
+00:00:18.000 --> 00:00:20.666
+<b><font color='#000000'>and you can see how the form expands. </font></b>
+
+6
+00:00:20.666 --> 00:00:29.500
+<b><font color='#000000'>These six metadata fields in the "Required" category are mandatory and must be filled in. </font></b>
+
+7
+00:00:29.500 --> 00:00:33.333
+<b><font color='#000000'>To get started, go to the first section for identifiers. </font></b>
+
+8
+00:00:33.333 --> 00:00:38.208
+<b><font color='#000000'>Use the drop-down menu to select the identifier you want to assign to your data.</font></b>
+
+9
+00:00:38.208 --> 00:00:43.250
+<b><font color='#000000'>For example, if your data is already published, this could be a DOI, </font></b>
+
+10
+00:00:43.250 --> 00:00:45.875
+<b><font color='#000000'> a Digital Object Identifier. </font></b>
+
+11
+00:00:45.875 --> 00:00:50.375
+<b><font color='#000000'>When the type of identifier is selected, you will see that another field appears.</font></b>
+
+12
+00:00:50.375 --> 00:00:53.333
+<b><font color='#000000'>Here you can now enter the DOI itself.</font></b>
+
+13
+00:00:53.333 --> 00:00:59.416
+<b><font color='#000000'>Please note that some of the identifiers, such as a DOI, may have a specific structure.</font></b>
+
+14
+00:00:59.416 --> 00:01:02.041
+<b><font color='#000000'>If your entry does not have the correct form,</font></b>
+
+15
+00:01:02.041 --> 00:01:07.333
+<b><font color='#000000'>the red colouring will indicate that there is an error, so that you can check your entry.</font></b>
+
+16
+00:01:07.333 --> 00:01:10.791
+<b><font color='#000000'>In general, if you are not sure what each of the fields mean,</font></b>
+
+17
+00:01:10.791 --> 00:01:15.458
+<b><font color='#000000'>you can find further information for every field by using the information symbol.</font></b>
+
+18
+00:01:15.500 --> 00:01:19.333
+<b><font color='#000000'>To hide the additional information, just click on the symbol again. </font></b>
+
+19
+00:01:19.333 --> 00:01:23.083
+<b><font color='#000000'>If you would like to enter an additional identifier for your data - </font></b>
+
+20
+00:01:23.083 --> 00:01:28.375
+<b><font color='#000000'> for example a project-specific identifier, just use the "Add Identifier" button. </font></b>
+
+21
+00:01:28.458 --> 00:01:32.666
+<b><font color='#000000'>As you can see, a new input field has been added. </font></b>
+
+22
+00:01:32.708 --> 00:01:37.333
+<b><font color='#000000'>If you change your mind and decide you don´t need this additional identifier </font></b>
+
+23
+00:01:37.333 --> 00:01:40.000
+<b><font color='#000000'> you can simply delete it from the form. </font></b>
+
+24
+00:01:40.000 --> 00:01:44.125
+<b><font color='#000000'>Just use the recycle bin symbol to the left of the input field.</font></b>
+
+25
+00:01:44.125 --> 00:01:49.416
+<b><font color='#000000'>Please note that at least one identifier must be present, as this is a mandatory field. </font></b>
+
+26
+00:01:49.416 --> 00:01:53.458
+<b><font color='#000000'>All other metadata in this form, both required and optional, </font></b>
+
+27
+00:01:53.458 --> 00:01:56.458
+<b><font color='#000000'> can be entered in the same way as just shown. </font></b>
+
+28
+00:01:56.458 --> 00:02:00.500
+<b><font color='#000000'>Once you've finished entering your metadata, don't forget to save your input </font></b>
+
+29
+00:02:00.500 --> 00:02:03.708
+<b><font color='#000000'>using the “Save” button in the bottom right-hand corner. </font></b>
+
+30
+00:02:03.708 --> 00:02:07.708
+<b><font color='#000000'>If you close the form without saving, all your entries will be lost.</font></b>
+

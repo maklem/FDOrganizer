@@ -1,0 +1,123 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:03.750
+<b><font color='#000000'>You are currently in the Editor mode of the FDOrganizer. </font></b>
+
+2
+00:00:03.750 --> 00:00:06.000
+<b><font color='#000000'>Here you can manage your data. </font></b>
+
+3
+00:00:06.000 --> 00:00:09.458
+<b><font color='#000000'>For example, you can structure it or add metadata.</font></b>
+
+4
+00:00:09.458 --> 00:00:12.583
+<b><font color='#000000'>To prepare your data for the long-term availability, </font></b>
+
+
+5
+00:00:12.583 --> 00:00:15.583
+<b><font color='#000000'>you first need to create a new project.</font></b>
+
+6
+00:00:15.583 --> 00:00:18.583
+<b><font color='#000000'>To do this, use the Add project button. </font></b>
+
+7
+00:00:18.583 --> 00:00:21.541
+<b><font color='#000000'>There are two ways to create a new project.</font></b>
+
+8
+00:00:21.541 --> 00:00:23.833
+<b><font color='#000000'>Either you can create an empty project</font></b>
+
+9
+00:00:23.833 --> 00:00:27.250
+<b><font color='#000000'>or you can import your data directly from a zip file.</font></b>
+
+10
+00:00:27.291 --> 00:00:32.000
+<b><font color='#000000'>For an empty project, make sure you select the correct option and then assign a name.</font></b>
+
+11
+00:00:32.000 --> 00:00:36.208
+<b><font color='#000000'>When you press the Create project button, it will be created. </font></b>
+
+12
+00:00:36.208 --> 00:00:40.333
+<b><font color='#000000'>If you want to choose the second option and import your data directly from a zip file, </font></b>
+
+13
+00:00:40.333 --> 00:00:43.208
+<b><font color='#000000'>use also the Add project button </font></b>
+
+14
+00:00:43.208 --> 00:00:47.083
+<b><font color='#000000'>and select the option „Import from zip“.</font></b>
+
+15
+00:00:47.083 --> 00:00:50.041
+<b><font color='#000000'>Use the plus sign to select your zip file. </font></b>
+
+16
+00:00:50.041 --> 00:00:53.166
+<b><font color='#000000'>Your file explorer will then open in a new window.</font></b>
+
+17
+00:00:53.166 --> 00:00:56.041
+<b><font color='#000000'>Here you can select the zip file you want to use</font></b>
+
+18
+00:00:56.041 --> 00:01:00.250
+<b><font color='#000000'>and upload it to the FDOrganizer by using the Open button.</font></b>
+
+19
+00:01:00.333 --> 00:01:02.791
+<b><font color='#000000'>When you click the Import zip button,</font></b>
+
+20
+00:01:02.791 --> 00:01:06.250
+<b><font color='#000000'>your new project is created containing the data from your zip file. </font></b>
+
+21
+00:01:06.291 --> 00:01:11.333
+<b><font color='#000000'>You can change the name of your project by using the pencil icon next to the current name. </font></b>
+
+22
+00:01:11.333 --> 00:01:16.750
+<b><font color='#000000'>If you want to cancel your name change and keep your original name, click on the cross. </font></b>
+
+23
+00:01:16.833 --> 00:01:19.625
+<b><font color='#000000'>To confirm your name change, use the check mark </font></b>
+
+24
+00:01:19.625 --> 00:01:22.583
+<b><font color='#000000'>and the new name will be applied to the current project.</font></b>
+
+25
+00:01:22.583 --> 00:01:28.000
+<b><font color='#000000'>If necessary, you can remove the whole project by using the recycle bin symbol.</font></b>
+
+26
+00:01:28.000 --> 00:01:32.083
+<b><font color='#000000'>When you click on the symbol, a dialogue box will offer you two options. </font></b>
+
+27
+00:01:32.125 --> 00:01:34.958
+<b><font color='#000000'>You can either leave your project unchanged. </font></b>
+
+28
+00:01:34.958 --> 00:01:37.833
+<b><font color='#000000'>Or you can permanently delete it. </font></b>
+
+29
+00:01:37.833 --> 00:01:41.416
+<b><font color='#000000'>Please note that in this case, all of the data contained in that project </font></b>
+
+30
+00:01:41.416 --> 00:01:44.416
+<b><font color='#000000'>will also be deleted and cannot be recovered.</font></b>
+

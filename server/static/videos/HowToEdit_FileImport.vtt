@@ -1,0 +1,134 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.708
+<b><font color='#000000'>If you want to edit one of your projects in general,</font></b>
+
+2
+00:00:02.708 --> 00:00:06.041
+<b><font color='#000000'>you must first select the package you want to modify. </font></b>
+
+3
+00:00:06.041 --> 00:00:08.333
+<b><font color='#000000'>The selected package becomes highlighted</font></b>
+
+4
+00:00:08.333 --> 00:00:11.416
+<b><font color='#000000'>and its contents are displayed on the right side. </font></b>
+
+5
+00:00:11.416 --> 00:00:16.583
+<b><font color='#000000'>Use the "Edit project" button located on the right to start your editing process.</font></b>
+
+6
+00:00:16.583 --> 00:00:19.541
+<b><font color='#000000'>If you want to upload your data to a specific folder, </font></b>
+
+7
+00:00:19.541 --> 00:00:22.125
+<b><font color='#000000'>you must first select that folder.</font></b>
+
+8
+00:00:22.125 --> 00:00:26.916
+<b><font color='#000000'>You can add your data in two ways, using either "File Upload" or "Import". </font></b>
+
+9
+00:00:26.916 --> 00:00:30.208
+<b><font color='#000000'>With "Import" you can add data from external data sources, </font></b>
+
+10
+00:00:30.208 --> 00:00:33.125
+<b><font color='#000000'>such as databases or repositories.</font></b>
+
+11
+00:00:33.125 --> 00:00:36.916
+<b><font color='#000000'>In order to log in, you have to select the corresponding entry, </font></b>
+
+12
+00:00:36.916 --> 00:00:39.041
+<b><font color='#000000'>here the database "EasyDB". </font></b>
+
+13
+00:00:39.041 --> 00:00:43.916
+<b><font color='#000000'>To access your data, enter your external source username and password.</font></b>
+
+14
+00:00:43.916 --> 00:00:49.083
+<b><font color='#000000'>After the login, all your files in the external source will be displayed on the right.</font></b>
+
+15
+00:00:49.083 --> 00:00:53.333
+<b><font color='#000000'>Here you can see two folders on the database system containing the data.</font></b>
+
+16
+00:00:53.333 --> 00:00:56.916
+<b><font color='#000000'>To upload your files first select the appropriate folder. </font></b>
+
+17
+00:00:56.916 --> 00:01:01.583
+<b><font color='#000000'>There are two different ways to import your files into the FDOrganizer: </font></b>
+
+18
+00:01:01.583 --> 00:01:04.750
+<b><font color='#000000'> either "Import selected" or "Import all". </font></b>
+
+19
+00:01:04.750 --> 00:01:09.333
+<b><font color='#000000'>To upload only individual selected files at first select the relevant file</font></b>
+
+20
+00:01:09.333 --> 00:01:10.708
+<b><font color='#000000'> by clicking on it. </font></b>
+
+21
+00:01:10.708 --> 00:01:13.458
+<b><font color='#000000'>Then use the Button "Import selected". </font></b>
+
+22
+00:01:13.458 --> 00:01:18.000
+<b><font color='#000000'>As soon as the import is complete, the files are displayed on the left.</font></b>
+
+23
+00:01:18.000 --> 00:01:22.750
+<b><font color='#000000'>In addition to the file name, you can also see the size of each file. </font></b>
+
+24
+00:01:22.750 --> 00:01:26.958
+<b><font color='#000000'>If you want to import all your files in your external source at once, </font></b>
+
+25
+00:01:26.958 --> 00:01:29.333
+<b><font color='#000000'>use the "Import all" button. </font></b>
+
+26
+00:01:29.333 --> 00:01:34.208
+<b><font color='#000000'>If necessary, you can also delete your files after they have been uploaded. </font></b>
+
+27
+00:01:34.208 --> 00:01:36.541
+<b><font color='#000000'>Just use the recycle bin symbol. </font></b>
+
+28
+00:01:36.541 --> 00:01:41.041
+<b><font color='#000000'>When you click on the symbol, a dialogue box will offer you two options.</font></b>
+
+29
+00:01:41.041 --> 00:01:44.375
+<b><font color='#000000'>You can either keep your file by selecting "Do not delete"</font></b>
+
+30
+00:01:44.375 --> 00:01:47.291
+<b><font color='#000000'>or delete it by selecting "Delete file". </font></b>
+
+31
+00:01:47.291 --> 00:01:52.000
+<b><font color='#000000'>In this case, your data will only be deleted from the FDOrganizer.</font></b>
+
+32
+00:01:52.000 --> 00:01:54.708
+<b><font color='#000000'> It will not be deleted in your external source,</font></b>
+
+33
+00:01:54.708 --> 00:01:57.916
+<b><font color='#000000'>so if you want to restore the file, you can import it again.</font></b>
+

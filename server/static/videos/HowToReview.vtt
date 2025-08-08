@@ -1,0 +1,126 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:03.791
+<b><font color='#000000'>If you want to review data, you need to be in the "Review" tab.</font></b>
+
+2
+00:00:03.791 --> 00:00:07.208
+<b><font color='#000000'>Here you will find the three different statuses "Needs review", </font></b>
+
+3
+00:00:07.208 --> 00:00:09.416
+<b><font color='#000000'>"Rejected" and "Accepted".</font></b>
+
+4
+00:00:09.416 --> 00:00:13.583
+<b><font color='#000000'>As soon as a data package has been submitted for review by a data provider, </font></b>
+
+5
+00:00:13.583 --> 00:00:16.125
+<b><font color='#000000'>it will be displayed under "Needs review". </font></b>
+
+6
+00:00:16.125 --> 00:00:20.375
+<b><font color='#000000'>When you select a package, you will see all its contents on the right side.</font></b>
+
+7
+00:00:20.375 --> 00:00:23.500
+<b><font color='#000000'>To view the metadata, use the book icon. </font></b>
+
+8
+00:00:23.500 --> 00:00:26.416
+<b><font color='#000000'>You will find it at different levels of the package.</font></b>
+
+9
+00:00:26.416 --> 00:00:29.375
+<b><font color='#000000'>Each file can have metadata, each folder</font></b>
+
+10
+00:00:29.375 --> 00:00:32.333
+<b><font color='#000000'>or the whole package can have metadata.</font></b>
+
+11
+00:00:32.333 --> 00:00:35.625
+<b><font color='#000000'>If you open the metadata form by using the book symbol, </font></b>
+
+12
+00:00:35.625 --> 00:00:38.666
+<b><font color='#000000'>you can check the metadata entered by the data provider.</font></b>
+
+13
+00:00:38.666 --> 00:00:41.375
+<b><font color='#000000'>To ensure the completeness of the legal entries,</font></b>
+
+14
+00:00:41.375 --> 00:00:45.041
+<b><font color='#000000'>use the list icon displayed next to the data package. </font></b>
+
+15
+00:00:45.041 --> 00:00:48.750
+<b><font color='#000000'>You can check the data provider´s entries under the "Legal" tab. </font></b>
+
+16
+00:00:48.750 --> 00:00:53.833
+<b><font color='#000000'>You can also use the list icon to give the data provider feedback on their data.</font></b>
+
+17
+00:00:53.833 --> 00:00:57.916
+<b><font color='#000000'>Choose the "Review" tab and you can enter your feedback in the "New Comment" field </font></b>
+
+18
+00:00:57.916 --> 00:01:00.250
+<b><font color='#000000'>and use the "Add to review" button.</font></b>
+
+19
+00:01:00.250 --> 00:01:05.000
+<b><font color='#000000'>If necessary, you can also delete the current review using the recycle bin.</font></b>
+
+20
+00:01:05.000 --> 00:01:08.583
+<b><font color='#000000'>To make your reviews visible to the data provider in the next step,</font></b>
+
+21
+00:01:08.583 --> 00:01:11.500
+<b><font color='#000000'>you need to reject the data package for revision.</font></b>
+
+22
+00:01:11.500 --> 00:01:14.583
+<b><font color='#000000'>To do this, use the "Request changes" button at the bottom.</font></b>
+
+23
+00:01:14.583 --> 00:01:19.500
+<b><font color='#000000'>The status of the data package will now change from "Needs review" to "Rejected".</font></b>
+
+24
+00:01:19.500 --> 00:01:23.000
+<b><font color='#000000'>As soon as the package has been processed by the data provider,</font></b>
+
+25
+00:01:23.000 --> 00:01:26.333
+<b><font color='#000000'>it will reappear with the status "Needs review". </font></b>
+
+26
+00:01:26.333 --> 00:01:29.500
+<b><font color='#000000'>It can then either be sent back to the data provider </font></b>
+
+27
+00:01:29.500 --> 00:01:31.958
+<b><font color='#000000'>with new reviews for processing again,</font></b>
+
+28
+00:01:31.958 --> 00:01:36.041
+<b><font color='#000000'>or the data package can be archived without further complaint.</font></b>
+
+29
+00:01:36.041 --> 00:01:40.500
+<b><font color='#000000'>To do this, use the "Accept & Archive" button in the top right.</font></b>
+
+30
+00:01:40.500 --> 00:01:43.833
+<b><font color='#000000'>The data package will now change to the status "Accepted"</font></b>
+
+31
+00:01:43.833 --> 00:01:47.000
+<b><font color='#000000'>and will also appear as "Archived" to the data provider.</font></b>
+
