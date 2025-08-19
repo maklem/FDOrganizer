@@ -1,5 +1,6 @@
 import Button from "../button/button.js";
 import UploadFile from "../upload-file/upload-file.js";
+import VideoDialog from "../video-dialog/video-dialog.js";
 import { store } from "./state.js"
 import { setup } from "../setup.js";
 
@@ -8,7 +9,8 @@ const template = await setup('upload');
 export default {
     components: {
         Button,
-        UploadFile
+        UploadFile,
+        VideoDialog
     },
     data() {
         return {

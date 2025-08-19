@@ -25,7 +25,7 @@
 }
 .metadata-header {
     display: grid;
-    grid-template-columns: max-content auto min-content;
+    grid-template-columns: max-content max-content auto min-content;
     align-items: center;
     gap: 1rem;
 
@@ -40,8 +40,13 @@
     font-size: 2rem;
 }
 
-.metadata-header .field-label {
-    padding-bottom: 0;
+.metadata-header .dialog-button {
+    display: grid;
+    justify-content: left;
+}
+.metadata-header .question-button {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
 }
 
 .metadata-header .back-button {
@@ -68,7 +73,7 @@
     display: grid;
     grid-template-rows: repeat(6, max-content);
 
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .choose-type {
@@ -81,17 +86,3 @@
 
 }
 
-.help-overlay {
-    position: absolute;
-    width: 30%;
-    max-height:92vh;
-    top:3rem;
-    left: 35%;
-
-    background-color: #ccc;
-}
-.help-overlay>div{
-    white-space: pre;
-    overflow-y: scroll;
-    max-height:90vh;
-}

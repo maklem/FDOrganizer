@@ -6,6 +6,12 @@
                     <header class="package-status-header">
                         <i class="icon fa-solid" :class="status.icon"></i>
                         <h2 class="text">{{status.name}}</h2>
+                        <VideoDialog v-if="status.id === 'active'" title="How to archive data" video="HowToArchive_Active">
+                            <span class="tutorial-trigger">How to archive?</span>
+                        </VideoDialog>
+                        <VideoDialog v-if="status.id === 'rework'" title="How to revise reviewed projects" video="HowToArchive_Rework">
+                            <span class="tutorial-trigger">How to revise?</span>
+                        </VideoDialog>
                     </header>
                     <ArchiveListItem v-if="!!store.packagesWithStatus(status.id).length"
                         v-for="pkg in store.packagesWithStatus(status.id)"

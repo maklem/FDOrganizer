@@ -4,6 +4,7 @@ import MetadataSection from "../metadata-section/metadata-section.js"
 import Button from "../button/button.js"
 import LabeledInput from "../labeled-input/labeled-input.js"
 import Toast from "../toast/toast.js"
+import VideoDialog from "../video-dialog/video-dialog.js"
 
 const template = await setup('metadata');
 
@@ -12,7 +13,8 @@ export default {
         MetadataSection,
         Button,
         LabeledInput,
-        Toast
+        Toast,
+        VideoDialog
     },
     props: {
     },

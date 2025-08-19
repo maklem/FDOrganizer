@@ -6,6 +6,9 @@
                     <header class="package-status-header">
                         <i class="icon fa-solid" :class="status.icon"></i>
                         <h2 class="text">{{status.name}}</h2>
+                        <VideoDialog v-if="status.id === 'review'" title="How to review a submitted project" video="HowToReview">
+                            <span class="tutorial-trigger">How to review?</span>
+                        </VideoDialog>
                     </header>
                     <ReviewListItem v-if="!!store.packagesWithStatus(status.id).length"
                         v-for="pkg in store.packagesWithStatus(status.id)"

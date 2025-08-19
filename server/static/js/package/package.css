@@ -17,6 +17,23 @@
     border-right: 0.2rem solid #eee;
 }
 
+.left-sidebar .no-data-placeholder {
+    justify-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    
+    font-size: 1.3rem;
+    color: #777;
+    font-weight: 700;
+}
+.no-data-placeholder .question-button {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+}
+
 .left-sidebar .package-list-item {
     border-bottom: 0.05rem solid #eee;
 }

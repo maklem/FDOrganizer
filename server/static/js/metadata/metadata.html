@@ -3,6 +3,9 @@
         <header class="metadata-header">
             <i class="fa-solid" :class="iconClass"></i>
             <h1 v-if="!!store.entity">{{store.entity.name}}</h1>
+            <VideoDialog title="How to add metadata" video="HowToAddMetadata_Form">
+                <i class="fa-solid fa-circle-question question-button"></i>
+            </VideoDialog>
             <Button class="back-button" :flat @button-clicked="store.closeDocument()">
                 <i class="fa-solid fa-xmark"></i>
             </Button>
@@ -14,10 +17,6 @@
             <Button class="close-button" @button-clicked="store.closeDocument()">Abort</Button>
             <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched">Save</Button>
         </div>
-        <!-- <div class="help-overlay">
-            <button @click="helpOverlay=!helpOverlay">x</button>
-            <div v-if="helpOverlay">{{JSON.stringify(store.metadata,(key, value) => value ?? "undefined", 4)}}</div>
-        </div> -->
     </div>
     <Toast></Toast>
 </dialog>

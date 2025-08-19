@@ -72,6 +72,19 @@ input[type="file"] {
 
 .manual-upload .button-row {
     flex: 0 0 0;
+    width: 100%;
+    display:grid;
+    grid-template-columns: auto max-content;
+    justify-items: left;
+    align-items: end;
+}
+
+.button-row .tutorial-trigger{
+    font-size: 1rem;
+    margin: 0;
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .manual-upload .upload-dialog {

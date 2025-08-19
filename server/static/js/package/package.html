@@ -2,6 +2,12 @@
     <main class="package-overview">
         <aside class="left-sidebar">
             <template v-if="!store.loading.packageList">
+                <div class="no-data-placeholder" v-if="!store.packages.length">
+                    <span>No data added yet</span>
+                    <VideoDialog title="How to add a project" video="HowToAddAProject">
+                        <i class="fa-solid fa-circle-question question-button"></i>
+                    </VideoDialog>
+                </div>
                 <PackageListItem
                     v-for="pkg in store.packages"
                     @open-metadata="metadataStore.openMetadata('package', pkg.id)"

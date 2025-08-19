@@ -57,7 +57,7 @@
 
 .package-status-header {
     display:grid;
-    grid-template-columns: max-content auto;
+    grid-template-columns: max-content auto max-content;
     align-items: center;
     gap: 1rem;
 
@@ -73,6 +73,14 @@
 .package-status-header .text{
     font-size: 1.1rem;
     margin: 0;
+}
+
+.package-status-header .tutorial-trigger{
+    font-size: 1rem;
+    margin: 0;
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .no-data-placeholder {

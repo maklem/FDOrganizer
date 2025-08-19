@@ -3,7 +3,6 @@
     flex-direction: column;
 
     overflow-y: hidden;
-    padding: 0 0 1rem 0;
     flex: 1 1 0;
 }
 
@@ -15,11 +14,32 @@
 .sources-list .button-row {
     width: 100%;
     display: grid;
-    grid-template-rows: max-content;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: max-content max-content;
     gap: 0.5rem;
-    align-items: end;
+    align-items: center;
     justify-items: stretch;
     
     padding: 1rem;
     align-self: end;
+
+    .import-tutorial-trigger{
+        padding: 0;
+    }
+
+    .dialog-button {
+                grid-area: 2 / 1 / 2 / 2;
+    }            
+}
+
+.import-tutorial-trigger{
+    font-size: 1rem;
+    margin: 0;
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 1rem;
+    text-align: left;
+    height: 100%;
+    display: block;
 }

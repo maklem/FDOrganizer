@@ -1,11 +1,17 @@
 <div class="sources-list">
     <ImportSource
-        v-for="source in store.sources"
-        v-bind="source"
-        :class="{active: store.activeSource === source.id}"
+    v-for="source in store.sources"
+    v-bind="source"
+    :class="{active: store.activeSource === source.id}"
     ></ImportSource>
     <div class="button-row" v-if="store.showImportButtons()">
+        <VideoDialog title="How to import files" video="HowToEdit_FileImport">
+            <span class="import-tutorial-trigger">How to import files?</span>
+        </VideoDialog>
         <Button :disabled="!store.selectedDocuments.length" @button-clicked="store.importSelected()">Import selected files</Button>
         <Button :disabled="!store.documents.length" @button-clicked="store.importAll()">Import all</Button>
     </div>
 </div>
+<VideoDialog v-if="!store.showImportButtons()" title="How to import files" video="HowToEdit_FileImport">
+    <span class="import-tutorial-trigger">How to import files?</span>
+</VideoDialog>

@@ -64,7 +64,7 @@ section {
         grid-template-rows: repeat(auto-fit, minmax(min-content, 30%));
         justify-content: stretch;
 
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
     &.legal-tab {

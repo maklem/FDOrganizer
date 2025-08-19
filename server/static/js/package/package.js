@@ -5,10 +5,12 @@ import Button from "../button/button.js";
 import PackageContent from "../package-content/package-content.js";
 import LabeledInput from "../labeled-input/labeled-input.js"
 import Metadata from "../metadata/metadata.js"
+import VideoDialog from "../video-dialog/video-dialog.js"
 
 import {store} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"
 import { setup } from "../setup.js";
+import videoDialog from "../video-dialog/video-dialog.js";
 
 const template = await setup('package');
 
@@ -19,7 +21,8 @@ const pkg = createApp({
         Button,
         PackageContent,
         Metadata,
-        LabeledInput
+        LabeledInput,
+        VideoDialog
     },
     data() {
         return {

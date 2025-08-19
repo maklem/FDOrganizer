@@ -31,3 +31,20 @@
     background-size: 200%;
     animation: gradient 2s ease-in infinite;
 }
+
+.package-content .no-data-placeholder {
+    justify-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    
+    font-size: 1.3rem;
+    color: #777;
+    font-weight: 700;
+}
+.no-data-placeholder .question-button {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+}
