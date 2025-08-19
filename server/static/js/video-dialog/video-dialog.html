@@ -1,0 +1,20 @@
+<!-- Thumbnail -->
+ <button class="dialog-button" @click="openDialog">
+  <slot></slot>
+ </button>
+
+
+<!-- Dialog -->
+<dialog ref="dialog" class="video-dialog" :open="dialogOpen">
+  <header class="tutorial-header">
+      <i class="fa-solid fa-circle-question"></i>
+      <h1>{{title}}</h1>
+      <Button class="back-button" :flat @button-clicked="closeDialog">
+          <i class="fa-solid fa-xmark"></i>
+      </Button>
+  </header>
+  <video ref="video" controls>
+    <source :src="videoUrl" type="video/mp4">
+    <track label="English" kind="subtitles" srclang="en" :src="subtitleUrl"></track>
+  </video>
+</dialog>
