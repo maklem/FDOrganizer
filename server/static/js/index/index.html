@@ -1,30 +1,23 @@
 <App>
     <main class="index-page">
-        <div class="index">
-            <h2>Welcome to the FDOrganizer</h2>
-            <p>This is an alpha version of the FDOrganizer in active development.
-                It may change at any time and data may be deleted at any time.
-                Please use with caution!
-            </p>
-        </div>
         <div class="grid-container">
-            <div class="item">
+            <div class="column">
                 <h2>The FDOrganizer</h2>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-dolly"></i>
                     <div>
                         <h4>Pre-Ingest Tool</h4>
                         <p>The tool can be used for data curation and organization before the data is transferred to a long-term archive</p>
                     </div>
                 </div>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-server"></i>
                     <div>
                         <h4>Interface to several data sources</h4>
                         <p>A variety of data sources, such as databases or electronic lab notebooks, can be connected to the FDOrganizer</p>
                     </div>
                 </div>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-box-archive"></i>
                     <div>
                         <h4>Interface to long-term archiving system</h4>
@@ -32,23 +25,23 @@
                     </div>
                 </div>
             </div>
-            <div class="item">
+            <div class="column">
                 <h2>The Features</h2>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-file-import"></i>
                     <div>
                         <h4>Import research data from different source systems</h4>
                         <p>Research data can be imported easily from various connected data sources, such as electronic lab notebooks or databases</p>
                     </div>
                 </div>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-regular fa-folder-open"></i>
                     <div>
                         <h4>Organize and store research data</h4>
                         <p>The data can be organized and arranged in appropriate structures</p>
                     </div>
                 </div>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-sitemap"></i>
                     <div>
                         <h4>Add and structure metadata</h4>
@@ -56,9 +49,9 @@
                     </div>
                 </div>
             </div>
-            <div class="item">
+            <div class="column">
                 <h2>How to use</h2>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-pen-to-square"></i>
                     <div>
                         <h4>Edit</h4>
@@ -68,7 +61,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-box-archive"></i>
                     <div>
                         <h4>Archive</h4>
@@ -78,7 +71,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="flex">
+                <div class="intro-item">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <div>
                         <h4>Review</h4>
@@ -86,5 +79,33 @@
                     </div>
                 </div>
             </div>
-    </main>
+            <div class="column">
+                <h2>Video Tutorial</h2>
+                <h4>First Steps</h4>
+                <VideoDialog title="First Steps" video="FirstSteps_Overview">
+                    <video disablePictureInPicture class="tutorial-video" src="/static/videos/FirstSteps_Overview.mp4"></video>
+                </VideoDialog>
+                <h4>File management</h4>
+                <template v-for="tutorial in tutorials.manage">
+                    <h5>{{tutorial.header}}</h5>
+                    <VideoDialog :title=tutorial.title :video=tutorial.video>
+                        <video disablePictureInPicture class="tutorial-video" :src="'/static/videos/'+tutorial.video+'.mp4'"></video>
+                    </VideoDialog>
+                </template>
+                <h4>Metadata</h4>
+                <template v-for="tutorial in tutorials.metadata">
+                    <h5>{{tutorial.header}}</h5>
+                    <VideoDialog :title=tutorial.title :video=tutorial.video>
+                        <video disablePictureInPicture class="tutorial-video" :src="'/static/videos/'+tutorial.video+'.mp4'"></video>
+                    </VideoDialog>
+                </template>
+                <h4>Archival</h4>
+                <template v-for="tutorial in tutorials.archive">
+                    <h5>{{tutorial.header}}</h5>
+                    <VideoDialog :title=tutorial.title :video=tutorial.video>
+                        <video disablePictureInPicture class="tutorial-video" :src="'/static/videos/'+tutorial.video+'.mp4'"></video>
+                    </VideoDialog>
+                </template>
+            </div>
+        </main>
 </App>
