@@ -24,7 +24,7 @@
         <div v-if="store.loading.content || store.loading.authentication" class="loading"></div>
         <template v-else>
             <form v-if="!authenticated && needsAuthentication" class="authenticate">
-                <template v-if="authenticationType === store.AUTH_TYPES.USERNAME_AND_PASSWORD">
+                <template v-if="authenticationType === store.AUTH_TYPES.password">
                     <LabeledInput
                         :id="id + '-username'"
                         :label="'Username'"
