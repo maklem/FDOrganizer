@@ -15,6 +15,7 @@ flask_session
 # IDE settings
 /.vscode
 /.mypy_cache
+/.idea
 
 # Environment variables
 .env
@@ -22,3 +23,6 @@ flask_session
 #docker volumes
 db/
 init-flags/
+
+*.log
+

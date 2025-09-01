@@ -1,1 +1,1 @@
-flask --app server --debug run --cert=./server/ssl/ca.crt --key=./server/ssl/ca.key
+flask --app server --debug run --cert=./ssl/ca.crt --key=./ssl/ca.key

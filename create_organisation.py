@@ -7,7 +7,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import requests #type: ignore
 import json
-from simple_term_menu import TerminalMenu #type: ignore
+
 
 def credentials():
     return {
@@ -53,6 +53,7 @@ def get_organisation_data():
     return organisation_data
 
 def get_idp_data():
+    from simple_term_menu import TerminalMenu  # type: ignore
     identity_provider = {}
 
     options = ["OIDC", "SAML", "LDAP", "LOCAL"]

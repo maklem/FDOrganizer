@@ -6,9 +6,9 @@ pipdeptree==2.20.0
 PyJWT==2.8.0
 python-dotenv==1.0.1
 python-ldap==3.4.4; sys_platform != "win32"
-https://github.com/cgohlke/python-ldap-build/releases/download/v3.4.4/python_ldap-3.4.4-cp312-cp312-win_amd64.whl; sys_platform == "win32"
+https://github.com/cgohlke/python-ldap-build/releases/download/v3.4.4-1/python_ldap-3.4.4-cp313-cp313-win_amd64.whl; sys_platform == "win32"
 PyYAML==6.0.1
 requests_oauth2client==1.5.3
 simple-term-menu==1.6.4
 xmlschema==3.3.1
-uWSGI==2.0.28
+uWSGI==2.0.28; sys_platform != "win32"
