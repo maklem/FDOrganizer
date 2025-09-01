@@ -1,5 +1,6 @@
 import importlib
 import json
+import os.path
 from functools import wraps
 from pathlib import Path
 from typing import List, Literal, Union
@@ -113,7 +114,8 @@ def plugin_info(plugin_path: Path):
         #     "id": plugin,
         #     "error": f'{plugin}: Config file not found'
         # }
-    plugin_id = str(plugin_path).split('/')[-1]
+    #plugin_id = str(plugin_path).split('/')[-1]
+    plugin_id = os.path.basename(plugin_path)
     return {
         "id": plugin_id,
         "name": config.get("displayName"),
