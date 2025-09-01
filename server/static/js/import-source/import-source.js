@@ -17,7 +17,8 @@ export default {
         id: String,
         name: String,
         authenticated: Boolean,
-        needsAuthentication: Boolean
+        needsAuthentication: Boolean,
+        authenticationType: String
     },
     data() {
         return {
@@ -26,8 +27,8 @@ export default {
         }
     },
     methods: {
-        authenticate(event) {
-            store.authenticate(this.id)
+        authenticate() {
+            store.authenticate(this.id, this.authenticationType)
         }
     },
     template

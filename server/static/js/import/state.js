@@ -3,7 +3,10 @@ import { get, post } from "../http.js"
 import { loginSource, getSessionToken, logoutSource } from '../authentication.js';
 import {store as editStore} from '../package-edit/state.js'
 
-
+const AUTH_TYPES = {
+    password: 'USERNAME_AND_PASSWORD',
+    APIKey: 'API_KEY'
+}
 export const store = reactive({
     sources: [],
     documents: [],
@@ -21,6 +24,7 @@ export const store = reactive({
     },
     setPassword,
     setUsername,
+    setAPIKey,
     getFolders,
     resetContent,
     resetPath,
@@ -36,7 +40,8 @@ export const store = reactive({
     getSource,
     authenticate,
     logout,
-    showImportButtons
+    showImportButtons,
+    AUTH_TYPES
 });
 /**
  * @param  {string} sourceId
@@ -96,6 +101,12 @@ function setUsername(username) {
     store.failedLogin = false
 }
 
+
+function setAPIKey(username) {
+    store.username = username
+    store.failedLogin = false
+}
+
 function activateSource(sourceId) {
     if (store.activeSource === sourceId) return
     store.resetContent()
@@ -147,11 +158,12 @@ function resetPath() {
     store.remotePath = []
 }
 
-async function authenticate(sourceId) {
+async function authenticate(sourceId, authType) {
     store.loading.authentication = true
-    const {username, password} = {...store}
+    const {username, password, APIKey} = {...store}
     try {
-        await loginSource(sourceId, {username, password})
+        if (authType === AUTH_TYPES.password) await loginSource(sourceId, {username, password})
+        if (authType === AUTH_TYPES.APIKey) await loginSource(sourceId, {APIKey})
     } catch {
         store.failedLogin = true
         store.loading.authentication = false
@@ -159,6 +171,7 @@ async function authenticate(sourceId) {
     }
     store.setUsername(undefined)
     store.setPassword(undefined)
+    store.setAPIKey(undefined)
     store.sources = store.sources.map(source => ({...source, authenticated: source.id === sourceId ? true : source.authenticated}))
     store.loading.authentication = false
     store.getSource(sourceId)
