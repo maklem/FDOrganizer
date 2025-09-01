@@ -16,6 +16,7 @@ export const store = reactive({
     activeSource: undefined,
     username: undefined,
     password: undefined,
+    APIKey: undefined,
     failedLogin: false,
     loading: {
         content: false,
@@ -102,8 +103,8 @@ function setUsername(username) {
 }
 
 
-function setAPIKey(username) {
-    store.username = username
+function setAPIKey(value) {
+    store.APIKey = value
     store.failedLogin = false
 }
 
