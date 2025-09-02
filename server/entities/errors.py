@@ -15,3 +15,13 @@ class PatchError(Exception):
 
 class XMLValidationError(Exception):
     '''XML is invalid according to schema'''
+
+class PluginError(Exception):
+    '''Plugin failed'''
+    def __init__(self, plugin: str, status_code: int, message: str):
+        self.plugin = plugin
+        self.status_code = status_code
+        self.message = message
+        self.text = plugin + " has produced an error: Status code " + str(status_code) + "; " + message
+        self.add_note(self.text)
+

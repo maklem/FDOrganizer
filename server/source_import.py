@@ -8,6 +8,7 @@ from flask import request, Response
 from importlib_resources import files
 
 from server import APP
+from .entities.errors import PluginError
 from .shared import persist_documents
 from .services.database import get
 from .entities import Document, Folder
@@ -39,7 +40,10 @@ def needs_authentication(api_method):
 def get_toplevel(source: str):
     plugin = get_plugin(source)
     auth = get_plugin_auth(source)
-    result = plugin.get_toplevel(request, auth)
+    try:
+        result = plugin.get_toplevel(request, auth)
+    except PluginError as e:
+        return web_response(500, message=e.text)
     if isinstance(result, Response):
         return result
     return web_response(200, details = serialize(result))
@@ -51,7 +55,10 @@ def import_documents_from(source: str, source_ids: list[str], parent: str, paren
     # Get selected files and their metadata from the plugin source
     plugin = get_plugin(source)
     auth = get_plugin_auth(source)
-    result = plugin.get_files_with_metadata(source_ids, request, auth)
+    try:
+        result = plugin.get_files_with_metadata(source_ids, request, auth)
+    except PluginError as e:
+        return web_response(500, message=e.text)
     if isinstance(result, Response):
         return result
     import_triples = result
@@ -71,7 +78,10 @@ def get_collection(source: str, collection: str):
         return web_error(400, 'No valid Collection ID provided', component="SERVER")
     plugin = get_plugin(source)
     auth = get_plugin_auth(source)
-    result = plugin.get_collection(collection, request, auth)
+    try:
+        result = plugin.get_collection(collection, request, auth)
+    except PluginError as e:
+        return web_response(500, message=e.text)
     if isinstance(result, Response):
         return result
     return web_response(200, details = serialize(result))
@@ -82,7 +92,10 @@ def login_source(source: str):
     plugin = importlib.import_module(f'.plugins.{source}.import', 'server')
 
     # Get plugin authentication
-    response = plugin.login(request)
+    try:
+        response = plugin.login(request)
+    except PluginError as e:
+        return web_response(500, message=e.text)
     if response.status_code > 399:
         return response
     plugin_token = json.loads(response.get_data())

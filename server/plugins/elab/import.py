@@ -13,6 +13,7 @@ import requests #type: ignore
 from flask.wrappers import Request, Response
 import pathlib
 
+from server.entities.errors import PluginError
 from ...entities.folder import Folder
 from ...entities.document import Document
 from ...util import web_error, web_response
@@ -25,11 +26,8 @@ def get_config():
 
 def login(request: Request) -> Response:
     request_data = json.loads(request.get_data())
-    api = setup_api(request_data["APIKey"])
-    upl = setup_uploads_api(request_data["APIKey"])
-
-    if not (api and upl):
-        return web_error(500, "Failed to authenticate with eLabFTW", component="eLabFTW")
+    setup_api(request_data["APIKey"])
+    setup_uploads_api(request_data["APIKey"])
     return web_response(200, "Authentication with eLabFTW successful", request_data["APIKey"])
 
 
@@ -42,7 +40,7 @@ def setup_api(auth):
         exp = elabapi_python.ExperimentsApi(client)
         return exp
     except:
-        return None
+        raise PluginError('eLabFTW', 500, "Failed to authenticate with eLabFTW experiments API")
 
 def setup_uploads_api(auth):
     try:
@@ -53,7 +51,7 @@ def setup_uploads_api(auth):
         upl = elabapi_python.UploadsApi(client)
         return upl
     except:
-        return None
+        raise PluginError('eLabFTW', 500, "Failed to authenticate with eLabFTW uploads API")
 
 def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folders', 'documents'], list]]:
     '''

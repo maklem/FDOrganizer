@@ -11,6 +11,7 @@ from typing import Literal
 import requests #type: ignore
 from flask.wrappers import Request, Response
 
+from server.entities.errors import PluginError
 from .plugin_document import PluginDocument
 
 from .plugin_folder import PluginFolder
@@ -31,7 +32,7 @@ def login(request: Request) -> Response:
     try:
         token = response.json()['token']
     except (json.JSONDecodeError, KeyError):
-        return web_error(500, "Failed to receive token from easydb", component="Easy DB")
+        raise PluginError('EasyDB', 500, "Failed to receive token from easydb")
 
     # Authorize session via token and username&password
     auth_url = f'{url}/authenticate'
@@ -43,9 +44,9 @@ def login(request: Request) -> Response:
     }
     response = requests.post(auth_url, payload, timeout=10)
     if response is None:
-        return web_error(500, "Failed to authenticate token with easydb", component="Easy DB")
+        raise PluginError('EasyDB', 500, "Failed to authenticate token with easydb")
     if response.status_code > 399:
-        return web_error(response.status_code, response.text, component="Easy DB")
+        raise PluginError('EasyDB', response.status_code, response.text)
 
     # Get user id for adding it to auth token
     response = requests.get(f'{url}?token={token}', timeout=10)
@@ -88,7 +89,7 @@ def get_toplevel(request: Request, auth) -> dict[Literal['folders', 'documents']
     url = f'{BASEURL}/search?token={auth.get("token")}'
     response = requests.post(url, json= search_query, timeout=10)
     if response.status_code > 399:
-        return web_error(response.status_code, response.text, component="Easy DB")
+        raise PluginError('EasyDB', response.status_code, response.text)
     result_list = response.json()
     collections = result_list.get('objects')
     folders = [convert_collection(x) for x in collections]
@@ -121,7 +122,7 @@ def get_collection(collection_id: str, request: Request, auth):
 
     response = requests.post(url, json=search_query, timeout=10)
     if response.status_code > 399:
-        return web_error(response.status_code, response.text, component="Easy DB")
+        raise PluginError('EasyDB', response.status_code, response.text)
 
     # Convert files for Frontend
     result_list = response.json()
@@ -147,7 +148,7 @@ def get_files_with_metadata(file_ids, request, auth):
 
     response = requests.post(url, json=search_query, timeout=10)
     if response.status_code > 399:
-        return web_error(response.status_code, response.text, component="Easy DB")
+        raise PluginError('EasyDB', response.status_code, response.text)
 
     # Convert files for Frontend
     result_list = response.json()
