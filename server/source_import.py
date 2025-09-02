@@ -43,9 +43,7 @@ def get_toplevel(source: str):
     try:
         result = plugin.get_toplevel(request, auth)
     except PluginError as e:
-        return web_response(500, message=e.text)
-    if isinstance(result, Response):
-        return result
+        return web_error(e.status_code, message=e.message, component=source)
     return web_response(200, details = serialize(result))
 
 @APP.route('/import/<source>', methods=['POST'])
@@ -58,12 +56,9 @@ def import_documents_from(source: str, source_ids: list[str], parent: str, paren
     try:
         result = plugin.get_files_with_metadata(source_ids, request, auth)
     except PluginError as e:
-        return web_response(500, message=e.text)
-    if isinstance(result, Response):
-        return result
-    import_triples = result
+        return web_error(e.status_code, message=e.message, component=source)
     # Import the files and metadata into the selected FDO package
-    persisted_documents =  import_files_and_metadata(import_triples, parent, parent_type)
+    persisted_documents =  import_files_and_metadata(result, parent, parent_type)
     if isinstance(persisted_documents, Response):
         return persisted_documents
     for document in persisted_documents['success']:
@@ -81,9 +76,7 @@ def get_collection(source: str, collection: str):
     try:
         result = plugin.get_collection(collection, request, auth)
     except PluginError as e:
-        return web_response(500, message=e.text)
-    if isinstance(result, Response):
-        return result
+        return web_error(e.status_code, message=e.message, component=source)
     return web_response(200, details = serialize(result))
 
 @APP.route('/import/<source>/login', methods=['POST'])
@@ -95,9 +88,7 @@ def login_source(source: str):
     try:
         response = plugin.login(request)
     except PluginError as e:
-        return web_response(500, message=e.text)
-    if response.status_code > 399:
-        return response
+        return web_error(e.status_code, message=e.message, component=source)
     plugin_token = json.loads(response.get_data())
 
     # Add plugin auth to existing JWT

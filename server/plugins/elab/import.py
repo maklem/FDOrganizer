@@ -16,7 +16,7 @@ import pathlib
 from server.entities.errors import PluginError
 from ...entities.folder import Folder
 from ...entities.document import Document
-from ...util import web_error, web_response
+from ...util import web_response
 
 def get_config():
     config_filepath = pathlib.Path(__file__).parent.resolve().joinpath('config.json')
@@ -40,7 +40,7 @@ def setup_api(auth):
         exp = elabapi_python.ExperimentsApi(client)
         return exp
     except:
-        raise PluginError('eLabFTW', 500, "Failed to authenticate with eLabFTW experiments API")
+        raise PluginError(500, "Failed to authenticate with eLabFTW experiments API")
 
 def setup_uploads_api(auth):
     try:
@@ -51,7 +51,7 @@ def setup_uploads_api(auth):
         upl = elabapi_python.UploadsApi(client)
         return upl
     except:
-        raise PluginError('eLabFTW', 500, "Failed to authenticate with eLabFTW uploads API")
+        raise PluginError(500, "Failed to authenticate with eLabFTW uploads API")
 
 def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folders', 'documents'], list]]:
     '''
@@ -115,9 +115,13 @@ def extract_file(api, upload):
 
 
 def get_attributes(experiment):
-    return {i:getattr(experiment, i) for i in ['body', 'category', 'category_title', 'comments', 'compounds', 'created_at', 'experiments_links',
+    selected_keys = {'body', 'category', 'category_title', 'comments', 'compounds', 'created_at', 'experiments_links',
                                                'fullname', 'locked_at', 'metadata', 'modified_at', 'page', 'related_experiments_links', 'related_items_links',
-                                               'sharelink', 'status_title', 'steps', 'tags', 'timestamped_at', 'title', 'type'] if getattr(experiment, i)}
+                                               'sharelink', 'status_title', 'steps', 'tags', 'timestamped_at', 'title', 'type'}
+    return {key:value for key, value in experiment.to_dict().items() if key in selected_keys and value}
+
+
+
 
 def create_metadata(experiment):
     b = json.dumps(get_attributes(experiment)).encode('utf-8')
