@@ -53,9 +53,9 @@ def import_documents_from(source: str, source_ids: list[str], parent: str, paren
     result = plugin.get_files_with_metadata(source_ids, request, auth)
     if isinstance(result, Response):
         return result
-    
+    import_triples = result
     # Import the files and metadata into the selected FDO package
-    persisted_documents =  import_files(result, parent, parent_type)
+    persisted_documents =  import_files_and_metadata(import_triples, parent, parent_type)
     if isinstance(persisted_documents, Response):
         return persisted_documents
     for document in persisted_documents['success']:
@@ -144,10 +144,14 @@ def serialize(content: dict[Literal["folders","documents"], list]) -> dict[str, 
     documents = [Document.to_dict(x) for x in content['documents']]
     return {'folders':folders, 'documents': documents}
 
-def import_files(import_documents: List[dict], parent: str, parent_type: str):
+def import_files_and_metadata(import_triples: List[dict], parent: str, parent_type: str):
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not can_add_files(package_or_folder, request):
         return web_error(401, "You don't have permission to edit this content", component="SERVER")
+    import_triples = [add_owner(x, user(request)) for x in import_triples]
+    return persist_documents(import_triples, parent, parent_type)
 
-    return persist_documents(import_documents, parent, parent_type)
+def add_owner(import_triple: dict, username: str):
+    import_triple['document'].owner = username
+    return import_triple
