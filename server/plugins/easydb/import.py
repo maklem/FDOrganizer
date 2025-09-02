@@ -3,29 +3,22 @@
 '''
 
 
-from ast import List
 import io
 import json
 import mimetypes
-from typing import Literal, Union
+from typing import Literal
 
 import requests #type: ignore
 from flask.wrappers import Request, Response
-import pathlib
 
 from .plugin_document import PluginDocument
 
-from ...services.authentication import user
 from .plugin_folder import PluginFolder
 from ...entities.folder import Folder
 from ...entities.document import Document
 from ...util import web_error, web_response
 
-def get_config():
-    config_filepath = pathlib.Path(__file__).parent.resolve().joinpath('config.json')
-    with open(config_filepath, encoding="utf-8") as file:
-        return json.load(file)
-
+BASEURL = "https://uni-bayreuth.5.easydb.de/api/v1"
 
 def login(request: Request) -> Response:
     '''
@@ -33,7 +26,7 @@ def login(request: Request) -> Response:
         user login
     '''
     # Get session token from easydb
-    url = f'{get_config()["baseUrl"]}/session'
+    url = f'{BASEURL}/session'
     response = requests.get(url ,timeout=10)
     try:
         token = response.json()['token']
@@ -59,7 +52,7 @@ def login(request: Request) -> Response:
     user = response.json().get('user').get('user').get('_id')
     return web_response(200, "Authentication with Easy DB successful", {'token': token, 'user': user})
 
-def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folders', 'documents'], list]]:
+def get_toplevel(request: Request, auth) -> dict[Literal['folders', 'documents'], list] | Response:
     '''
         querys the easydb server for collections. returns the collections either as string or json array
     '''
@@ -92,13 +85,13 @@ def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folder
         ]
     }
 
-    url = f'{get_config()["baseUrl"]}/search?token={auth.get("token")}'
+    url = f'{BASEURL}/search?token={auth.get("token")}'
     response = requests.post(url, json= search_query, timeout=10)
     if response.status_code > 399:
         return web_error(response.status_code, response.text, component="Easy DB")
     result_list = response.json()
     collections = result_list.get('objects')
-    folders = [convert_collection(x, user(request)) for x in collections]
+    folders = [convert_collection(x) for x in collections]
     return {'folders': folders, 'documents': []}
 
 def get_collection(collection_id: str, request: Request, auth):
@@ -124,7 +117,7 @@ def get_collection(collection_id: str, request: Request, auth):
         ]
     }
 
-    url = f'{get_config()["baseUrl"]}/search?token={auth.get("token")}'
+    url = f'{BASEURL}/search?token={auth.get("token")}'
 
     response = requests.post(url, json=search_query, timeout=10)
     if response.status_code > 399:
@@ -133,11 +126,10 @@ def get_collection(collection_id: str, request: Request, auth):
     # Convert files for Frontend
     result_list = response.json()
     files = result_list.get('objects')
-    files = [convert_file(x, user(request)) for x in files if x.get('object').get('file')]
+    files = [convert_file(x) for x in files if x.get('object').get('file')]
     return {'documents': files, 'folders': []}
 
 def get_files_with_metadata(file_ids, request, auth):
-    print(file_ids)
     search_query = {
         "type" : "object",
         "search" : [
@@ -151,7 +143,7 @@ def get_files_with_metadata(file_ids, request, auth):
             }
         ]
     }
-    url = f'{get_config()["baseUrl"]}/search?token={auth.get("token")}'
+    url = f'{BASEURL}/search?token={auth.get("token")}'
 
     response = requests.post(url, json=search_query, timeout=10)
     if response.status_code > 399:
@@ -161,7 +153,7 @@ def get_files_with_metadata(file_ids, request, auth):
     result_list = response.json()
     objects = result_list.get('objects')
     files = [extract_file(x) for x in objects]
-    documents = [convert_file(x, user(request), is_stored=True) for x in objects]
+    documents = [convert_file(x, is_stored=True) for x in objects]
     metadata = [extract_metadata(x) for x in objects]
     
     results = []
@@ -169,15 +161,15 @@ def get_files_with_metadata(file_ids, request, auth):
         results.append({'document': documents[index], 'file': files[index], 'metadata': metadata[index]})
     return results
 
-def convert_collection(collection: dict, username: str) -> Folder:
+def convert_collection(collection: dict) -> Folder:
     outer_collection = PluginFolder.from_dict(collection)
     inner_collection = outer_collection.collection
     displayname = inner_collection.displayname['de-DE']
     collection_id = inner_collection._id
-    return Folder(name = displayname, id = collection_id, owner = username, documents=[], folders=[], package_id="")
+    return Folder(name = displayname, id = collection_id, owner = '', documents=[], folders=[], package_id="")
 
 
-def convert_file(easydb_object: dict, username: str, is_stored: bool = False) -> Document:
+def convert_file(easydb_object: dict, is_stored: bool = False) -> Document:
     obj: PluginDocument = PluginDocument.from_dict(easydb_object) 
     inner_object = obj.object
     file_id = obj._system_object_id
@@ -188,7 +180,7 @@ def convert_file(easydb_object: dict, username: str, is_stored: bool = False) ->
     mimetype = mimetypes.guess_type(file.original_filename)[0] or 'application/octet-stream'
     size = file.filesize
 
-    return Document(name = displayname, size = size, type = mimetype, is_stored = is_stored, owner = username, source_id= file_id, source="easy DB")
+    return Document(name = displayname, size = size, type = mimetype, is_stored = is_stored, owner = "", source_id= file_id, source="easy DB")
 
 def extract_file(easydb_object: dict):
     obj: PluginDocument = PluginDocument.from_dict(easydb_object)

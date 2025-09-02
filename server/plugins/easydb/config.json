@@ -1,5 +1,4 @@
 {
-    "baseUrl": "https://uni-bayreuth.5.easydb.de/api/v1",
     "displayName": "Easy DB",
     "needsAuthentication": true,
     "authenticationType": "USERNAME_AND_PASSWORD"
