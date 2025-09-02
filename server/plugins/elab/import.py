@@ -90,21 +90,38 @@ def get_collection(collection_id: str, request: Request, auth):
         eid = int(collection_id.removesuffix("_experiment"))
         uploads = upl.read_uploads('experiments', eid)
         uploads.sort(key=lambda upload: upload.real_name)
+        experiment = exp.get_experiment(eid)
         return {'documents': [Document(name=upload.real_name, size=upload.filesize, type=get_filetype(upload.real_name), is_stored=False, owner='', source_id=str(upload.item_id)+"_"+str(upload.id),
-                 source="eLabFTW") for upload in uploads], 'folders': []}
+                 source="eLabFTW") for upload in uploads]+[create_metadata(experiment)[0]], 'folders': []}
 
 
 def get_file_id(file_id):
     l = file_id.split("_")
     return [int(i) for i in l]
 
-def get_files_with_metadata(file_ids, request, auth):
+def get_files_with_metadata(ids, request, auth):
     upl = setup_uploads_api(auth)
+    exp = setup_api(auth)
+    file_ids = list(filter(lambda x: len(get_file_id(x)) == 2, ids))
     uploads = [upl.read_upload('experiments', *get_file_id(file_id)) for file_id in file_ids]
-    files = [extract_file(upl,x) for x in uploads]
+    files = [extract_file(upl, x) for x in uploads]
     documents = [Document(name=upload.real_name, size=upload.filesize, type=get_filetype(upload.real_name), is_stored=True, owner='', source_id=str(upload.item_id)+"_"+str(upload.id),
                  source="eLabFTW") for upload in uploads]
+    metadata = create_metadata(exp.get_experiment(get_file_id(ids[0])[0]))
+    documents.append(metadata[0])
+    files.append(metadata[1])
     return [{'document': d, 'file': f, 'metadata': None} for d, f in zip(documents, files)]
 
 def extract_file(api, upload):
     return io.BytesIO(api.read_upload('experiments', upload.item_id, upload.id, format='binary', _preload_content=False).data)
+
+
+def get_attributes(experiment):
+    return {i:getattr(experiment, i) for i in ['body', 'category', 'category_title', 'comments', 'compounds', 'created_at', 'experiments_links',
+                                               'fullname', 'locked_at', 'metadata', 'modified_at', 'page', 'related_experiments_links', 'related_items_links',
+                                               'sharelink', 'status_title', 'steps', 'tags', 'timestamped_at', 'title', 'type'] if getattr(experiment, i)}
+
+def create_metadata(experiment):
+    b = json.dumps(get_attributes(experiment)).encode('utf-8')
+    bio = io.BytesIO(b)
+    return Document(name="metadata.json", size=len(b), type="json", is_stored=True, owner='', source_id=str(experiment.id), source="eLabFTW"), bio
