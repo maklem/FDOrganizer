@@ -1,12 +1,15 @@
+import io
 import json
+import pathlib
 import time
-from typing import Literal, TypedDict
-from zipfile import ZipFile, ZipInfo
+import zipfile
+from dataclasses import dataclass
+from zipfile import ZipFile
+
 from flask import Response, request
 from requests import HTTPError #type: ignore
 from werkzeug.datastructures import FileStorage
 
-from .entities.errors import OrganisationError
 
 from .package_details import create_file_document_pair
 
@@ -20,8 +23,13 @@ from .services.database import delete, find, get, post, update
 from .util import can_delete_packages, can_edit_name, json_body, web_error, web_response
 from server import APP
 
-Structmap = TypedDict('Structmap', {'name': str, 'folders': list['Structmap'], 'files': list[ZipInfo]})
-PathedFile = TypedDict('PathedFile', {'path': list['str'], 'content': ZipInfo})
+
+@dataclass
+class Directory:
+    name: str
+    folders: list # list[Directory]
+    files: list[zipfile.Path]
+
 
 @APP.route("/package/all", methods=["GET"])
 def get_packages():
@@ -121,59 +129,50 @@ def rename_package(package_id: str, name: str) -> Response:
 
 @APP.route("/package/zip", methods=["PUT"])
 def create_package_from_zip() -> Response:
-    project_zip = next(request.files.values())
+    project_zip: FileStorage = next(request.files.values())
+    if project_zip.filename is None:
+        return web_error(400, "Not a valid zip package name", component="SERVER")
     with ZipFile(project_zip.stream, 'r') as zip_ref:
-        files: list[PathedFile] = [{'path': info.filename.split('/'), 'content': info} for info in zip_ref.infolist() if info.file_size > 0]
-        # if len([file for file in files if file.get('path')[0] != files[0].get('path')[0]]):
-        #     files = [{'path': file.get('path')[1:], 'content': file.get('content')} for file in files]
-        #     print(f'Removed folder {files[0].get("path")[0]} from path because it contained all the files')
-        if project_zip.filename is None:
-            return web_error(400, "Not a valid zip package name", component= "SERVER")
-        structmap: Structmap = {"name": project_zip.filename.split('.')[0], "folders": [], "files": []}
-        for file in files:
-            structmap = fill_structmap_layer(structmap, file)
+        zip_path = zipfile.Path(zip_ref)
+        # Recursively build directory structure tree
+        directory = recurse_directory(zip_path)
         # Build new package for zip content
         username = user(request)
-        package_id = create_package_in_db(structmap['name'], username, organisation(request))
+        package_id = create_package_in_db(pathlib.Path(project_zip.filename).stem, username, organisation(request))
         # Create folders and documents
-        folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in structmap['folders']]
-        doc_ids = [create_document_from_zip(file_entry, zip_ref, username) for file_entry in structmap['files']]
+        folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in directory.folders]
+        doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
         # Update package with new folder and document ids
         update(Databases.PACKAGES, package_id, {'folders': folder_ids, 'documents': doc_ids})
     return web_response(200, 'Success')
 
-def fill_structmap_layer(structmap: Structmap, file: PathedFile) -> Structmap:
-    if len(file['path']) == 1:
-        structmap['files'].append(file['content'])
-        return structmap
-    else:
-        step = file['path'][0]
-        if len([folder for folder in structmap["folders"] if folder['name'] == step]) == 0:
-            folder_struct: Structmap = {"name": step, "folders": [], "files": [] }
+
+def recurse_directory(path: zipfile.Path) -> Directory:
+    directory = Directory(path.name, [], [])
+    for obj in path.iterdir():
+        if obj.is_dir():
+            new_directory = recurse_directory(obj)
+            directory.folders.append(new_directory)
         else:
-            folder_struct = [folder for folder in structmap["folders"] if folder['name'] == step][0]
-            structmap['folders'] = [folder for folder in structmap["folders"] if folder['name'] != step]
+            directory.files.append(obj)
+    return directory
 
-        new_file: PathedFile = {"path": file['path'][1:], 'content': file['content']}
-        branch = fill_structmap_layer(folder_struct, new_file)
-        structmap['folders'].append(branch)
-    return structmap
-
-def create_folder_from_zip(structmap: Structmap, zipfile: ZipFile, username: str, package_id: str):
+def create_folder_from_zip(directory: Directory, zipfile: ZipFile, username: str, package_id: str):
     
-    folder_ids = [create_folder_from_zip(folder_entry, zipfile, username, package_id) for folder_entry in structmap['folders']]
-    doc_ids = [create_document_from_zip(file_entry, zipfile, username) for file_entry in structmap['files']]
+    folder_ids = [create_folder_from_zip(folder_entry, zipfile, username, package_id) for folder_entry in directory.folders]
+    doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
     
     # Differ between top level (package) and nested levels (folder)
-    folder = Folder(name=structmap['name'], documents=doc_ids, folders=folder_ids, owner=username, package_id=package_id)
+    folder = Folder(name=directory.name, documents=doc_ids, folders=folder_ids, owner=username, package_id=package_id)
     persisted_entity = post(Databases.FOLDERS, folder.to_json()).json()
 
     return persisted_entity['id']
 
-def create_document_from_zip(file_info, zipfile: ZipFile, username):
-    file = zipfile.open(file_info)
+def create_document_from_zip(file_info: zipfile.Path, username):
+    file = io.BytesIO(file_info.read_bytes())
+    #print(list(zipfile.Path(file_info.name).iterdir()))
     storage = FileStorage(file)
-    storage.filename = file_info.filename.split('/')[-1]
+    storage.filename = file_info.name
     file_doc_pair = create_file_document_pair(storage, username)
     return create_document_with_attachement(file_doc_pair['file'], file_doc_pair['document'])
 
