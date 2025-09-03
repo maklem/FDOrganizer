@@ -37,7 +37,7 @@ def authentication_token(username: str, password: str):
 def get_database_names():
     if len(sys.argv) >= 2:
         return sys.argv[1:]
-    return input("Wählen Sie einen Namen für die Datenbank:\n")
+    return [input("Wählen Sie einen Namen für die Datenbank:\n")]
 
 def create(url: str, token: str):
     couch_header = {"Accept": "application/json",

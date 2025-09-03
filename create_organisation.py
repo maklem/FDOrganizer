@@ -29,8 +29,8 @@ def authentication_token(username: str, password: str):
     url = f'{base_url()}/_session'
     response = authenticate(url, username, password)
     print(url)
-    if not response.status_code == 200:
-        print(f'User Authentication not sucessful! Check configured username and password')
+    if response.status_code != 200:
+        print(f'User Authentication not successful! Check configured username and password')
         return False
     cookie = response.headers["Set-Cookie"]
     return cookie[:cookie.find(";")]
@@ -40,16 +40,9 @@ def authentication_token(username: str, password: str):
 def get_organisation_data():
     if len(sys.argv) > 1:
         return json.loads(open(Path(sys.argv[1])).read())
+    name = input("Name der Organisation:\n")
     # Init data structure
-    organisation_data = {}
-    organisation_data['reviewers'] = []
-    organisation_data['plugins'] = []
-    organisation_data['identity_provider'] = {}
-
-    # Let user input data
-    organisation_data['name'] = input("Name der Organisation:\n")
-    organisation_data['identity_provider'] = get_idp_data()
-
+    organisation_data = {'reviewers':[],'plugins':[],'identity_provider':get_idp_data(),'name':name}
     return organisation_data
 
 def get_idp_data():

@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 def get_database_names():
     if len(sys.argv) >= 2:
         return sys.argv[1:]
-    return input("Welche Datenbank möchten Sie zurücksetzen:\n")
+    return [input("Welche Datenbank möchten Sie zurücksetzen:\n")]
 
 def delete(url: str, token: str):
     couch_header = {
