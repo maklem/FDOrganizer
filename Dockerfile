@@ -1,12 +1,14 @@
-FROM python:3.10-slim-bookworm
+FROM python:3.12-bookworm
 
 WORKDIR /server
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 build-essential \
+python3-dev \
+python3-pip \
+libpcre2-dev \
 libsasl2-dev \
 libldap2-dev \
-libssl-dev \
 iputils-ping \
 && \
 apt-get clean \
