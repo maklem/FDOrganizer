@@ -31,7 +31,8 @@ def get_packages():
             "owner": user(request),
             "status": "active",
             "organisation": organisation(request)
-        }
+        },
+        "limit": 1000
     }
 
     try:
