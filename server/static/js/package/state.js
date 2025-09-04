@@ -9,6 +9,11 @@ export const store = reactive({
     loading: {
         packageList: false,
     },
+    newPackage: {
+        name: '',
+        keepEmpty: false,
+        keepStructure: false
+    },
     createPackage,
     deletePackage,
     getPackages,
@@ -16,7 +21,8 @@ export const store = reactive({
     openDetails,
     climbPackagePath,
     uploadZip,
-    changePackageName
+    changePackageName,
+    setNewPackageName
 });
 
 function openDetails() {
@@ -29,9 +35,10 @@ async function getPackages() {
     store.loading.packageList = false
 }
 
-async function createPackage(name) {
+async function createPackage() {
     store.loading.packageList = true
-    await put(`package`, {name: name})
+    await put(`package`, {name: store.newPackage.name})
+    store.newPackage.name = ''
     await store.getPackages()
     store.loading.packageList = false
 }
@@ -60,6 +67,8 @@ async function uploadZip() {
     const body = new FormData()
 
     body.append(store.zipfile.name, store.zipfile)
+    body.append('keep_empty', store.newPackage.keepEmpty)
+    body.append('keep_structure', store.newPackage.keepStructure)
     const result =  await put('/package/zip', body, {"Content-Type": 'multipart/form-data'})
     store.zipfile = undefined
     store.getPackages()
@@ -72,4 +81,9 @@ async function changePackageName(id, newName) {
    await patch(`package/${id}/rename`, {name: newName})
    await store.getPackages()
    store.loading.packageList = false
+}
+
+function setNewPackageName(value) {
+    console.log(value)
+    store.newPackage.name = value
 }

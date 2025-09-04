@@ -129,6 +129,7 @@ def rename_package(package_id: str, name: str) -> Response:
 
 @APP.route("/package/zip", methods=["PUT"])
 def create_package_from_zip() -> Response:
+    print(request.form.to_dict())
     project_zip: FileStorage = next(request.files.values())
     if project_zip.filename is None:
         return web_error(400, "Not a valid zip package name", component="SERVER")

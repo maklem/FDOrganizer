@@ -46,10 +46,10 @@
                     </div>
                 </div>
                 <LabeledInput v-if="source === 'empty'"
-                    :value="packageName"
+                    :value="store.newPackage.name"
                     :label="'Choose a name:'"
                     :placeholder="'e.g. Dataset 1'"
-                    @input="name => packageName = name"
+                    @input="value => store.setNewPackageName(value)"
                 ></LabeledInput>
                 <template v-if="source === 'zip'">
                     <input
@@ -64,13 +64,30 @@
                         </template>
                         <div v-else class="filename">{{store.zipfile.name}}</div>
                     </label>
+                    <details>
+                        <summary>see options</summary>
+                        <ul class="option-list">
+                            <li>
+                                <label for="keep-empty">
+                                    <input type="checkbox" name="keep-empty" :id="'keep-empty'" class="select" @input="event => store.newPackage.keepEmpty = event.target.checked"/>
+                                    <div>Keep empty files</div>
+                                </label>
+                            </li>
+                            <li>
+                                <label for="keep-structure">
+                                    <input type="checkbox" name="keep-structure" :id="'keep-structure'" class="select" @input="event => store.newPackage.keepStructure = event.target.checked"/>
+                                    <div>Keep original folder structure</div>
+                                </label>
+                            </li>
+                        </ul>
+                    </details>
                 </template>
                 <form method="dialog">
                     <Button class="abort-create" @button-clicked="$refs.newPackage.close()">Abort</Button>
                     <Button v-if="source === 'empty'" 
-                        :disabled="packageName === ''"
+                        :disabled="store.newPackage.name === ''"
                         class="confirm-create"
-                        @button-clicked="createPackage(packageName)"
+                        @button-clicked="store.createPackage()"
                     >
                         <div>Create project</div>
                     </Button>

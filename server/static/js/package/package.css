@@ -127,6 +127,28 @@
     gap: 0.5rem;
 }
 
+.create-package .option-list {
+    list-style-type: none;
+    margin-block-start: 0.5rem;
+    padding-inline-start: 1rem;
+}
+
+.create-package summary {
+    cursor: pointer;
+}
+
+.option-list li {
+    label {
+        display: flex;
+        gap: 0.5rem;
+        cursor: pointer;
+
+        input {
+            cursor: pointer;
+        }
+    }
+}
+
 input[type="file"] {
     display: none;
 }

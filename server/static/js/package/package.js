@@ -10,7 +10,6 @@ import VideoDialog from "../video-dialog/video-dialog.js"
 import {store} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"
 import { setup } from "../setup.js";
-import videoDialog from "../video-dialog/video-dialog.js";
 
 const template = await setup('package');
 
@@ -29,7 +28,6 @@ const pkg = createApp({
             store,
             metadataStore,
             source: 'empty',
-            packageName: ''
         }
     },
 
@@ -37,14 +35,13 @@ async mounted() {
         this.store.getPackages()
     },
     methods: {
-        createPackage(packageName) {
-            store.createPackage(packageName)
-            this.packageName = ''
+        createPackage() {
+            store.createPackage()
             this.$refs.newPackage.close()
         },
         enterPressed(event) {
             if (event.which !== 13) return
-            this.createPackage(this.packageName)
+            this.createPackage()
         },
         setZip(event) {
             const zipfile = [...event.currentTarget.files][0]
