@@ -130,14 +130,14 @@ def rename_package(package_id: str, name: str) -> Response:
 
 @APP.route("/package/zip", methods=["PUT"])
 def create_package_from_zip() -> Response:
-    print(request.form.to_dict())
+    vals = request.form.to_dict()
     zip_temp_path = './TEMP/TEMP.zip'
     project_zip: FileStorage = next(request.files.values())
     project_zip.save(zip_temp_path)
     with ZipFile(zip_temp_path, 'r') as zip_ref:
         zip_path = zipfile.Path(zip_ref)
         # Recursively build directory structure tree
-        directory = recurse_directory(zip_path)
+        directory = build_directory_tree(zip_path, vals['keep_empty']=='true', vals['keep_structure']=='true')
         # Build new package for zip content
         username = user(request)
         package_id = create_package_in_db(pathlib.Path(project_zip.filename).stem, username, organisation(request))
@@ -149,16 +149,22 @@ def create_package_from_zip() -> Response:
     os.remove(zip_temp_path)
     return web_response(200, 'Success')
 
-
-def recurse_directory(path: zipfile.Path) -> Directory:
-    directory = Directory(path.name, [], [])
-    for obj in path.iterdir():
-        if obj.is_dir():
-            new_directory = recurse_directory(obj)
-            directory.folders.append(new_directory)
-        else:
-            directory.files.append(obj)
-    return directory
+def build_directory_tree(path: zipfile.Path, keep_empty: bool, keep_structure: bool) -> Directory:
+    def recurse_directory(path: zipfile.Path, keep_empty: bool) -> Directory:
+        directory = Directory(path.name, [], [])
+        for obj in path.iterdir():
+            if obj.is_dir():
+                new_directory = recurse_directory(obj, keep_empty)
+                directory.folders.append(new_directory)
+            elif keep_empty or obj.read_bytes():
+                directory.files.append(obj)
+        return directory
+    if not keep_structure:
+        path_list = [path]
+        while len(path_list) == 1 and path_list[0].is_dir():
+            path = path_list[0]
+            path_list = list(path.iterdir())
+    return recurse_directory(path, keep_empty)
 
 def create_folder_from_zip(directory: Directory, zipfile: ZipFile, username: str, package_id: str):
     
