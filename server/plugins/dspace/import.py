@@ -105,7 +105,10 @@ def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folder
 
     for item in itemlist:
         id = item["id"] #die Item ID ist nicht die uuid des Items
-        displayname = item['sections']["traditionalpageone"]["dc.title"][0]["value"] # dirty way zum names des items
+        try:
+            displayname = item['sections']["traditionalpageone"]["dc.title"][0]["value"] # dirty way zum names des items
+        except KeyError:
+            displayname = item["sections"]["identifiers"]["doi"]
         username = user(request) # auth["uuid"]  # wäre uuid des Users aus Login
         # bundles = item["_embedded"]["item"]["_links"]["bundles"]["href"]
         folders.append(Folder(name=displayname, id=id, owner=username, documents=[], folders=[], package_id=""))
