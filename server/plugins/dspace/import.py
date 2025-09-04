@@ -12,6 +12,7 @@ import requests #type: ignore
 from flask.wrappers import Request, Response
 import pathlib
 
+from server.entities.errors import PluginError
 # from .plugin_document import PluginDocument
 
 from ...services.authentication import user
@@ -46,7 +47,7 @@ def login(request: Request) -> Response:
             token = response.cookies.get_dict()["DSPACE-XSRF-COOKIE"]
             # print(token)
     except (json.JSONDecodeError, KeyError):
-        return web_error(500, "Failed to receive token from DSpace", component="DSpace")
+        raise PluginError(500, "Failed to receive token from DSpace")
 
     auth_url = f'{url}authn/login'
     # request_data = json.loads(request.get_data())
@@ -70,9 +71,9 @@ def login(request: Request) -> Response:
 
     response = requests.post(auth_url, data = data , headers = headers, cookies = cookies, timeout=10)
     if response is None:
-        return web_error(500, "Failed to authenticate token with DSpace7", component="DSpace")
+        raise PluginError(500, "Failed to authenticate token with DSpace7")
     if response.status_code > 399:
-        return web_error(response.status_code, response.text + " DAMN" , component="DSpace")
+        raise PluginError(response.status_code, response.text)
 
     # print(response.headers)
     bearer_token = response.headers['Authorization']
@@ -110,7 +111,7 @@ def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folder
         folders.append(Folder(name=displayname, id=id, owner=username, documents=[], folders=[], package_id=""))
 
     if response.status_code > 399:
-        return web_error(response.status_code, response.text, component="DSpace")
+        raise PluginError(response.status_code, response.text)
 
     return {'folders': folders, 'documents': []}
 
@@ -135,20 +136,20 @@ def get_collection(collection_id: str, request: Request, auth):
     # holen der Itemsdaten nach item-ID
     itemGet =  requests.get(url + "submission/workspaceitems/" + str(collection_id) + "/item", headers=headers)
     if itemGet.status_code > 399:
-        return web_error(itemGet.status_code, itemGet.text, component="DSpace")
+        raise PluginError(itemGet.status_code, itemGet.text)
     # jetzt daraus die uuid des Items
     itemuuid = itemGet.json()["id"]
     # bundle des workspacceitems
     bundleGet = requests.get(url + "core/items/" + str(itemuuid) + "/bundles", headers=headers)
     if bundleGet.status_code > 399:
-        return web_error(bundleGet.status_code, bundleGet.text, component="DSpace")
+        raise PluginError(bundleGet.status_code, bundleGet.text)
     # uuid des Bundels
     bundleUUID = bundleGet.json()["_embedded"]["bundles"][0]["uuid"]
 
     # die bitstreams der Files in dem bundle
     bitstreamGet = requests.get(url + "core/bundles/" + str(bundleUUID) + "/bitstreams", headers=headers)
     if bitstreamGet.status_code > 399:
-        return web_error(bitstreamGet.status_code, bitstreamGet.text, component="DSpace")
+        raise PluginError(bitstreamGet.status_code, bitstreamGet.text)
 
     bitstream = bitstreamGet.json()
     # Convert files for Frontend
@@ -189,7 +190,7 @@ def get_files_with_metadata(file_ids, request, auth):
         response = requests.get(url+"core/bitstreams/" + str(id) + "/content", headers=headers, timeout=10) # https://open.fau.de/server/api/core/bitstreams/{uuid}/content'
         # print(response.content)
         if response.status_code > 399:
-            return web_error(response.status_code, response.text, component="Easy DB")
+            raise PluginError(response.status_code, response.text)
         file_content = response.content
         file = io.BytesIO(file_content)
         files.append(file)
