@@ -1,0 +1,5 @@
+{
+    "displayName": "DSpace7",
+    "needsAuthentication": true,
+    "authenticationType": "USERNAME_AND_PASSWORD"
+}
