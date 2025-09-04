@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import pathlib
 import time
 import zipfile
@@ -27,7 +28,7 @@ from server import APP
 @dataclass
 class Directory:
     name: str
-    folders: list # list[Directory]
+    folders: list["Directory"]
     files: list[zipfile.Path]
 
 
@@ -130,10 +131,10 @@ def rename_package(package_id: str, name: str) -> Response:
 @APP.route("/package/zip", methods=["PUT"])
 def create_package_from_zip() -> Response:
     print(request.form.to_dict())
+    zip_temp_path = './TEMP/TEMP.zip'
     project_zip: FileStorage = next(request.files.values())
-    if project_zip.filename is None:
-        return web_error(400, "Not a valid zip package name", component="SERVER")
-    with ZipFile(project_zip.stream, 'r') as zip_ref:
+    project_zip.save(zip_temp_path)
+    with ZipFile(zip_temp_path, 'r') as zip_ref:
         zip_path = zipfile.Path(zip_ref)
         # Recursively build directory structure tree
         directory = recurse_directory(zip_path)
@@ -145,6 +146,7 @@ def create_package_from_zip() -> Response:
         doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
         # Update package with new folder and document ids
         update(Databases.PACKAGES, package_id, {'folders': folder_ids, 'documents': doc_ids})
+    os.remove(zip_temp_path)
     return web_response(200, 'Success')
 
 
@@ -163,7 +165,7 @@ def create_folder_from_zip(directory: Directory, zipfile: ZipFile, username: str
     folder_ids = [create_folder_from_zip(folder_entry, zipfile, username, package_id) for folder_entry in directory.folders]
     doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
     
-    # Differ between top level (package) and nested levels (folder)
+    # Differentiate between top level (package) and nested levels (folder)
     folder = Folder(name=directory.name, documents=doc_ids, folders=folder_ids, owner=username, package_id=package_id)
     persisted_entity = post(Databases.FOLDERS, folder.to_json()).json()
 
@@ -171,7 +173,6 @@ def create_folder_from_zip(directory: Directory, zipfile: ZipFile, username: str
 
 def create_document_from_zip(file_info: zipfile.Path, username):
     file = io.BytesIO(file_info.read_bytes())
-    #print(list(zipfile.Path(file_info.name).iterdir()))
     storage = FileStorage(file)
     storage.filename = file_info.name
     file_doc_pair = create_file_document_pair(storage, username)
