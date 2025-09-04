@@ -18,6 +18,7 @@ services:
     volumes:
       - ${EXPORT_DIR}:/server/export:rw
       - ./init-flags:/var/flags:rw
+      - ./server/static/videos:/server/server/static/videos:ro
     command:
       - sh
       - -c
