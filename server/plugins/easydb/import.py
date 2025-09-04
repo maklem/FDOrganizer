@@ -53,6 +53,15 @@ def login(request: Request) -> Response:
     user = response.json().get('user').get('user').get('_id')
     return web_response(200, "Authentication with Easy DB successful", {'token': token, 'user': user})
 
+def send_query(auth, search_query):
+    url = f'{BASEURL}/search?token={auth.get("token")}'
+    response = requests.post(url, json=search_query, timeout=10)
+    if response.status_code > 399:
+        raise PluginError(response.status_code, response.text)
+    result_list = response.json()
+    objects = result_list.get('objects')
+    return objects
+
 def get_toplevel(request: Request, auth) -> dict[Literal['folders', 'documents'], list] | Response:
     '''
         querys the easydb server for collections. returns the collections either as string or json array
@@ -85,13 +94,7 @@ def get_toplevel(request: Request, auth) -> dict[Literal['folders', 'documents']
             },
         ]
     }
-
-    url = f'{BASEURL}/search?token={auth.get("token")}'
-    response = requests.post(url, json= search_query, timeout=10)
-    if response.status_code > 399:
-        raise PluginError(response.status_code, response.text)
-    result_list = response.json()
-    collections = result_list.get('objects')
+    collections = send_query(auth, search_query)
     folders = [convert_collection(x) for x in collections]
     return {'folders': folders, 'documents': []}
 
@@ -117,16 +120,7 @@ def get_collection(collection_id: str, request: Request, auth):
             }
         ]
     }
-
-    url = f'{BASEURL}/search?token={auth.get("token")}'
-
-    response = requests.post(url, json=search_query, timeout=10)
-    if response.status_code > 399:
-        raise PluginError(response.status_code, response.text)
-
-    # Convert files for Frontend
-    result_list = response.json()
-    files = result_list.get('objects')
+    files = send_query(auth, search_query)
     files = [convert_file(x) for x in files if x.get('object').get('file')]
     return {'documents': files, 'folders': []}
 
@@ -144,15 +138,7 @@ def get_files_with_metadata(file_ids, request, auth):
             }
         ]
     }
-    url = f'{BASEURL}/search?token={auth.get("token")}'
-
-    response = requests.post(url, json=search_query, timeout=10)
-    if response.status_code > 399:
-        raise PluginError(response.status_code, response.text)
-
-    # Convert files for Frontend
-    result_list = response.json()
-    objects = result_list.get('objects')
+    objects = send_query(auth, search_query)
     files = [extract_file(x) for x in objects]
     documents = [convert_file(x, is_stored=True) for x in objects]
     metadata = [extract_metadata(x) for x in objects]
