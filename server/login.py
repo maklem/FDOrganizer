@@ -1,10 +1,10 @@
 from flask import Response, request, redirect, session, url_for
-import json
+import requests
 from requests_oauth2client import OAuth2Client, ClientSecretJwt
 
 from server import APP
 from .entities.errors import IdentityProviderError
-from .entities.organisation import IdentityProvider, Organisation
+from .entities.organisation import Organisation
 from .entities.databases import Databases
 from .services.database import get, getall
 from .util import json_body, web_error, web_response
@@ -40,7 +40,7 @@ def login_ldap(organisation_id: str, username: str, password: str) -> Response:
 
 
 @APP.route("/login-oidc/<organisation_id>", methods=["GET"])
-def redirect_oidc(organisation_id: str):
+def login_oidc(organisation_id: str):
     organisation = get_organisation_from_db(organisation_id)
     try:
         client = oidc_client(organisation)
@@ -53,10 +53,10 @@ def redirect_oidc(organisation_id: str):
     session['state'] = az_request.state
     session['nonce'] = az_request.nonce
     # redirect to OIDC login window
-    return redirect(az_request.uri)
+    return web_response(200, details={"auth_url": az_request.uri})
 
 @APP.route("/login-oidc-callback/<organisation_id>", methods=["GET"])
-def login_oidc(organisation_id: str):
+def callback_oidc(organisation_id: str):
     organisation = get_organisation_from_db(organisation_id)
     client = oidc_client(organisation)
     
@@ -82,6 +82,55 @@ def login_oidc(organisation_id: str):
     session.pop('code_verifier')
     session.pop('state')
     session.pop('nonce')
+
+    # create token with info for authenticated user
+    token = create_token(username, organisation_id)
+
+    # redirect to start page and set auth cookie
+    redirect_response = redirect(url_for('navhome'))
+    redirect_response.set_cookie('token', token)
+    return redirect_response
+
+@APP.route("/login-keycloak/<organisation_id>", methods=["GET"])
+def login_keycloak(organisation_id: str):
+    organisation = get_organisation_from_db(organisation_id)
+
+    scopes = '+'.join(organisation.identity_provider.scope)
+    auth_url = f'{organisation.identity_provider.url}auth?scope={scopes}&response_type=code&client_id={organisation.identity_provider.client_id}&redirect_uri={request.url_root}login-keycloak-callback/{organisation.id}'
+    if organisation.identity_provider.client_secret is not None:
+        auth_url += f'&client_secret={organisation.identity_provider.client_secret}'
+    # redirect to OIDC login window
+    return web_response(200, details={"auth_url": auth_url})
+
+@APP.route("/login-keycloak-callback/<organisation_id>", methods=["GET"])
+def callback_keycloak(organisation_id: str):
+    organisation = get_organisation_from_db(organisation_id)
+
+    token_url = f'{organisation.identity_provider.url}token'
+    token_request_body= {
+        'grant_type': 'authorization_code',
+        'client_id': organisation.identity_provider.client_id,
+        'redirect_uri': f'{request.url_root}login-keycloak-callback/{organisation.id}',
+        'code': request.args.get('code')
+    }
+    if organisation.identity_provider.client_secret is not None:
+        token_request_body['client_secret'] = organisation.identity_provider.client_secret
+    token_response = requests.post(token_url, data=token_request_body)
+    try:
+        access_token = token_response.json()['access_token']
+    except KeyError:
+        web_error(400, "Could not accquire access token for fetching user info. Organisation IDP-data might be wrong", component= "SERVER")
+
+    userinfo_url = f'{organisation.identity_provider.url}userinfo'
+    userinfo_response = requests.get(userinfo_url, headers={'Authorization': f'Bearer {access_token}'})
+    userinfo = userinfo_response.json()
+
+    if organisation.identity_provider.username_field is None:
+        try:
+            username = userinfo['username']
+        except KeyError:
+            web_error(400, "No 'username' field or custom field for the organisation found in userinfo", component= "SERVER")
+    username = userinfo[organisation.identity_provider.username_field]
 
     # create token with info for authenticated user
     token = create_token(username, organisation_id)

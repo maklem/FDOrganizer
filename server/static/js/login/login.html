@@ -65,6 +65,7 @@
         </fieldset>
         <Button v-if="store.selectedOrganisation.authType === 'OIDC'" @button-clicked="store.loginOIDC()">Go To Login</Button>
         <Button v-if="store.selectedOrganisation.authType === 'SAML'" @button-clicked="store.loginSAML()">Go To Login</Button>
+        <Button v-if="store.selectedOrganisation.authType === 'KEYCLOAK'" @button-clicked="store.loginKeycloak()">Go To Login</Button>
     </form>
     <div v-else class="lds-spinner">
         <div></div>

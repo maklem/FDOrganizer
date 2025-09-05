@@ -15,6 +15,7 @@ export const store = reactive({
     setUsername,
     loginLDAP,
     loginOIDC,
+    loginKeycloak,
     loginSAML,
     loginLocal,
     getOrganisations,
@@ -63,7 +64,13 @@ async function loginLDAP() {
 }
 
 async function loginOIDC() {
-    get(`/login-oidc/${store.selectedOrganisation.id}`);
+    const response = await get(`/login-oidc/${store.selectedOrganisation.id}`);
+    window.location.href = response.auth_url
+}
+
+async function loginKeycloak() {
+    const response = await get(`/login-keycloak/${store.selectedOrganisation.id}`);
+    window.location.href = response.auth_url
 }
 
 async function loginSAML() {
