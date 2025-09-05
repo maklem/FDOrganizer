@@ -1,15 +1,16 @@
 {
-    "reviewers": [],
-    "plugins": [],
-    "identity_provider": {
-      "type": "LOCAL",
-      "url": "https://localhost.local",
-      "scope": [
-        "scope1",
-        "scope2"
-      ],
-      "client_id": "fdo",
-      "client_secret": "lsdkjflksdjlfsdp42oi5498dfjkwdf"
-    },
-    "name": "BiblioCon"
+  "name": "Dummy-Universität",
+  "reviewers": ["reviewer", "admin"],
+  "plugins": [],
+  "identity_provider": {
+    "type": "KEYCLOAK",
+    "client_id": "fdo",
+    "client_secret": "oGiloDqxrpqgtM55GRInInwkwV3pEiam",
+    "url": "http://localhost:8080/realms/default/protocol/openid-connect/",
+    "username_field": "preferred_username",
+    "scope": [
+      "openid",
+      "profile"
+    ]
   }
+}
