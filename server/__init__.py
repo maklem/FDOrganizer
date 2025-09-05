@@ -63,9 +63,8 @@ formatter = RequestFormatter(
 credentialfilter = CredentialFilter()
 new_handler = logging.handlers.RotatingFileHandler(
         'server.log',
-        maxBytes=15000,
+        maxBytes=15000000,
         backupCount=5)
-# TODO: ENV vars für Dauer und Rotation
 new_handler.addFilter(credentialfilter)
 new_handler.setFormatter(formatter)
 APP.logger.addHandler(new_handler)
