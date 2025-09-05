@@ -103,7 +103,7 @@ def get_collection(collection_id: str, request: Request, auth):
         # An experiment folder was opened.
         eid = int(collection_id.removesuffix("_experiment"))
         experiment = get_latest_timestamp(upl, eid)
-        uploads = experiment["uploads"]
+        uploads = list(filter(lambda x: not x["immutable"], experiment["uploads"]))
         uploads.sort(key=lambda upload: upload["real_name"])
         # This also creates the metadata.json document.
         return {'documents': [Document(name=upload["real_name"], size=upload["filesize"], type=get_filetype(upload["real_name"]), is_stored=False, owner='', source_id=str(upload["item_id"])+"_"+str(upload["id"]),
