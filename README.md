@@ -12,7 +12,7 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 
 3. die Daten mit Metadaten für die Archivierung anzureichern, um sie dann
 
-4. von einem Datenkurator prüfen zu lassen (in Arbeit). Sind die Daten geprüft, werden
+4. von einem Datenkurator prüfen zu lassen. Sind die Daten geprüft, werden
 
 5. die Daten für die Archivierung paketiert und für das Archivsystem (z.B. Rosetta) zum Import bereitgestellt
 
@@ -45,19 +45,19 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
         EXPORT_DIR=/directory/for/exported/packages
         ```
 
-    1. Erstellen eines linux-Nutzers für das Handling von exportierten Datenpaketen (Optional). Für das Einrichten eines sicheren Zugriffs auf die exportierten Daten via **SFTP** siehe z.B. [hier](https://thunderysteak.github.io/sftp-user-chroot)
+    1. OPTIONAL: Erstellen eines linux-Nutzers für das Handling von exportierten Datenpaketen. Für das Einrichten eines sicheren Zugriffs auf die exportierten Daten via **SFTP** siehe z.B. [hier](https://thunderysteak.github.io/sftp-user-chroot)
 
-    1. Überprüfe die ID des neu erstellten Linux-Nutzers
+        1. Überprüfe die ID des neu erstellten Linux-Nutzers
 
-        ```bash
-        id -u NUTZERNAME
-        ```
+            ```bash
+            id -u NUTZERNAME
+            ```
 
-    1. Setzen der Linux-Nutzer-ID in den Umgebungsvariablen
-    
-        ```
-        EXPORT_USER=NUTZER_ID
-        ```
+        1. Setzen der Linux-Nutzer-ID in den Umgebungsvariablen
+        
+            ```
+            EXPORT_USER=NUTZER_ID
+            ```
     
 ## Betrieb
 
@@ -65,7 +65,7 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 
 #### Voraussetzungen
 
-* Python in Version >=3.10 ist installiert
+* Python in Version >=3.11 ist installiert
 * pip ist installiert
 * Virtual Environment für die App ist vorhanden
 * CouchDB-Instanz ist vorhanden
@@ -95,12 +95,9 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 
 1. Erstellen von Datenbanken
 
-    Datenbanken können mit Hilfe des Scripts *create_database* erstellt werden.
+    Datenbanken können unter Linux mit Hilfe des Scripts `init_db.sh` erstellt werden.
 
-    ```python
-        python create_database.py <database_name>
-    ```
-    Wird kein Name beim Start des Skripts übergeben, wird dieser nachträglich abgefragt.
+    Unter Windows muss dies manuell über die [CouchDB-Weboberfläche](localhost:5984/_utils) passieren
     Die Namen der benötigten Datenbanken können in der Datei `server/entities/databases.py` eingesehen werden.
 
 1. Hinzufügen einer Organisation
