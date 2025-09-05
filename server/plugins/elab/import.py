@@ -3,6 +3,7 @@
 
 import io
 import json
+from zipfile import ZipFile
 
 import elabapi_python
 from typing import Literal, Union
@@ -58,7 +59,7 @@ def setup_uploads_api(auth):
 def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folders', 'documents'], list]]:
     """Queries the eLabFTW server for package contents."""
     exp = setup_experiments_api(auth)
-    experiments = exp.read_experiments()
+    experiments = get_filtered_experiments(exp)
     # Retrieves a list of years that experiments were last modified in.
     # This could be optimized using BucketSort/CountingSort if necessary.
     folders = list({experiment.modified_at[:4] for experiment in experiments})
@@ -69,11 +70,30 @@ def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folder
 def get_filetype(name):
     return pathlib.Path(name).suffix
 
+def get_filtered_experiments(exp):
+    return list(filter(lambda ex: ex.timestamped_at and ex.modified_at and ex.timestamped_at >= ex.modified_at,
+                exp.read_experiments()))
+
+def get_latest_timestamp(api, eid):
+    """Returns the latest timestamped version of an experiment."""
+    latest = '\x00'
+    latest_up = None
+    for up in api.read_uploads('experiments', eid, state=2):
+        if up.immutable and up.created_at > latest:
+            latest = up.created_at
+            latest_up = up
+    zf = ZipFile(extract_file(api, latest_up))
+    file = [i for i in zf.namelist() if i.endswith('json')][0]
+    experiment = json.loads(zf.read(file))[0]
+    return experiment
+
+
 def get_collection(collection_id: str, request: Request, auth):
     """Retrieves information about the content of a folder, i.e. number, types and properties of items.
     collection_id is a unique identifier for a folder."""
     exp = setup_experiments_api(auth)
-    experiments = exp.read_experiments()
+    # Filters the experiments, only keeping those not modified after having been timestamped.
+    experiments = get_filtered_experiments(exp)
     upl = setup_uploads_api(auth)
     if collection_id.endswith("_year"):
         # A year folder was opened.
@@ -82,11 +102,11 @@ def get_collection(collection_id: str, request: Request, auth):
     elif collection_id.endswith("_experiment"):
         # An experiment folder was opened.
         eid = int(collection_id.removesuffix("_experiment"))
-        uploads = upl.read_uploads('experiments', eid)
-        uploads.sort(key=lambda upload: upload.real_name)
-        experiment = exp.get_experiment(eid)
+        experiment = get_latest_timestamp(upl, eid)
+        uploads = experiment["uploads"]
+        uploads.sort(key=lambda upload: upload["real_name"])
         # This also creates the metadata.json document.
-        return {'documents': [Document(name=upload.real_name, size=upload.filesize, type=get_filetype(upload.real_name), is_stored=False, owner='', source_id=str(upload.item_id)+"_"+str(upload.id),
+        return {'documents': [Document(name=upload["real_name"], size=upload["filesize"], type=get_filetype(upload["real_name"]), is_stored=False, owner='', source_id=str(upload["item_id"])+"_"+str(upload["id"]),
                  source="eLabFTW") for upload in uploads]+[create_metadata(experiment)[0]], 'folders': []}
 
 
@@ -98,7 +118,6 @@ def get_file_id(file_id):
 def get_files_with_metadata(ids, request, auth):
     """Retrieves uploaded files and constructs metadata."""
     upl = setup_uploads_api(auth)
-    exp = setup_experiments_api(auth)
     # This filters out metadata.json from the files because it does not exist on eLabFTW.
     file_ids = list(filter(lambda x: len(get_file_id(x)) == 2, ids))
     # The star expression inputs experiment and upload IDs as parameters.
@@ -107,7 +126,8 @@ def get_files_with_metadata(ids, request, auth):
     documents = [Document(name=upload.real_name, size=upload.filesize, type=get_filetype(upload.real_name), is_stored=True, owner='', source_id=str(upload.item_id)+"_"+str(upload.id),
                  source="eLabFTW") for upload in uploads]
     # This retrieves the experiment from the ID of its corresponding metadata.json file.
-    metadata = create_metadata(exp.get_experiment(get_file_id(ids[0])[0]))
+    experiment = get_latest_timestamp(upl, get_file_id(ids[0])[0])
+    metadata = create_metadata(experiment)
     documents.append(metadata[0])
     files.append(metadata[1])
     return [{'document': d, 'file': f, 'metadata': None} for d, f in zip(documents, files)]
@@ -118,13 +138,19 @@ def extract_file(api, upload):
 
 def get_attributes(experiment):
     """Retrieves and filters attributes from an eLabFTW experiment."""
-    selected_keys = {'body', 'category', 'category_title', 'comments', 'compounds', 'created_at', 'experiments_links',
-                                               'fullname', 'locked_at', 'metadata', 'modified_at', 'page', 'related_experiments_links', 'related_items_links',
-                                               'sharelink', 'status_title', 'steps', 'tags', 'timestamped_at', 'title', 'type'}
-    return {key:value for key, value in experiment.to_dict().items() if key in selected_keys and value}
+    selected_keys = {'body', 'body_html', 'comments', 'created_at', 'custom_id', 'elabid', 'experiments_links', 'fullname',
+                     'id', 'items_links', 'metadata', 'orcid', 'rating', 'related_experiments_links', 'status_title', 'steps', 'tags', 'timestamped_at',
+                     'timestamped_by', 'title', 'type', 'up_item_id', 'userid'}
+    d = {key:value for key, value in experiment.items() if key in selected_keys and value}
+    if d.get('steps'):
+        d['steps'] = [i['body'] for i in d['steps']]
+    for k in ('experiments_links', 'related_experiments_links', 'items_links'):
+        if d.get(k):
+            d[k] = [{key:value for key, value in i.items() if key in {'entityid', 'title', 'elabid'}} for i in d[k]]
+    return d
 
 def create_metadata(experiment):
     """Creates metadata from an eLabFTW experiment."""
     b = json.dumps(get_attributes(experiment)).encode('utf-8')
     bio = io.BytesIO(b)
-    return Document(name="metadata.json", size=len(b), type="json", is_stored=True, owner='', source_id=str(experiment.id), source="eLabFTW"), bio
+    return Document(name="metadata.json", size=len(b), type="json", is_stored=True, owner='', source_id=str(experiment["id"]), source="eLabFTW"), bio
