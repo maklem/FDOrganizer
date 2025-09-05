@@ -1,0 +1,77 @@
+{
+  "realm": "default",
+  "displayName": "Default",
+  "enabled": true,
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin"
+        }
+      ],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "nutzer1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "passwort1"
+        }
+      ],
+      "realmRoles": ["user"]
+    },
+    {
+      "username": "nutzer2",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "passwort2"
+        }
+      ],
+      "realmRoles": ["user"]
+    },
+    {
+      "username": "reviewer",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "reviewer"
+        }
+      ],
+      "realmRoles": ["user"]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "admin"
+      },
+      {
+        "name": "user"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "fdo",
+      "name": "FDOrganizer",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "oGiloDqxrpqgtM55GRInInwkwV3pEiam",
+      "redirectUris": ["https://localhost:5000/login-keycloak-callback/*"],
+      "webOrigins": ["https://localhost:5000"],
+      "directAccessGrantsEnabled": true
+    }
+  ]
+}

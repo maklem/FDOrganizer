@@ -58,3 +58,15 @@ services:
       - COUCHDB_HOST=db
       - COUCHDB_PORT=5984
     restart: always
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${KEYCLOAK_ADMIN}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KEYCLOAK_IMPORT=/opt/keycloak/data/import/realm-config.json
+    ports:
+      - 8080:8080
+    volumes:
+      - ./keycloak/realm-config.json:/opt/keycloak/data/import/realm-config.json:ro
+    command: ["start-dev", "--import-realm"]
+    restart: always
