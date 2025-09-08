@@ -6,7 +6,6 @@ import json
 
 from typing import Literal, Union
 
-import requests #type: ignore
 from flask.wrappers import Request, Response
 
 from server.entities.errors import PluginError

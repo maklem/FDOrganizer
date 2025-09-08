@@ -2,7 +2,6 @@
 ###################################
 ###              import stuff ####
 ###################################
-from ast import List
 import io
 import json
 import mimetypes
@@ -10,16 +9,13 @@ from typing import Literal, Union
 
 import requests #type: ignore
 from flask.wrappers import Request, Response
-import pathlib
 
 from server.entities.errors import PluginError
-# from .plugin_document import PluginDocument
 
 from ...services.authentication import user
-# from .plugin_folder import PluginFolder
 from ...entities.folder import Folder
 from ...entities.document import Document
-from ...util import web_error, web_response
+from ...util import web_response
 
 
 
