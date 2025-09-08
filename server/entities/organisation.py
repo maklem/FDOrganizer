@@ -6,7 +6,7 @@ shouldBeExcluded = lambda x: x is None
 
 @dataclass
 class IdentityProvider(DataClassJsonMixin):
-    type: Literal["SAML", "OIDC", "LDAP", "KEYCLOAK"]
+    type: Literal["LOCAL", "OIDC", "KEYCLOAK"]
     url: str
     scope: list[str]
     client_id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))

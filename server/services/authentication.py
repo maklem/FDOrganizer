@@ -87,14 +87,12 @@ def is_reviewer(request: Request) -> bool:
 
 def credentials_valid(username: str, password: str, organisation_id: str):
     organisation = Organisation.from_db(get(Databases.ORGANISATIONS, organisation_id).json())
-    if organisation.identity_provider.type == "LDAP":
-        return True
-        return auth_ldap(username, password, organisation.identity_provider.url, organisation.identity_provider.scope)
-    elif organisation.identity_provider.type == "LOCAL":
+    if organisation.identity_provider.type == "LOCAL":
         query =  {
             "selector": {
                 "organisation": organisation_id,
-                "username": username
+                "username": username,
+                "password": password
             }
         }
         user = find(Databases.USERS, json.dumps(query)).json().get('docs')[0]
@@ -103,7 +101,7 @@ def credentials_valid(username: str, password: str, organisation_id: str):
         else:
             return False
     else:
-        return True
+        return False
     
 def auth_ldap(username: str, password: str, url: str, scope: list[str]):
     user_dn = f'cn={username},{",".join(str(element) for element in scope)}'

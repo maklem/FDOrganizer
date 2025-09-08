@@ -27,18 +27,6 @@ def login_local(organisation_id: str, username: str, password: str) -> Response:
     auth_response.set_cookie('token', token)
     return auth_response
 
-@APP.route("/login-ldap/<organisation_id>", methods=["POST"])
-@json_body
-def login_ldap(organisation_id: str, username: str, password: str) -> Response:
-    try:
-        token = authorize(username, password, organisation_id)
-    except RuntimeError:
-        return web_response(200, details = {'success': False, 'reason': "wrong credentials"})
-    auth_response =  web_response(200, details = {'success': True})
-    auth_response.set_cookie('token', token)
-    return auth_response
-
-
 @APP.route("/login-oidc/<organisation_id>", methods=["GET"])
 def login_oidc(organisation_id: str):
     organisation = get_organisation_from_db(organisation_id)
