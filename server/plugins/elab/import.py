@@ -6,13 +6,14 @@ import json
 from zipfile import ZipFile
 
 import elabapi_python
+from elabapi_python.rest import ApiException
 from typing import Literal, Union
 
-import requests #type: ignore
 from flask.wrappers import Request, Response
 import pathlib
 
-from server.entities.errors import PluginError
+from ...entities.errors import PluginError
+
 from ...entities.folder import Folder
 from ...entities.document import Document
 from ...util import web_response
@@ -27,34 +28,34 @@ def get_config():
 def login(request: Request) -> Response:
     """Authenticates with eLabFTW experiments and uploads APIs."""
     request_data = json.loads(request.get_data())
-    setup_experiments_api(request_data["APIKey"])
-    setup_uploads_api(request_data["APIKey"])
+    client = setup_experiments_api(request_data["APIKey"])
+    try:
+        response_data, status_code, headers = get_filtered_experiments(client)
+    except ApiException as e:
+        raise PluginError(status_code=e.status, message="Failed to authenticate with eLabFTW experiments API")
+    if status_code > 399:
+        raise PluginError(status_code=status_code, message="Failed to authenticate with eLabFTW experiments API")
     return web_response(200, "Authentication with eLabFTW successful", request_data["APIKey"])
 
 
 def setup_experiments_api(auth):
     """Sets up the experiments API."""
-    try:
-        config = elabapi_python.Configuration()
-        config.host = get_config()["baseUrl"]
-        client = elabapi_python.ApiClient(config)
-        client.set_default_header('Authorization', auth)
-        exp = elabapi_python.ExperimentsApi(client)
-        return exp
-    except:
-        raise PluginError(500, "Failed to authenticate with eLabFTW experiments API")
+    config = elabapi_python.Configuration()
+    config.host = get_config()["baseUrl"]
+    client = elabapi_python.ApiClient(config)
+    client.set_default_header('Authorization', auth)
+    exp = elabapi_python.ExperimentsApi(client)
+    return exp
+
 
 def setup_uploads_api(auth):
     """Sets up the uploads API."""
-    try:
-        config = elabapi_python.Configuration()
-        config.host = get_config()["baseUrl"]
-        client = elabapi_python.ApiClient(config)
-        client.set_default_header('Authorization', auth)
-        upl = elabapi_python.UploadsApi(client)
-        return upl
-    except:
-        raise PluginError(500, "Failed to authenticate with eLabFTW uploads API")
+    config = elabapi_python.Configuration()
+    config.host = get_config()["baseUrl"]
+    client = elabapi_python.ApiClient(config)
+    client.set_default_header('Authorization', auth)
+    upl = elabapi_python.UploadsApi(client)
+    return upl
 
 def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folders', 'documents'], list]]:
     """Queries the eLabFTW server for package contents."""
