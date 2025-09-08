@@ -1,13 +1,17 @@
 from datetime import datetime
 import shutil
 from pathlib import Path
+from flask import request
 from xmlschema import XMLSchema11
 import hashlib
 import jinja2
 import os
 
+from .services.authentication import organisation
+
+from .entities.organisation import Organisation
+
 from .entities.errors import ExportUserError, PathError, XMLValidationError
-from .shared import update_package_state
 from .util import web_error, web_response
 from .entities import Folder, Document, Package, Databases, Metadata
 from .services.database import get, get_attachment
@@ -49,7 +53,7 @@ def build_export_package(package_id: str):
         return web_error(500, message=error.args[0], stacktrace=error.args[1])
     # Copy files and METS to correct dir for Rosetta Ingest
     try:
-        create_sip(package, mets)
+        create_sip(package, mets, organisation(request))
     except PathError as error:
         return web_error(500, message=error.args[0])
     except ExportUserError as error:
@@ -59,12 +63,13 @@ def build_export_package(package_id: str):
 
     return web_response(200, details = {'success': True})
 
-def create_sip(package: Package, mets):
+def create_sip(package: Package, mets, organisation_id: str):
     sipname = f'{package.id}-{round(datetime.now().timestamp())}'
     source = Path(TEMP_DIR, package.name)
     if not os.path.exists(source):
         raise PathError(f'Configured source path {source} does not exist')
-    export_dir = os.getenv("EXPORT_DIR")
+    
+    export_dir = Path.joinpath(Path(str(os.getenv("EXPORT_DIR"))), get_organisation_subdirectory(organisation_id))
     export_user = os.getenv("EXPORT_USER")
     if export_dir is None or export_user is None:
         raise ExportUserError('No export user for SIP transfer configured. Check server environment variables')
@@ -73,6 +78,11 @@ def create_sip(package: Package, mets):
     shutil.chown(source, linuxuser)
     shutil.copytree(source, os.path.join(target, 'streams', package.name))
     Path(os.path.join(target, 'mets.xml')).write_text(mets, encoding='utf-8')
+
+def get_organisation_subdirectory(organisation_id: str):
+    org_response = get(Databases.ORGANISATIONS, organisation_id).json()
+    org= Organisation.from_db(org_response)
+    return org.export_subdirectory
 
 def delete_temp_package(package_name: str):
     shutil.rmtree(os.path.join(TEMP_DIR, package_name))

@@ -17,9 +17,9 @@ class IdentityProvider(DataClassJsonMixin):
 class Organisation(DataClassJsonMixin):
     name: str
     reviewers: list[str]
-    # rosetta_token: str
     plugins: list[str]
     identity_provider: IdentityProvider
+    export_subdirectory: str
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
 
     @staticmethod

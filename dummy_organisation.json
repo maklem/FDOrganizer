@@ -1,7 +1,8 @@
 {
   "name": "Dummy-Universität",
   "reviewers": ["reviewer", "admin"],
-  "plugins": [],
+  "plugins": ["dummy"],
+  "export_subdirectory": "dummy_universitaet",
   "identity_provider": {
     "type": "KEYCLOAK",
     "client_id": "fdo",

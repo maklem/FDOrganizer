@@ -49,7 +49,7 @@ def get_idp_data():
     from simple_term_menu import TerminalMenu  # type: ignore
     identity_provider = {}
 
-    options = ["OIDC", "SAML", "LDAP", "LOCAL"]
+    options = ["OIDC", "LOCAL", "KEYCLOAK"]
     terminal_menu = TerminalMenu(options)
     identity_provider['type'] = options[terminal_menu.show()] # type: ignore
 

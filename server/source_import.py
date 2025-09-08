@@ -3,17 +3,19 @@ import json
 import os.path
 from functools import wraps
 from pathlib import Path
-from typing import List, Literal, Union
+from typing import List, Literal
 from flask import request, Response
 from importlib_resources import files
 
 from server import APP
+from .entities.organisation import Organisation
+from .entities.databases import Databases
 from .entities.errors import PluginError
 from .shared import persist_documents
 from .services.database import get
 from .entities import Document, Folder
 from .util import can_add_files, get_database_from_string, json_body, web_error, web_response
-from .services.authentication import add_payload, payload, remove_payload, user
+from .services.authentication import add_payload, organisation, payload, remove_payload, user
 
 SERVERNAME = __name__.split('.')[0]
 
@@ -107,6 +109,7 @@ def logout_source(source: str):
 @APP.route('/import/sources')
 def list_import_sources():
     info = [plugin_info(x) for x in get_plugins()]
+    info = [plugin for plugin in info if plugin["id"] in get_organisation_plugins(organisation(request))]
     return web_response(200, details = info)
 
 
@@ -161,3 +164,8 @@ def import_files_and_metadata(import_triples: List[dict], parent: str, parent_ty
 def add_owner(import_triple: dict, username: str):
     import_triple['document'].owner = username
     return import_triple
+
+def get_organisation_plugins(organisation_id: str) -> list[str]:
+    org_response = get(Databases.ORGANISATIONS, organisation_id).json()
+    org= Organisation.from_db(org_response)
+    return org.plugins

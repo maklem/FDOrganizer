@@ -84,6 +84,30 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
         ```
         TOKEN_SECRET=EbwDR8KR/dXAH55dMtTcqOqARfpwT04El7VlV3QiruXt4zaXiHOrvWd9Ic11UKPhZ98lAuBQ05kpmZ0EIXuJrg==
         ```
+
+1. Anlegen von Organisationen in der Datenbank
+
+    Eine Installation des FDOrganizer kann von einer oder mehreren Einrichtungen genutzt werden. Dabei kann jede Einrichtung eine eigene Nutzerverwaltung, Authentifizierungsmethode und eigene Plugins nutzen. Dazu müssen Organisationen in der Datenbank angelegt werden (siehe unten). Die Organisationen haben folgenden Aufbau:
+
+    ```
+    {
+        "name": "Dummy-Universität", # Name der Einrichtung
+        "reviewers": ["reviewer", "admin"], # Nutzernamen der Reviewer-Accounts
+        "plugins": [], # Eine Liste von installierten Plugins, die die Einrichtung nutzt
+        "export_subdirectory": "dummy_universitaet", # Subdirectory des Export-Ordners für die Einrichtung
+        "identity_provider": {
+            "type": "KEYCLOAK",
+            "client_id": "fdo",
+            "client_secret": "oGiloDqxrpqgtM55GRInInwkwV3pEiam",
+            "url": "http://localhost:8080/realms/default/protocol/openid-connect/",
+            "username_field": "preferred_username",
+            "scope": [
+            "openid",
+            "profile"
+            ]
+        } # Daten des Identity Providers, der zur Authentifizierung genutzt wird
+    }
+    ```
 ## Betrieb
 
 ### Lokal
@@ -135,9 +159,9 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
         python create_organisation.py <file_path>
     ```
 
-    Wenn der Parameter *file_path* genutzt wird, wird die organisation anhand der JSON-Struktur in der referenzierten Datei aufgebaut (siehe Datei *dummy_organisation*).
-    Ansonsten wird eine interaktive Abfrage nach den Eigenschaften der Organisation gestartet.
-    In beiden Fällen wird die Organisation in der Datenbank angelegt.
+    Der Parameter *file_path* muss auf eine JSON-Datei verweisen, in der eine Organisation konfiguriert ist.
+    Durch starten des Skripts wird die Organisation anhand der JSON-Struktur in der referenzierten Datei aufgebaut (siehe Datei *dummy_organisation*) und in der Datenbank gespeichert.
+    Wird der parameter *file_path* nicht gesetzt, startet eine interaktive Abfrage der Daten, die jedoch unvollständig ist und händische Anpassungen in der Datenbank erfordert.
 
 1. Zum lokalen Ausführen der App können entweder das [Flask CLI](https://flask.palletsprojects.com/en/2.2.x/cli/) oder die Startskripte benutzt werden.
 Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://localhost:5000) und nutzen die mitgelieferten Self-Signed-Certificates zur SSL-Verschlüsselung.
