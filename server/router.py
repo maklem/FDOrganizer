@@ -1,3 +1,4 @@
+import os
 from flask import render_template, request, url_for, redirect
 from server import APP
 from .services.authentication import is_authorized, is_reviewer
@@ -30,6 +31,8 @@ def navindex():
 
 @APP.route("/impressum")
 def navimpressum():
+    if os.getenv("IMPRESSUM_LINK") is not None:
+        return redirect(str(os.getenv("IMPRESSUM_LINK")))
     return render_template("impressum.html")
 
 @APP.route("/history")

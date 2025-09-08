@@ -58,7 +58,18 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
             ```
             EXPORT_USER=NUTZER_ID
             ```
-    
+
+1. Setzen von Umgebungsvariable für Impressum-Link
+
+    * Um ein externes impressum einzubinden muss eine Umgebungsvariable in `.env` hinzugefügt werden, die den Hyperlink zum Impressum enthält:
+
+        ```
+        IMPRESSUM_LINK=https://localhost:5000/impressum
+        ```
+
+    * Wird diese Variable nicht gesetzt, wird automatisch das HTML-Template `impressum.html` gerendert, das sich in `server/templates/` befindet.
+
+
 ## Betrieb
 
 ### Lokal
