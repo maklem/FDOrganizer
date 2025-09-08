@@ -132,7 +132,7 @@ def rename_package(package_id: str, name: str) -> Response:
 def create_package_from_zip() -> Response:
     vals = request.form.to_dict()
     zip_temp_path = './TEMP/TEMP.zip'
-    project_zip: FileStorage = next(request.files.values())
+    project_zip: FileStorage = next(request.files.values()) # type: ignore
     project_zip.save(zip_temp_path)
     with ZipFile(zip_temp_path, 'r') as zip_ref:
         zip_path = zipfile.Path(zip_ref)
@@ -140,7 +140,7 @@ def create_package_from_zip() -> Response:
         directory = build_directory_tree(zip_path, vals['keep_empty']=='true', vals['keep_structure']=='true')
         # Build new package for zip content
         username = user(request)
-        package_id = create_package_in_db(pathlib.Path(project_zip.filename).stem, username, organisation(request))
+        package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, organisation(request))
         # Create folders and documents
         folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in directory.folders]
         doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]

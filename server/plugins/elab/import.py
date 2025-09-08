@@ -5,8 +5,8 @@ import io
 import json
 from zipfile import ZipFile
 
-import elabapi_python
-from elabapi_python.rest import ApiException
+import elabapi_python #type: ignore
+from elabapi_python.rest import ApiException #type: ignore
 from typing import Literal, Union
 
 from flask.wrappers import Request, Response
@@ -32,7 +32,7 @@ def login(request: Request) -> Response:
     try:
         response_data, status_code, headers = get_filtered_experiments(client)
     except ApiException as e:
-        raise PluginError(status_code=e.status, message="Failed to authenticate with eLabFTW experiments API")
+        raise PluginError(status_code=e.status, message="Failed to authenticate with eLabFTW experiments API") # type: ignore
     if status_code > 399:
         raise PluginError(status_code=status_code, message="Failed to authenticate with eLabFTW experiments API")
     return web_response(200, "Authentication with eLabFTW successful", request_data["APIKey"])
@@ -124,7 +124,7 @@ def get_files_with_metadata(ids, request, auth):
     # The star expression inputs experiment and upload IDs as parameters.
     uploads = [upl.read_upload('experiments', *get_file_id(file_id)) for file_id in file_ids]
     files = [extract_file(upl, x) for x in uploads]
-    documents = [Document(name=upload.real_name, size=upload.filesize, type=get_filetype(upload.real_name), is_stored=True, owner='', source_id=str(upload.item_id)+"_"+str(upload.id),
+    documents = [Document(name=upload.real_name, size=upload.filesize, type=get_filetype(upload.real_name), is_stored=True, owner='', source_id=str(upload.item_id)+"_"+str(upload.id), # type: ignore
                  source="eLabFTW") for upload in uploads]
     # This retrieves the experiment from the ID of its corresponding metadata.json file.
     experiment = get_latest_timestamp(upl, get_file_id(ids[0])[0])

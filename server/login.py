@@ -1,5 +1,5 @@
 from flask import Response, request, redirect, session, url_for
-import requests
+import requests #type: ignore
 from requests_oauth2client import OAuth2Client, ClientSecretJwt
 
 from server import APP
