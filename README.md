@@ -69,7 +69,21 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 
     * Wird diese Variable nicht gesetzt, wird automatisch das HTML-Template `impressum.html` gerendert, das sich in `server/templates/` befindet.
 
+1. Setzen von Umgebungsvariable für das Login-Secret
 
+    Beim Login in den FDOrganizer wird ein JWT-Token erstellt und im Browser gespeichert. Es dient zur Authentifizierung des Nutzers für alle weiteren HTTP-Anfragen die der FDOrganizer durchführt. Der Key sollte mindestens 512 Bit (also 64 Byte) lang sein.
+
+    1. OPTIONAL: Erstellen des Secret Keys mit openssl
+
+        ```
+        openssl rand -base64 64
+        ```
+
+    1. Setzen des Secret Keys in `.env`
+
+        ```
+        TOKEN_SECRET=EbwDR8KR/dXAH55dMtTcqOqARfpwT04El7VlV3QiruXt4zaXiHOrvWd9Ic11UKPhZ98lAuBQ05kpmZ0EIXuJrg==
+        ```
 ## Betrieb
 
 ### Lokal

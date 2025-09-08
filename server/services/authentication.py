@@ -1,8 +1,7 @@
-SECRET = 'In nomine domini est pax et salvatio'
 
 import json
+import os
 from time import time
-from json import dumps, loads
 from typing import TypedDict
 from flask.wrappers import Request
 from jwt import InvalidSignatureError, encode, decode, DecodeError
@@ -11,6 +10,8 @@ import ldap #type: ignore
 
 from .database import find, get
 from ..entities import Databases, Organisation
+
+SECRET = str(os.getenv('TOKEN_SECRET'))
 
 class TokenPayload(TypedDict):
     username: str
