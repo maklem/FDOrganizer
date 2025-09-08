@@ -34,6 +34,7 @@
                   <label for="check-duration">I attest that the cost for the preservation is covered for a minimum preservation period of
                     <LabeledInput
                       class="duration-input"
+                      :type="'quantity'"
                       :value="store.duration"
                       :disabled="(!store.checkDuration ? true : undefined) || store.settingsReadonly"
                       :placeholder="'yy'"

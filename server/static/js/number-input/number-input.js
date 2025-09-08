@@ -36,10 +36,12 @@ export default {
 function sanitize(type, oldvalue, newvalue) {
     if (newvalue === "") return oldvalue
     if (type === "coordinate") return parseFloat(newvalue)
+    if (type === "quantity") return parseInt(newvalue)
     return newvalue
 }
 
 function step(type) {
     if (type === "coordinate") return '.00000001'
+    if (type === "quantity") return '1'
     return '1'
 }

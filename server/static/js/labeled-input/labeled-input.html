@@ -32,6 +32,18 @@
         @focus="focus = true"
         @blur="focus = false"
     ></NumberInput>
+    <NumberInput v-else-if="type === 'quantity'"
+        :value="value"
+        :id="id"
+        :type="type"
+        :invalid="!focus && invalid"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        class="input"
+        @input="(value) => $emit('input', value)"
+        @focus="focus = true"
+        @blur="focus = false"
+    ></NumberInput>
     <DefaultInput v-else-if="type === 'password'"
         :value="value"
         :id="id"
