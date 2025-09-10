@@ -1,6 +1,0 @@
-{
-    "baseUrl": "https://elab-test.ur.de/api/v2",
-    "displayName": "eLabFTW",
-    "needsAuthentication": true,
-    "authenticationType": "API_KEY"
-}

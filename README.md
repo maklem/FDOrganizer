@@ -221,3 +221,20 @@ Für eine Nutzung im Produktionsmodus kann
     * ein anderer Zeitraum gewählt werden, indem `./cron_clean/cronjobs` angepasst wird
 
     * der container `cron` aus `docker-compose.yaml` entfernt werden
+
+## Plugins
+
+Plugins für den FDOrganizer können vom Betreiber des FDO in wenigen Schritten installiert werden.
+
+1. Auswahl eines Plugins. Hier gibt es die zwei Möglichkeiten:
+
+    * Anpassung eines Plugins aus der Liste der existierenden Plugins, verfügbar auf [Github](https://github.com/ub-regensburg/FDOrganizer-plugins)
+
+    * Schreiben eines eigenen Plugins auf Basis des mitgelieferten Dummy-Plugins
+
+1. Plugin-Ordner dem Directory `server/plugins` hinzufügen
+
+1. Plugin für eine Organisation aktivieren
+
+    Der Name des Plugins muss der Organisation in der Liste der Plugins hinzugefügt werden (siehe *dummy_organisation.json*), erst danach wird es im FDOrganizer sichtbar.
+    Dies geschieht manuell in der Datenbank über deren Weboberfläche.
