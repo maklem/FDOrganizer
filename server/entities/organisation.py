@@ -13,6 +13,7 @@ class IdentityProvider(DataClassJsonMixin):
     client_id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     client_secret: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     username_field: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
+    required_fields: dict[str,str] | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
 
 @dataclass
 class Organisation(DataClassJsonMixin):
