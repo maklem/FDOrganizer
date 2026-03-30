@@ -69,4 +69,4 @@ new_handler.addFilter(credentialfilter)
 new_handler.setFormatter(formatter)
 APP.logger.addHandler(new_handler)
 
-from . import router,login,metadata,package_details,package,source_import,archive,export, review
+from . import router,login,metadata,package_details,package,source_import,archive,export, review, download_archive  # noqa: E402, F401

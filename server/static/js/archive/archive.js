@@ -37,6 +37,9 @@ const archive = createApp({
         this.store.getPackages()
      },
     methods: {
+	    goToDownload(pkgId){
+		    window.open("/download/"+pkgId )
+	    }
     },
     template
 })
