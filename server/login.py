@@ -118,7 +118,8 @@ def callback_keycloak(organisation_id: str):
             username = userinfo['username']
         except KeyError:
             web_error(400, "No 'username' field or custom field for the organisation found in userinfo", component= "SERVER")
-    username = userinfo[organisation.identity_provider.username_field]
+    else:
+        username = userinfo[organisation.identity_provider.username_field]
 
     # create token with info for authenticated user
     token = create_token(username, organisation_id)

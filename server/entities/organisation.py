@@ -2,7 +2,8 @@ from dataclasses import dataclass, field
 from typing import Literal, Any
 from dataclasses_json import DataClassJsonMixin, config
 
-shouldBeExcluded = lambda x: x is None
+def shouldBeExcluded(x) -> bool:
+    return x is None
 
 @dataclass
 class IdentityProvider(DataClassJsonMixin):
