@@ -1,24 +1,23 @@
 from datetime import datetime
-from flask import request
 import logging
 import os
+from typing import Generator, Any
+
+from flask import request
+import hashlib
 from zipstream import ZipStream
 
-from typing import Generator
-
 from .services.authentication import organisation
-
-from .entities.errors import ExportUserError, PathError, XMLValidationError
+from .entities.errors import XMLValidationError
 from .util import can_read, web_error
 from .entities import Document, Package, Databases, Metadata
 from .services.database import get, get_attachment
-from .export import create_structmap, create_package_data, build_sip_metadata, add_label, add_note
+from .export_utils import create_structmap, create_package_data, build_sip_metadata, add_label, add_note
 from . import APP
 
 TEMP_DIR = os.path.join('server','tmp')
 
-def timestamp_to_date(value, format="%Y-%m-%d"):
-    return datetime.fromtimestamp(value / 1000).strftime(format)
+Hashmap = dict[str,str]
 
 @APP.route("/download/<package_id>", methods=["GET"])
 def stream_exportable_package(package_id: str):
@@ -38,16 +37,27 @@ def stream_exportable_package(package_id: str):
         logging.error(error.args[0])
         return web_error(500, error.args[0])
 
+    structmap = create_structmap(package)
+
+    def count_files(structmap) -> int:
+        here = len(structmap['files'])
+        there = sum(count_files(folder) for folder in structmap['folders'])
+        return here + there
+
+    if 0 == count_files(structmap):
+        error = "Can not generate download for package with no files."
+        logging.error(error)
+        return web_error(500, error)
+
     def generate() -> Generator[bytes,None,None]:
         # Get all documents and folders in hierarchical structure
-        structmap = create_structmap(package)
-        
+        hashmap: Hashmap = {}
         zs = ZipStream()
         # Download files
-        yield from stream_zipped_directory(zs, structmap, package.name)
+        yield from stream_zipped_directory(zs, hashmap, structmap, package.name)
 
         # Create data for mets generation (depends on downloaded files)
-        file_list = create_streamed_file_list(structmap, package.name)
+        file_list = create_streamed_file_list(structmap, hashmap, package.name)
 
         # ie_structure = create_ie_structure(structmap)
         ie_structure = structmap
@@ -69,30 +79,34 @@ def stream_mets(zs: ZipStream, package: Package, mets, organisation_id: str) -> 
     zs.add(mets, 'mets.xml')
     yield from zs.all_files()
 
-def stream_zipped_directory(zs: ZipStream, structmap, structpath = "") -> Generator[bytes,None,None]:
+def stream_zipped_directory(zs: ZipStream, hashmap: Hashmap, structmap, structpath = "") -> Generator[bytes,None,None]:
     for document in structmap.get('files'):
-        yield from stream_zipped_file(zs, document, structpath)
+        yield from stream_zipped_file(zs, hashmap, document, structpath)
     for folder in structmap.get('folders'):
-        yield from stream_zipped_directory(zs, folder, structpath=os.path.join(structpath, folder['name']))
+        yield from stream_zipped_directory(zs, hashmap, folder, structpath=os.path.join(structpath, folder['name']))
 
-def stream_zipped_file(zs: ZipStream, document: Document, structpath:str) -> Generator[bytes,None,None]:
+def stream_zipped_file(zs: ZipStream, hashmap: Hashmap, document: Document, structpath:str) -> Generator[bytes,None,None]:
+    if not document.id:
+        return
+
     file_name = os.path.join(structpath, document.name)
     try:
         file_data = get_attachment(document.id, document.name).content # type: ignore
     except Exception:
         print(f'No attachment found for document {document.name} with ID {document.id}')
+    hashmap[document.id] = hashlib.md5(file_data).hexdigest()
     zs.add(file_data, file_name)
     yield from zs.all_files()
 
-def create_streamed_file_list(structmap, structpath = ""):
-    doc_data = [streamed_document_data(document, structpath) for document in structmap.get('files')]
+def create_streamed_file_list(structmap, hashmap, structpath = ""):
+    doc_data = [streamed_document_data(document, hashmap, structpath) for document in structmap.get('files')]
 
-    nested_data = [create_streamed_file_list(folder, os.path.join(structpath, folder.get('name'))) for folder in structmap.get('folders')]
+    nested_data = [create_streamed_file_list(folder, hashmap, os.path.join(structpath, folder.get('name'))) for folder in structmap.get('folders')]
     flat_nested_data = [file_info for sublist in nested_data for file_info in sublist]
 
     return [*doc_data, *flat_nested_data]
 
-def streamed_document_data(document: Document, structpath: str):
+def streamed_document_data(document: Document, hashmap: Hashmap, structpath: str) -> dict[str,Any]:
     label = ""
     note = ""
     metadata: Metadata | None = None
@@ -114,7 +128,7 @@ def streamed_document_data(document: Document, structpath: str):
         'fileModificationDate': datetime.now().strftime('%Y-%m-%d'),
         # TODO
         # 'fileModificationDate': document.last_modified,
-        'MD5': "none",
+        'MD5': hashmap[document.id] if document.id and hashmap[document.id] else "missing",
         'label': label,
         'note':  note,
         'metadata': metadata if metadata is not None else None

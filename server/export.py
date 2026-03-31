@@ -1,3 +1,4 @@
+from typing import Any
 from datetime import datetime
 import shutil
 from pathlib import Path
@@ -15,12 +16,10 @@ from .entities.errors import ExportUserError, PathError, XMLValidationError
 from .util import web_error, web_response
 from .entities import Folder, Document, Package, Databases, Metadata
 from .services.database import get, get_attachment
+from .export_utils import create_structmap, create_package_data, build_sip_metadata, add_label, add_note
 from . import APP
 
 TEMP_DIR = os.path.join('server','tmp')
-
-def timestamp_to_date(value, format="%Y-%m-%d"):
-    return datetime.fromtimestamp(value / 1000).strftime(format)
 
 @APP.route("/export/<package_id>", methods=["POST"])
 def build_export_package(package_id: str):
@@ -87,44 +86,6 @@ def get_organisation_subdirectory(organisation_id: str):
 def delete_temp_package(package_name: str):
     shutil.rmtree(os.path.join(TEMP_DIR, package_name))
 
-def create_package_data(package: Package):
-    if package.metadata is None:
-        raise ValueError('Package has no metadata')
-    metadata = Metadata.from_dict(get(Databases.METADATA, package.metadata).json())
-    return {
-        'metadata': metadata.metadata,
-        'id': package.id
-    }
-
-def create_structmap(entity: Package | Folder):
-    documents = [Document.from_db(get(Databases.DOCUMENTS, document_id).json()) for document_id in entity.documents]
-    folders = [Folder.from_dict(get(Databases.FOLDERS, folder_id).json()) for folder_id in entity.folders]
-    return {
-        'name': entity.name,
-        'files': documents,
-        'folders': [create_structmap(folder) for folder in folders]
-    }
-
-def build_sip_metadata(package_data, file_list, structmap):
-    templateLoader = jinja2.FileSystemLoader(searchpath=[os.path.join('server', 'metadata_templates', 'rosetta-mets'), os.path.join('server', 'metadata_templates', 'dublincore')])
-    templateEnv = jinja2.Environment(
-        loader=templateLoader,
-        autoescape=jinja2.select_autoescape(),
-        trim_blocks=True,
-        lstrip_blocks=True
-    )
-    templateEnv.filters["timestamp_to_date"] = timestamp_to_date
-    template = templateEnv.get_template('rosetta-mets.xml.jinja')
-    rendered_xml = template.render(files = file_list, package = package_data, structmap = structmap)
-    schema_path = os.path.join('server', 'metadata_templates', 'rosetta-mets', 'schema')
-    schema_file = open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd'))
-    schema = XMLSchema11(schema_file, base_url=schema_path)
-    try:
-        schema.validate(rendered_xml)
-    except Exception as error:
-        raise XMLValidationError(f'Validation of METS-File failed: {error.args[0]}', rendered_xml)
-    return rendered_xml
-
 def create_ie_directory(structmap, structpath = ""):
     for document in structmap.get('files'):
         download_file(document, structpath)
@@ -134,7 +95,7 @@ def create_ie_directory(structmap, structpath = ""):
 def download_file(document: Document, structpath:str):
     try:
         file_data = get_attachment(document.id, document.name).content # type: ignore
-    except:
+    except Exception:
         print(f'No attachment found for document {document.name} with ID {document.id}')
     doc_file = Path(os.path.join(TEMP_DIR, structpath, document.name))
     doc_file.parent.mkdir(exist_ok=True, parents=True)
@@ -148,7 +109,7 @@ def create_file_list(structmap, structpath = ""):
 
     return [*doc_data, *flat_nested_data]
 
-def document_data(document: Document, structpath: str):
+def document_data(document: Document, structpath: str) -> dict[str,Any]:
     label = ""
     note = ""
     metadata: Metadata | None = None
@@ -178,19 +139,3 @@ def document_data(document: Document, structpath: str):
         'note':  note,
         'metadata': metadata if metadata is not None else None
     }
-
-def add_label(metadata: Metadata):
-    try:
-        return metadata.metadata['title'][0]['titleText'][0]
-    except KeyError:
-        return ""
-    
-def add_note(metadata: Metadata):
-    try:
-        notes = [description['textAbstract'] for description in metadata.metadata['description'] if description['descriptionType'][0] == "descriptionAbstract"]
-        if notes:
-            return notes[0]
-        else:
-            return ""
-    except KeyError:
-        return ""
