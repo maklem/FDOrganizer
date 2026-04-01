@@ -1,3 +1,5 @@
+from curses import meta
+import difflib
 from typing import Any, Literal
 import os
 from datetime import datetime
@@ -20,11 +22,67 @@ def create_package_data(package: Package) -> dict[Literal['metadata','id'],Any]:
         'id': package.id
     }
 
-def create_structmap(entity: Package | Folder) -> dict[Literal['name','files','folders'],Any]:
+def check_languages(languages: list[dict[str,Any]], filename) -> list[str]:
+    errors: list[str] = []
+
+    for i in range(len(languages)):
+        error_prefix = f"In metadata for \"{filename}\": language[{i}]"
+        if "languageType" not in languages[i]:
+            errors.append(f"{error_prefix} has no type.")
+            continue
+        if languages[i]["languageType"][0] == "naturalLanguage":
+            if "languageCode" not in languages[i]:
+                errors.append(f"{error_prefix} of type 'naturalLanguage' has no languageCode.")
+                continue
+            if languages[i]["languageCode"][0] == "custom":
+                if "customLanguage" not in languages[i]:
+                    errors.append(f"{error_prefix} of type 'naturalLanguage' with code 'custom' has no custom value.")
+                    continue
+        elif languages[i]["languageType"][0] == "programmingLanguage":
+            if "customProgrammingLanguage" not in languages[i]:
+                errors.append(f"{error_prefix} of type 'programmingLanguage' has no value.")
+                continue
+        else:
+            errors.append(f"{error_prefix} has unknown type.")
+            continue
+    return errors
+
+def check_document(prefix: str, document: Document) -> list[str]:
+    errors = []
+    if document.metadata is not None:
+        metadata = Metadata.from_dict(get(Databases.METADATA, document.metadata).json())
+        if "language" in metadata.metadata:
+            errors = check_languages(metadata.metadata["language"], os.path.join(prefix, document.name))
+    return errors
+
+def check_folder(prefix: str, document: dict[str,Any]) -> list[str]:
+    errors = []
+    if "metadata" in document:
+        metadata = Metadata.from_dict(get(Databases.METADATA, document["metadata"]).json())
+        if "language" in metadata.metadata:
+            errors = check_languages(metadata.metadata["language"], os.path.join(prefix, document["name"]))
+    return errors
+
+def check_structmap(prefix, structmap:dict[Literal['name','files','folders']|str,Any]) -> list[str]:
+    errors = []
+    for e in check_folder(prefix, structmap):
+        errors.append(e)    
+
+    current_prefix = os.path.join(prefix, structmap["name"])
+    for file in structmap['files']:
+        for e in check_document(current_prefix, file):
+            errors.append(e)
+    for folder in structmap['folders']:
+        for e in check_structmap(current_prefix, folder):
+            errors.append(e)
+    return errors
+
+def create_structmap(entity: Package | Folder) -> dict[Literal['name','files','folders','metadata'],Any]:
     documents = [Document.from_db(get(Databases.DOCUMENTS, document_id).json()) for document_id in entity.documents]
     folders = [Folder.from_dict(get(Databases.FOLDERS, folder_id).json()) for folder_id in entity.folders]
     return {
         'name': entity.name,
+        'metadata': entity.metadata,
         'files': documents,
         'folders': [create_structmap(folder) for folder in folders]
     }

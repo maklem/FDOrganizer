@@ -2,13 +2,16 @@ from functools import wraps
 import json
 import re
 from typing import Any, Optional, Union
-from flask import Request, make_response, request
+from flask import Request, make_response, request, render_template
 
 from .entities import Package, Databases
 
 from .services.database import get
 
 from .services.authentication import is_reviewer, organisation, user
+
+def error_page(code: int = 500, errors: list[str] = []):
+    return render_template("error.html", errors=errors), code
 
 def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]] = None, component = "SERVER"):
     error_data: dict[str, Union[str, list[str]]] = {

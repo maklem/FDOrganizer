@@ -7,7 +7,7 @@ from .entities.errors import IdentityProviderError
 from .entities.organisation import Organisation
 from .entities.databases import Databases
 from .services.database import get, getall
-from .util import json_body, web_error, web_response
+from .util import json_body, web_error, web_response, error_page
 from .services.authentication import authorize, create_token
 
 @APP.route("/organisations", methods=["GET"])
@@ -107,7 +107,7 @@ def callback_keycloak(organisation_id: str):
     try:
         access_token = token_response.json()['access_token']
     except KeyError:
-        return web_error(400, "Could not accquire access token for fetching user info. Organisation IDP-data might be wrong", component= "SERVER")
+        return error_page(400, ["Could not accquire access token for fetching user info. Organisation IDP-data might be wrong."])
 
     userinfo_url = f'{organisation.identity_provider.url}userinfo'
     userinfo_response = requests.get(userinfo_url, headers={'Authorization': f'Bearer {access_token}'})
@@ -117,7 +117,7 @@ def callback_keycloak(organisation_id: str):
         try:
             username = userinfo['username']
         except KeyError:
-            return web_error(400, "No 'username' field or custom field for the organisation found in userinfo", component= "SERVER")
+            return error_page(400, [f"No 'username' field or custom field for the organisation found in {userinfo=}"])
     else:
         username = userinfo[organisation.identity_provider.username_field]
 
@@ -125,12 +125,12 @@ def callback_keycloak(organisation_id: str):
         errors = []
         for field, value in  organisation.identity_provider.required_fields.items():
             if field not in userinfo:
-                errors.append(f"Field '{field}' is missing in userinfo.")
+                errors.append(f"Field '{field}' is missing in userinfo. IdP reported {userinfo=}.")
                 continue
             if userinfo[field] != value:
-                errors.append(f"Could not log in. Required field '{field}' is '{userinfo[field]}', but expected '{value}'")
+                errors.append(f"Could not log in. Required field '{field}' to be '{value}', but got '{userinfo[field]}'.")
         if errors:
-            return web_error(403, "\n".join(errors), component= "LOGIN")
+            return error_page(403, errors)
 
     # create token with info for authenticated user
     token = create_token(username, organisation_id)

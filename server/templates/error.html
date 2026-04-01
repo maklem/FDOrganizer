@@ -1,0 +1,7 @@
+{% extends "template.html" %}
+{% block js %}
+<script>
+	window.errorMessages = {{ errors | tojson }};
+</script>
+<script type="module" src="{{url_for('static', filename='js/error/error.js')}}"></script>
+{% endblock %}

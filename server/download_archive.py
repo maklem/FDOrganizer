@@ -3,16 +3,17 @@ import logging
 import os
 from typing import Generator, Any
 
-from flask import request
+from flask import request, redirect
 import hashlib
+from jinja2.exceptions import UndefinedError
 from zipstream import ZipStream
 
 from .services.authentication import organisation
 from .entities.errors import XMLValidationError
-from .util import can_read, web_error
+from .util import can_read, web_error, error_page
 from .entities import Document, Package, Databases, Metadata
 from .services.database import get, get_attachment
-from .export_utils import create_structmap, create_package_data, build_sip_metadata, add_label, add_note
+from .export_utils import create_structmap, create_package_data, build_sip_metadata, add_label, add_note, check_structmap
 from . import APP
 
 TEMP_DIR = os.path.join('server','tmp')
@@ -26,16 +27,13 @@ def stream_exportable_package(package_id: str):
     organisation_id = organisation(request)
 
     if not can_read(raw_package, request):
-        return web_error(403, message="Rejected. You do not have permission to read this package.")
+        return error_page(403,["Rejected. You do not have permission to read this package."])
 
-    # Refuse packages that are already archived
-#    if package.status == 'archived':
-#        return web_error(400, message="Package is already archived")
     try:
         package_data = create_package_data(package)
     except ValueError as error:
         logging.error(error.args[0])
-        return web_error(500, error.args[0])
+        return error_page(500, [error.args[0]])
 
     structmap = create_structmap(package)
 
@@ -47,28 +45,42 @@ def stream_exportable_package(package_id: str):
     if 0 == count_files(structmap):
         error = "Can not generate download for package with no files."
         logging.error(error)
-        return web_error(500, error)
+        return error_page(500, [error])
+
+    errors = check_structmap("", structmap)
+    if errors:
+        logging.error("Failed to generate download. Errors:")
+        for e in errors:
+            logging.error(f" - {e}")
+        return error_page(500, errors)
+
 
     def generate() -> Generator[bytes,None,None]:
         # Get all documents and folders in hierarchical structure
         hashmap: Hashmap = {}
         zs = ZipStream()
+        errors: list[str] = []
         # Download files
         yield from stream_zipped_directory(zs, hashmap, structmap, package.name)
 
         # Create data for mets generation (depends on downloaded files)
         file_list = create_streamed_file_list(structmap, hashmap, package.name)
 
-        # ie_structure = create_ie_structure(structmap)
-        ie_structure = structmap
-
         # Create METS-File for ingest
         try:
-            mets = build_sip_metadata(package_data, file_list, ie_structure)
+            mets = build_sip_metadata(package_data, file_list, structmap)
             yield from stream_mets(zs, package, mets, organisation_id)
-        except XMLValidationError as error:
+        except UndefinedError as error:
+            errors.append(error.args[0])
             logging.error(error.args[0])
-        
+        except XMLValidationError as error:
+            errors.append(error.args[0])
+            logging.error(error.args[0])
+
+        if errors:
+            zs.add("\n\n".join(errors), "generator-errors.log")
+            yield from zs.all_files()
+            
         yield from zs.finalize()
 
     # return web_response(200, details = {'success': True})

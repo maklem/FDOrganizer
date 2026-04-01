@@ -5,12 +5,20 @@ from .services.authentication import is_authorized, is_reviewer
 
 
 def needs_authentication(route: str) -> bool:
-    return route not in [url_for("navlogin"), url_for('get_organisations')] and "static" not in route and "/login-oidc" not in route and "/login-ldap" not in route and "/login-local" not in route and "/login-keycloak" not in route
+    return not any([
+        route.startswith(url_for("navlogin")),
+        route.startswith(url_for('get_organisations')),
+        route.startswith("/static"),
+        route.startswith("/login-oidc"),
+        route.startswith("/login-ldap"),
+        route.startswith("/login-local"),
+        route.startswith("/login-keycloak"),
+    ])
 
 @APP.before_request
 def request_logger():
     if "static" not in request.path:
-        APP.logger.info(f'Request')
+        APP.logger.info('Request')
     return None
 
 @APP.before_request

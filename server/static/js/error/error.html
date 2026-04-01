@@ -1,0 +1,13 @@
+<div class="error">
+  <TopBanner></TopBanner>
+  <h2>Error</h2>
+  <div class="errorMessage">
+    FDOrganizer could not complete your request.
+    <p>
+    During evaluation the following errors were reported.
+    <ul>
+      <li v-for="msg in store.errorMessages">{{ msg }}</li>
+    </ul>
+    Please contact the technical administrators, in case you need help.
+  </div>
+</div>
