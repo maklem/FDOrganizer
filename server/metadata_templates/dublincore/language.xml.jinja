@@ -1,7 +1,11 @@
 {% for language in (metadata.language | default([], true)) %}
-    {% if language.languageCode[0] == "custom" %}
-        <dc:language>{{language.customLanguage | first}}</dc:language>
+    {% if language.languageType[0] == "naturalLanguage" %}
+        {% if language.languageCode[0] == "custom" %}
+            <dc:language>{{language.customLanguage | first}}</dc:language>
+        {% else %}
+            <dc:language>{{language.languageCode | first}}</dc:language>
+        {% endif %}
     {% else %}
-        <dc:language>{{language.languageCode | first}}</dc:language>
+        <dc:format>{{language.customProgrammingLanguage | first}}</dc:format>
     {% endif %}
 {% endfor %}
