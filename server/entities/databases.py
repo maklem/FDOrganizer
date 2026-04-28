@@ -8,4 +8,5 @@ class Databases(Enum):
     FOLDERS = 'folders'
     USERS = 'users'
     ORGANISATIONS = 'organisations'
+    IDENTITYPROVIDERS = 'identityproviders'
     REVIEWS = 'reviews'

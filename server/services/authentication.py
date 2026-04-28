@@ -1,3 +1,4 @@
+from server.entities.identityprovider import IdentityProvider
 
 import json
 import os
@@ -36,13 +37,14 @@ def add_payload(token: str, key: str, value: str):
     updated_payload = payload(token) | {key: value}
     return encode(payload = updated_payload, key = SECRET)
 
+
 def remove_payload(token: str, key: str):
     updated_payload = payload(token) | {key: None}
     return encode(payload = updated_payload, key = SECRET)
 
 
 def create_token(username, organisation):
-    return encode(payload = dict(create_payload(username, organisation)), key = SECRET, algorithm='HS256')
+    return encode(payload = {**create_payload(username, organisation)}, key = SECRET, algorithm='HS256')
 
 
 def payload(token: str):
@@ -59,10 +61,13 @@ def token_valid(token: str):
         return False
     return True
 
-def authorize(username: str, password: str, organisation: str):
-    if not credentials_valid(username, password, organisation):
+def authorize(username: str, password: str, idp_id: str):
+    identity_provider = IdentityProvider.from_db(get(Databases.IDENTITYPROVIDERS, idp_id).json())
+    if not identity_provider.organisation:
+        raise HTTPError(f"Invalid Configuration for {idp_id=}. Field 'organisation' not set or empty.")
+    if not credentials_valid(username, password, idp_id):
         raise HTTPError("Credentials not valid")
-    return create_token(username, organisation)
+    return create_token(username, identity_provider.organisation)
 
 def is_authorized(request: Request):
     try:
@@ -86,12 +91,14 @@ def is_reviewer(request: Request) -> bool:
     token = request.cookies['token']
     return payload(token)['reviewer']
 
-def credentials_valid(username: str, password: str, organisation_id: str):
-    organisation = Organisation.from_db(get(Databases.ORGANISATIONS, organisation_id).json())
-    if organisation.identity_provider.type == "LOCAL":
+def credentials_valid(username: str, password: str, idp_id: str) -> bool:
+    identity_provider = IdentityProvider.from_db(get(Databases.IDENTITYPROVIDERS, idp_id).json())
+    if identity_provider.organisation is None:
+        return False
+    if identity_provider.type == "LOCAL":
         query =  {
             "selector": {
-                "organisation": organisation_id,
+                "organisation": idp_id,
                 "username": username,
                 "password": password
             }
