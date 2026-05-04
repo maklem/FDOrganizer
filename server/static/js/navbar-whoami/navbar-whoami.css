@@ -1,0 +1,10 @@
+.navbar-whoami {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+
+    font-size: 1.0rem;
+    color:#bbbbbb;
+    padding-right: 1.0rem;
+}

@@ -18,10 +18,10 @@ from .shared import create_document_with_attachement, delete_document, delete_fo
 
 from .entities import Package, Databases, Folder
 
-from .services.authentication import user, organisation
+from .services.authentication import user, organisation, user_displayname
 from .services.database import delete, find, get, post, update
 
-from .util import can_delete_packages, can_edit_name, json_body, web_error, web_response
+from .util import can_delete_packages, can_edit_name, json_body, web_error, web_response, is_owner
 from server import APP
 
 
@@ -54,9 +54,10 @@ def get_packages():
 @json_body
 def create_package(name: str) -> Response:
     username = user(request)
+    displayname = user_displayname(request)
     organisation_name = organisation(request)
     now = round(time.time()*1000)
-    package = Package(name=name, status='active', documents=[], folders=[], owner=username, organisation=organisation_name, created=now, last_changed=now)
+    package = Package(name=name, status='active', documents=[], folders=[], owner=username, organisation=organisation_name, created=now, last_changed=now, owner_displayname=displayname)
     try:
         package_created = post(Databases.PACKAGES, package.to_json())
     except HTTPError as error:
@@ -120,8 +121,12 @@ def rename_package(package_id: str, name: str) -> Response:
     if not can_edit_name(package, request):
         return web_error(401, "You don't have permission to change the name of this package", component= "SERVER")
     changes = {
-        "name": name
+        "name": name,
     }
+
+    if is_owner(package, user(request)):
+        changes["owner_displayname"] = user_displayname(request)
+
     try:
         update(Databases.PACKAGES, package_id, changes)
     except HTTPError as error:
@@ -140,7 +145,7 @@ def create_package_from_zip() -> Response:
         directory = build_directory_tree(zip_path, vals['keep_empty']=='true', vals['keep_structure']=='true')
         # Build new package for zip content
         username = user(request)
-        package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, organisation(request))
+        package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, organisation(request), owner_displayname=user_displayname(request))
         # Create folders and documents
         folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in directory.folders]
         doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
@@ -184,8 +189,8 @@ def create_document_from_zip(file_info: zipfile.Path, username):
     file_doc_pair = create_file_document_pair(storage, username)
     return create_document_with_attachement(file_doc_pair['file'], file_doc_pair['document'])
 
-def create_package_in_db(name:str, owner: str, organisation: str) -> str:
+def create_package_in_db(name:str, owner: str, organisation: str, owner_displayname: str) -> str:
     now = round(time.time()*1000)
-    package = Package(name=name, status='active', documents=[], folders=[], owner=owner, organisation=organisation, created=now, last_changed=now)
+    package = Package(name=name, status='active', documents=[], folders=[], owner=owner, organisation=organisation, created=now, last_changed=now, owner_displayname=owner_displayname)
     package_created = post(Databases.PACKAGES, package.to_json())
     return package_created.json()['id']

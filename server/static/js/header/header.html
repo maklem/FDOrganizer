@@ -1,6 +1,7 @@
 <div class="navbar">
     <NavbarTab v-for="tab in tabs" :url="tab.url" :title="tab.title"></NavbarTab>
     <div class="right-content">
+        <NavbarWhoami></NavbarWhoami>
         <Button class="logout" @button-clicked="logout">Log out</Button>
         <div class="shard"></div>
         <div class="logo">

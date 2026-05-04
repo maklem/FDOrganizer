@@ -17,6 +17,7 @@ class Package(DataClassJsonMixin):
     last_changed: int
     owner: str
     organisation: str
+    owner_displayname: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     metadata: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     archive_id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))

@@ -14,7 +14,7 @@ from .entities.organisation import Organisation
 from .entities.databases import Databases
 from .services.database import get, getall, find
 from .util import json_body, web_error, web_response, error_page
-from .services.authentication import authorize, create_token, add_payload
+from .services.authentication import authorize, create_token, add_payload, is_authorized, user, user_displayname, organisation_displayname
 
 @APP.route("/organisations", methods=["GET"])
 def get_organisations():
@@ -141,6 +141,8 @@ def callback_keycloak(idp_id: str):
     except RuntimeError as e:
         return error_page(500, e.args[0])
 
+    organisation = get_organisation_from_db(user_organisation)
+
     user_displayname= None
     if identity_provider.displayname_field is not None and identity_provider.displayname_field in userinfo:
         user_displayname = userinfo[identity_provider.displayname_field]
@@ -148,7 +150,9 @@ def callback_keycloak(idp_id: str):
     # create token with info for authenticated user
     token = create_token(username, user_organisation)
     if user_displayname:
-        add_payload(token, "displayname", user_displayname)
+        token = add_payload(token, "displayname", user_displayname)
+
+    token = add_payload(token, "organisation_displayname", organisation.name)
 
     # redirect to start page and set auth cookie
     redirect_response = redirect(url_for('navhome'))
@@ -214,3 +218,9 @@ def get_organisation_from_db(organisation_id: str) -> Organisation:
 def get_idp_from_db(idp_id: str) -> IdentityProvider:
     org_response = get(Databases.IDENTITYPROVIDERS, idp_id).json()
     return IdentityProvider.from_db(org_response)
+
+@APP.route("/whoami", methods=["GET"])
+def whoami():
+    if not is_authorized(request):
+        return web_response(200, details={"name": "", "displayname": "Not logged in", "organisation": ""})
+    return web_response(200, details={"name": user(request), "displayname": user_displayname(request), "organisation": organisation_displayname(request)})

@@ -9,6 +9,7 @@ def needs_authentication(route: str) -> bool:
         route.startswith(url_for("navlogin")),
         route.startswith(url_for('get_organisations')),
         route.startswith("/static"),
+        route.startswith("/whoami"),
         route.startswith("/login-oidc"),
         route.startswith("/login-ldap"),
         route.startswith("/login-local"),

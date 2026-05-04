@@ -83,9 +83,19 @@ def user(request: Request) -> str:
     token = request.cookies['token']
     return payload(token)['username']
 
+def user_displayname(request: Request) -> str:
+    token = request.cookies['token']
+    data = payload(token)
+    return data["displayname"] if "displayname" in data else data["username"]
+
 def organisation(request: Request) -> str:
     token = request.cookies['token']
     return payload(token)['organisation']
+
+def organisation_displayname(request: Request) -> str:
+    token = request.cookies['token']
+    data = payload(token)
+    return data["organisation_displayname"] if "organisation_displayname" in data else data["organisation"]
 
 def is_reviewer(request: Request) -> bool:
     token = request.cookies['token']

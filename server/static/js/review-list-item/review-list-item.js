@@ -14,7 +14,8 @@ export default {
         name: String,
         last_changed: String,
         status: String,
-        owner: String
+        owner: String,
+        owner_displayname: [String, null]
     },
     data() {
         return {
