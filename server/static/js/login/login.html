@@ -38,33 +38,7 @@
             </div>
             <Button @button-clicked="store.loginLocal()">Login</Button>
         </fieldset>
-        <fieldset v-if="store.selectedOrganisation.authType === 'LDAP'">
-            <LabeledInput
-                id="auth-username"
-                :label="'Username'"
-                :placeholder="'Your username for ' + store.selectedOrganisation.name"
-                :value="store.username"
-                :invalid="store.failedLogin"
-                @input="(value) => store.username = value"
-                :required="true"
-            ></LabeledInput>
-            <LabeledInput
-                id="auth-password"
-                :label="'Password'"
-                :placeholder="'The password for ' + store.selectedOrganisation.name"
-                :type="'password'"
-                :value="store.password"
-                :invalid="store.failedLogin"
-                @input="(value) => store.password = value"
-                :required="true"
-            ></LabeledInput>
-            <div class="error-text" :class="{visible: store.failedLogin}">
-                Wrong username or password!
-            </div>
-            <Button @button-clicked="store.loginLDAP()">Login</Button>
-        </fieldset>
         <Button v-if="store.selectedOrganisation.authType === 'OIDC'" @button-clicked="store.loginOIDC()">Go To Login</Button>
-        <Button v-if="store.selectedOrganisation.authType === 'SAML'" @button-clicked="store.loginSAML()">Go To Login</Button>
         <Button v-if="store.selectedOrganisation.authType === 'KEYCLOAK'" @button-clicked="store.loginKeycloak()">Go To Login</Button>
     </form>
     <div v-else class="lds-spinner">

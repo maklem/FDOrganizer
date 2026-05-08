@@ -1,6 +1,4 @@
-# LZV 
-
-Projekt LZV des Bibliotheksverbund Bayern
+# FDOrganizer
 
 ## Beschreibung
 
@@ -24,90 +22,224 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 
 ## Konfiguration
 
-1. Konfigurieren der CouchDB Zugangsdaten in `.env`-Datei
 
-    1. Erstellen einer Datei im Projektverzeichnis mit dem Namen `.env`
+1. Konfiguration der FDOrganizer Umgebung `.env`.
 
-    2. Setzen von Umgebungsvariablen, die für die Interaktion des FDOrganizer mit der Datenbank nötig sind (hier mit Beispielwerten)
+    In `dummy.env` existiert eine beispielhafte Konfiguration.
+    Die einzelnen Elemente werden in Folge erklärt.
 
-        ```
-        COUCHDB_USER=admin
-        COUCHDB_PASSWORD=admin
-        COUCHDB_HOST=127.0.0.1
-        COUCHDB_PORT=5984
-        ```
+    1. Konfigurieren der CouchDB Zugangsdaten
 
-1. Setzen von Umgebungsvariablen für den export von Datenpaketen in der .env-Datei
+        1. Erstellen einer Datei im Projektverzeichnis mit dem Namen `.env`
 
-    1. Setzen eines Target-Verzeichnisses für exportierte Datenpakete in den Umgebungsvariablen
+        2. Setzen von Umgebungsvariablen, die für die Interaktion des FDOrganizer mit der Datenbank nötig sind (hier mit Beispielwerten)
 
-        ```
-        EXPORT_DIR=/directory/for/exported/packages
-        ```
-
-    1. OPTIONAL: Erstellen eines linux-Nutzers für das Handling von exportierten Datenpaketen. Für das Einrichten eines sicheren Zugriffs auf die exportierten Daten via **SFTP** siehe z.B. [hier](https://thunderysteak.github.io/sftp-user-chroot)
-
-        1. Überprüfe die ID des neu erstellten Linux-Nutzers
-
-            ```bash
-            id -u NUTZERNAME
+            ```
+            COUCHDB_USER=admin
+            COUCHDB_PASSWORD=admin
+            COUCHDB_HOST=127.0.0.1
+            COUCHDB_PORT=5984
             ```
 
-        1. Setzen der Linux-Nutzer-ID in den Umgebungsvariablen
+    1. Setzen von Umgebungsvariablen für den export von Datenpaketen in der .env-Datei
+
+        1. Setzen eines Target-Verzeichnisses für exportierte Datenpakete in den Umgebungsvariablen
+
+            ```
+            EXPORT_DIR=/directory/for/exported/packages
+            ```
+
+        1. OPTIONAL: Erstellen eines linux-Nutzers für das Handling von exportierten Datenpaketen. Für das Einrichten eines sicheren Zugriffs auf die exportierten Daten via **SFTP** siehe z.B. [hier](https://thunderysteak.github.io/sftp-user-chroot)
+
+            1. Überprüfe die ID des neu erstellten Linux-Nutzers
+
+                ```bash
+                id -u NUTZERNAME
+                ```
+
+            1. Setzen der Linux-Nutzer-ID in den Umgebungsvariablen
+            
+                ```
+                EXPORT_USER=NUTZER_ID
+                ```
+
+    1. Setzen von Umgebungsvariable für Impressum-Link
+
+        * Um ein externes impressum einzubinden muss eine Umgebungsvariable in `.env` hinzugefügt werden, die den Hyperlink zum Impressum enthält:
+
+            ```
+            IMPRESSUM_LINK=https://localhost:5000/impressum
+            ```
+
+        * Wird diese Variable nicht gesetzt, wird automatisch das HTML-Template `impressum.html` gerendert, das sich in `server/templates/` befindet.
+
+    1. Setzen von Umgebungsvariable für das Login-Secret
+
+        Beim Login in den FDOrganizer wird ein JWT-Token erstellt und im Browser gespeichert. Es dient zur Authentifizierung des Nutzers für alle weiteren HTTP-Anfragen die der FDOrganizer durchführt. Der Key sollte mindestens 512 Bit (also 64 Byte) lang sein.
+
+        1. OPTIONAL: Erstellen des Secret Keys mit openssl
+
+            ```
+            openssl rand -base64 64
+            ```
+
+        1. Setzen des Secret Keys in `.env`
+
+            ```
+            TOKEN_SECRET=EbwDR8KR/dXAH55dMtTcqOqARfpwT04El7VlV3QiruXt4zaXiHOrvWd9Ic11UKPhZ98lAuBQ05kpmZ0EIXuJrg==
+            ```
+
+1. Konfiguration von FDOrganizer in der Datenbank
+
+    In Folge werden die minimal nötigen Einträge für den Betrieb von FDOrganizer angelegt.
+    Die Einträge können nachträglich über das Admin-Interface der CouchDB geändert oder gelöscht werden.
+    (⚠️ Änderungen der Daten und erneutes Einspielen erzeugt Kopien!)
+
+    Das Interface findet man typischerweise unter `http://couchdb-host:5984/_utils/`.
+
+
+
+    1. Anlegen von Organisationen in der Datenbank
+
+        Eine Installation des FDOrganizer kann von einer oder mehreren Einrichtungen genutzt werden. Dabei kann jede Einrichtung eine eigene Nutzerverwaltung, Authentifizierungsmethode und eigene Plugins nutzen. Dazu müssen Organisationen und Identityprovider in der Datenbank angelegt werden.
         
+        Die Organisationen haben folgenden Aufbau:
+
+        ```json
+        {
+            "idp_tag": "university.example",
+            "name": "Example University",
+            "reviewers": [
+                "reviewer",
+                "admin"
+            ],
+            "plugins": [
+                "dummy"
+            ],
+            "export_subdirectory": "example_university_data_dir"
+        }
+        ```
+
+        Dabei sind erwähnenswert:
+
+        * `idp_tag` benennt die von einem Identityprovider referenzierte `organisation`,
+          oder den Wert im `organisation_field` von Userinfo aus OIDC/Keycloak.
+        * `reviewers` benennt jene, die Pakete prüfen dürfen. Dazu kann entweder die Nutzer-ID,
+          oder der Anzeigename (`displayname_field`) verwendet werden; vorzugsweise ist dieses
+          ein geprüftes Feld wie die Emailadresse, welche eine bessere Identifikation zulässt als
+          die Pairwise-ID.
+
+        Die Konfiguration kann mittels Skript in der Datenbank angelegt werden:
+        ```sh
+        python maintenance.py populate organisations my_organisation.json
+        ```
+
+        Nachträgliche Änderungen sind nur über Fauxton, der Admin-UI von Couch-DB vorzunehmen. 
+        Erneute Ausführung des Skripts fügt eine Kopie ein, statt einen passenden Eintrag zu ersetzen.
+
+    1. Anlegen von Identityprovidern
+
+        Für den Login gibt es drei verschiedene Möglichkeiten.
+        Nötig davon ist im Regelfall genau eine.
+
+        1. Login über SSO (OIDC/Keycloak) für eine einzelne Organisation
+
+            Für viele Fälle reicht ein Identity Provider, der auf eine Organisation zugeschnitten ist.
+            Wichtig: Das Feld `organisation` dient zur Verknüpfung mit einer Organisation. 
+            Dieses muss mit dem Eintrag `idp_tag` einer Organisation übereinstimmen.
+
+            ```json
+            {
+                "name": "Login of Example University",
+                "type": "KEYCLOAK",
+                "client_id": "fdo",
+                "client_secret": "12345678",
+                "url": "https://localhost:8000/realms/master/protocol/openid-connect/",
+                "username_field": "preferred_username",
+                "displayname_field": "email",
+                "organisation": "university.example",
+                "scope": [
+                    "openid",
+                    "profile"
+                ]
+            }
             ```
-            EXPORT_USER=NUTZER_ID
+
+        1. Login über SSO (OIDC/Keycloak) für mehrere gebündelte Organisationen
+
+            Möchte man die Nutzer eines Identity Providers über Nutzerattribut in verschiedene Organisationen teilen, kann man das Feld `organisation_field` befüllen.
+
+            ```json
+            {
+                "name": "Multi-Site Login",
+                "type": "KEYCLOAK",
+                "client_id": "fdo-multi-site",
+                "client_secret": "12345678",
+                "url": "https://localhost:8000/realms/master/protocol/openid-connect/",
+                "username_field": "preferred_username",
+                "displayname_field": "email",
+                "organisation_field": "org",
+                "scope": [
+                    "openid",
+                    "profile"
+                ]
+            }
             ```
 
-1. Setzen von Umgebungsvariable für Impressum-Link
+            Konnte sich ein Nutzer authentifizieren, wird er der entsprechenden Organisation zugewiesen.
+            Ist keine passende Organisation konfiguriert, wird der Login abgelehnt.
 
-    * Um ein externes impressum einzubinden muss eine Umgebungsvariable in `.env` hinzugefügt werden, die den Hyperlink zum Impressum enthält:
+        1. Login über lokale Nutzer für Entwicklung und Testzwecke
 
-        ```
-        IMPRESSUM_LINK=https://localhost:5000/impressum
-        ```
+            > [!WARNING]
+            > Hochgradig unsicher: Bekannte Standartpasswörter, Passwörter nicht gehasht!
+            >
+            > Nur in einer geschlossenen Entwickungsumgebung verwenden, auf die nicht aus dem Netzwerk/Internet zugegriffen werden kann!
+            
+            Als Identityprovider dient eine kleine Konfig.
 
-    * Wird diese Variable nicht gesetzt, wird automatisch das HTML-Template `impressum.html` gerendert, das sich in `server/templates/` befindet.
+            ```json
+            {
+                "name": "Login of Example University [Local]",
+                "type": "LOCAL",
+                "organisation": "university.example"
+            }
+            ```
 
-1. Setzen von Umgebungsvariable für das Login-Secret
+            Dazu kommt eine Liste von Nutzern.
 
-    Beim Login in den FDOrganizer wird ein JWT-Token erstellt und im Browser gespeichert. Es dient zur Authentifizierung des Nutzers für alle weiteren HTTP-Anfragen die der FDOrganizer durchführt. Der Key sollte mindestens 512 Bit (also 64 Byte) lang sein.
-
-    1. OPTIONAL: Erstellen des Secret Keys mit openssl
-
-        ```
-        openssl rand -base64 64
-        ```
-
-    1. Setzen des Secret Keys in `.env`
-
-        ```
-        TOKEN_SECRET=EbwDR8KR/dXAH55dMtTcqOqARfpwT04El7VlV3QiruXt4zaXiHOrvWd9Ic11UKPhZ98lAuBQ05kpmZ0EIXuJrg==
-        ```
-
-1. Anlegen von Organisationen in der Datenbank
-
-    Eine Installation des FDOrganizer kann von einer oder mehreren Einrichtungen genutzt werden. Dabei kann jede Einrichtung eine eigene Nutzerverwaltung, Authentifizierungsmethode und eigene Plugins nutzen. Dazu müssen Organisationen in der Datenbank angelegt werden (siehe unten). Die Organisationen haben folgenden Aufbau:
-
-    ```
-    {
-        "name": "Dummy-Universität", # Name der Einrichtung
-        "reviewers": ["reviewer", "admin"], # Nutzernamen der Reviewer-Accounts
-        "plugins": [], # Eine Liste von installierten Plugins, die die Einrichtung nutzt
-        "export_subdirectory": "dummy_universitaet", # Subdirectory des Export-Ordners für die Einrichtung
-        "identity_provider": {
-            "type": "KEYCLOAK",
-            "client_id": "fdo",
-            "client_secret": "oGiloDqxrpqgtM55GRInInwkwV3pEiam",
-            "url": "http://localhost:8080/realms/default/protocol/openid-connect/",
-            "username_field": "preferred_username",
-            "scope": [
-            "openid",
-            "profile"
+            ```json
+            [
+                {
+                    "username": "nutzer1",
+                    "password": "passwort1"
+                },
+                {
+                    "username": "nutzer2",
+                    "password": "passwort2"
+                },
+                {
+                    "username": "reviewer",
+                    "password": "reviewer"
+                }
             ]
-        } # Daten des Identity Providers, der zur Authentifizierung genutzt wird
-    }
-    ```
+            ```
+
+            Die Berechtigungen werden über die Konfiguration der Organisationen vergeben.
+
+        Die gewünschte Konfiguration kann mittels Skript in der Datenbank angelegt werden:
+        ```sh
+        python maintenance.py populate identityproviders my_identity_provider.json
+        ```
+
+        Bzw für Nutzer
+        ```sh
+        python maintenance.py populate users users.json
+        ```
+
+        Nachträgliche Änderungen sind nur über Fauxton, der Admin-UI von Couch-DB vorzunehmen. 
+        Erneute Ausführung des Skripts fügt eine Kopie ein, statt einen passenden Eintrag zu ersetzen.
+
 ## Betrieb
 
 ### Lokal
@@ -122,11 +254,16 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 
 #### Installation
 
+1. Erstellen eines venv
+    ```bash
+    python3 -m venv .venv
+    ```
+
 1. Aktivieren des venv 
 
     1. Linux
     
-         ```bash
+        ```bash
         source .venv/bin/activate
         ```
     
@@ -136,7 +273,7 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
         .venv\Scripts\activate.bat
         ```
 
-1. Installation der Abhängigkeiten am Server (siehe `requirements.txt`)
+1. Installation der Abhängigkeiten
 
     ```bash
     pip install -r requirements.txt
@@ -144,35 +281,22 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 
 1. Erstellen von Datenbanken
 
-    Datenbanken können unter Linux mit Hilfe des Scripts `init_db.sh` erstellt werden.
+    Datenbanken können mit Hilfe des Scripts  `maintenance.py` erstellt werden.
 
-    Unter Windows muss dies manuell über die [CouchDB-Weboberfläche](localhost:5984/_utils) passieren
-    Die Namen der benötigten Datenbanken können in der Datei `server/entities/databases.py` eingesehen werden.
-
-1. Hinzufügen einer Organisation
-
-    Eine einzelne Installation des FDOrganizer kann von einer oder mehreren Organisationen (Universitäten, Forschungseinrichtungen, etc.) genutzt werden.
-    Um den FDOrganizer zu nutzen muss mindestens eine Organisation mit dazugehöriger Authentifizierung in der Datenbank hinterlegt werden.
-    Dazu kann das Script *create_organisation* genutzt werden:
-
-    ```python
-        python create_organisation.py <file_path>
+    ```sh
+    python maintenance.py databases
     ```
 
-    Der Parameter *file_path* muss auf eine JSON-Datei verweisen, in der eine Organisation konfiguriert ist.
-    Durch starten des Skripts wird die Organisation anhand der JSON-Struktur in der referenzierten Datei aufgebaut (siehe Datei *dummy_organisation*) und in der Datenbank gespeichert.
-    Wird der parameter *file_path* nicht gesetzt, startet eine interaktive Abfrage der Daten, die jedoch unvollständig ist und händische Anpassungen in der Datenbank erfordert.
+1. Befüllen der Datenbank
+
+    Siehe Oben: Datenbankeinträge für Identityprovider, Organisation, und ggf. User.
 
 1. Zum lokalen Ausführen der App können entweder das [Flask CLI](https://flask.palletsprojects.com/en/2.2.x/cli/) oder die Startskripte benutzt werden.
-Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://localhost:5000) und nutzen die mitgelieferten Self-Signed-Certificates zur SSL-Verschlüsselung.
+    Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://localhost:5000) und nutzen die mitgelieferten Self-Signed-Certificates zur SSL-Verschlüsselung.
 
-* Windows
-
-    Start via `./start.bat`
-
-* Linux
-
-    Start via `./start_local.sh` oder `sh start_local.sh`
+    ```sh
+    flask --app src --debug run
+    ```
 
 #### Wartung
 
@@ -182,10 +306,8 @@ Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://l
     Dazu kann das Skript zum zurücksetzen der Datenbanken genutzt werden.
 
     ```python
-        python reset_database.py <database_name>
+    python maintenance.py reset <database_name>
     ```
-
-    Wird der Name der Datenbank beim Start des Skripts nicht übergeben, wird dieser nachträglich abgefragt.
 
 ### Docker
 
@@ -204,23 +326,49 @@ Die Startskripte starten die App im Debug-Modus auf [`localhost:5000`](https://l
 
     * Standardmäßig nutzt der FDO Port **34000** auf dem Hostsystem.
 
-1. Das Anlegen der benötigten Datenbanken wird beim ersten Starten des FDO-Containers ausgeführt (siehe [`init_db.sh`](./init_db.sh))
-
-1. Ebenfalls wird mit den Daten aus [`dummy_organisation.json`](./dummy_organisation.json) eine default-organisation angelegt, deren Daten für die Authentifizierung genutzt werden (siehe [`init_organisation.sh`](./init_organisation.sh))
+1. Das Anlegen der benötigten Datenbanken wird beim ersten Starten des FDO-Containers ausgeführt (siehe [`docker_init.sh`](./docker_init.sh))
+   Dabei werden zudem die Dummy-Daten für Organisation (`dummy_organisation.json`) und Identity Providers (`dummy_keycloak_idp.json`, sowie `dummy_local_idp.json` und `dummy_local_users.json`) in die Datenbank eingespielt.
 
 1. Wird das compose plugin für Docker zum Starten genutzt, kann der Cluster über `docker compose up` gestartet werden.
+  ```
+  docker compose --env-file dummy.env build
+  docker compose --env-file dummy.env up
+  ```
 
 1. Die Default-Namen der Container können auch in `docker-compose.yml` angepasst werden mit dem Property `container_name`.
 
+##### Bekannte Fehler
+
+* `Temporary failure in name resolution` bei der Initialisierung der Datenbank.  
+  Abhilfe: Docker neustarten.
+  ```
+  sudo systemctl restart docker
+  ```
+
 #### Wartung
 
-* Ein cronjob führt per default eine zeitgesteuerte Löschung aller Dokumente in der Datenbank zwischen **20 Uhr und 8 Uhr des Folgetags** durch.
+##### "The Purge"
+Ein cronjob führt per default eine zeitgesteuerte Löschung aller Dokumente in der Datenbank zwischen **20 Uhr und 8 Uhr des Folgetags** durch.
 Angelegte Organisationen und Nutzer bleiben hiervon unberührt.
 Für eine Nutzung im Produktionsmodus kann
-
     * ein anderer Zeitraum gewählt werden, indem `./cron_clean/cronjobs` angepasst wird
-
     * der container `cron` aus `docker-compose.yaml` entfernt werden
+
+## Wartung
+
+### Ablaufende Daten
+
+Sollen nur Teile der Daten gelöscht werden, stehen alternativ die Skripte `cron_deleter.py` und `cron_purge_tombstones.py` zur Verfügung.
+
+Bei Ausführung löscht `cron_deleter.py` alle Pakete, die älter als ein konfigurierter Zeitraum sind. Dabei wird jeweils der aktuelle Status und der Zeitpunkt der letzten Statusveränderung berücksichtigt.
+
+CouchDB hinterlässt nach dem Löschen so genannte Thombstone Documents.
+Im Falle verteilter Datenbanken werden diese benötigt, damit Dokumente auf allen verteilten Datenbank-Kopien gelöscht werden und nicht neu erstellt werden.
+
+Im einfachen Fall nutzt FDOrganizer eine einzelne Datenbank, statt einer verteilten.
+Die Tombstone Documents werden nicht benötigt und können auch gelöscht werden.
+Dazu steht `cron_purge_tombstones.py` zur Verfügung.
+
 
 ## Plugins
 
@@ -238,3 +386,10 @@ Plugins für den FDOrganizer können vom Betreiber des FDO in wenigen Schritten 
 
     Der Name des Plugins muss der Organisation in der Liste der Plugins hinzugefügt werden (siehe *dummy_organisation.json*), erst danach wird es im FDOrganizer sichtbar.
     Dies geschieht manuell in der Datenbank über deren Weboberfläche.
+
+## Geschichte
+
+* 2020--2022: Projekt LZV des Bibliotheksverbund Bayern
+* 2023--2025: ...
+* 2026: Anpassungen für Projekt HITS FDM
+  (Hochschulübergreifende IT-Services - Forschungsdatenmanagement)

@@ -1,17 +1,12 @@
 {
-  "name": "Dummy-Universität",
-  "reviewers": ["reviewer", "admin"],
-  "plugins": ["dummy"],
-  "export_subdirectory": "dummy_universitaet",
-  "identity_provider": {
-    "type": "KEYCLOAK",
-    "client_id": "fdo",
-    "client_secret": "oGiloDqxrpqgtM55GRInInwkwV3pEiam",
-    "url": "http://localhost:8080/realms/default/protocol/openid-connect/",
-    "username_field": "preferred_username",
-    "scope": [
-      "openid",
-      "profile"
-    ]
-  }
+  "idp_tag": "university.example",
+  "name": "Example University",
+  "reviewers": [
+    "reviewer",
+    "admin"
+  ],
+  "plugins": [
+    "dummy"
+  ],
+  "export_subdirectory": "example_university_data_dir"
 }

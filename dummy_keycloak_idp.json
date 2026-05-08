@@ -1,0 +1,14 @@
+{
+  "name": "Login of Example University [Keycloak]",
+  "type": "KEYCLOAK",
+  "client_id": "fdorganizer.university.example",
+  "client_secret": "12345678",
+  "url": "https://localhost:8000/realms/master/protocol/openid-connect/",
+  "username_field": "preferred_username",
+  "displayname_field": "email",
+  "organisation": "university.example",
+  "scope": [
+    "openid",
+    "profile"
+  ]
+}

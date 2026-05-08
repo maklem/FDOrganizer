@@ -31,7 +31,7 @@ class CredentialFilter(logging.Filter):
         if not has_request_context():
             return True
         route = request.path
-        if "/login-oidc" in route or "/login-ldap" in route or "/login-local" in route:
+        if "/login-oidc" in route or "/login-local" in route:
             record.contains_credentials = True
         if re.search("/import/.+/login",route):
             record.contains_credentials = True

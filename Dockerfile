@@ -20,6 +20,5 @@ RUN chown $EXPORT_USER /server
 COPY --chown=$EXPORT_USER . .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN chmod +x /server/init_db.sh
+RUN chmod +x /server/docker_init.sh
 RUN chmod +x /server/start.sh
-RUN chmod +x /server/init_organisation.sh

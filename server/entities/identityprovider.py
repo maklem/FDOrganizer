@@ -5,12 +5,15 @@ from dataclasses_json import DataClassJsonMixin, config
 def isNone(x) -> bool:
     return x is None
 
+def isEmpty(x) -> bool:
+    return x is None or len(x) == 0
+
 @dataclass
 class IdentityProvider(DataClassJsonMixin):
     type: Literal["LOCAL", "OIDC", "KEYCLOAK"]
     name: str
-    url: str
-    scope: list[str]
+    url: str | None = field(default=None, metadata=config(exclude=isNone))
+    scope: list[str] = field(default_factory=lambda: [], metadata=config(exclude=isEmpty))
     client_id: str | None = field(default=None, metadata=config(exclude=isNone))
     client_secret: str | None = field(default=None, metadata=config(exclude=isNone))
     username_field: str | None = field(default=None, metadata=config(exclude=isNone))

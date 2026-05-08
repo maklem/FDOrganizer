@@ -13,10 +13,8 @@ export const store = reactive({
     },
     setPassword,
     setUsername,
-    loginLDAP,
     loginOIDC,
     loginKeycloak,
-    loginSAML,
     loginLocal,
     getOrganisations,
     selectOrganisation
@@ -53,16 +51,6 @@ async function loginLocal() {
     }
 }
 
-async function loginLDAP() {
-    const {username, password} = store
-    try {
-        await post(`/login-ldap/${store.selectedOrganisation.id}`, { username, password })
-        window.history.go();
-    } catch {
-        store.failedLogin = true;
-    }
-}
-
 async function loginOIDC() {
     const response = await get(`/login-oidc/${store.selectedOrganisation.id}`);
     window.location.href = response.auth_url
@@ -71,15 +59,4 @@ async function loginOIDC() {
 async function loginKeycloak() {
     const response = await get(`/login-keycloak/${store.selectedOrganisation.id}`);
     window.location.href = response.auth_url
-}
-
-async function loginSAML() {
-    // TODO
-    // get(`/login-saml/${store.selectedOrganisation.id}`);
-    try {
-        const json = await post(`/login-ldap/${store.selectedOrganisation.id}`, { username: 'test', password: "asdfsdfasd" })
-        window.history.go();
-    } catch {
-        store.failedLogin = true;
-    }
 }

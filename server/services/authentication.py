@@ -7,7 +7,6 @@ from typing import TypedDict
 from flask.wrappers import Request
 from jwt import InvalidSignatureError, encode, decode, DecodeError
 from requests import HTTPError #type: ignore
-import ldap #type: ignore
 
 from .database import find, get
 from ..entities import Databases, Organisation
@@ -43,8 +42,8 @@ def remove_payload(token: str, key: str):
     return encode(payload = updated_payload, key = SECRET)
 
 
-def create_token(username, organisation):
-    return encode(payload = {**create_payload(username, organisation)}, key = SECRET, algorithm='HS256')
+def create_token(username, organisation_id):
+    return encode(payload = {**create_payload(username, organisation_id)}, key = SECRET, algorithm='HS256')
 
 
 def payload(token: str):
@@ -61,13 +60,40 @@ def token_valid(token: str):
         return False
     return True
 
+
+def find_organisation_by_tag(idp_tag: str) -> Organisation:
+    errors = list[str]()
+    query = {
+        "selector": {
+            "idp_tag": idp_tag
+        }
+    }
+    org_response = find(Databases.ORGANISATIONS, json.dumps(query))
+    if org_response.status_code != 200:
+        errors.append("Invalid Configuration."),
+        errors.append(f"Organisation '{idp_tag}' is not configured on this server.")
+        raise RuntimeError(errors)
+    
+    org_data = org_response.json()['docs']
+    if len(org_data) != 1:
+        errors.append("Invalid Configuration."),
+        errors.append(f"Organisation '{idp_tag}' is ambiguous on this server. ({len(org_data)})")
+        raise RuntimeError(errors)
+
+    return Organisation.from_db(org_data[0])
+
+
 def authorize(username: str, password: str, idp_id: str):
     identity_provider = IdentityProvider.from_db(get(Databases.IDENTITYPROVIDERS, idp_id).json())
     if not identity_provider.organisation:
         raise HTTPError(f"Invalid Configuration for {idp_id=}. Field 'organisation' not set or empty.")
+    if not (organisation := find_organisation_by_tag(identity_provider.organisation)):
+        raise HTTPError(f"Could not log into {organisation=}. Organisation not found.")
     if not credentials_valid(username, password, idp_id):
         raise HTTPError("Credentials not valid")
-    return create_token(username, identity_provider.organisation)
+    token = create_token(username, organisation.id)
+    token = add_payload(token, "organisation_displayname", organisation.name)
+    return token
 
 def is_authorized(request: Request):
     try:
@@ -108,27 +134,18 @@ def credentials_valid(username: str, password: str, idp_id: str) -> bool:
     if identity_provider.type == "LOCAL":
         query =  {
             "selector": {
-                "organisation": idp_id,
                 "username": username,
-                "password": password
+                "password": password,
             }
         }
-        user = find(Databases.USERS, json.dumps(query)).json().get('docs')[0]
+        try:
+            user = find(Databases.USERS, json.dumps(query)).json().get('docs')[0]
+        except IndexError:
+            return False
+
         if user is not None:
             return True
         else:
             return False
     else:
         return False
-    
-def auth_ldap(username: str, password: str, url: str, scope: list[str]):
-    user_dn = f'cn={username},{",".join(str(element) for element in scope)}'
-    connect = ldap.initialize(url)
-    try:
-        connect.bind_s(user_dn, password)
-        connect.unbind_s()
-        return True
-    except ldap.LDAPError: # type: ignore
-        connect.unbind_s()
-        return False
-        

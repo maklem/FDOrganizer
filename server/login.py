@@ -14,7 +14,7 @@ from .entities.organisation import Organisation
 from .entities.databases import Databases
 from .services.database import get, getall, find
 from .util import json_body, web_error, web_response, error_page
-from .services.authentication import authorize, create_token, add_payload, is_authorized, user, user_displayname, organisation_displayname
+from .services.authentication import authorize, create_token, add_payload, is_authorized, user, user_displayname, organisation_displayname, find_organisation_by_tag
 
 @APP.route("/organisations", methods=["GET"])
 def get_organisations():
@@ -176,24 +176,8 @@ def user_organisation_from_login(identity_provider: IdentityProvider, userinfo: 
         errors.append("User could not be assigned to an organisation.")
         raise RuntimeError(errors)
 
-    query = {
-        "selector": {
-            "idp_id": user_organisation_tag
-        }
-    }
-    org_response = find(Databases.ORGANISATIONS, json.dumps(query))
-    if org_response.status_code != 200:
-        errors.append("Invalid Configuration."),
-        errors.append(f"Organisation '{user_organisation_tag}' is not configured on this server.")
+    user_organisation = find_organisation_by_tag(user_organisation_tag)
     
-    org_data = org_response.json()['docs']
-    if len(org_data) != 1:
-        errors.append("Invalid Configuration."),
-        errors.append(f"Organisation '{user_organisation_tag}' is ambiguous on this server.")
-        raise RuntimeError(errors)
-
-    user_organisation = Organisation.from_db(org_data[0])
-
     if not user_organisation.id:
         errors.append("Invalid Configuration."),
         errors.append(f"Found {user_organisation=}")

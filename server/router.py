@@ -11,7 +11,6 @@ def needs_authentication(route: str) -> bool:
         route.startswith("/static"),
         route.startswith("/whoami"),
         route.startswith("/login-oidc"),
-        route.startswith("/login-ldap"),
         route.startswith("/login-local"),
         route.startswith("/login-keycloak"),
     ])

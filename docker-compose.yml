@@ -24,7 +24,7 @@ services:
     command:
       - sh
       - -c
-      - /server/init_db.sh && /server/init_organisation.sh && /server/start.sh
+      - /server/docker_init.sh && /server/start.sh
     restart: always
     user: ${EXPORT_USER}
 
@@ -60,6 +60,7 @@ services:
       - COUCHDB_HOST=db
       - COUCHDB_PORT=5984
     restart: always
+
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     environment:
