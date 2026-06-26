@@ -2585,6 +2585,28 @@
                 "type": "long-text"
             }
         ]
+    },
+    {
+        "id": "storage_period",
+        "label": {
+            "en": "Storage Period",
+            "de": "Speicherdauer"
+        },
+        "tooltip": {
+            "en": "When may the data be deleted?",
+            "de": "Ab wann dürfen die Daten gelöscht werden?"
+        },
+        "fields":[
+            {
+                "id":"minimal_date",
+                "label": {
+                    "en": "minimal date",
+                    "de": "Mindestdatum"
+                },
+                "min": 1,
+                "placeholder": "e.g. 2040-10-15",
+                "type": "text"
+            }
+        ]
     }
-    
 ]

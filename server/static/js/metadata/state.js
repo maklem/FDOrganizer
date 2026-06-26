@@ -2,7 +2,7 @@ import {reactive} from '../vue.js';
 import { store as toastStore } from "../toast/state.js"
 import { validate } from '../validation-util.js';
 import { put, get } from "../http.js"
-import { CONTENT, RELATIONS, SCOPE, ORIGIN_AND_CREATION, USAGE_AND_RIGHTS } from './metadata-sections.js';
+import { CONTENT, RELATIONS, SCOPE, ORIGIN_AND_CREATION, USAGE_AND_RIGHTS, STORAGE } from './metadata-sections.js';
 
 
 export const store = reactive({
@@ -95,6 +95,7 @@ function splitSchema(schema) {
         provenance: createSection(schema, ORIGIN_AND_CREATION, 'Data Creation & Aquisition'),
         relations: createSection(schema, RELATIONS, 'Related Documents'),
         rights: createSection(schema, USAGE_AND_RIGHTS, 'Usage & Rights'),
+        storage: createSection(schema, STORAGE, 'Storage'),
     }
 }
 
