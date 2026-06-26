@@ -10,7 +10,7 @@ class Organisation(DataClassJsonMixin):
     name: str
     reviewers: list[str]
     plugins: list[str]
-    export_subdirectory: str
+    export_subdirectory: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     idp_id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
 

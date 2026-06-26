@@ -28,37 +28,41 @@ def build_export_package(package_id: str):
     # Refuse packages that are already archived
     if package.status == 'archived':
         return web_error(400, message="Package is already archived")
-    
-    # Get all documents and folders in hierarchical structure
-    structmap = create_structmap(package)
-    
-    # Download files
-    create_ie_directory(structmap, package.name)
 
-    # Create data for mets generation (depends on downloaded files)
-    file_list = create_file_list(structmap, package.name)
+    try:    
+        # Get all documents and folders in hierarchical structure
+        structmap = create_structmap(package)
+        
+        # Download files
+        create_ie_directory(structmap, package.name)
 
-    try:
-        package_data = create_package_data(package)
-    except ValueError as error:
-        return web_error(400, message=error.args[0])
-    # ie_structure = create_ie_structure(structmap)
-    ie_structure = structmap
+        # Create data for mets generation (depends on downloaded files)
+        file_list = create_file_list(structmap, package.name)
 
-    # Create METS-File for ingest
-    try:
-        mets = build_sip_metadata(package_data, file_list, ie_structure)
-    except XMLValidationError as error:
-        return web_error(500, message=error.args[0], stacktrace=error.args[1])
-    # Copy files and METS to correct dir for Rosetta Ingest
-    try:
-        create_sip(package, mets, organisation(request))
-    except PathError as error:
-        return web_error(500, message=error.args[0])
-    except ExportUserError as error:
-        return web_error(500, message=error.args[0])
+        try:
+            package_data = create_package_data(package)
+        except ValueError as error:
+            return web_error(400, message=error.args[0])
+        # ie_structure = create_ie_structure(structmap)
+        ie_structure = structmap
 
-    delete_temp_package(package.name)
+        # Create METS-File for ingest
+        try:
+            mets = build_sip_metadata(package_data, file_list, ie_structure)
+        except XMLValidationError as error:
+            return web_error(500, message=error.args[0], stacktrace=error.args[1])
+
+        should_place_files = get_organisation_subdirectory(organisation(request)) is not None
+        if should_place_files:
+            # Copy files and METS to correct dir for Rosetta Ingest
+            try:
+                create_sip(package, mets, organisation(request))
+            except PathError as error:
+                return web_error(500, message=error.args[0])
+            except ExportUserError as error:
+                return web_error(500, message=error.args[0])
+    finally:
+        delete_temp_package(package.name)
 
     return web_response(200, details = {'success': True})
 
@@ -68,7 +72,10 @@ def create_sip(package: Package, mets, organisation_id: str):
     if not os.path.exists(source):
         raise PathError(f'Configured source path {source} does not exist')
     
-    export_dir = Path.joinpath(Path(str(os.getenv("EXPORT_DIR"))), get_organisation_subdirectory(organisation_id))
+    if (export_sub_dir := get_organisation_subdirectory(organisation_id)) is None:
+        raise PathError('Configured export_subdirectory is None')
+
+    export_dir = Path.joinpath(Path(str(os.getenv("EXPORT_DIR"))), export_sub_dir)
     export_user = os.getenv("EXPORT_USER")
     if export_dir is None or export_user is None:
         raise ExportUserError('No export user for SIP transfer configured. Check server environment variables')
@@ -78,7 +85,7 @@ def create_sip(package: Package, mets, organisation_id: str):
     shutil.copytree(source, os.path.join(target, 'streams', package.name))
     Path(os.path.join(target, 'mets.xml')).write_text(mets, encoding='utf-8')
 
-def get_organisation_subdirectory(organisation_id: str):
+def get_organisation_subdirectory(organisation_id: str) -> str | None:
     org_response = get(Databases.ORGANISATIONS, organisation_id).json()
     org= Organisation.from_db(org_response)
     return org.export_subdirectory
