@@ -2596,6 +2596,7 @@
             "en": "When may the data be deleted?",
             "de": "Ab wann dürfen die Daten gelöscht werden?"
         },
+	"max": 1,
         "fields":[
             {
                 "id":"minimal_date",
@@ -2604,6 +2605,7 @@
                     "de": "Mindestdatum"
                 },
                 "min": 1,
+		"max": 1,
                 "placeholder": "e.g. 2040-10-15",
                 "type": "text"
             }

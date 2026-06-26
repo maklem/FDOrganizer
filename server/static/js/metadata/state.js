@@ -192,7 +192,8 @@ const LABELS = {
     relations: 'Related Documents',
     scope: 'Data Scope',
     provenance: 'Data Creation & Acquisition',
-    rights: 'Usage & Rights'
+    rights: 'Usage & Rights',
+    storage: 'Storage Period'
 }
 
 function openMetadata(entityType, entityId, readonly = false) {
