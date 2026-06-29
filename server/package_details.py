@@ -1,7 +1,9 @@
+from hashlib import md5, sha512
 import io
 import json
 import os
 import time
+
 from werkzeug.datastructures import FileStorage
 from flask import Response, request
 from requests import HTTPError #type: ignore
@@ -204,15 +206,21 @@ def create_file_document_pair(file: FileStorage, username: str):
         raise HTTPError('No file provided')
     if not file.filename:
         raise HTTPError('No filename available')
-    outfile = io.BytesIO(file.read())
+    
+    file_data = file.read()
+    hash_md5 = md5(file_data).hexdigest()
+    hash_sha512 = sha512(file_data).hexdigest()
+    outfile = io.BytesIO(file_data)
     outfile.seek(0)
+
     # Create Document from uploaded information + file
     document = Document(
         name=file.filename,
         size=file.seek(0, os.SEEK_END),
         type=file.mimetype,
+        hash_md5=hash_md5,
+        hash_sha512=hash_sha512,
         source="manual upload",
-        is_stored=True,
         owner=username)
     return {'document': document, 'file': outfile }
 

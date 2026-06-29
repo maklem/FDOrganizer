@@ -3,15 +3,17 @@ from typing import Any
 
 from dataclasses_json import DataClassJsonMixin, config
 
-shouldBeExcluded = lambda x: x is None
+def shouldBeExcluded(x):
+    return x is None
 
 
 @dataclass
 class Document(DataClassJsonMixin):
     name: str
     size: int
+    hash_md5: str
+    hash_sha512: str
     type: str
-    is_stored: bool
     source: str
     owner: str
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))

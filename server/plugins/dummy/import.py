@@ -39,7 +39,7 @@ def get_collection(collection_id: str, request: Request, auth):
             'folders': [Folder(name='0'+str(i), id=collection_id + "_" + str(i) + "_folder", owner='', documents=[], folders=[], package_id="")
                         for i in range(10)], 'documents': []}
     elif collection_id.endswith('_folder'):
-        return {'documents': [Document(name=str(i), size=len(str(i)), type='txt', is_stored=True, owner='', source_id=collection_id+'_'+str(i),
+        return {'documents': [Document(name=str(i), size=len(str(i)), type='txt', owner='', source_id=collection_id+'_'+str(i),
                  source="Dummy") for i in range(10)], 'folders': []}
     # IDs must be unique.
 
@@ -49,6 +49,6 @@ def get_files_with_metadata(ids, request, auth):
     # Setup API again.
     # Prepare file content as BytesIO stream.
     files = [io.BytesIO(id_.split("_")[-1].encode('utf-8')) for id_ in ids]
-    documents = [Document(name=id_.split("_")[-1], size=len(id_.split("_")[-1]), type='txt', is_stored=True, owner='', source_id=id_,
+    documents = [Document(name=id_.split("_")[-1], size=len(id_.split("_")[-1]), type='txt', owner='', source_id=id_,
                  source="Dummy") for id_ in ids]
     return [{'document': d, 'file': f, 'metadata': None} for d, f in zip(documents, files)]
