@@ -70,6 +70,9 @@ def check_folder(prefix: str, folder: StructMap) -> list[str]:
 
 def check_structmap(prefix, structmap:StructMap) -> list[str]:
     errors = []
+    if prefix=="" and structmap['metadata'] is None:
+        errors.append("Package requires metadata, but none were found.")
+
     for e in check_folder(prefix, structmap):
         errors.append(e)    
 

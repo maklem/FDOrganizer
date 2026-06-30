@@ -77,10 +77,12 @@ def submit_for_review(package_id: str) -> Response:
             return web_error(400,  "Could not submit package for review.\nErrors:\n"+ "\n".join(errors))
         build_sip_metadata(package, file_list, structmap)
     except UndefinedError as error:
-        errors.append(error.args[0])
+        errors.append(str(error))
     except XMLValidationError as error:
         errors.append(error.args[0])
-    return web_error(400, "Could not submit package for review.\nErrors:\n"+ "\n".join(errors))
+
+    if errors:
+        return web_error(400, "Could not submit package for review.\nErrors:\n"+ "\n".join(" * " + e for e in errors))
     
     update_package_state(package_id, "review")
     return web_response(200, message="Package submitted for review")
