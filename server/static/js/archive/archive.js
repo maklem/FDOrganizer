@@ -6,7 +6,7 @@ import PackageContent from "../package-content/package-content.js";
 import Metadata from "../metadata/metadata.js"
 import ArchivePackageSettings from "../archive-package-settings/archive-package-settings.js"
 import VideoDialog from "../video-dialog/video-dialog.js"
-
+import PackageCheck from "../package-check/package-check.js";
 
 import {store, STATUS} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"
