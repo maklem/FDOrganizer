@@ -65,22 +65,26 @@ def check_package_validity(package: Package) -> list[str]:
         file_list = create_file_list(structmap)
         errors = check_structmap("", structmap)
         if errors:
-            errors
+            return errors
         build_sip_metadata(package, file_list, structmap)
     except UndefinedError as error:
-        errors.append(str(error))
+        errors.append(f"*Something* is wrong. ({str(error)})")
+    except TypeError as error:
+        errors.append(f"*Something* is wrong. ({str(error)})")
     except XMLValidationError as error:
-        errors.append(error.args[0])
+        errors.append(f"The generated metadata does not satisfy the schema requirements. ({str(error)})")
     return errors
 
-@APP.route("/archive/check/<package_id>", methods=["POST"])
+@APP.route("/archive/check/<package_id>", methods=["GET"])
 def check_package(package_id: str)->Response:
     try:
         package = Package.from_db(get(Databases.PACKAGES, package_id).json())
+    except KeyError:
+        return web_response(200, details={"status": "error", 'details': ["Could not read package from database. A"]})
     except HTTPError:
-        web_response(400, details={"error": ["Could not read package from database."]})
+        return web_response(200, details={"status": "error", 'details': ["Could not read package from database. B"]})
     if errors := check_package_validity(package):
-        return web_response(400, details={'status': "error", 'details': errors})
+        return web_response(200, details={'status': "error", 'details': errors})
     
     return web_response(200, details={'status': 'success'})
 

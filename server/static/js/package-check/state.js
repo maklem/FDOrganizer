@@ -2,22 +2,23 @@ import {reactive} from '../vue.js';
 import {get} from "../http.js"
 
 export const store = reactive({
-    has_errors: false,
+    hasErrors: false,
     errors: [],
-    check_package,
+    checkPackage,
 });
 
-async function check_package(package_id) {
-    const json = await get("/archive/check/"+package_id)
+async function checkPackage(package_id) {
+    console.log("Checking package ", package_id);
+    const json = await get("/archive/check/"+package_id);
     if( json.status == "success" ){
         store.errors = [];
-        store.has_errors = false;
+        store.hasErrors = false;
     }else if( json.status == "error" ){
-        store.errors = json.errors
-        store.has_errors = true;
+        store.errors = json.details
+        store.hasErrors = true;
     }else{
         store.errors = ["Failed to communicate with storage backend.", "Please contact administrator."];
-        store.has_errors = true;
+        store.hasErrors = true;
     }
-    console.log("For package ", package_id, "I found ", store.errors)
+    console.log("For package ", package_id, "I found ", store.errors);
 }

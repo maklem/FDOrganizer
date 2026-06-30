@@ -1,7 +1,8 @@
 .package-check-errors {
     font-size: 1.0rem;
-    color:#bbbbbb;
-    background-color: #F99;
+    color:#000;
+    background-color: #FCC;
     border: 2pt solid red;
     border-radius: 5pt;
+    padding: 5pt;
 }

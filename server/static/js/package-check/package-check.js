@@ -1,11 +1,12 @@
 import { setup } from "../setup.js";
+import { watchEffect } from "../vue.js";
 import { store } from "./state.js";
 
 const template = await setup('package-check');
 
 export default {
     props: {
-        package_id: String
+        package: String
     },
     computed: {
     },
@@ -14,8 +15,16 @@ export default {
             store
         }
     },
+    created() {
+        console.log("PackageCheck: Created()");
+    },
     mounted() {
-        this.$nextTick().then(store.check_package(package_id));
+        console.log("PackageCheck: Mounted()");
+        this.$nextTick().then(() => {store.checkPackage(this.package)});
+    },
+    watchEffect() {
+        console.log("PackageCheck: WatchEffect()");
+        this.$nextTick().then(() => {store.checkPackage(this.package)});
     },
     template
 }

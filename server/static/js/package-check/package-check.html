@@ -1,5 +1,5 @@
-<div class="package-check" :class="{active: isActive}">
-<div v-if="store.has_errors" class="package-check-errors">
+<div class="package-check">
+<div v-if="store.hasErrors" class="package-check-errors">
     Package is not ready for review.
     <ul>
         <li v-for="error in store.errors">{{ error }}</li>

@@ -25,10 +25,6 @@
             </template>
             <div class="loading" v-else></div>
         </aside>
-        <PackageCheck 
-            v-if="!!store.selectedPackage"
-            @package_id="store.selectedPackage">
-        </PackageCheck>
         <PackageContent
             v-if="!!store.selectedPackage"
             @back="store.climbPackagePath()"
