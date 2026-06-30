@@ -58,6 +58,32 @@ def check_export_requirements(package_id: str):
         requirements['contains_files'] = False
     return web_response(200, details = requirements)
 
+
+def check_package_validity(package: Package) -> list[str]:
+    try:
+        structmap = create_structmap(package)
+        file_list = create_file_list(structmap)
+        errors = check_structmap("", structmap)
+        if errors:
+            errors
+        build_sip_metadata(package, file_list, structmap)
+    except UndefinedError as error:
+        errors.append(str(error))
+    except XMLValidationError as error:
+        errors.append(error.args[0])
+    return errors
+
+@APP.route("/archive/check/<package_id>", methods=["POST"])
+def check_package(package_id: str)->Response:
+    try:
+        package = Package.from_db(get(Databases.PACKAGES, package_id).json())
+    except HTTPError:
+        web_response(400, details={"error": ["Could not read package from database."]})
+    if errors := check_package_validity(package):
+        return web_response(400, details={'status': "error", 'details': errors})
+    
+    return web_response(200, details={'status': 'success'})
+
 @APP.route("/archive/submit/<package_id>", methods=["POST"])
 def submit_for_review(package_id: str) -> Response:
     try:
@@ -69,19 +95,7 @@ def submit_for_review(package_id: str) -> Response:
     if package.get('status') not in ['active', 'rework']:
         return web_error(400, "Package cannot be submitted for review in status {}".format(package.get('status')), component= "SERVER")
 
-    try:
-        structmap = create_structmap(Package.from_db(package))
-        file_list = create_file_list(structmap)
-        errors = check_structmap("", structmap)
-        if errors:
-            return web_error(400,  "Could not submit package for review.\nErrors:\n"+ "\n".join(errors))
-        build_sip_metadata(package, file_list, structmap)
-    except UndefinedError as error:
-        errors.append(str(error))
-    except XMLValidationError as error:
-        errors.append(error.args[0])
-
-    if errors:
+    if errors := check_package_validity(Package.from_db(package)):
         return web_error(400, "Could not submit package for review.\nErrors:\n"+ "\n".join(" * " + e for e in errors))
     
     update_package_state(package_id, "review")
