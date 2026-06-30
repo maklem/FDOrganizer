@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from requests.models import HTTPError
 
 from server.package import delete_folder, delete_document
 from server.entities import Databases, Package
@@ -27,7 +28,10 @@ def delete_package(package_id):
             if not delete_folder(folder):
                 failed_folders.append(folder)
         except HTTPError as error:
-            print(f"Error deleting folder: {error.response.status_code} - {error.response.reason}")
+            if error.response is None:
+                print("Error deleting folder: database connection failed")
+            else:
+                print(f"Error deleting folder: {error.response.status_code} - {error.response.reason}")
             failed_folders.append(folder)
 
     # Delete documents, rollback for all if failed
@@ -36,7 +40,10 @@ def delete_package(package_id):
             if not delete_document(document):
                 failed_documents.append(document)
         except HTTPError as error:
-            print(f"Error deleting document: {error.response.status_code} - {error.response.reason}")
+            if error.response is None:
+                print("Error deleting document: database connection failed")
+            else:
+                print(f"Error deleting document: {error.response.status_code} - {error.response.reason}")
             failed_documents.append(document)
 
     # Delete metadata of folder, rollback for all, if failed
@@ -44,13 +51,19 @@ def delete_package(package_id):
         try:
             delete(Databases.METADATA, package.get('metadata'))
         except HTTPError as error:
-            print(f"Error deleting metadata: {error.response.status_code} - {error.response.reason}")
+            if error.response is None:
+                print("Error deleting metadata: database connection failed")
+            else:
+                print(f"Error deleting metadata: {error.response.status_code} - {error.response.reason}")
 
     # Delete the folder itself
     try:
-        package_deleted = delete(Databases.PACKAGES, package_id).json()
+        delete(Databases.PACKAGES, package_id).json()
     except HTTPError as error:
-        print(f"Error deleting package: {error.response.status_code} - {error.response.reason}")
+        if error.response is None:
+            print("Error deleting package: database connection failed")
+        else:
+            print(f"Error deleting package: {error.response.status_code} - {error.response.reason}")
 
 packages = [Package.from_db(x) for x in getall(Databases.PACKAGES)]
 for package in packages:

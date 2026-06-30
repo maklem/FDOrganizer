@@ -6,7 +6,7 @@ from time import time
 from typing import TypedDict
 from flask.wrappers import Request
 from jwt import InvalidSignatureError, encode, decode, DecodeError
-from requests import HTTPError #type: ignore
+from requests import HTTPError
 
 from .database import find, get
 from ..entities import Databases, Organisation

@@ -1,16 +1,15 @@
 import json
 from typing import Any
-from requests import HTTPError #type: ignore
+from requests import HTTPError
 from flask import request
 
 from . import APP
 
 from .entities import Databases, Document, Folder, Package, Metadata
 
-from .services.authentication import user
 from .services.database import get, post, update
 
-from .util import can_read_metadata, can_update_metadata, get_database_from_string, web_error, web_response
+from .util import can_read_metadata, can_update_metadata, get_database_from_string, web_error, web_error_database_connection, web_response
 
 
 @APP.route("/<entity_type>/<entity_id>/metadata", methods=["GET"])
@@ -19,7 +18,7 @@ def get_entity_with_metadata(entity_type, entity_id):
     try:
         entity = get(get_database_from_string(entity_type), entity_id).json()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")      
+        return web_error_database_connection(error)
     # Check permissions
     if not can_read_metadata(entity, request):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
@@ -33,7 +32,7 @@ def get_entity_with_metadata(entity_type, entity_id):
     try:
         metadata = get(Databases.METADATA, metadata_id).json()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")    
+        return web_error_database_connection(error)
     # Return metadata
     result = result | {"metadata": Metadata.convert(metadata)}
     return web_response(200, details = result)
@@ -44,7 +43,7 @@ def update_entity_metadata(entity_type, entity_id):
     try:
         entity = get(get_database_from_string(entity_type), entity_id).json()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")      
+        return web_error_database_connection(error)
     # Check ownership
     if not can_update_metadata(entity, request):
         return web_error(401, "You don't have permission to change this content", component= "SERVER")
@@ -59,17 +58,17 @@ def update_entity_metadata(entity_type, entity_id):
         try:
             metadata = post(Databases.METADATA, payload = json.dumps(new_metadata)).json()
         except HTTPError as error:
-            return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+            return web_error_database_connection(error)
         changes = {'metadata': metadata.get('id')}
         try:
             entity = update(get_database_from_string(entity_type), entity.get('_id'), changes).json()
         except HTTPError as error:
-            return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+            return web_error_database_connection(error)
     else:
         try:
             metadata = update(Databases.METADATA, metadata_id, new_metadata, replace=True).json()
         except HTTPError as error:
-            return web_error(error.response.status_code, error.response.reason, component= "DATABASE")    
+            return web_error_database_connection(error)
     # Return metadata
     return web_response(200, details = metadata)
 

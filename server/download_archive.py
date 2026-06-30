@@ -3,14 +3,14 @@ import logging
 import os
 from typing import Generator, Any
 
-from flask import request, redirect
+from flask import request
 import hashlib
 from jinja2.exceptions import UndefinedError
 from zipstream import ZipStream
 
 from .services.authentication import organisation
 from .entities.errors import XMLValidationError
-from .util import can_read, web_error, error_page
+from .util import can_read, error_page
 from .entities import Document, Package, Databases, Metadata
 from .services.database import get, get_attachment
 from .export_utils import create_structmap, create_package_data, build_sip_metadata, add_label, add_note, check_structmap
@@ -103,7 +103,7 @@ def stream_zipped_file(zs: ZipStream, hashmap: Hashmap, document: Document, stru
 
     file_name = os.path.join(structpath, document.name)
     try:
-        file_data = get_attachment(document.id, document.name).content # type: ignore
+        file_data = get_attachment(document.id, document.name).content
     except Exception:
         print(f'No attachment found for document {document.name} with ID {document.id}')
     hashmap[document.id] = hashlib.md5(file_data).hexdigest()

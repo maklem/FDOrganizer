@@ -2,13 +2,13 @@ from datetime import datetime
 import json
 from typing import Any, Literal
 from flask import Response, request
-from requests import HTTPError #type: ignore
+from requests import HTTPError
 from server import APP
 from .shared import update_package_state
 from .entities import Review, Comment, Package, Databases
 from .services.database import find, get, post, update
 from .services.authentication import is_reviewer, organisation, user
-from .util import can_read, json_body, web_error, web_response, is_owner
+from .util import can_read, json_body, web_error, web_response, web_error_database_connection
 
 
 @APP.route("/review/packages", methods=["GET"])
@@ -25,7 +25,7 @@ def get_review_packages():
     try:
         packages = find(Databases.PACKAGES, json.dumps(query)).json().get('docs')
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, details = [Package.convert(x) for x in packages])
 
 @APP.route("/review/<package_id>", methods=["GET"])
@@ -37,7 +37,7 @@ def get_package_reviews(package_id) -> Response:
     try:
         reviews = get_reviews(package.get("reviews"))
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     if not is_reviewer(request):
         reviews = [review for review in reviews if review.status != "open"]
     return web_response(200, details = [x.to_dict() for x in reviews])
@@ -67,7 +67,7 @@ def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = Non
         created_review = get(Databases.REVIEWS, post_response.get('id')).json()
         created_review = Review.from_db(created_review)
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     # Update package with new review
     try:
         update(Databases.PACKAGES, package_id, {
@@ -77,7 +77,7 @@ def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = Non
             }
         })
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, 'Success', created_review.to_dict())
 
 @APP.route("/review/<review_id>/comment/", methods=["PUT"])
@@ -98,7 +98,7 @@ def post_new_comment(review_id: str, index: int, content: str) -> Response:
     try:
         update(Databases.REVIEWS, review_id, changes)
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, details = Comment.convert(new_comment.to_dict()))
 
 @APP.route("/review/<review_id>/<comment_index>", methods=["DELETE"])
@@ -123,7 +123,7 @@ def delete_comment(review_id: str, comment_index: int):
     try:
         update(Databases.REVIEWS, review_id, changes)
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, 'Success')
 
 @APP.route("/review/submit/<package_id>", methods=["POST"])

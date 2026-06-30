@@ -1,3 +1,5 @@
+import requests
+from typing import Any
 from hashlib import md5, sha512
 import io
 import json
@@ -6,24 +8,25 @@ import time
 
 from werkzeug.datastructures import FileStorage
 from flask import Response, request
-from requests import HTTPError #type: ignore
+from requests import HTTPError
 from server import APP
 from .shared import delete_folder, persist_documents
 
 from .entities import Folder, Databases, Document, Package
 
-from .util import can_add_files, can_delete_files, can_read, can_read_folder, json_body, web_error, web_response, get_database_from_string
+from .util import can_add_files, can_delete_files, can_read, can_read_folder, json_body, web_error, web_response, get_database_from_string, web_error_database_connection
 from .services.authentication import user
-from .services.database import attach, delete, find, get, post, update
+from .services.database import delete, find, get, post, update
+
 
 
 @APP.route("/package/<package_id>/content", methods=["GET"])
-def get_package(package_id):
+def get_package(package_id) -> Response:
     # Get package from DB
     try:
         package = get(Databases.PACKAGES, package_id).json()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     # Check if user has rights to view the package
     if not can_read(package, request):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
@@ -31,18 +34,18 @@ def get_package(package_id):
     try:
         content = get_content(package.get('folders'), package.get('documents'))
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     # Return package and its content
     result = {'package': Package.convert(package)} | content
     return web_response(200, details = result)
 
 @APP.route("/folder/<folder_id>/content", methods=["GET"])
-def get_folder_content(folder_id):
+def get_folder_content(folder_id) -> Response:
     # Get folder from DB
     try:
         folder = get(Databases.FOLDERS, folder_id).json()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     # Check if user has rights to view the folder contents
     if not can_read_folder(folder, request):
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
@@ -50,7 +53,7 @@ def get_folder_content(folder_id):
     try:
         content = get_content(folder.get('folders'), folder.get('documents'))
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     # Return folder contents
     return web_response(200, details = content)
 
@@ -75,7 +78,7 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
     try:
         folder_created = post(Databases.FOLDERS, folder.to_json()).json()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     except KeyError as error:
         return web_error(400, error.args[0], component= "DATABASE")
     #Update parent to include folder
@@ -91,11 +94,11 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
     except HTTPError as error:
         # Delete new folder on error
         delete_folder(folder_created.get('id'))
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, 'Success', folder_created)
     
 @APP.route("/package/documents", methods=["POST"])
-def create_documents():
+def create_documents() -> Response:
     if int(request.headers['Content-Length']) > int(APP.config['MAX_CONTENT_LENGTH']):
         return web_error(413, "File is too large to be processed", component= "SERVER")
     # Get Infos from request header and body
@@ -126,7 +129,7 @@ def create_documents():
     return web_response(200, 'Success', persisted_documents)
 
 @APP.route("/package/document/<document_id>", methods=["DELETE"])
-def delete_document_from_package(document_id):
+def delete_document_from_package(document_id) -> Response:
     # Check incoming request for errors
     if not request.json:
         return web_error(400, "Request is missing information", component= "SERVER")
@@ -153,18 +156,18 @@ def delete_document_from_package(document_id):
         update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
 
     # After the reference is sucessfully deleted, delete document itself
     try:
         delete(Databases.DOCUMENTS, document_id)
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, 'Document deleted')
 
 
 @APP.route("/package/folder/<folder_id>", methods=["DELETE"])
-def delete_folder_from_package(folder_id):
+def delete_folder_from_package(folder_id) -> Response:
     # Check incoming request for errors
     if not request.json:
         return web_error(400, "Request is missing information", component= "SERVER")
@@ -191,7 +194,7 @@ def delete_folder_from_package(folder_id):
         update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
 
     # After the reference is sucessfully deleted, delete document itself
     if not delete_folder(folder_id):
@@ -199,8 +202,7 @@ def delete_folder_from_package(folder_id):
     return web_response(200, 'Folder deleted')
 
 
-def create_file_document_pair(file: FileStorage, username: str):
-    result = {'success': False}
+def create_file_document_pair(file: FileStorage, username: str) -> dict[str,Any]:
     # Check uploaded file integrity
     if file is None:
         raise HTTPError('No file provided')
@@ -225,7 +227,7 @@ def create_file_document_pair(file: FileStorage, username: str):
     return {'document': document, 'file': outfile }
 
             
-def content_query(id_array):
+def content_query(id_array) -> dict[str,Any]:
     return {
         "selector": {
             "_id": {
@@ -235,14 +237,14 @@ def content_query(id_array):
         "limit": 1000
     }
 
-def modify_package(package_id: str):
+def modify_package(package_id: str) -> requests.models.Response:
     now = round(time.time()*1000)
     changes = {
         "last_changed": now
     }
     return update(Databases.PACKAGES, package_id, changes)
 
-def get_content(folders: list[str], documents: list[str]):
+def get_content(folders: list[str], documents: list[str]) -> dict[str,Any]:
     found_folders =find(
         Databases.FOLDERS,
         json.dumps(content_query(folders))

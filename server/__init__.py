@@ -1,11 +1,10 @@
-import json
 import logging
 import logging.handlers
 import re
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, request
 from werkzeug.exceptions import HTTPException
-from flask_session import Session #type: ignore
+from flask_session import Session
 from .services.authentication import is_authorized, user
 
 from .util import web_error
@@ -46,7 +45,7 @@ class RequestFormatter(logging.Formatter):
             if is_authorized(request):
                 record.username = user(request)
             record.params = '---'
-            if not record.contains_credentials and request.is_json: #type: ignore
+            if not record.contains_credentials and request.is_json:
                 jsondata = request.get_json(silent=True)
                 if jsondata is not None: 
                     record.params = request.json

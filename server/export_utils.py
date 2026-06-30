@@ -1,6 +1,4 @@
-from curses import meta
-import difflib
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict, Optional
 import os
 from datetime import datetime
 from xmlschema import XMLSchema11
@@ -9,6 +7,13 @@ import jinja2
 from .services.database import get
 from .entities import Folder, Document, Package, Databases, Metadata
 from .entities.errors import XMLValidationError
+
+StructMap = TypedDict('StructMap', {
+    'name': str,
+    'metadata': Optional[str],
+    'folders': list['StructMap'],
+    'files': list[Document],
+})
 
 def timestamp_to_date(value, format="%Y-%m-%d"):
     return datetime.fromtimestamp(value / 1000).strftime(format)
@@ -55,15 +60,15 @@ def check_document(prefix: str, document: Document) -> list[str]:
             errors = check_languages(metadata.metadata["language"], os.path.join(prefix, document.name))
     return errors
 
-def check_folder(prefix: str, document: dict[str,Any]) -> list[str]:
+def check_folder(prefix: str, folder: StructMap) -> list[str]:
     errors = []
-    if "metadata" in document:
-        metadata = Metadata.from_dict(get(Databases.METADATA, document["metadata"]).json())
+    if "metadata" in folder and folder["metadata"] is not None:
+        metadata = Metadata.from_dict(get(Databases.METADATA, folder["metadata"]).json())
         if "language" in metadata.metadata:
-            errors = check_languages(metadata.metadata["language"], os.path.join(prefix, document["name"]))
+            errors = check_languages(metadata.metadata["language"], os.path.join(prefix, folder["name"]))
     return errors
 
-def check_structmap(prefix, structmap:dict[Literal['name','files','folders']|str,Any]) -> list[str]:
+def check_structmap(prefix, structmap:StructMap) -> list[str]:
     errors = []
     for e in check_folder(prefix, structmap):
         errors.append(e)    
@@ -77,7 +82,7 @@ def check_structmap(prefix, structmap:dict[Literal['name','files','folders']|str
             errors.append(e)
     return errors
 
-def create_structmap(entity: Package | Folder) -> dict[Literal['name','files','folders','metadata'],Any]:
+def create_structmap(entity: Package | Folder) -> StructMap:
     documents = [Document.from_db(get(Databases.DOCUMENTS, document_id).json()) for document_id in entity.documents]
     folders = [Folder.from_dict(get(Databases.FOLDERS, folder_id).json()) for folder_id in entity.folders]
     return {

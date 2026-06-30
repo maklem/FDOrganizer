@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Literal
-from requests import HTTPError #type: ignore
+from requests import HTTPError
 
 from .entities import Document, Databases, CouchDocument
 
@@ -93,7 +93,7 @@ def persist_documents(doc_file_pairs: List, parent, parent_type):
     try:
         update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
-    except HTTPError as error:
+    except HTTPError:
         # Delete new documents on error
         for doc in new_documents:
             delete_document(doc)

@@ -1,9 +1,7 @@
-import json
 from couchdb.http import HTTPError
-from re import I
 from server.entities.identityprovider import IdentityProvider
 from flask import Response, request, redirect, session, url_for
-import requests #type: ignore
+import requests
 from requests_oauth2client import OAuth2Client, ClientSecretJwt
 
 from typing import Any
@@ -12,7 +10,7 @@ from server import APP
 from .entities.errors import IdentityProviderError
 from .entities.organisation import Organisation
 from .entities.databases import Databases
-from .services.database import get, getall, find
+from .services.database import get, getall
 from .util import json_body, web_error, web_response, error_page
 from .services.authentication import authorize, create_token, add_payload, is_authorized, user, user_displayname, organisation_displayname, find_organisation_by_tag
 
@@ -107,7 +105,6 @@ def login_keycloak(idp_id: str):
 @APP.route("/login-keycloak-callback/<idp_id>", methods=["GET"])
 def callback_keycloak(idp_id: str):
     identity_provider = get_idp_from_db(idp_id)
-    errors = []
 
     token_url = f'{identity_provider.url}token'
     token_request_body= {

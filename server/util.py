@@ -2,7 +2,8 @@ from functools import wraps
 import json
 import re
 from typing import Any, Optional, Union
-from flask import Request, make_response, request, render_template
+from flask import Request, make_response, request, render_template, Response
+from requests import HTTPError
 
 from .entities import Package, Databases
 
@@ -10,10 +11,10 @@ from .services.database import get
 
 from .services.authentication import is_reviewer, organisation, user
 
-def error_page(code: int = 500, errors: list[str] = []):
+def error_page(code: int = 500, errors: list[str] = []) -> tuple[str,int]:
     return render_template("error.html", errors=errors), code
 
-def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]] = None, component = "SERVER"):
+def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]] = None, component = "SERVER") -> Response:
     error_data: dict[str, Union[str, list[str]]] = {
         'message': message,
         'component': component
@@ -22,7 +23,12 @@ def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]
         error_data['stacktrace'] = stacktrace
     return make_response(json.dumps(error_data), code)
 
-def web_response(code: int, message:Optional[str] = None, details: dict[str, Any] | list[Any] | None = None):
+def web_error_database_connection(error: HTTPError) -> Response:
+    if error.response is None:
+        return web_error(500, "connection to database failed.", component= "DATABASE")
+    return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+
+def web_response(code: int, message:Optional[str] = None, details: dict[str, Any] | list[Any] | None = None) -> Response:
     if message is None and details is None:
         return make_response(code)
     if details is None:

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from zipfile import ZipFile
 
 from flask import Response, request
-from requests import HTTPError #type: ignore
+from requests import HTTPError
 from werkzeug.datastructures import FileStorage
 
 
@@ -21,7 +21,7 @@ from .entities import Package, Databases, Folder
 from .services.authentication import user, organisation, user_displayname
 from .services.database import delete, find, get, post, update
 
-from .util import can_delete_packages, can_edit_name, json_body, web_error, web_response, is_owner
+from .util import can_delete_packages, can_edit_name, json_body, web_error, web_error_database_connection, web_response, is_owner
 from server import APP
 
 
@@ -47,7 +47,7 @@ def get_packages():
     try:
         packages = find(Databases.PACKAGES, json.dumps(query)).json().get('docs')
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, details = [Package.convert(x) for x in packages])
 
 @APP.route("/package", methods=["PUT"])
@@ -61,7 +61,7 @@ def create_package(name: str) -> Response:
     try:
         package_created = post(Databases.PACKAGES, package.to_json())
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, 'Success', package_created.json())
 
 @APP.route("/package/<package_id>", methods=["DELETE"])
@@ -79,7 +79,7 @@ def delete_package(package_id):
         try:
             if not delete_folder(folder):
                 failed_folders.append(folder)
-        except HTTPError as error:
+        except HTTPError:
             failed_folders.append(folder)
     if len(failed_folders) > 0:
         # TODO: Rollback for deletion 
@@ -90,7 +90,7 @@ def delete_package(package_id):
         try:
             if not delete_document(document):
                 failed_documents.append(document)
-        except HTTPError as error:
+        except HTTPError:
             failed_documents.append(document)
     if len(failed_documents) > 0:
         # TODO: Rollback for deletion 
@@ -102,14 +102,14 @@ def delete_package(package_id):
             delete(Databases.METADATA, package.get('metadata'))
         except HTTPError as error:
             # TODO: Rollback for deletion 
-            return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+            return web_error_database_connection(error)
         
     # Delete the folder itself
     try:
         package_deleted = delete(Databases.PACKAGES, package_id).json()
     except HTTPError as error:
         # TODO: Rollback for deletion 
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
 
 
     return web_response(200, 'Success', package_deleted)
@@ -130,7 +130,7 @@ def rename_package(package_id: str, name: str) -> Response:
     try:
         update(Databases.PACKAGES, package_id, changes)
     except HTTPError as error:
-        return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
+        return web_error_database_connection(error)
     return web_response(200, 'Success')
 
 @APP.route("/package/zip", methods=["PUT"])

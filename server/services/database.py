@@ -4,7 +4,7 @@ from typing import Any, Literal, Optional
 import urllib.parse
 from base64 import b64encode
 
-import requests # type: ignore
+import requests
 
 from ..entities.errors import PatchError
 
@@ -113,7 +113,7 @@ def update(database: Databases, doc_id, changes: dict[str, Any], replace: bool =
 
 
 def delete(database: Databases, doc_id: str) -> requests.Response:
-    revision = requests.head(doc_url(database, doc_id), headers=auth_header(), timeout=10).headers.get('etag')
+    revision = requests.head(doc_url(database, doc_id), headers=auth_header(), timeout=10).headers.get('etag') or ""
     headers = auth_header() | {
         "Content-Type": "application/json",
         "Accept": "application/json",
