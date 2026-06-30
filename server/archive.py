@@ -1,11 +1,13 @@
+from jinja2.exceptions import UndefinedError
 import json
 from flask import Response, request
 from requests import HTTPError
 
+from server.export_utils import create_structmap, create_file_list, build_sip_metadata, check_structmap
+
 from .shared import update_package_state
-
-
 from .entities import Package, Databases
+from .entities.errors import XMLValidationError
 
 from .services.authentication import organisation, user
 from .services.database import find, get, update
@@ -66,5 +68,19 @@ def submit_for_review(package_id: str) -> Response:
         return web_error(401, "You don't have permission to submit this package", component= "SERVER")
     if package.get('status') not in ['active', 'rework']:
         return web_error(400, "Package cannot be submitted for review in status {}".format(package.get('status')), component= "SERVER")
+
+    try:
+        structmap = create_structmap(Package.from_db(package))
+        file_list = create_file_list(structmap)
+        errors = check_structmap("", structmap)
+        if errors:
+            return web_error(400,  "Could not submit package for review.\nErrors:\n"+ "\n".join(errors))
+        build_sip_metadata(package, file_list, structmap)
+    except UndefinedError as error:
+        errors.append(error.args[0])
+    except XMLValidationError as error:
+        errors.append(error.args[0])
+    return web_error(400, "Could not submit package for review.\nErrors:\n"+ "\n".join(errors))
+    
     update_package_state(package_id, "review")
     return web_response(200, message="Package submitted for review")

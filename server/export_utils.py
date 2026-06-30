@@ -92,7 +92,39 @@ def create_structmap(entity: Package | Folder) -> StructMap:
         'folders': [create_structmap(folder) for folder in folders]
     }
 
-def build_sip_metadata(package_data, file_list, structmap) -> str:
+def create_file_list(structmap, structpath = "") -> list[dict[str,Any]]:
+    doc_data = [create_document_data(document, structpath) for document in structmap.get('files')]
+
+    nested_data = [create_file_list(folder, os.path.join(structpath, folder.get('name'))) for folder in structmap.get('folders')]
+    flat_nested_data = [file_info for sublist in nested_data for file_info in sublist]
+
+    return [*doc_data, *flat_nested_data]
+
+def create_document_data(document: Document, structpath: str) -> dict[str,Any]:
+    label = ""
+    note = ""
+    metadata: Metadata | None = None
+    if document.metadata is not None:
+        metadata = Metadata.from_dict(get(Databases.METADATA, document.metadata).json())
+        label = add_label(metadata)
+        note = add_note(metadata)
+    else:
+        print(f'No metadata found for document {document.name} with ID {document.id}')
+    
+    return {
+        'id': document.id,
+        'fileOriginalName': document.name,
+        'fileOriginalPath': os.path.join(structpath, document.name),
+        'fileSizeBytes': str(document.size),
+        'fileCreationDate': datetime.now().strftime('%Y-%m-%d'),
+        'fileModificationDate': datetime.now().strftime('%Y-%m-%d'),
+        'MD5': document.hash_md5,
+        'label': label,
+        'note':  note,
+        'metadata': metadata if metadata is not None else None
+    }
+
+def build_sip_metadata(package_data, file_list, structmap: StructMap) -> str:
     templateLoader = jinja2.FileSystemLoader(searchpath=[os.path.join('server', 'metadata_templates', 'rosetta-mets'), os.path.join('server', 'metadata_templates', 'dublincore')])
     templateEnv = jinja2.Environment(
         loader=templateLoader,

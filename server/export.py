@@ -1,11 +1,7 @@
-from typing import Any
 from datetime import datetime
 import shutil
 from pathlib import Path
 from flask import request
-from xmlschema import XMLSchema11
-import hashlib
-import jinja2
 import os
 
 from .services.authentication import organisation
@@ -14,9 +10,9 @@ from .entities.organisation import Organisation
 
 from .entities.errors import ExportUserError, PathError, XMLValidationError
 from .util import web_error, web_response
-from .entities import Folder, Document, Package, Databases, Metadata
+from .entities import Document, Package, Databases
 from .services.database import get, get_attachment
-from .export_utils import create_structmap, create_package_data, build_sip_metadata, add_label, add_note
+from .export_utils import create_structmap, create_package_data, build_sip_metadata, create_file_list
 from . import APP
 
 TEMP_DIR = os.path.join('server','tmp')
@@ -107,42 +103,3 @@ def download_file(document: Document, structpath:str):
     doc_file = Path(os.path.join(TEMP_DIR, structpath, document.name))
     doc_file.parent.mkdir(exist_ok=True, parents=True)
     doc_file.write_bytes(file_data)
-
-def create_file_list(structmap, structpath = ""):
-    doc_data = [document_data(document, structpath) for document in structmap.get('files')]
-
-    nested_data = [create_file_list(folder, os.path.join(structpath, folder.get('name'))) for folder in structmap.get('folders')]
-    flat_nested_data = [file_info for sublist in nested_data for file_info in sublist]
-
-    return [*doc_data, *flat_nested_data]
-
-def document_data(document: Document, structpath: str) -> dict[str,Any]:
-    label = ""
-    note = ""
-    metadata: Metadata | None = None
-    if document.metadata is not None:
-        metadata = Metadata.from_dict(get(Databases.METADATA, document.metadata).json())
-        label = add_label(metadata)
-        note = add_note(metadata)
-    else:
-        print(f'No metadata found for document {document.name} with ID {document.id}')
-
-    doc_file = Path(os.path.join(TEMP_DIR, structpath, document.name))
-    checksum = hashlib.md5(doc_file.read_bytes())
-    
-    return {
-        'id': document.id,
-        'fileOriginalName': document.name,
-        'fileOriginalPath': os.path.join(structpath, document.name),
-        'MD5': checksum.hexdigest(),
-        'fileSizeBytes': str(document.size),
-        'fileCreationDate': datetime.now().strftime('%Y-%m-%d'),
-        # TODO
-        # 'fileCreationDate': metadata.metadata.get('date'),
-        'fileModificationDate': datetime.now().strftime('%Y-%m-%d'),
-        # TODO
-        # 'fileModificationDate': document.last_modified,
-        'label': label,
-        'note':  note,
-        'metadata': metadata if metadata is not None else None
-    }

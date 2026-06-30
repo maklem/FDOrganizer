@@ -1,7 +1,6 @@
-from datetime import datetime
 import logging
 import os
-from typing import Generator, Any
+from typing import Generator
 
 from flask import request
 import hashlib
@@ -11,9 +10,9 @@ from zipstream import ZipStream
 from .services.authentication import organisation
 from .entities.errors import XMLValidationError
 from .util import can_read, error_page
-from .entities import Document, Package, Databases, Metadata
+from .entities import Document, Package, Databases
 from .services.database import get, get_attachment
-from .export_utils import create_structmap, create_package_data, build_sip_metadata, add_label, add_note, check_structmap
+from .export_utils import create_structmap, create_package_data, build_sip_metadata, check_structmap, create_file_list
 from . import APP
 
 TEMP_DIR = os.path.join('server','tmp')
@@ -64,7 +63,7 @@ def stream_exportable_package(package_id: str):
         yield from stream_zipped_directory(zs, hashmap, structmap, package.name)
 
         # Create data for mets generation (depends on downloaded files)
-        file_list = create_streamed_file_list(structmap, hashmap, package.name)
+        file_list = create_file_list(structmap, package.name)
 
         # Create METS-File for ingest
         try:
@@ -109,39 +108,3 @@ def stream_zipped_file(zs: ZipStream, hashmap: Hashmap, document: Document, stru
     hashmap[document.id] = hashlib.md5(file_data).hexdigest()
     zs.add(file_data, file_name)
     yield from zs.all_files()
-
-def create_streamed_file_list(structmap, hashmap, structpath = ""):
-    doc_data = [streamed_document_data(document, hashmap, structpath) for document in structmap.get('files')]
-
-    nested_data = [create_streamed_file_list(folder, hashmap, os.path.join(structpath, folder.get('name'))) for folder in structmap.get('folders')]
-    flat_nested_data = [file_info for sublist in nested_data for file_info in sublist]
-
-    return [*doc_data, *flat_nested_data]
-
-def streamed_document_data(document: Document, hashmap: Hashmap, structpath: str) -> dict[str,Any]:
-    label = ""
-    note = ""
-    metadata: Metadata | None = None
-    if document.metadata is not None:
-        metadata = Metadata.from_dict(get(Databases.METADATA, document.metadata).json())
-        label = add_label(metadata)
-        note = add_note(metadata)
-    else:
-        print(f'No metadata found for document {document.name} with ID {document.id}')
-    
-    return {
-        'id': document.id,
-        'fileOriginalName': document.name,
-        'fileOriginalPath': os.path.join(structpath, document.name),
-        'fileSizeBytes': str(document.size),
-        'fileCreationDate': datetime.now().strftime('%Y-%m-%d'),
-        # TODO
-        # 'fileCreationDate': metadata.metadata.get('date'),
-        'fileModificationDate': datetime.now().strftime('%Y-%m-%d'),
-        # TODO
-        # 'fileModificationDate': document.last_modified,
-        'MD5': hashmap[document.id] if document.id and hashmap[document.id] else "missing",
-        'label': label,
-        'note':  note,
-        'metadata': metadata if metadata is not None else None
-    }
