@@ -26,5 +26,9 @@ export default {
         console.log("PackageCheck: WatchEffect()");
         this.$nextTick().then(() => {store.checkPackage(this.package)});
     },
+    updated() {
+        console.log("PackageCheck: Updated()");
+        this.$nextTick().then(() => {store.checkPackage(this.package)});
+    },
     template
 }

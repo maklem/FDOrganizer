@@ -2,7 +2,10 @@
 <div v-if="store.hasErrors" class="package-check-errors">
     Package is not ready for review.
     <ul>
-        <li v-for="error in store.errors">{{ error }}</li>
+        <li v-for="error in store.errors">
+            <pre v-if="error.includes('\n')">{{ error }}</pre>
+            <span v-if="!error.includes('\n')">{{ error }}</span>
+        </li>
     </ul>
 </div>
 </div>

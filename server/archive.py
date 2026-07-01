@@ -2,8 +2,9 @@ from jinja2.exceptions import UndefinedError
 import json
 from flask import Response, request
 from requests import HTTPError
+import traceback
 
-from server.export_utils import create_structmap, create_file_list, build_sip_metadata, check_structmap
+from server.export_utils import create_structmap, create_file_list, build_sip_metadata, check_structmap, create_package_data
 
 from .shared import update_package_state
 from .entities import Package, Databases
@@ -61,16 +62,17 @@ def check_export_requirements(package_id: str):
 
 def check_package_validity(package: Package) -> list[str]:
     try:
+        package_data = create_package_data(package)
         structmap = create_structmap(package)
         file_list = create_file_list(structmap)
         errors = check_structmap("", structmap)
         if errors:
             return errors
-        build_sip_metadata(package, file_list, structmap)
-    except UndefinedError as error:
-        errors.append(f"*Something* is wrong. ({str(error)})")
-    except TypeError as error:
-        errors.append(f"*Something* is wrong. ({str(error)})")
+        build_sip_metadata(package_data, file_list, structmap)
+    except UndefinedError:
+        errors.append(f"*Something* is wrong...\n\n{traceback.format_exc()}")
+    except TypeError:
+        errors.append(f"*Something* is wrong...\n\n{traceback.format_exc()}")
     except XMLValidationError as error:
         errors.append(f"The generated metadata does not satisfy the schema requirements. ({str(error)})")
     return errors
