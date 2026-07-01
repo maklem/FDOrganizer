@@ -144,7 +144,7 @@ def build_sip_metadata(package_data, file_list, structmap: StructMap) -> str:
     try:
         schema.validate(rendered_xml)
     except Exception as error:
-        raise XMLValidationError(f'Validation of METS-File failed: {error.args[0]}', rendered_xml)
+        raise XMLValidationError(f'Validation of METS-File failed: {str(error)}', rendered_xml)
     return rendered_xml
 
 def add_label(metadata: Metadata):
