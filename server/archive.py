@@ -61,11 +61,17 @@ def check_export_requirements(package_id: str):
 
 
 def check_package_validity(package: Package) -> list[str]:
+    errors = []
     try:
-        package_data = create_package_data(package)
         structmap = create_structmap(package)
         file_list = create_file_list(structmap)
         errors = check_structmap("", structmap)
+
+        try:
+            package_data = create_package_data(package)
+        except ValueError as e:
+            errors.append(str(e))
+
         if errors:
             return errors
         build_sip_metadata(package_data, file_list, structmap)
