@@ -2599,10 +2599,10 @@
 	"max": 1,
         "fields":[
             {
-                "id":"minimal_date",
+                "id":"expiry_date",
                 "label": {
-                    "en": "minimal date",
-                    "de": "Mindestdatum"
+                    "en": "expiry date",
+                    "de": "Ablaufdatum"
                 },
                 "min": 1,
 		"max": 1,
