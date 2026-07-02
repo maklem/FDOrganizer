@@ -67,6 +67,17 @@ def check_package_validity(package: Package) -> list[str]:
         file_list = create_file_list(structmap)
         errors = check_structmap("", structmap)
 
+        if package.archive_settings is None:
+            errors.append("Legal questions for archiving have not been answered.")
+        else:
+            prefix = "Legal questions for archiving: "
+            if not package.archive_settings.checkDSGVO or package.archive_settings.personalData not in ['none', "anonymous", "consent"]:
+                errors.append(prefix+"data is not DSGVO compliant")
+            if not package.archive_settings.checkDuration or package.archive_settings.duration < 1:
+                errors.append(prefix+"data can not be stored without funding for at least a year.")
+            if not package.archive_settings.checkTerms:
+                errors.append(prefix+"data can not be stored without agreement to terms.")
+
         if errors:
             return errors
 
