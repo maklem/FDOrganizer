@@ -36,6 +36,10 @@
                             "en": "Other",
                             "de": "Sonstige"
                         }
+                    },
+                    {
+                        "id": "resourceIdentifierNotApplicable",
+                        "label": "Not Applicable"
                     }
                 ]
             },
@@ -1801,6 +1805,10 @@
                             "en": "Other",
                             "de": "Sonstige"
                         }
+                    },
+                    {
+                        "id": "descriptionNotApplicable",
+                        "label": "Not Applicable"
                     }
                 ]
             },
