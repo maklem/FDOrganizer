@@ -36,16 +36,6 @@ def stream_exportable_package(package_id: str):
 
     structmap = create_structmap(package)
 
-    def count_files(structmap) -> int:
-        here = len(structmap['files'])
-        there = sum(count_files(folder) for folder in structmap['folders'])
-        return here + there
-
-    if 0 == count_files(structmap):
-        error = "Can not generate download for package with no files."
-        logging.error(error)
-        return error_page(500, [error])
-
     errors = check_structmap("", structmap)
     if errors:
         logging.error("Failed to generate download. Errors:")

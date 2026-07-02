@@ -27,7 +27,7 @@ def create_package_data(package: Package) -> dict[Literal['metadata','id'],Any]:
         'id': package.id
     }
 
-def check_languages(languages: list[dict[str,Any]], filename) -> list[str]:
+def _check_languages(languages: list[dict[str,Any]], filename) -> list[str]:
     errors: list[str] = []
 
     for i in range(len(languages)):
@@ -52,33 +52,47 @@ def check_languages(languages: list[dict[str,Any]], filename) -> list[str]:
             continue
     return errors
 
-def check_document(prefix: str, document: Document) -> list[str]:
+def _check_document(prefix: str, document: Document) -> list[str]:
     errors = []
     if document.metadata is not None:
         metadata = Metadata.from_dict(get(Databases.METADATA, document.metadata).json())
         if "language" in metadata.metadata:
-            errors = check_languages(metadata.metadata["language"], os.path.join(prefix, document.name))
+            errors = _check_languages(metadata.metadata["language"], os.path.join(prefix, document.name))
     return errors
 
-def check_folder(prefix: str, folder: StructMap) -> list[str]:
+def _check_folder(prefix: str, folder: StructMap) -> list[str]:
     errors = []
     if "metadata" in folder and folder["metadata"] is not None:
         metadata = Metadata.from_dict(get(Databases.METADATA, folder["metadata"]).json())
         if "language" in metadata.metadata:
-            errors = check_languages(metadata.metadata["language"], os.path.join(prefix, folder["name"]))
+            errors = _check_languages(metadata.metadata["language"], os.path.join(prefix, folder["name"]))
     return errors
+
+def _check_filecount(structmap: StructMap) -> list[str]:
+    errors = []
+
+    def count_files(structmap) -> int:
+        here = len(structmap['files'])
+        there = sum(count_files(folder) for folder in structmap['folders'])
+        return here + there
+
+    if 0 == count_files(structmap):
+        errors.append("Package has no files.")
+    return errors
+
 
 def check_structmap(prefix, structmap:StructMap) -> list[str]:
     errors = []
-    if prefix=="" and structmap['metadata'] is None:
-        errors.append("Package requires metadata, but none were found.")
+    if prefix=="":
+        if structmap['metadata'] is None:
+            errors.append("Package requires metadata, but none were found.")
+        errors = errors + _check_filecount(structmap)
 
-    for e in check_folder(prefix, structmap):
-        errors.append(e)    
+    errors = errors + _check_folder(prefix, structmap)
 
     current_prefix = os.path.join(prefix, structmap["name"])
     for file in structmap['files']:
-        for e in check_document(current_prefix, file):
+        for e in _check_document(current_prefix, file):
             errors.append(e)
     for folder in structmap['folders']:
         for e in check_structmap(current_prefix, folder):

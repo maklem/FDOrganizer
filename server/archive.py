@@ -67,6 +67,9 @@ def check_package_validity(package: Package) -> list[str]:
         file_list = create_file_list(structmap)
         errors = check_structmap("", structmap)
 
+        if errors:
+            return errors
+
         try:
             package_data = create_package_data(package)
         except ValueError as e:
