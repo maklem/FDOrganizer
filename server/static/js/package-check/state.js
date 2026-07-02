@@ -22,6 +22,12 @@ async function checkPackage(package_id) {
     
     console.log("PackageCheck: updating ", package_id);
     const json = await get("/archive/check/"+package_id);
+
+    if(store.package != package_id){
+        console.log("PackageCheck: Racing Condition: package_id changed while waiting for response.")
+        return;
+    }
+
     if( json.status == "success" ){
         store.errors = [];
         store.hasErrors = false;
