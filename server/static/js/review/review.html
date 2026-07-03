@@ -30,7 +30,14 @@
                 class="accept-button side-button"
                 @button-clicked="store.acceptReview()">
                     <i class="fa-solid fa-check"></i>
-                    <div>Accept & Archive</div>
+                    <div>Accept for Archive</div>
+                </Button>
+                <Button
+                v-if="store.selectedPackage.status === 'archived'"
+                class="accept-button side-button"
+                @button-clicked="store.download()">
+                    <i class="fa-solid fa-download"></i>
+                    <div>Download Package</div>
                 </Button>
         </PackageContent>
         <Metadata></Metadata>

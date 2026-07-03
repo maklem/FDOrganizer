@@ -34,7 +34,8 @@ export const store = reactive({
     requestReview,
     acceptReview,
     rejectReview,
-    reviewReadonly
+    reviewReadonly,
+    download
 });
 
 function packagesWithStatus(status) {
@@ -87,4 +88,8 @@ async function rejectReview(id) {
 
 function reviewReadonly(pkg) {
     return ['rework', 'archived'].includes(pkg.status)
+}
+
+function download() {
+    window.open('/download/'+store.selectedPackage.id )
 }
