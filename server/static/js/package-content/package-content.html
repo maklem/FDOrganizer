@@ -4,9 +4,6 @@
         <slot></slot>
     </PackageHeader>
     <div v-if="!store.loading.content" class="files" >
-        <PackageCheck 
-            :package="store.package.id">
-        </PackageCheck>
         <PackageContentFolder
             v-for="folder in store.folders()"
             v-bind="folder"

@@ -97,18 +97,6 @@ def check_package_validity(package: Package) -> list[str]:
         errors.append(f"The generated metadata does not satisfy the schema requirements. ({str(error)})")
     return errors
 
-@APP.route("/archive/check/<package_id>", methods=["GET"])
-def check_package(package_id: str)->Response:
-    try:
-        package = Package.from_db(get(Databases.PACKAGES, package_id).json())
-    except KeyError:
-        return web_response(200, details={"status": "error", 'details': ["Could not read package from database. A"]})
-    except HTTPError:
-        return web_response(200, details={"status": "error", 'details': ["Could not read package from database. B"]})
-    if errors := check_package_validity(package):
-        return web_response(200, details={'status': "error", 'details': errors})
-    
-    return web_response(200, details={'status': 'success'})
 
 @APP.route("/archive/submit/<package_id>", methods=["POST"])
 def submit_for_review(package_id: str) -> Response:
