@@ -6,6 +6,8 @@ import PackageContent from "../package-content/package-content.js";
 import Metadata from "../metadata/metadata.js"
 import ArchivePackageSettings from "../archive-package-settings/archive-package-settings.js"
 import VideoDialog from "../video-dialog/video-dialog.js"
+import StatusDialog from "../status-dialog/status-dialog.js";
+import {store as statusStore} from "../status-dialog/state.js"
 
 import {store, STATUS} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"
@@ -22,13 +24,15 @@ const archive = createApp({
         PackageContent,
         ArchivePackageSettings,
         Metadata,
-        VideoDialog
+        VideoDialog,
+        StatusDialog
     },
     data() {
         return {
             store,
             metadataStore,
             settingsStore,
+            statusStore,
             STATUS
         }
     },

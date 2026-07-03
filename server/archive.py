@@ -117,12 +117,12 @@ def submit_for_review(package_id: str) -> Response:
     except HTTPError as error:
         return web_error_database_connection(error)
     if not can_submit_package(package, request):
-        return web_error(401, "You don't have permission to submit this package", component= "SERVER")
+        return web_response(200, details={'status': 'error', 'details': ["You don\'t have permission to submit this package"]})
     if package.get('status') not in ['active', 'rework']:
-        return web_error(400, "Package cannot be submitted for review in status {}".format(package.get('status')), component= "SERVER")
+        return web_response(200, details={'status': 'error', 'details': [ "Package cannot be submitted for review in status {} ".format(package.get('status'))]})
 
     if errors := check_package_validity(Package.from_db(package)):
-        return web_error(400, "Could not submit package for review.\nErrors:\n"+ "\n".join(" * " + e for e in errors))
+        return web_response(200, details={'status': 'error', 'details': errors})
     
     update_package_state(package_id, "review")
-    return web_response(200, message="Package submitted for review")
+    return web_response(200, details={'status': 'ok', 'details': ["Package submitted for review"]})

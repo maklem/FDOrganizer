@@ -1,0 +1,46 @@
+.status-dialog-modal {
+    border: 0.125rem solid #eee;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 90%;
+    max-height: 80%;
+    height: 80%;
+    width: 90%;
+
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.status-dialog-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.status-dialog-modal .content {
+    display:grid;
+    grid-template-rows: min-content minmax(0, auto) max-content;
+    gap: 1rem;
+
+    width: 100%;
+    height: 100%;
+}
+
+.status-dialog-errors, .status-dialog-messages {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+
+    font-size: 1.0rem;
+    color:#000;
+    border-radius: 5pt;
+    padding: 5pt;
+}
+
+.status-dialog-errors {
+    background-color: #FCC;
+    border: 2pt solid red;
+}
+
+.status-dialog-messages {
+    background-color: #FFF;
+    border: 2pt solid #AFF;
+}

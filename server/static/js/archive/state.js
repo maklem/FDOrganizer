@@ -2,6 +2,7 @@ import {reactive} from '../vue.js';
 import {get, post} from "../http.js"
 import {store as editStore} from '../package-edit/state.js'
 import {store as settingsStore} from '../archive-package-settings/state.js'
+import {store as statusStore} from "../status-dialog/state.js"
 
 export const STATUS = [
     {
@@ -73,9 +74,20 @@ function climbPackagePath() {
 
 
 async function requestReview() {
+    statusStore.openDialog("Submitting package for review...", 'ok', [])
+
     const request = post(`/archive/submit/${store.selectedPackage.id}`)
-    store.selectedPackage = undefined
-    await request;
+    const response = await request;
+
+    if(response.status == 'ok') {
+        statusStore.closeDialog()
+        store.selectedPackage = undefined
+    }else
+    if(response.status == 'error') {
+        statusStore.openDialog("Could not submit package for review", 'error', response.details)
+    }else{
+        statusStore.openDialog("Could not submit package for review", 'error', ["Connection to server/database broken.", "Please try again later."])
+    }
     store.getPackages()
 }
 

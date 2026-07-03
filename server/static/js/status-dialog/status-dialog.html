@@ -1,0 +1,22 @@
+<dialog class="status-dialog-modal" ref="modal">
+  <div class="content">
+    <h1>{{store.title}}</h1>
+    <div class="status-dialog-errors" v-if="store.type == 'error'">
+      <ul>
+          <li v-for="error in store.messages">
+              <pre v-if="error.includes('\n')">{{ error }}</pre>
+              <span v-if="!error.includes('\n')">{{ error }}</span>
+          </li>
+      </ul>
+    </div>
+    <div class="status-dialog-messages" v-else>
+      <ul>
+          <li v-for="error in store.messages">
+              <pre v-if="error.includes('\n')">{{ error }}</pre>
+              <span v-if="!error.includes('\n')">{{ error }}</span>
+          </li>
+      </ul>
+    </div>
+    <Button class="close-button" @button-clicked="store.closeDialog()">Ok</Button>
+  </div>
+</dialog>
