@@ -5,13 +5,16 @@ Instead administrators need to apply changes the database directly.
 
 CouchDB (the database software used by FDOrganizer) ships with an administrative UI named Fauxton.
 It runs on `http://couchdb-host:5984/_utils/`. However CouchDB listens to localhost only, and it is good to keep it that way.
-There are many ways to still gain access to the database. Here I outline the one I consider most pactical.
+There are many ways to still gain access to the database. Here I outline one I consider pactical.
+
+Then you need administrative user accounts, to log into the database. Instructions follow below.
 
 ## Reverse Proxy Configuration: nginx
 
 If nginx is already in use to proxy FDOrganizer, and serves as HTTPS termination,
 adding an additional reverse proxy is quite easy.
 
+I.e. add a new server configuration as `/etc/nginx/sites-available/forward-fdo-couchdb.conf`.
 ```conf
 server {
     # Set up listening adresses
@@ -39,20 +42,46 @@ server {
     }
 }
 ```
-## couch-db users
+Here we are reusing the certificate obtained for the FDOrganizer instance.
 
+## CouchDB users
 
+For couchdb, admin accounts are specified in configuration files.
+Installed from Apache's APT repositories, all configuration files
+are in `/opt/couchdb/etc/`
+
+In `local.d/10-admins.ini` you can add and remove admins. You may add users
+here with passwords in plaintext.
+```ini
+[admins]
+myuser = ntpTB5Z8WXSjEqsWBS7k
+```
+When CouchDB is restarted next time, users are reloaded, and passwords
+are replaced by hashes. 
+```ini
+[admins]
+myuser = -pbkdf2:sha256-962435e85d2476f7ec3c0a7aa1e82614b15c9c115e7338c35e4fa755edfb58db,730256ceb32d97fedcc2a75b2967b629,600000
+```
+You can remove admins, by removing a line, or marking it as a comment (a lines starting with `#` or `;`).
+
+**Note:** Technically admins can be added in `local.ini` as well. However
+these have passwords kept in plaintext. Contrary to the description, the
+password is not replaced here. Instead they are added (with hashed password)
+to `local.d/10-admins.ini`.
 
 ## Security Hardening
 
-IP based filters are considered weak. Still they add a tiny bit of security, and reduce load on backend systems caused by web crawlers.
+IP based filters are considered weak. Still they add a tiny bit of security,
+and reduce load on backend systems caused by web crawlers.
 
-Two way TLS is much stronger in terms of security, but require good handling of client certificates, and add complexity and load on administrators.
+Two way TLS is much stronger in terms of security, but require good handling
+of client certificates, and add complexity and load on administrators.
 
 ### ip based filter - iptables
 
 `iptables` is a strong firewall present in most recent linux distributions.
-As it operates on network level, it can be used to block (DROP or REJECT) connections to&from any client.
+As it operates on network level, it can be used to block (DROP or REJECT)
+connections to+from any client.
 
 ```sh
 iptables -A INPUT -s 10.200.0.0/16 -p tcp --port 5980 -j ACCEPT
