@@ -84,6 +84,7 @@ As it operates on network level, it can be used to block (DROP or REJECT)
 connections to+from any client.
 
 ```sh
+iptables -A INPUT -p tcp --port 22 -j ACCEPT
 iptables -A INPUT -s 10.200.0.0/16 -p tcp --port 5980 -j ACCEPT
 iptables -A INPUT -p tcp --port 5980 -j DROP
 ```
@@ -93,6 +94,8 @@ iptables -A INPUT -p tcp --port 5980 -j DROP
   You will not be able to do that, once you block that connection.
 * Lines are parsed top to bottom. The first line that matches wins.
   Thus the line that drops *any other* connection should be the last line.
+* Check with your distribution if iptables' rules are persisted and 
+  restored on reboot.
 
 ### ip based filter - nginx
 
