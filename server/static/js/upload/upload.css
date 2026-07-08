@@ -132,6 +132,13 @@ form[method="dialog"] {
     --rgb-button-color: var(--rgb-font-color);
 }
 
+.upload-dialog .error {
+    border: 2pt solid red;
+    border-radius: 5pt;
+    padding: 5pt;
+    margin-bottom: 5pt;
+}
+
 @keyframes gradient {
 	0% {
 		background-position: 0% 50%;
