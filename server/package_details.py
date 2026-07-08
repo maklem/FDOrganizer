@@ -96,7 +96,15 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
         delete_folder(folder_created.get('id'))
         return web_error_database_connection(error)
     return web_response(200, 'Success', folder_created)
-    
+
+def file_size_of(entry: Package | Folder) -> int:
+    size = 0
+    for doc in entry.documents:
+        size += get(Databases.DOCUMENTS, doc).json()["size"]
+    for folder in entry.folders:
+        size += file_size_of(Folder.from_dict(get(Databases.FOLDERS, folder).json()))
+    return size
+
 @APP.route("/package/documents", methods=["POST"])
 def create_documents() -> Response:
     if int(request.headers['Content-Length']) > int(APP.config['MAX_CONTENT_LENGTH']):
@@ -112,7 +120,7 @@ def create_documents() -> Response:
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not can_add_files(package_or_folder, request):
         return web_error(401, "You don't have permission to edit this content", component="SERVER")
-    
+
     #Create documents for uploaded files
     file_document_pairs = []
     failed_files= []
@@ -121,6 +129,21 @@ def create_documents() -> Response:
             file_document_pairs.append(create_file_document_pair(file, username))
         except HTTPError as error:
             failed_files.append({'file': file.filename, 'error': error.args[0]})
+
+    new_size = sum(entry['document'].size for entry in file_document_pairs)
+
+    if parent_type == 'package':
+        package_id = parent
+    else:
+        package_id: str = package_or_folder['package_id']
+
+    package = Package.from_db(get(Databases.PACKAGES, package_id).json())
+    stored_size = file_size_of(package)
+
+    package_size_limit = APP.config.get('FDO_MAX_PACKAGE_SIZE', 1000)
+    if stored_size + new_size > package_size_limit:
+        return web_error(413, f"Upload denied. Package would exceed configured limit of FDO_MAX_PACKAGE_SIZE={package_size_limit} bytes.")
+
 
     #Persist documents and files in DB
     persisted_documents = persist_documents(file_document_pairs, parent, parent_type)

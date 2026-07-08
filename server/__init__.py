@@ -16,6 +16,8 @@ APP.config["APPLICATION_ROOT"] = "/fdorganizer"
 
 APP.config["SESSION_PERMANENT"] = False
 APP.config["SESSION_TYPE"] = "filesystem"
+
+APP.config["FDO_MAX_PACKAGE_SIZE"] = 5*1024*1024*1024
 Session(APP)
 
 load_dotenv(dotenv_path="../.env")
