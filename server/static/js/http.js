@@ -30,7 +30,16 @@ async function fetchWithType(type, url, httpBody, new_headers) {
     }
 
     const response = await fetch(url, options);
-    const json = await response.json()
+    let json = {}
+    try {
+        json = await response.json()
+    } catch {
+        if (response.status > 399) {
+            throw new HTTPError(`${response.status} - ${response.statusText}`, response.status)
+        } else {
+            throw new Error("Received an invalid response from server. Please contact your administrator.")
+        }
+    }
     if (response.status > 399) throw new HTTPError(`${response.status} - ${json.message}`, response.status)
     return json
 }
