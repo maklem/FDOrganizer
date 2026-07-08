@@ -59,10 +59,11 @@ export default {
         closeDialog() {
             this.$refs.uploadFiles.close()
             this.store.failedUploads = []
+            this.store.error = ""
         },
         async startUpload() {
             await this.store.startUpload()
-            if (!this.store.failedUploads.length) this.closeDialog()
+            if (!this.store.failedUploads.length && !this.store.error.length) this.closeDialog()
         }
     },
     template

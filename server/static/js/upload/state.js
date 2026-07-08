@@ -6,6 +6,7 @@ export const store = reactive({
     files: [],
     draggedFiles: [],
     failedUploads: [],
+    error: "",
     loading: {
         upload: false
     },
@@ -25,14 +26,20 @@ function displayFiles() {
     })
 }
 async function startUpload() {
+    store.error = ""
     store.loading.upload = true
-    
-    const uploads = await uploadFiles()
-    await editStore.getPackageContent()
-    store.failedUploads = uploads.failed
-    
-    store.files = store.files.filter(file => store.failedUploads.map(upload => upload.file).includes(file.name))
-    store.loading.upload = false
+    try {
+        const uploads = await uploadFiles()
+        await editStore.getPackageContent()
+        store.failedUploads = uploads.failed
+        
+        store.files = store.files.filter(file => store.failedUploads.map(upload => upload.file).includes(file.name))
+    } catch (error) {
+	store.failedUploads = store.files
+        store.error = String(error)
+    } finally {
+        store.loading.upload = false
+    }
 }
 
 async function uploadFiles() {
