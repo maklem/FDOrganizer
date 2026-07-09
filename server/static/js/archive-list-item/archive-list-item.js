@@ -13,6 +13,7 @@ export default {
         id: String,
         name: String,
         last_changed: String,
+        keep_until: String,
         status: String
     },
     data() {

@@ -6,6 +6,7 @@
     <i class="fa-solid fa-box icon"></i>
     <div class="name">{{name}}</div>
     <div class="date">{{ owner_displayname ?? owner }}</div>
+    <div class="expiry">Expires: {{formatRelativeDate(keep_until)}}</div>
     <div class="action">
         <Button
         :flat

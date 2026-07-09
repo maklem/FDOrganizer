@@ -5,7 +5,8 @@
 >
     <i class="fa-solid fa-box icon"></i>
     <div class="name">{{name}}</div>
-    <div class="date">{{formatRelativeDate(last_changed)}}</div>
+    <div class="date">Changed: {{formatRelativeDate(last_changed)}}</div>
+    <div class="expiry">Expires: {{formatRelativeDate(keep_until)}}</div>
     <div class="action">
         <Button
         :flat

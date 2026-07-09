@@ -4,7 +4,8 @@
     grid-template-rows: auto;
     grid-template-areas:
         "icon name action"
-        "icon date action";
+        "icon date action"
+        "icon expiry action";
     justify-items: start;
     align-items: center;
     grid-gap: 0.3rem 1rem;
@@ -33,6 +34,12 @@
 
 .archive-list-item .date {
     grid-area: date;
+
+    color: #666666
+}
+
+.archive-list-item .expiry {
+    grid-area: expiry;
 
     color: #666666
 }
