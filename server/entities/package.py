@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -7,6 +8,9 @@ from .archive_settings import ArchiveSettings
 
 def shouldBeExcluded(x):
     return x is None
+
+def in_three_days_milliseconds():
+    return int((datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=3)).timestamp()*1000)
 
 @dataclass
 class Package(DataClassJsonMixin):
@@ -18,6 +22,7 @@ class Package(DataClassJsonMixin):
     last_changed: int
     owner: str
     organisation: str
+    keep_until: int = field(default_factory=in_three_days_milliseconds) # set default value during migration
     owner_displayname: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     metadata: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))
     id: str | None = field(default=None, metadata=config(exclude=shouldBeExcluded))

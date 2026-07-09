@@ -14,7 +14,7 @@ from werkzeug.datastructures import FileStorage
 
 from .package_details import create_file_document_pair
 
-from .shared import create_document_with_attachement, delete_document, delete_folder
+from .shared import create_document_with_attachement, delete_document, delete_folder, determine_package_expiration_timestamp_ms
 
 from .entities import Package, Databases, Folder
 
@@ -57,7 +57,8 @@ def create_package(name: str) -> Response:
     displayname = user_displayname(request)
     organisation_name = organisation(request)
     now = round(time.time()*1000)
-    package = Package(name=name, status='active', documents=[], folders=[], owner=username, organisation=organisation_name, created=now, last_changed=now, owner_displayname=displayname)
+    keep_until = determine_package_expiration_timestamp_ms("active")
+    package = Package(name=name, status='active', documents=[], folders=[], owner=username, organisation=organisation_name, created=now, last_changed=now, keep_until=keep_until, owner_displayname=displayname)
     try:
         package_created = post(Databases.PACKAGES, package.to_json())
     except HTTPError as error:
@@ -191,6 +192,8 @@ def create_document_from_zip(file_info: zipfile.Path, username):
 
 def create_package_in_db(name:str, owner: str, organisation: str, owner_displayname: str) -> str:
     now = round(time.time()*1000)
-    package = Package(name=name, status='active', documents=[], folders=[], owner=owner, organisation=organisation, created=now, last_changed=now, owner_displayname=owner_displayname)
+    status='active'
+    keep_until = determine_package_expiration_timestamp_ms(status)
+    package = Package(name=name, status=status, documents=[], folders=[], owner=owner, organisation=organisation, created=now, last_changed=now, keep_until=keep_until, owner_displayname=owner_displayname)
     package_created = post(Databases.PACKAGES, package.to_json())
     return package_created.json()['id']

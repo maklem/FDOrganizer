@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Literal
 from requests import HTTPError
 
@@ -6,6 +6,8 @@ from .entities import Document, Databases, CouchDocument
 
 from .util import get_database_from_string
 from .services.database import attach, delete, get, update, post
+
+PackageState = Literal['active', 'archived', 'review', 'rework']
 
 def delete_folder(id: str) -> bool:
     folder = get(Databases.FOLDERS, id).json()
@@ -112,9 +114,18 @@ def create_document_with_attachement(file, document: Document) -> str:
 
     return response_document.id
 
-def update_package_state(package_id: str, package_state: Literal['active', 'archived', 'review', 'rework']):
+def determine_package_expiration_timestamp_ms(state: PackageState) -> int:
+    from server import APP
+    keep = APP.config.get("KEEP_ACTIVE_PACKAGES_DAYS", 7)
+    if state == "archived":
+        keep = APP.config.get("KEEP_ARCHIVED_PACKAGES_DAYS", 7)
+    
+    return int((datetime.now() + timedelta(days=keep)).timestamp() * 1000)
+
+def update_package_state(package_id: str, package_state: PackageState):
     changes = {
         'status': package_state,
-        'last_changed': int(datetime.now().timestamp() * 1000)
+        'last_changed': int(datetime.now().timestamp() * 1000),
+        'keep_until': determine_package_expiration_timestamp_ms(package_state),
     }
     update(Databases.PACKAGES, package_id, changes=changes)

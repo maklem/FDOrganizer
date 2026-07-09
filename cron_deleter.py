@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from dotenv import load_dotenv
 from requests.models import HTTPError
 
@@ -9,12 +9,6 @@ from server.services.database import get, getall, delete
 load_dotenv(dotenv_path=".env")
 
 now = datetime.now()
-delete_before = {
-    "active":   now - timedelta(days=7),
-    "review":   now - timedelta(days=7),
-    "rework":   now - timedelta(days=7),
-    "archived": now - timedelta(days=1),
-}
 
 def delete_package(package_id):
     package = get(Databases.PACKAGES, package_id).json()
@@ -22,7 +16,7 @@ def delete_package(package_id):
     failed_folders = []
     failed_documents = []
 
-    # Delete folders, rollback for all if failed
+    # Delete folders
     for folder in package.get('folders'):
         try:
             if not delete_folder(folder):
@@ -34,7 +28,7 @@ def delete_package(package_id):
                 print(f"Error deleting folder: {error.response.status_code} - {error.response.reason}")
             failed_folders.append(folder)
 
-    # Delete documents, rollback for all if failed
+    # Delete documents
     for document in package.get('documents'):
         try:
             if not delete_document(document):
@@ -46,7 +40,7 @@ def delete_package(package_id):
                 print(f"Error deleting document: {error.response.status_code} - {error.response.reason}")
             failed_documents.append(document)
 
-    # Delete metadata of folder, rollback for all, if failed
+    # Delete metadata of folder
     if package.get('metadata') is not None:
         try:
             delete(Databases.METADATA, package.get('metadata'))
@@ -72,10 +66,12 @@ for package in packages:
     print(f"Created: {created.isoformat()}")
     changed = datetime.fromtimestamp(package.last_changed/1000)
     print(f"Changed: {changed.isoformat()}")
+    keep = datetime.fromtimestamp(package.keep_until/1000)
+    print(f"Keep:    {keep.isoformat()}")
     print(f"Owner:   {package.owner}")
     print(f"Status:  {package.status}")
     
-    if changed < delete_before[package.status]:
+    if keep < now:
         print(" -> delete")
         delete_package(package.id)
     else:

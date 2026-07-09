@@ -140,9 +140,9 @@ def create_documents() -> Response:
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
     stored_size = file_size_of(package)
 
-    package_size_limit = APP.config.get('FDO_MAX_PACKAGE_SIZE', 1000)
+    package_size_limit = APP.config.get('MAX_PACKAGE_SIZE', 1000)
     if stored_size + new_size > package_size_limit:
-        return web_error(413, f"Upload denied. Package would exceed configured limit of FDO_MAX_PACKAGE_SIZE={package_size_limit} bytes.")
+        return web_error(413, f"Upload denied. Package would exceed configured limit of MAX_PACKAGE_SIZE={package_size_limit} bytes.")
 
 
     #Persist documents and files in DB
