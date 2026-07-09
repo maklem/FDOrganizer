@@ -84,6 +84,7 @@ http = 0.0.0.0:8080
 http-to = /tmp/fdo-uwsgi.socket
 
 chmod-socket = 666
+socket-timeout = 300
 
 vacuum = true
 
@@ -127,6 +128,9 @@ server {
         uwsgi_param X-Real-IP $remote_addr;
         uwsgi_param X-Forwarded-For $proxy_add_x_forwarded_for;
         uwsgi_param X-Forwarded-Proto $http_x_forwarded_proto;
+
+        uwsgi_read_timeout 300s;
+        uwsgi_send_timeout 300s;
     }
 
     listen [::]:443 ssl ipv6only=on; # managed by Certbot
