@@ -1,7 +1,7 @@
-from server import APP
 from dotenv import load_dotenv
-
-load_dotenv(dotenv_path=".env")
+from server import APP
 
 if __name__ == "__main__":
+    if load_dotenv(dotenv_path=".env"):
+        APP.config.from_prefixed_env(prefix="FDO")
     APP.run()

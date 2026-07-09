@@ -22,11 +22,11 @@ APP.config["MAX_PACKAGE_SIZE"] = 5*1024*1024*1024
 APP.config["KEEP_ACTIVE_PACKAGES_DAYS"] = 60
 APP.config["KEEP_ARCHIVED_PACKAGES_DAYS"] = 15
 
-APP.config.from_prefixed_env(prefix="FDO")
-
 Session(APP)
 
 load_dotenv(dotenv_path="../.env")
+
+APP.config.from_prefixed_env(prefix="FDO")
 
 @APP.errorhandler(HTTPException)
 def handle_exception(error):
