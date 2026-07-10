@@ -45,15 +45,18 @@ export default {
             else metadata[this.field.id][index] = value
         },
         addField() {
-            const dummy = this.store.makeTemplate(this.field)
+            let dummy = this.store.makeTemplate(this.field)
 
             let metadata = this.store.metadata
             for (const step of this.path) {
                 metadata = metadata[step]
             }
 
-            if (Array.isArray(metadata[this.field.id])) metadata[this.field.id].push(!!this.field.fields ? dummy : dummy[0])
-            else metadata[this.field.id] = !!this.field.fields ? [dummy] : dummy
+            if (Array.isArray(metadata[this.field.id])){
+                metadata[this.field.id].push(dummy)
+            } else {
+                metadata[this.field.id] = [dummy]
+            }
         }
     },
     template

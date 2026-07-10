@@ -106,12 +106,13 @@ function sectionLabel(key) {
 
 
 function makeTemplate(field) {
-    if (!!field.fields) 
+    if (!!field.fields){
         return field.fields.reduce((subfieldContainer,subfield) => {
-            subfieldContainer[subfield.id] = makeTemplate(subfield)
+            subfieldContainer[subfield.id] = [makeTemplate(subfield)]
             return subfieldContainer
         }, {})
-    return [undefined]
+    }
+    return undefined
 }
 
 function filterUnmetConditions(data, schema) {
