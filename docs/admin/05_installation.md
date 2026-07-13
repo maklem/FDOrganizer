@@ -48,6 +48,10 @@ COUCHDB_PORT=5984
 # EXPORT_USER=110 # uid of fdorganizer
 # IMPRESSUM_LINK=https://localhost:5000/impressum
 TOKEN_SECRET=...
+
+# Configure expiry of documents
+FDO_KEEP_ACTIVE_PACKAGES_DAYS=60
+FDO_KEEP_ARCHIVED_PACKAGES_DAYS=15
 ```
 
 If you plan to have data stored on disk, specify `EXPORT_DIR` and `EXPORT_USER`.
@@ -67,9 +71,14 @@ python maintenance.py populate identityproviders dummy_local_idp.json
 python maintenance.py populate users dummy_local_users.json
 ```
 
-See [configuring FDO](20_config.md) on how to configure FDOrganizer for your needs.
+You will learn later how to [configure FDO](20_user_access.md) for your needs.
+For now we only need a valid database setup without contents.
+
 
 ## run FDOrganizer as a service
+
+FDOrganizer supplies `uwsgi.ini` to run a production server. Depending on your
+setup it might need some adjustments.
 
 ```ini, uwsgi.ini
 [uwsgi]
@@ -91,12 +100,16 @@ vacuum = true
 die-on-term = true
 ```
 
+To run FDO as a system service we will use a script `/srv/fdorganizer/start-fdo-as-service.bash`
+
 ```bash, /srv/fdorganizer/start-fdo-as-service.bash
 #!/bin/bash
 
 source $HOME/venv/bin/activate
 uwsgi --ini uwsgi.ini
 ```
+
+and create a systemd service in `/etc/systemd/system/fdo.service`
 
 ```ini, /etc/systemd/system/fdo.service
 [Unit]
@@ -112,7 +125,20 @@ WorkingDirectory=/srv/fdorganizer/FDOrganizer/
 WantedBy=multi-user.target
 ```
 
+After creation of the service and script, FDOrganizer can be started using
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl start fdo
+```
+
 ## nginx configuration
+
+So far we have FDOrganizer running as a system service, and serving pages via
+uwsgi on a local file socket. To make it accessible for browsers we will use
+nginx as reverse proxy.
+
+A minimal configuration could look like
 
 ```conf
 server {
@@ -141,8 +167,27 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
 ```
+We can store the configuration as `/etc/nginx/sites-available/fdorganizer.conf`.
+
+It can be made active using
+```sh
+sudo ln -s /etc/nginx/sites-available/fdorganizer.conf /etc/nginx/sites-enabled/
+```
+
+Next, we test the validity of our configuration
+```sh
+sudo nginx -t
+```
+
+If the test passes, we restart nginx to load the new configuration
+```sh
+sudo systemctl restart nginx
+```
 
 Note:
+* If you have no TLS/SSL certificate yet, why don't you get one using certbot?
+  In case your server is not accessible from the internet (and thus can not be
+  domain validated) you may remove/adjust the lines referring to *ssl*.
 * Request can be blocked on many layers.
   Here the line `client_max_body_size 1G;` expands the limits of uploads to 1GB (default in nginx is 1MB).
   Any larger request will be blocked by nginx, and not reach FDO.
