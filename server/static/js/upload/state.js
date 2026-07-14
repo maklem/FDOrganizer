@@ -44,14 +44,25 @@ async function startUpload() {
 
 async function uploadFiles() {
     const {parent, parentType} = editStore.currentPath()
-    const body = new FormData()
-    body.append('parent', parent)
-    body.append('parentType', parentType)
-
+    const response = {"failed": []}
+    
     store.files.forEach(file => {
+        const body = new FormData()
+        body.append('parent', parent)
+        body.append('parentType', parentType)
         body.append(file.name, file)
+        try{
+            const reply = await post('/package/documents', body, {"Content-Type": 'multipart/form-data'})
+        }
+        catch {
+            response.failed.append(file.name)
+            return
+        }
+        reply.failed.forEach(filename => {
+            response.failed.append(filename)
+        })
     })
-    return await post('/package/documents', body, {"Content-Type": 'multipart/form-data'})
+    return response
 }
 
 function removeFile(name) {
