@@ -58,7 +58,7 @@ function getAllFields() {
 }
 async function saveMetadata() {
     const schema = store.getAllFields()
-    const filteredData = filterUndefined(filterUnmetConditions(store.metadata, schema));
+    const filteredData = filterUnmetConditions(store.metadata, schema);
 
     if(!validateAll(filteredData, schema)) {
         toastStore.addMessage("error", "Manche Felder enthalten fehlerhafte Angaben")
@@ -171,11 +171,13 @@ function checkConditions(fieldInstance, subfield) {
 }
 
 function validateAll(metadata, schema) {
+    const ignoreEmpty = false;
+    console.log("validating...", metadata)
     return Object.entries(metadata).every(([key, value]) => {
         const field = schema.find(field => field.id === key)
         if(!!field.fields) return value.every(instance => validateAll(instance, field.fields))
-        if(Array.isArray(value)) return value.every(instance => validate(instance, field.type, true))
-        return validate(value, field.type, true)
+        if(Array.isArray(value)) return value.every(instance => validate(instance, field.type, ignoreEmpty))
+        return validate(value, field.type, ignoreEmpty)
     })
 }
 

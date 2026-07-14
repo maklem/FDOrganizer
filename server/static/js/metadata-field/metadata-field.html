@@ -53,7 +53,7 @@
             :disabled="store.readonly"
             :options="field.options ? field.options : false"
             :value="metadata[index]"
-            :invalid="!validate(metadata[index], field.type)"
+            :invalid="!validate(metadata[index], field.type, false)"
             :placeholder="field.placeholder ?? ''"
             @input="(value) => update(value, index)"
             @input="store.touched = true"
