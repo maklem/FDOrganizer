@@ -38,7 +38,7 @@ def get_packages():
     query = {
         "selector": {
             "owner": user(request),
-            "status": "active",
+            "status": {"$in": ["active", "rework"]},
             "organisation": organisation(request)
         },
         "limit": 1000
