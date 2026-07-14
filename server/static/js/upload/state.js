@@ -17,11 +17,22 @@ export const store = reactive({
 });
 
 function displayFiles() {
+    let total_size = editStore.limits.current_size
     return store.files.map(file => {
+        let error = ""
+        if(file.size > editStore.limits.file){
+             error="File exceeds file size limit"
+        }else{
+            total_size += file.size
+            if(total_size > editStore.limits.package){
+                error="File exceeds package limit"
+            }
+        }
         return {
             name: file.name,
             type: file.type,
-            size: file.size
+            size: file.size,
+            error: error,
         }
     })
 }
@@ -46,22 +57,22 @@ async function uploadFiles() {
     const {parent, parentType} = editStore.currentPath()
     const response = {"failed": []}
     
-    store.files.forEach(file => {
+    for(const file of store.files){
         const body = new FormData()
         body.append('parent', parent)
         body.append('parentType', parentType)
         body.append(file.name, file)
         try{
-            const reply = await post('/package/documents', body, {"Content-Type": 'multipart/form-data'})
+            let reply = await post('/package/documents', body, {"Content-Type": 'multipart/form-data'})
+            reply.failed.forEach(filename => {
+                response.failed.append(filename)
+            })
         }
         catch {
             response.failed.append(file.name)
             return
         }
-        reply.failed.forEach(filename => {
-            response.failed.append(filename)
-        })
-    })
+    }
     return response
 }
 

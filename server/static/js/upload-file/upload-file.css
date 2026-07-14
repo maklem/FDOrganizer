@@ -4,7 +4,8 @@
     grid-template-columns: max-content 1fr max-content;
     grid-template-areas:
         "icon name action"
-        "icon size action";
+        "icon size action"
+        "icon error action";
     place-items: center;
     place-content: center;
 
@@ -45,10 +46,18 @@
     color: #777777;
 }
 
+.file .error {
+    grid-area: error;
+
+    padding: 0.25rem;
+
+    color: #F00;
+}
+
 .file .overlay {
     display: flex;
     grid-column: 1/ span 3;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     align-self: stretch;
     justify-self: stretch;
 

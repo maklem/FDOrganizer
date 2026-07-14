@@ -18,7 +18,8 @@ export default {
     props: {
         name: String,
         size: String,
-        type: String
+        type: String,
+        error: String,
     },
     template
 }

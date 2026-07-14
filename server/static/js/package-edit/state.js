@@ -16,6 +16,7 @@ export const store = reactive({
     activeTab: 'upload',
     newFolderName: '',
     metadataEntity: undefined,
+    limits: {"current_size": 0, "file": 0, "package": 0},
     climbPackagePath,
     createFolder,
     currentPath,
@@ -74,6 +75,8 @@ async function getPackage(packageId) {
     store.package = json.package
     store.content = json
     store.packagePath = []
+    const limits = await get(`/package/${packageId}/limits`)
+    store.limits = limits
 }
 
 async function getFolder(folderId) {
