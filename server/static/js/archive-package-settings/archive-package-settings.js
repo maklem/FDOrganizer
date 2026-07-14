@@ -28,7 +28,10 @@ export default {
     },
     methods: {
         async save() {
-            if (await this.store.savePackageSettings()) this.store.closeSettings()
+            if (await this.store.savePackageSettings()){
+                this.store.closeSettings()
+                this.$emit("package-modified")
+            }
         },
         showAuthor(comment) {
             // Don't show author to non-reviewers
