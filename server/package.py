@@ -12,7 +12,7 @@ from requests import HTTPError
 from werkzeug.datastructures import FileStorage
 
 
-from .package_details import create_file_document_pair
+from .package_details import create_file_document_pair, file_size_of
 
 from .shared import create_document_with_attachement, delete_document, delete_folder, determine_package_expiration_timestamp_ms
 
@@ -21,7 +21,7 @@ from .entities import Package, Databases, Folder
 from .services.authentication import user, organisation, user_displayname
 from .services.database import delete, find, get, post, update
 
-from .util import can_delete_packages, can_edit_name, json_body, web_error, web_error_database_connection, web_response, is_owner
+from .util import can_delete_packages, can_edit_name, json_body, web_error, web_error_database_connection, web_response, is_owner, can_read
 from server import APP
 
 
@@ -49,6 +49,27 @@ def get_packages():
     except HTTPError as error:
         return web_error_database_connection(error)
     return web_response(200, details = [Package.convert(x) for x in packages])
+
+
+@APP.route("/package/<id>/limits", methods=["GET"])
+def get_package_limits(id: str):
+    package_limits = {
+        "current_size": 0,
+        "file": APP.config.get("MAX_CONTENT_LENGTH"),
+        "package": APP.config.get("MAX_PACKAGE_SIZE"),
+    }
+
+    package_data = get(Databases.PACKAGES, id).json()
+    if not can_read(package_data, request):
+        return web_response(403, details = package_limits)
+
+    try:
+        package_limits["current_size"] = file_size_of(Package.from_db(package_data))
+    except Exception:
+        pass
+
+    return web_response(200, details = package_limits)
+
 
 @APP.route("/package", methods=["PUT"])
 @json_body
