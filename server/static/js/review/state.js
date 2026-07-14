@@ -46,7 +46,7 @@ async function getPackages() {
     store.loading.packageList = true
     store.packages = await get(`/review/packages`)
     store.packages.sort((p1, p2) => {
-        return p2.last_changed - p1.last_changed
+        return p1.keep_until - p2.keep_until
     })
     store.loading.packageList = false
 }

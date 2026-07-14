@@ -32,6 +32,9 @@ function openDetails() {
 async function getPackages() {
     store.loading.packageList = true
     store.packages = await get(`package/all`)
+    store.packages.sort((p1, p2) => {
+        return p1.keep_until - p2.keep_until
+    })
     store.loading.packageList = false
 }
 
