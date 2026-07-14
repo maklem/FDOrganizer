@@ -38,7 +38,7 @@ mkdir -p /srv/fdorganizer/cron/log/
 cd /srv/fdorganizer/FDOrganizer/
 
 /srv/fdorganizer/venv/bin/python3 /srv/fdorganizer/FDOrganizer/cron_deleter.py > /srv/fdorganizer/cron/log/$(date --iso).log
-/srv/fdorganizer/venv/bin/python3 /srv/fdorganizer/FDOrganizer/cron_purge_thombstones.py >> /srv/fdorganizer/cron/log/$(date --iso).log
+/srv/fdorganizer/venv/bin/python3 /srv/fdorganizer/FDOrganizer/cron_purge_tombstones.py >> /srv/fdorganizer/cron/log/$(date --iso).log
 
 source /srv/fdorganizer/FDOrganizer/.env
 COUCHDB=http://$COUCHDB_USER:$COUCHDB_PASSWORD@$COUCHDB_HOST:$COUCHDB_PORT
