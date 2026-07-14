@@ -30,14 +30,14 @@ async function startUpload() {
     store.loading.upload = true
     try {
         const uploads = await uploadFiles()
-        await editStore.getPackageContent()
         store.failedUploads = uploads.failed
         
         store.files = store.files.filter(file => store.failedUploads.map(upload => upload.file).includes(file.name))
     } catch (error) {
-	store.failedUploads = store.files
+	    store.failedUploads = store.files
         store.error = String(error)
     } finally {
+        await editStore.getPackageContent()
         store.loading.upload = false
     }
 }
