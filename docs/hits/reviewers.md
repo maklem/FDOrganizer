@@ -1,3 +1,10 @@
+---
+title: Anleitung für Reviewer
+draft: true
+tags:
+- HITS FDM
+---
+
 # Kurzanleitung für Reviewer
 
 * Login
@@ -22,3 +29,7 @@
 
 * Download
   * bei angenommenen Paketen ist nun ein Button "Download Package" an der Stelle wo zuvor der Button "Accept for Archive" war.
+
+* Siehe auch:
+  * Videotutorials im FDOrganizer
+    * Aber aufpassen: Manches ist inzwischen (leicht) anders
