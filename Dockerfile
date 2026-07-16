@@ -15,9 +15,7 @@ apt-get clean \
 && \
 rm -rf /var/lib/apt/lists/*
 
-ARG EXPORT_USER
-RUN chown $EXPORT_USER /server
-COPY --chown=$EXPORT_USER . .
+COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN chmod +x /server/docker_init.sh

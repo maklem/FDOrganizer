@@ -17,7 +17,7 @@ def couchdb(request) -> Iterator[DockerContainer]:
 
 @fixture(scope="session")
 def fdorganizer_image() -> Iterator[DockerImage]:
-    with DockerImage("../", tag="fdorganizer-in-test") as image:
+    with DockerImage(".", tag="fdorganizer-in-test") as image:
         yield image
 
 @fixture()
