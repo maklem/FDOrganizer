@@ -6,7 +6,7 @@ export const store = reactive({
     files: [],
     draggedFiles: [],
     failedUploads: [],
-    error: "",
+    error: [],
     loading: {
         upload: false
     },
@@ -37,16 +37,20 @@ function displayFiles() {
     })
 }
 async function startUpload() {
-    store.error = ""
+    store.error = []
     store.loading.upload = true
     try {
         const uploads = await uploadFiles()
         store.failedUploads = uploads.failed
         
         store.files = store.files.filter(file => store.failedUploads.map(upload => upload.file).includes(file.name))
+
+        if(store.failedUploads.length > 0){
+            store.error = store.failedUploads.map(e => e.file + " → " + e.error)
+        }
     } catch (error) {
 	    store.failedUploads = store.files
-        store.error = String(error)
+        store.error = [String(error)]
     } finally {
         await editStore.getPackageContent()
         store.loading.upload = false
@@ -65,12 +69,15 @@ async function uploadFiles() {
         try{
             let reply = await post('/package/documents', body, {"Content-Type": 'multipart/form-data'})
             reply.failed.forEach(filename => {
-                response.failed.append(filename)
+                response.failed.push({
+                    "file": filename,
+                    "error": "upload rejected by server.",
+                })
             })
         }
-        catch {
-            response.failed.append(file.name)
-            return
+        catch (error) {
+            response.failed.push({"file": file.name, "error": String(error)})
+            continue
         }
     }
     return response

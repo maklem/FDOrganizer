@@ -31,7 +31,11 @@
             <h1>Upload Files</h1>
             <div v-if="store.loading.upload" class="loading"></div>
             <p class="text">{{dialogText}}</p>
-            <div class="error" v-if="store.error.length">{{store.error}}</div>
+            <div class="error" v-if="store.error.length">
+                <ul>
+                    <li v-for="error in store.error">{{error}}</li>
+                </ul>
+            </div>
             <form method="dialog">
                 <Button class="close-button" :disabled="store.loading.upload" @button-clicked="closeDialog">Abort</Button>
                 <Button :disabled="store.loading.upload" @button-clicked="startUpload">{{store.failedUploads.length ? 'Try Again': 'Yes'}}</Button>
