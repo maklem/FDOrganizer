@@ -11,6 +11,14 @@ from testcontainers.core.image import DockerImage
 from testcontainers.core.wait_strategies import LogMessageWaitStrategy
 
 
+@fixture(scope="session")
+def fdorganizer_image() -> Iterator[DockerImage]:
+    with DockerImage(".", tag="fdorganizer-in-test") as image:
+        yield image
+        print("=== Logs: fdorganizer_image ===")
+        print(image.get_logs())
+
+
 FDORGANIZER_SCOPE="module"
 
 
@@ -39,13 +47,6 @@ def couchdb(request, fdo_network: Network) -> Iterator[DockerContainer]:
         print("=== Logs: couchdb ===")
         print(container.get_logs())
 
-
-@fixture(scope=FDORGANIZER_SCOPE)
-def fdorganizer_image() -> Iterator[DockerImage]:
-    with DockerImage(".", tag="fdorganizer-in-test") as image:
-        yield image
-        print("=== Logs: fdorganizer_image ===")
-        print(image.get_logs())
 
 
 @fixture(scope=FDORGANIZER_SCOPE)

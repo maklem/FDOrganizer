@@ -7,6 +7,5 @@
   ],
   "plugins": [
     "dummy"
-  ],
-  "export_subdirectory": "example_university_data_dir"
+  ]
 }
