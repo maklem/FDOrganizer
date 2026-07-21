@@ -23,6 +23,15 @@ Clone the code from a git hoster of your choice (GitHub, RRZE-Gitos, ...)
 git clone git@gitos.rrze.fau.de:on95evoc/fdorganizer.git
 ```
 
+## System dependencies
+
+Dependency `uWSGI` is published as source and needs to be compiled.
+Pip will do that for you, given you have the system dependencies installed.
+On `Ubuntu 26.04 LTS` you can install these using:
+```sh
+apt install gcc python3.14-dev libcrypt-dev
+```
+
 ## Virtual Env
 
 set up the virtual environment

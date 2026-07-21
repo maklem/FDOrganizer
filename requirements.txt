@@ -9,7 +9,7 @@ PyYAML==6.0.1
 requests_oauth2client==1.5.3
 simple-term-menu==1.6.4
 xmlschema==3.3.1
-uWSGI==2.0.28; sys_platform != "win32"
+uWSGI==2.0.31; sys_platform != "win32"
 windows-curses; sys_platform == "win32"
 zipstream-ng==1.9.0
 couchdb==1.2
