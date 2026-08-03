@@ -97,8 +97,6 @@ def login_keycloak(idp_id: str):
 
     scopes = '+'.join(identity_provider.scope)
     auth_url = f'{identity_provider.url}auth?scope={scopes}&response_type=code&client_id={identity_provider.client_id}&redirect_uri={request.url_root}login-keycloak-callback/{identity_provider.id}'
-    if identity_provider.client_secret is not None:
-        auth_url += f'&client_secret={identity_provider.client_secret}'
     # redirect to OIDC login window
     return web_response(200, details={"auth_url": auth_url})
 
