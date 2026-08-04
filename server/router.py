@@ -38,28 +38,29 @@ def navhome():
 def navindex():
     return render_template("index.html")
 
+@APP.route("/info/source")
+def navsource():
+    if os.getenv("SOURCE_LINK") is not None:
+        return redirect(str(os.getenv("SOURCE_LINK")))
+    return render_template("missing-link.html")
+
 @APP.route("/info/impressum")
 def navimpressum():
     if os.getenv("IMPRESSUM_LINK") is not None:
         return redirect(str(os.getenv("IMPRESSUM_LINK")))
-    return render_template("impressum.html")
+    return render_template("missing-link.html")
 
 @APP.route("/info/datenschutz")
 def navdatenschutz():
     if os.getenv("DATENSCHUTZ_LINK") is not None:
         return redirect(str(os.getenv("DATENSCHUTZ_LINK")))
-    return render_template("impressum.html")
+    return render_template("missing-link.html")
 
 @APP.route("/info/a11y")
 def navbarrierefreiheit():
     if os.getenv("BARRIEREFREIHEIT_LINK") is not None:
         return redirect(str(os.getenv("BARRIEREFREIHEIT_LINK")))
-    return render_template("impressum.html")
-
-
-@APP.route("/history")
-def navhistory():
-    return render_template("history.html")
+    return render_template("missing-link.html")
 
 @APP.route("/package")
 def navpackage():
