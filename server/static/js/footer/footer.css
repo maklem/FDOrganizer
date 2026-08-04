@@ -1,0 +1,30 @@
+.bottom-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    padding: 0.5rem;
+    flex: 0 0 0;
+
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.bottom-bar .links {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    flex: 1 0 1;
+}
+
+.bottom-bar .links a {
+    padding: 0 1rem;
+    text-decoration: none;
+
+    color: var(--on-primary-color);
+
+}

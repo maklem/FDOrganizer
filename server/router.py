@@ -9,6 +9,7 @@ def needs_authentication(route: str) -> bool:
         route.startswith(url_for("navlogin")),
         route.startswith(url_for('get_organisations')),
         route.startswith("/static"),
+        route.startswith("/info/"),
         route.startswith("/whoami"),
         route.startswith("/login-oidc"),
         route.startswith("/login-local"),
@@ -37,11 +38,24 @@ def navhome():
 def navindex():
     return render_template("index.html")
 
-@APP.route("/impressum")
+@APP.route("/info/impressum")
 def navimpressum():
     if os.getenv("IMPRESSUM_LINK") is not None:
         return redirect(str(os.getenv("IMPRESSUM_LINK")))
     return render_template("impressum.html")
+
+@APP.route("/info/datenschutz")
+def navdatenschutz():
+    if os.getenv("DATENSCHUTZ_LINK") is not None:
+        return redirect(str(os.getenv("DATENSCHUTZ_LINK")))
+    return render_template("impressum.html")
+
+@APP.route("/info/a11y")
+def navbarrierefreiheit():
+    if os.getenv("BARRIEREFREIHEIT_LINK") is not None:
+        return redirect(str(os.getenv("BARRIEREFREIHEIT_LINK")))
+    return render_template("impressum.html")
+
 
 @APP.route("/history")
 def navhistory():

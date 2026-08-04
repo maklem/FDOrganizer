@@ -4,6 +4,7 @@ import { setup } from "../setup.js";
 import { store } from "./state.js";
 import TopBanner from "../top-banner/top-banner.js";
 import LabeledInput from "../labeled-input/labeled-input.js";
+import Footer from "../footer/footer.js";
 
 
 const template = await setup('login');
@@ -12,7 +13,8 @@ createApp({
     components: {
         TopBanner,
         Button,
-        LabeledInput
+        LabeledInput,
+        Footer
     },
     data() {
         return {
