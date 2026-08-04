@@ -1,10 +1,39 @@
 .navbar-whoami {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
+    display: inline-grid;
+    grid-template-columns: auto min-content;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "name icon"
+        "organisation icon"
+        "copy icon";
+    justify-items: flex-end;
+    align-items: center;
 
     font-size: 1.0rem;
     color:#bbbbbb;
     padding-right: 1.0rem;
+
+    cursor: pointer;
+}
+
+.navbar-whoami .copy {
+    grid-area: copy;
+}
+
+.navbar-whoami:hover .icon,
+.navbar-whoami:hover .copy {
+    color:#fff;
+}
+
+.navbar-whoami .name {
+        grid-area: name;
+}
+
+.navbar-whoami .icon {
+    grid-area: icon;
+    padding-left: 0.5rem;
+    font-size: 1.7rem;
+}
+.navbar-whoami .organisation {
+        grid-area: organisation;
 }

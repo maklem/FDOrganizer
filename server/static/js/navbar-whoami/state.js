@@ -6,6 +6,7 @@ export const store = reactive({
     displayname: "",
     organisation: "",
     loadUserInfo,
+    copyToClipboard
 });
 
 async function loadUserInfo() {
@@ -14,4 +15,11 @@ async function loadUserInfo() {
     store.displayname = json.displayname
     store.organisation = json.organisation
     console.log("I am ", json.displayname)
+}
+
+function copyToClipboard() {
+    const text = "Name: "+store.displayname+"\n"+
+        "ID: "+store.name+"\n"+
+        "ORG: "+store.organisation;
+    navigator.clipboard.writeText(text);
 }

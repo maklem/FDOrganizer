@@ -1,4 +1,8 @@
-<div class="navbar-whoami" :class="{active: isActive}">
-    <div :title="store.name">{{store.displayname}}</div>
-    <div>{{store.organisation}}</div>
+<div class="navbar-whoami" :class="{active: isActive}" @click="store.copyToClipboard()">
+    <div class="icon" title="copy to clipboard">
+        <i class="fa-solid fa-clipboard-user"></i>
+    </div>
+    <div :title="store.name" class="name">{{store.displayname}}</div>
+    <div class="organisation">{{store.organisation}}</div>
+    <!-- <div class="copy"><i class="fa-solid fa-copy"></i> copy to clipboard</div> -->
 </div>
