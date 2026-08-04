@@ -25,6 +25,18 @@
     color:#fff;
 }
 
+
+.navbar-whoami .id{
+    display: none;
+}
+.navbar-whoami:hover .id{
+    display: block;
+}
+.navbar-whoami:hover .name{
+    display: none;
+}
+
+.navbar-whoami .id,
 .navbar-whoami .name {
         grid-area: name;
 }
