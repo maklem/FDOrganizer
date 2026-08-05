@@ -84,4 +84,4 @@ def fdorganizer(fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_ne
 @fixture(scope=FDORGANIZER_SCOPE)
 def fdorganizer_url(fdorganizer: DockerContainer) -> str:
     addr = fdorganizer.get_docker_client().bridge_ip(container_id=fdorganizer.get_wrapped_container().id)
-    return f"http://{addr}:8080/"
+    return f"http://{addr}:8000/"
