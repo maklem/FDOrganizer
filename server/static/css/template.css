@@ -36,7 +36,8 @@ body {
     font-family: Tahoma, Verdana, sans-serif, monospace;
 }
 
-#app-container {
+#app-container,
+main {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -44,4 +45,70 @@ body {
 
     height: 100%;
     width: 100%;
+}
+
+.static-content {
+    display: flex;
+    flex-grow: 1;
+}
+
+.static-top-banner {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    flex: 0 0 0;
+    padding: 1rem;
+
+}
+
+.static-top-banner div {
+    font-size: 3rem;
+    font-weight: 1000;
+}
+
+.static-top-banner img {
+    height: 5rem;
+}
+
+h2.static-title {
+    width: 100%;
+    flex: 0 0 0;
+    padding: 0.5rem 1rem;
+
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.static-bottom-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    padding: 0.5rem;
+    flex: 0 0 0;
+
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.static-bottom-bar .links {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    flex: 1 0 1;
+}
+
+.static-bottom-bar .links a {
+    padding: 0 1rem;
+    text-decoration: none;
+
+    color: var(--on-primary-color);
+
 }
