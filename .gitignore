@@ -8,6 +8,7 @@ __pycache__
 /server/conf/config.json
 flask_session
 /server/tmp
+/server/templates/terms-of-service.html
 
 # Package files
 *.egg-info

@@ -1,4 +1,5 @@
 import os
+import jinja2.exceptions
 from flask import render_template, request, url_for, redirect
 from server import APP
 from .services.authentication import is_authorized, is_reviewer
@@ -61,6 +62,15 @@ def navbarrierefreiheit():
     if os.getenv("BARRIEREFREIHEIT_LINK") is not None:
         return redirect(str(os.getenv("BARRIEREFREIHEIT_LINK")))
     return render_template("missing-link.html")
+
+@APP.route("/info/tos")
+def navtos():
+    TOS_FILE="terms-of-service.html"
+    try:
+        return render_template(TOS_FILE)
+    except jinja2.exceptions.TemplateNotFound as e:
+        APP.logger.error("Terms of Service not found. Please add your terms as 'server/templates/terms-of-service.html'")
+        return render_template("terms-of-service-missing.html")
 
 @APP.route("/package")
 def navpackage():
