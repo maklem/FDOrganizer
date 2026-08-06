@@ -107,7 +107,9 @@ h2.static-title {
 .static-bottom-bar .links a {
     padding: 0 1rem;
     text-decoration: none;
-
     color: var(--on-primary-color);
+}
 
+.static-bottom-bar .links a:hover {
+    text-decoration: underline;
 }

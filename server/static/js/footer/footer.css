@@ -26,5 +26,8 @@
     text-decoration: none;
 
     color: var(--on-primary-color);
+}
 
+.bottom-bar .links a:hover {
+    text-decoration: underline;
 }
