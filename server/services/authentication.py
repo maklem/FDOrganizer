@@ -1,23 +1,31 @@
-from server.entities.identityprovider import IdentityProvider
-
 import json
-import os
 from time import time
 from typing import TypedDict
+
 from flask.wrappers import Request
-from jwt import InvalidSignatureError, encode, decode, DecodeError
+from jwt import DecodeError, InvalidSignatureError, decode, encode
 from requests import HTTPError
 
-from .database import find, get
-from ..entities import Databases, Organisation
+from server.entities.identityprovider import IdentityProvider
 
-SECRET = str(os.getenv('TOKEN_SECRET'))
+from ..entities import Databases, Organisation
+from .database import find, get
+
 
 class TokenPayload(TypedDict):
     username: str
     organisation: str
     timeout: int
     reviewer: bool
+
+
+def token_secret() -> str:
+    import os
+    secret = os.getenv('TOKEN_SECRET')
+    if secret is None:
+        raise ValueError("no secret set!")
+    return str(secret)
+
 
 def create_payload(username: str, organisation_id: str) -> TokenPayload:
     organisation = Organisation.from_db(get(Databases.ORGANISATIONS, organisation_id).json())
@@ -34,20 +42,20 @@ def create_payload(username: str, organisation_id: str) -> TokenPayload:
 
 def add_payload(token: str, key: str, value: str):
     updated_payload = payload(token) | {key: value}
-    return encode(payload = updated_payload, key = SECRET)
+    return encode(payload = updated_payload, key = token_secret())
 
 
 def remove_payload(token: str, key: str):
     updated_payload = payload(token) | {key: None}
-    return encode(payload = updated_payload, key = SECRET)
+    return encode(payload = updated_payload, key = token_secret())
 
 
 def create_token(username, organisation_id):
-    return encode(payload = {**create_payload(username, organisation_id)}, key = SECRET, algorithm='HS256')
+    return encode(payload = {**create_payload(username, organisation_id)}, key = token_secret(), algorithm='HS256')
 
 
 def payload(token: str):
-    return decode(token, key = SECRET, algorithms = ['HS256'])
+    return decode(token, key = token_secret(), algorithms = ['HS256'])
 
 
 def token_valid(token: str):
@@ -56,9 +64,8 @@ def token_valid(token: str):
     except InvalidSignatureError:
         return False
     timeout = content.get('timeout') or 0
-    if timeout < int(time()):
-        return False
-    return True
+    
+    return timeout > int(time())
 
 
 def find_organisation_by_tag(idp_tag: str) -> Organisation:
