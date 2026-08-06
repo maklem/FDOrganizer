@@ -48,7 +48,6 @@ main {
 }
 
 .static-content {
-    display: flex;
     flex-grow: 1;
 }
 

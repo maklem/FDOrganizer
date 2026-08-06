@@ -1,7 +1,14 @@
 {% extends "template.html" %}
 {% block js %}
-<script>
-	window.errorMessages = {{ errors | tojson }};
-</script>
-<script type="module" src="{{url_for('static', filename='js/error/error.js')}}"></script>
+{% endblock %}
+{% block title %}
+Error!
+{% endblock %}
+{% block content %}
+Something went wrong. Here are the messages:
+<ul>
+	{% for error in errors %}
+	<li>{{error}}</li>
+	{% endfor %}
+</ul>
 {% endblock %}
