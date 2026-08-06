@@ -67,6 +67,13 @@ main {
     font-size: 3rem;
     font-weight: 1000;
 }
+.static-top-banner a {
+    color: black;
+    text-decoration: none;
+}
+.static-top-banner a:hover {
+    color: #555;
+}
 
 .static-top-banner img {
     height: 5rem;
