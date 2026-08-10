@@ -40,9 +40,10 @@ async function getPackages() {
 
 async function createPackage() {
     store.loading.packageList = true
-    await put(`package`, {name: store.newPackage.name})
+    const created = await put(`package`, {name: store.newPackage.name})
     store.newPackage.name = ''
     await store.getPackages()
+    store.selectPackage(created.id)
     store.loading.packageList = false
 }
 
@@ -74,7 +75,8 @@ async function uploadZip() {
     body.append('keep_structure', store.newPackage.keepStructure)
     const result =  await put('/package/zip', body, {"Content-Type": 'multipart/form-data'})
     store.zipfile = undefined
-    store.getPackages()
+    await store.getPackages()
+    store.selectPackage(result.id)
     store.loading.packageList = false
     return result
 }
