@@ -13,7 +13,7 @@ export function logout() {
  * @param  {string} cvalue
  */
 function setCookie(cname, cvalue) {
-	document.cookie = cname + "=" + cvalue + ";path=/";
+	document.cookie = cname + "=" + cvalue + ";path=/;SameSite=Strict";
 }
 
 function getCookie(cname) {
