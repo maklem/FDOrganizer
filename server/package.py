@@ -11,18 +11,28 @@ from flask import Response, request
 from requests import HTTPError
 from werkzeug.datastructures import FileStorage
 
-
-from .package_details import create_file_document_pair, file_size_of
-
-from .shared import create_document_with_attachement, delete_document, delete_folder, determine_package_expiration_timestamp_ms
-
-from .entities import Package, Databases, Folder
-
-from .services.authentication import user, organisation, user_displayname
-from .services.database import delete, find, get, post, update
-
-from .util import can_delete_packages, can_edit_name, json_body, web_error, web_error_database_connection, web_response, is_owner, can_read
 from server import APP
+
+from .entities import Databases, Folder, Package
+from .package_details import create_file_document_pair, file_size_of
+from .services.authentication import organisation, user, user_displayname
+from .services.database import delete, find, get, post, update
+from .shared import (
+    create_document_with_attachement,
+    delete_document,
+    delete_folder,
+    determine_package_expiration_timestamp_ms,
+)
+from .util import (
+    can_delete_packages,
+    can_edit_name,
+    can_read,
+    is_owner,
+    json_body,
+    web_error,
+    web_error_database_connection,
+    web_response,
+)
 
 
 @dataclass
@@ -174,7 +184,7 @@ def create_package_from_zip() -> Response:
         # Update package with new folder and document ids
         update(Databases.PACKAGES, package_id, {'folders': folder_ids, 'documents': doc_ids})
     os.remove(zip_temp_path)
-    return web_response(200, 'Success')
+    return web_response(200, 'Success', details={"id": package_id})
 
 def build_directory_tree(path: zipfile.Path, keep_empty: bool, keep_structure: bool) -> Directory:
     def recurse_directory(path: zipfile.Path, keep_empty: bool) -> Directory:

@@ -87,7 +87,7 @@
                     <Button v-if="source === 'empty'" 
                         :disabled="store.newPackage.name === ''"
                         class="confirm-create"
-                        @button-clicked="store.createPackage()"
+                        @button-clicked="createPackage()"
                     >
                         <div>Create project</div>
                     </Button>
