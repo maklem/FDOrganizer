@@ -1,0 +1,89 @@
+.metadata-import-modal {
+    border: 0.125rem solid #eee;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 95%;
+    max-height: 90%;
+    height: 90%;
+    width: 95%;
+
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.metadata-import-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.metadata-import-modal .content {
+    display:grid;
+    grid-template-rows: min-content auto min-content;
+    gap: 1rem;
+
+    width: 100%;
+    height: 100%;
+}
+
+.metadata-import-modal main {
+    display: flex;
+    flex-direction: column;
+}
+
+.metadata-import-modal form {
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+#import-json-data {
+    width: 100%;
+    height: 100%;
+
+    box-sizing: border-box;
+    resize: none;
+}
+
+.metadata-import-header {
+    display: grid;
+    grid-template-columns: max-content max-content auto min-content;
+    align-items: center;
+    gap: 1rem;
+
+}
+
+.metadata-import-header > h1 {
+    margin: 0;
+    line-break: anywhere;
+}
+
+.metadata-import-header > i {
+    font-size: 2rem;
+}
+
+.metadata-import-header .dialog-button {
+    display: grid;
+    justify-content: left;
+}
+.metadata-import-header .question-button {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+}
+
+.metadata-import-header .back-button {
+    font-size: 1.5rem;
+    --rgb-button-color: var(--rgb-font-color);
+    --button-color: var(--font-color);
+    padding: 0.25rem 0.5rem;
+}
+
+.metadata-import-modal .button-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: end;
+}
+
+.metadata-import-modal .button-row .close-button {
+    width: fit-content;
+    height: fit-content;
+    --button-color: #333;
+    --rgb-button-color: 51, 51, 51;
+}

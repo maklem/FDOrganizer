@@ -14,9 +14,11 @@
             <MetadataSection v-for="key in Object.keys(store.schema)" :id="key" :label="store.sectionLabel(key)" :selectedSection="selectedSection" @select-section=selectSection(key)></MetadataSection>
         </main>
         <div class="button-row">
+            <Button class="close-button" @button-clicked="importstore.openImport()">Import</Button>
             <Button class="close-button" @button-clicked="store.closeDocument()">Abort</Button>
             <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched">Save</Button>
         </div>
     </div>
     <Toast></Toast>
+    <MetadataImport></MetadataImport>
 </dialog>
