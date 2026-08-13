@@ -36,8 +36,7 @@ body {
     font-family: Tahoma, Verdana, sans-serif, monospace;
 }
 
-#app-container,
-main {
+#app-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,10 +66,12 @@ main {
     font-size: 3rem;
     font-weight: 1000;
 }
+
 .static-top-banner a {
     color: black;
     text-decoration: none;
 }
+
 .static-top-banner a:hover {
     color: #555;
 }
