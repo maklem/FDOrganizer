@@ -11,12 +11,12 @@
         <main>
             <h2>Datacite JSON Data</h2>
             <form>
-                <textarea id="import-json-data"></textarea>
+                <textarea v-model="inputtext" id="import-json-data"></textarea>
             </form>
         </main>
         <div class="button-row">
             <Button class="close-button" @button-clicked="store.closeImport()">Abort</Button>
-            <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched">Import</Button>
+            <Button class="save-metadata" @button-clicked="store.mergeIntoMetadata(inputtext); store.closeImport();">Import</Button>
         </div>
     </div>
 </dialog>
