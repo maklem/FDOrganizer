@@ -19,6 +19,7 @@ export default {
             metadatastore,
             helpOverlay: true,
             JSON,
+            inputtext: ""
         }
     },
     computed: {
@@ -27,9 +28,6 @@ export default {
         store.modalRef = this.$refs.modal
     },
     methods: {
-        async save() {
-            if (await this.store.saveMetadata()) this.store.closeDocument()
-        }
     },
     template
 }

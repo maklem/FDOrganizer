@@ -1,12 +1,11 @@
 import { reactive } from '../vue.js';
-import { validate } from '../validation-util.js';
-import { put, get } from "../http.js"
-
+import { store as metadatastore } from "../metadata/state.js";
 
 export const store = reactive({
     modalRef: undefined,
     openImport,
-    closeImport
+    closeImport,
+    mergeIntoMetadata
 });
 
 
@@ -16,4 +15,10 @@ function openImport(entityType, entityId, readonly = false) {
 
 function closeImport() {
     return store.modalRef.close()
+}
+
+function mergeIntoMetadata(inputtext) {
+    console.log(`Received "${inputtext}" for parsing`);
+    const data = JSON.parse(inputtext);
+    metadatastore.entity;
 }
