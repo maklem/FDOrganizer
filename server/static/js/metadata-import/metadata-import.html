@@ -1,0 +1,22 @@
+<dialog class="metadata-import-modal" ref="modal">
+    <div class="content" v-if="!metadatastore.loading.entity">
+        <header class="metadata-import-header">
+            <i class="fa-solid fa-file-import"></i>
+            <h1 v-if="!!metadatastore.entity">Import into {{metadatastore.entity.name}}</h1>
+            <div comment="spacer"></div>
+            <Button class="back-button" :flat @button-clicked="store.closeImport()">
+                <i class="fa-solid fa-xmark"></i>
+            </Button>
+        </header>
+        <main>
+            <h2>Datacite JSON Data</h2>
+            <form>
+                <textarea id="import-json-data"></textarea>
+            </form>
+        </main>
+        <div class="button-row">
+            <Button class="close-button" @button-clicked="store.closeImport()">Abort</Button>
+            <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched">Import</Button>
+        </div>
+    </div>
+</dialog>

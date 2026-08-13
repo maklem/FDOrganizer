@@ -5,6 +5,8 @@ import Button from "../button/button.js"
 import LabeledInput from "../labeled-input/labeled-input.js"
 import Toast from "../toast/toast.js"
 import VideoDialog from "../video-dialog/video-dialog.js"
+import MetadataImport from "../metadata-import/metadata-import.js"
+import { store as importstore } from "../metadata-import/state.js"
 
 const template = await setup('metadata');
 
@@ -14,13 +16,15 @@ export default {
         Button,
         LabeledInput,
         Toast,
-        VideoDialog
+        VideoDialog,
+        MetadataImport
     },
     props: {
     },
     data() {
         return {
             store,
+            importstore,
             helpOverlay: true,
             JSON,
         }
