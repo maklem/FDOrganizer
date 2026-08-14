@@ -26,8 +26,13 @@ export default {
     },
     async mounted() {
         store.modalRef = this.$refs.modal
+        store.modalResultsRef = this.$refs.modalresults
     },
     methods: {
+        mergeIntoMetadata() {
+            store.mergeIntoMetadata(this.inputtext)
+            store.openResults()
+        }
     },
     template
 }
