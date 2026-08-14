@@ -1,3 +1,20 @@
+.metadata-import-results-modal {
+    border: 0.125rem solid #eee;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 92.5%;
+    max-height: 85%;
+    height: 85%;
+    width: 92.5%;
+
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.metadata-import-results-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 .metadata-import-modal {
     border: 0.125rem solid #eee;
     border-radius: 0.25rem;
@@ -40,6 +57,14 @@
 
     box-sizing: border-box;
     resize: none;
+}
+
+.import-error {
+    border: 2px solid red;
+    background-color: #Fee;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
 }
 
 .metadata-import-header {

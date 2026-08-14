@@ -13,10 +13,34 @@
             <form>
                 <textarea v-model="inputtext" id="import-json-data"></textarea>
             </form>
+            <div class="import-error" v-if="!!store.error">Something went wrong during import: {{store.error}}</div>
         </main>
         <div class="button-row">
             <Button class="close-button" @button-clicked="store.closeImport()">Abort</Button>
-            <Button class="save-metadata" @button-clicked="store.mergeIntoMetadata(inputtext); store.closeImport();">Import</Button>
+            <Button class="save-metadata" @button-clicked="mergeIntoMetadata()">Import</Button>
+        </div>
+    </div>
+</dialog>
+<dialog class="metadata-import-results-modal" ref="modalresults">
+    <div class="content" v-if="!metadatastore.loading.entity">
+        <header class="metadata-import-header">
+            <i class="fa-solid fa-file-import"></i>
+            <h1 v-if="!!metadatastore.entity">Import into {{metadatastore.entity.name}}</h1>
+            <div comment="spacer"></div>
+        </header>
+        <main>
+            <h2>Import Results</h2>
+            <div class="import-results">
+                <ul>
+                    <li v-for="r in store.results">{{r}}</li>
+                </ul>
+            </div>
+            <div class="import-error" v-if="!!store.error">Something went wrong during import: {{store.error}}</div>
+        </main>
+        <div class="button-row">
+            <Button class="close-button" @button-clicked="store.closeImport()" v-if="!!store.error">Abort Import</Button>
+            <Button class="close-button" @button-clicked="store.closeResults()" v-if="!!store.error">Revise</Button>
+            <Button class="close-button" @button-clicked="store.closeImport()" v-if="!store.error">OK</Button>
         </div>
     </div>
 </dialog>
