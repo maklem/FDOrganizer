@@ -69,6 +69,10 @@ function mergeIntoMetadata(inputtext) {
         });
         store.results.push(`Added Identifier DOI: ${data.data.id}`)
     }
+
+    if(store.results.length > 0){
+        metadatastore.touched = true
+    }
     return true;
 }
 
