@@ -1,5 +1,6 @@
 import { reactive } from '../vue.js';
 import { store as metadatastore } from "../metadata/state.js";
+import { validate } from '../validation-util.js';
 
 export const store = reactive({
     modalRef: undefined,
@@ -42,8 +43,6 @@ function enshureList(object, name) {
 
 
 function mergeIntoMetadata(inputtext) {
-    console.log(`Received "${inputtext}" for parsing`);
-
     store.error = ""
     store.results = []
     
@@ -62,12 +61,66 @@ function mergeIntoMetadata(inputtext) {
     }
 
     if(!!data.data.id){
-        enshureList(metadatastore.metadata, "identifier")
-        metadatastore.metadata.identifier.push({
-            "resourceIdentifierDoi": [data.data.id],
-            "resourceIdentifierScheme": ["doi"],
-        });
-        store.results.push(`Added Identifier DOI: ${data.data.id}`)
+        if(validate(data.data.id, "doi", false))
+        {
+            enshureList(metadatastore.metadata, "identifier")
+            metadatastore.metadata.identifier.push({
+                "resourceIdentifierDoi": [data.data.id],
+                "resourceIdentifierScheme": ["doi"],
+            });
+            store.results.push(`Added Identifier DOI: ${data.data.id}`)
+        } else {
+            store.results.push(`Could not add Identifier "${data.data.id}" does not match DOI format.`)
+        }
+    }
+
+    if(data.data.attributes)
+    {
+        if(data.data.attributes.creators)
+        {
+            enshureList(metadatastore.metadata, "creator")
+            for(const creator_id in data.data.attributes.creators){
+                const creator = data.data.attributes.creators[creator_id]
+
+                if(creator.nameType == "Personal" && !!creator.givenName && !!creator.familyName)
+                {
+                    let affiType = "name"
+                    let affiContentField = "creatorAffiliationName"
+                    let affiContent = "FIXME"
+
+                    console.log("affiliation", creator.affiliation)
+                    if(creator.affiliation && creator.affiliation.length == 1){
+                        const affi = creator.affiliation[0]
+                        if(!!affi.name){
+                            affiContent = affi.name
+                        }
+
+                        if(affi.affiliationIdentifierScheme == "ROR")
+                        {
+                            if(validate(affi.affiliationIdentifier, "ror", false)
+                            ){
+                                affiType = "ror"
+                                affiContentField = "creatorAffiliationROR"
+                                affiContent = affi.affiliationIdentifier
+                            }
+                        }
+                    }
+
+                    let newdata = {
+                        "creatorType": [ "personal" ],
+                        "personIdentifierType": [ "name" ],
+                        "creatorFirstName": [ creator.givenName ],
+                        "creatorLastName": [ creator.familyName ],
+                        "creatorAffiliationIdentifierType": [ affiType ],
+                    }
+                    newdata[affiContentField] = [ affiContent ]
+
+                    metadatastore.metadata.creator.push(newdata)
+
+                    store.results.push(`Added creator "${creator.givenName} ${creator.familyName}", affiliated to "${affiType}: ${affiContent}"`)
+                }
+            }
+        }
     }
 
     if(store.results.length > 0){
