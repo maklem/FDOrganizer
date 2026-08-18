@@ -42,6 +42,40 @@ function enshureList(object, name) {
 }
 
 
+function _readAffiliation(affiliation) {
+    let affiType = "name"
+    let affiContentField = "creatorAffiliationName"
+    let affiContent = "FIXME"
+
+    console.log("affiliation", affiliation)
+    if(!!affiliation && affiliation.length == 1){
+        const affi = affiliation[0]
+        if(!!affi.name){
+            affiContent = affi.name
+        }
+
+        if(affi.affiliationIdentifierScheme == "ROR")
+        {
+            let identifier = affi.affiliationIdentifier
+            if(identifier.substring(0,16) == "https://ror.org/")
+            {
+                identifier = identifier.substring(16)
+            }
+            if(validate(identifier, "ror", false)
+            ){
+                affiType = "ror"
+                affiContentField = "creatorAffiliationROR"
+                affiContent = identifier
+            }
+        }
+    }
+    return {
+        "type": affiType,
+        "field": affiContentField,
+        "value": affiContent,
+    }
+}
+
 function mergeIntoMetadata(inputtext) {
     store.error = ""
     store.results = []
@@ -84,45 +118,86 @@ function mergeIntoMetadata(inputtext) {
 
                 if(creator.nameType == "Personal" && !!creator.givenName && !!creator.familyName)
                 {
-                    let affiType = "name"
-                    let affiContentField = "creatorAffiliationName"
-                    let affiContent = "FIXME"
-
-                    console.log("affiliation", creator.affiliation)
-                    if(creator.affiliation && creator.affiliation.length == 1){
-                        const affi = creator.affiliation[0]
-                        if(!!affi.name){
-                            affiContent = affi.name
-                        }
-
-                        if(affi.affiliationIdentifierScheme == "ROR")
-                        {
-                            if(validate(affi.affiliationIdentifier, "ror", false)
-                            ){
-                                affiType = "ror"
-                                affiContentField = "creatorAffiliationROR"
-                                affiContent = affi.affiliationIdentifier
-                            }
-                        }
-                    }
+                    const affi = _readAffiliation(creator.affiliation)
 
                     let newdata = {
                         "creatorType": [ "personal" ],
                         "personIdentifierType": [ "name" ],
                         "creatorFirstName": [ creator.givenName ],
                         "creatorLastName": [ creator.familyName ],
-                        "creatorAffiliationIdentifierType": [ affiType ],
+                        "creatorAffiliationIdentifierType": [ affi.type ],
                     }
-                    newdata[affiContentField] = [ affiContent ]
+                    newdata[affi.field] = [ affi.value ]
 
                     metadatastore.metadata.creator.push(newdata)
 
-                    store.results.push(`Added creator "${creator.givenName} ${creator.familyName}", affiliated to "${affiType}: ${affiContent}"`)
+                    store.results.push(`Added creator "${creator.givenName} ${creator.familyName}", affiliated to "${affi.type}: ${affi.value}"`)
                 }
+            }
+        }
+        if(data.data.attributes.titles)
+        {
+            enshureList(metadatastore.metadata, "title")
+
+            for(const title_id in data.data.attributes.titles)
+            {
+                const title = data.data.attributes.titles[title_id]
+
+                let type = "customTitle"
+                switch(title.titleType){
+                    case undefined: type="mainTitle"; break
+                    case 'Subtitle': type="subtitle"; break
+                    case 'AlternativeTitle': type="alternativeTitle"; break
+                    default: type="customTitle"; break
+                }
+
+                metadatastore.metadata.title.push({
+                    "titleType": [ type ],
+                    "titleText": [ title.title ]
+                })
+
+                store.results.push(`Added ${type} "${title.title}"`)
+            }
+        }
+        if(data.data.attributes.descriptions)
+        {
+            enshureList(metadatastore.metadata, "description")
+            for(const id in data.data.attributes.descriptions)
+            {
+                const desc = data.data.attributes.descriptions[id]
+                let type=""
+                let field=""
+                switch(desc.descriptionType){
+                    case "Abstract":
+                        type = "descriptionAbstract"
+                        field = "textAbstract"
+                        break
+                    case "TableOfContents":
+                        type = "descriptionTOC"
+                        field = "textTOC"
+                        break
+                    case undefined:
+                    case "Methods":
+                    case "SeriesInformation":
+                    case "TechnicalInfo":
+                    case "Other":
+                    default:
+                        type = "descriptionCustom"
+                        field = "textCustom"
+                }
+                
+                let newdata = {
+                    "descriptionType": [ type ],
+                }
+                newdata[field] = desc.description
+                metadatastore.metadata.description.push(newdata)
+
+                store.results.push(`Added description converting type ${desc.descriptionType} to ${type}`)
             }
         }
     }
 
+    
     if(store.results.length > 0){
         metadatastore.touched = true
     }
