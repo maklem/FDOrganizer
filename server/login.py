@@ -14,6 +14,8 @@ from .services.database import get, getall
 from .util import json_body, web_error, web_response, error_page
 from .services.authentication import authorize, create_token, add_payload, is_authorized, user, user_displayname, organisation_displayname, find_organisation_by_tag
 
+COOKIE_SAMESITE_POLICY="Lax"
+
 @APP.route("/organisations", methods=["GET"])
 def get_organisations():
     identity_providers = [IdentityProvider.from_db(identityprovider) for identityprovider in getall(Databases.IDENTITYPROVIDERS)]
@@ -31,7 +33,7 @@ def login_local(idp_id: str, username: str, password: str) -> Response:
         return web_response(403, details = {'success': False, 'reason': "wrong credentials"})
 
     auth_response =  web_response(200, details = {'success': True})
-    auth_response.set_cookie('token', token, samesite="Strict")
+    auth_response.set_cookie('token', token, samesite=COOKIE_SAMESITE_POLICY)
     return auth_response
 
 @APP.route("/login-oidc/<idp_id>", methods=["GET"])
@@ -88,7 +90,7 @@ def callback_oidc(idp_id: str):
 
     # redirect to start page and set auth cookie
     redirect_response = redirect(url_for('navhome'))
-    redirect_response.set_cookie('token', token, samesite="Strict")
+    redirect_response.set_cookie('token', token, samesite=COOKIE_SAMESITE_POLICY)
     return redirect_response
 
 @APP.route("/login-keycloak/<idp_id>", methods=["GET"])
@@ -151,7 +153,7 @@ def callback_keycloak(idp_id: str):
 
     # redirect to start page and set auth cookie
     redirect_response = redirect(url_for('navhome'))
-    redirect_response.set_cookie('token', token, samesite="Strict")
+    redirect_response.set_cookie('token', token, samesite=COOKIE_SAMESITE_POLICY)
     return redirect_response
 
 def user_organisation_from_login(identity_provider: IdentityProvider, userinfo: dict[str,Any]) -> str:
