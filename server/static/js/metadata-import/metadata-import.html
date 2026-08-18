@@ -18,7 +18,6 @@
             <form>
                 <textarea v-model="inputtext" id="import-json-data"></textarea>
             </form>
-            <div class="import-error" v-if="!!store.error">Something went wrong during import: {{store.error}}</div>
         </main>
         <div class="button-row">
             <Button class="close-button" @button-clicked="store.closeImport()">Abort</Button>
