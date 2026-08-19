@@ -16,10 +16,9 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
     page.get_by_role("button", name="+ Add project").click()
     page.get_by_role("textbox", name="Choose a name:").fill("Testproject")
     page.get_by_role("button", name="Create project").click()
-    page.get_by_role("button", name="Abort").click()
 
     # Upload a file
-    page.get_by_text("Testproject", exact=True).click()
+    page.get_by_text("Testproject").nth(0).click()
     page.get_by_role("button", name="Edit project").click()
     page.locator(".add-files").click()
     page.get_by_label("", exact=True).set_input_files("tests/dummy.dat")
