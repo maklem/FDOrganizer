@@ -62,6 +62,7 @@ def fdorganizer(fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_ne
         "COUCHDB_PORT": "5984",
         "COUCHDB_USER": couchdb.env.get("COUCHDB_USER", ""),
         "COUCHDB_PASSWORD": couchdb.env.get("COUCHDB_PASSWORD", ""),
+        "TOKEN_SECRET": "this-is-a-test",
     }
 
     command = dedent("""
