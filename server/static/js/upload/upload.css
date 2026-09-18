@@ -87,6 +87,17 @@ input[type="file"] {
     cursor: pointer;
 }
 
+.package-stats {
+    width: 100%;
+    text-align: left;
+    color: #777;
+}
+
+.package-stats .dialog-button {
+    padding-left: 0px;
+    margin-left: 0px;
+}
+
 .manual-upload .upload-dialog {
     border: 0.1rem solid #aaaaaa !important;
     border-radius: 0.5rem;

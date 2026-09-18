@@ -1,7 +1,9 @@
 import Button from "../button/button.js";
 import UploadFile from "../upload-file/upload-file.js";
 import VideoDialog from "../video-dialog/video-dialog.js";
+import { formatFilesize } from "../format-util.js";
 import { store } from "./state.js"
+import { store as editStore } from '../package-edit/state.js'
 import { setup } from "../setup.js";
 
 const template = await setup('upload');
@@ -14,7 +16,9 @@ export default {
     },
     data() {
         return {
-            store
+            store,
+            editStore,
+            formatFilesize
         }
     },
     computed: {

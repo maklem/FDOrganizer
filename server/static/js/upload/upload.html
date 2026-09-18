@@ -13,10 +13,16 @@
             <i class="fa-solid fa-plus"></i>
         </div>
     </label>
+
     <div class="button-row">
-        <VideoDialog title="How to upload files" video="HowToEdit_FileUpload">
-            <span class="tutorial-trigger">How to upload files?</span>
-        </VideoDialog>
+        <div class="package-stats">
+            <div>Currently used: {{formatFilesize(editStore.limits.current_size)}}</div>
+            <div>Limit for Package: {{formatFilesize(editStore.limits.package)}}</div>
+            <div>Limit per File / Upload Task: {{formatFilesize(editStore.limits.file)}}</div>
+            <VideoDialog title="How to upload files" video="HowToEdit_FileUpload">
+                <span class="tutorial-trigger">How to upload files?</span>
+            </VideoDialog>
+        </div>
         <Button
         class="start-upload"
         @button-clicked="$refs.uploadFiles.showModal()"
