@@ -1,12 +1,15 @@
 import logging
 import logging.handlers
+import os
 import re
+
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, request
 from werkzeug.exceptions import HTTPException
-from flask_session import Session
-from .services.authentication import is_authorized, user
 
+from flask_session import Session
+
+from .services.authentication import is_authorized, user
 from .util import web_error
 
 APP = Flask(__name__)
@@ -68,12 +71,10 @@ formatter = RequestFormatter(
     datefmt='%d.%m.%y %H:%M:%S'
 )
 credentialfilter = CredentialFilter()
-new_handler = logging.handlers.RotatingFileHandler(
-        'server.log',
-        maxBytes=15000000,
-        backupCount=5)
-new_handler.addFilter(credentialfilter)
-new_handler.setFormatter(formatter)
-APP.logger.addHandler(new_handler)
+logfilename = os.getenv("FDO_SERVERLOG")
+logfile_handler = logging.handlers.WatchedFileHandler(logfilename if logfilename is not None else 'server.log')
+logfile_handler.addFilter(credentialfilter)
+logfile_handler.setFormatter(formatter)
+APP.logger.addHandler(logfile_handler)
 
 from . import router,login,metadata,package_details,package,source_import,archive,export, review, download_archive  # noqa: E402, F401
