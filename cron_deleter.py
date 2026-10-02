@@ -50,6 +50,18 @@ def delete_package(package_id):
             else:
                 print(f"Error deleting metadata: {error.response.status_code} - {error.response.reason}")
 
+
+    # Delete reviews
+    try:
+        for review_id in package.get("reviews"):
+            delete(Databases.REVIEWS, review_id).json()
+    except HTTPError as error:
+        if error.response is None:
+            print("Error deleting review: database connection failed")
+        else:
+            print(f"Error deleting review: {error.response.status_code} - {error.response.reason}")
+
+
     # Delete the folder itself
     try:
         delete(Databases.PACKAGES, package_id).json()
