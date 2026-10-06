@@ -1,6 +1,6 @@
 import json
 from time import time
-from typing import TypedDict
+from typing import Any, TypedDict
 
 from flask.wrappers import Request
 from jwt import DecodeError, InvalidSignatureError, decode, encode
@@ -12,11 +12,23 @@ from ..entities import Databases, Organisation
 from .database import find, get
 
 
+class CookiePolicy(TypedDict):
+    samesite: str
+    secure: bool
+    httponly: bool
+
+COOKIE_POLICY: CookiePolicy = {
+    "samesite": "Lax",
+    "secure": True,
+    "httponly": True,
+}
+
 class TokenPayload(TypedDict):
     username: str
     organisation: str
     timeout: int
     reviewer: bool
+    plugins: dict[str, Any]
 
 
 def token_secret() -> str:
@@ -36,7 +48,8 @@ def create_payload(username: str, organisation_id: str) -> TokenPayload:
         'username': username,
         'timeout': int(time()) + 60 * 60 * 24,
         'organisation': organisation_id,
-        'reviewer': is_reviewer
+        'reviewer': is_reviewer,
+        'plugins': {}
     }
 
 
@@ -48,6 +61,20 @@ def add_payload(token: str, key: str, value: str):
 def remove_payload(token: str, key: str):
     updated_payload = payload(token) | {key: None}
     return encode(payload = updated_payload, key = token_secret())
+
+
+def add_plugin(token:str, key:str, value: str):
+    current_payload = payload(token)
+    current_payload["plugins"].update({key: value})
+
+    print(f"{current_payload=}")
+    return encode(payload = current_payload, key = token_secret())
+
+
+def remove_plugin(token: str, key: str):
+    current_payload = payload(token)
+    current_payload["plugins"].pop(key, None)
+    return encode(payload = current_payload, key = token_secret())
 
 
 def create_token(username, organisation_id):
@@ -133,6 +160,11 @@ def organisation_displayname(request: Request) -> str:
 def is_reviewer(request: Request) -> bool:
     token = request.cookies['token']
     return payload(token)['reviewer']
+
+def active_plugins(request: Request) -> list[str]:
+    token = request.cookies['token']
+    return list(payload(token)['plugins'].keys())
+
 
 def credentials_valid(username: str, password: str, idp_id: str) -> bool:
     identity_provider = IdentityProvider.from_db(get(Databases.IDENTITYPROVIDERS, idp_id).json())

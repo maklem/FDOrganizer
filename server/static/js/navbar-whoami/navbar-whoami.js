@@ -1,5 +1,5 @@
 import { setup } from "../setup.js";
-import { store } from "./state.js";
+import { userStore } from "../user/userStore.js";
 
 const template = await setup('navbar-whoami');
 
@@ -10,11 +10,11 @@ export default {
     },
     data() {
         return {
-            store
+            userStore
         }
     },
     mounted() {
-        this.$nextTick().then(store.loadUserInfo);
+        this.$nextTick().then(userStore.loadUserInfo);
     },
     template
 }

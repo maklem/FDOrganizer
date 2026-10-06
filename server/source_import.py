@@ -3,19 +3,34 @@ import json
 import os.path
 from functools import wraps
 from pathlib import Path
-from typing import List, Literal
-from flask import request, Response
+from typing import Literal
+
+from flask import Response, request
 from importlib_resources import files
 
 from server import APP
-from .entities.organisation import Organisation
+
+from .entities import Document, Folder
 from .entities.databases import Databases
 from .entities.errors import PluginError
-from .shared import persist_documents
+from .entities.organisation import Organisation
+from .services.authentication import (
+    add_plugin,
+    COOKIE_POLICY,
+    organisation,
+    payload,
+    remove_plugin,
+    user,
+)
 from .services.database import get
-from .entities import Document, Folder
-from .util import can_add_files, get_database_from_string, json_body, web_error, web_response
-from .services.authentication import add_payload, organisation, payload, remove_payload, user
+from .shared import persist_documents
+from .util import (
+    can_add_files,
+    get_database_from_string,
+    json_body,
+    web_error,
+    web_response,
+)
 
 SERVERNAME = __name__.split('.')[0]
 
@@ -24,7 +39,7 @@ def needs_authentication(api_method):
 
     def check_plugin_auth(*args, **kwargs):
         # Identify plugin and auth token from request params
-        auth_token = payload(request.cookies['token'])
+        auth_token = payload(request.cookies['token']).get('plugins', {})
         source = str(kwargs.get('source'))
         # Get correct plugin subtoken from auth token
         if kwargs.get('source') is None:
@@ -93,18 +108,21 @@ def login_source(source: str):
         return web_error(e.status_code, message=e.message, component=source)
     plugin_token = json.loads(response.get_data())
 
-    # Add plugin auth to existing JWT
-    new_token = add_payload(auth_token, source, plugin_token)
-    return web_response(200, details={"token": new_token})
+    new_token = add_plugin(auth_token, source, plugin_token)
+
+    response = web_response(200, details={ 'status': 'OK' })
+    response.set_cookie("token", new_token, **COOKIE_POLICY)
+    return response
 
 @APP.route('/import/<source>/logout', methods=['POST'])
 def logout_source(source: str):
     auth_token = request.cookies['token']
 
-    # Add plugin auth to existing JWT
-    new_token = remove_payload(auth_token, source)
-    return web_response(200, details={"token": new_token})
+    new_token = remove_plugin(auth_token, source)
 
+    response = web_response(200, details={ 'status': 'OK' })
+    response.set_cookie("token", new_token, **COOKIE_POLICY)
+    return response
 
 @APP.route('/import/sources')
 def list_import_sources():
@@ -142,7 +160,7 @@ def get_plugins() -> list[Path]:
 
 
 def get_plugin_auth(source: str):
-    auth_token = payload(request.cookies['token'])
+    auth_token = payload(request.cookies['token']).get('plugins', {})
     return auth_token.get(source)
 
 def get_plugin(source: str):
@@ -153,7 +171,7 @@ def serialize(content: dict[Literal["folders","documents"], list]) -> dict[str, 
     documents = [Document.to_dict(x) for x in content['documents']]
     return {'folders':folders, 'documents': documents}
 
-def import_files_and_metadata(import_triples: List[dict], parent: str, parent_type: str):
+def import_files_and_metadata(import_triples: list[dict], parent: str, parent_type: str):
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not can_add_files(package_or_folder, request):

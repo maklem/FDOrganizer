@@ -6,7 +6,8 @@ import { formatRelativeDate } from "../format-util.js"
 import { store } from "./state.js"
 
 import { setup } from "../setup.js";
-import { getSessionToken } from "../authentication.js"
+import { userStore } from "../user/userStore.js"
+
 const template = await setup('archive-package-settings');
 
 export default {
@@ -36,7 +37,7 @@ export default {
         showAuthor(comment) {
             // Don't show author to non-reviewers
             if (this.pageContext === 'archive') return false
-            return comment.owner !== getSessionToken().username
+            return comment.owner !== userStore.name;
         },
         requestChanges() {
             this.$emit('request-changes', this.store.package.id)
