@@ -15,7 +15,7 @@ from server import APP
 
 from .entities import Databases, Folder, Package
 from .package_details import create_file_document_pair, file_size_of
-from .services.authentication import organisation, user, user_displayname
+from .services.authentication import userdata
 from .services.database import delete, find, get, post, update
 from .shared import (
     create_document_with_attachement,
@@ -47,9 +47,9 @@ def get_packages():
 
     query = {
         "selector": {
-            "owner": user(request),
+            "owner": userdata().username,
             "status": {"$in": ["active", "rework"]},
-            "organisation": organisation(request)
+            "organisation": userdata().organisation_id
         },
         "limit": 1000
     }
@@ -84,9 +84,10 @@ def get_package_limits(id: str):
 @APP.route("/package", methods=["PUT"])
 @json_body
 def create_package(name: str) -> Response:
-    username = user(request)
-    displayname = user_displayname(request)
-    organisation_name = organisation(request)
+    user = userdata()
+    username = user.username
+    displayname = user.displayname
+    organisation_name = user.organisation_id
     now = round(time.time()*1000)
     keep_until = determine_package_expiration_timestamp_ms("active")
     package = Package(name=name, status='active', documents=[], folders=[], owner=username, organisation=organisation_name, created=now, last_changed=now, keep_until=keep_until, owner_displayname=displayname)
@@ -156,8 +157,8 @@ def rename_package(package_id: str, name: str) -> Response:
         "name": name,
     }
 
-    if is_owner(package, user(request)):
-        changes["owner_displayname"] = user_displayname(request)
+    if is_owner(package, userdata().username):
+        changes["owner_displayname"] = userdata().displayname
 
     try:
         update(Databases.PACKAGES, package_id, changes)
@@ -176,8 +177,8 @@ def create_package_from_zip() -> Response:
         # Recursively build directory structure tree
         directory = build_directory_tree(zip_path, vals['keep_empty']=='true', vals['keep_structure']=='true')
         # Build new package for zip content
-        username = user(request)
-        package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, organisation(request), owner_displayname=user_displayname(request))
+        username = userdata().username
+        package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, userdata().organisation_id, owner_displayname=user_displayname(request))
         # Create folders and documents
         folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in directory.folders]
         doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]

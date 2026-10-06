@@ -9,7 +9,7 @@ from .entities import Package, Databases
 
 from .services.database import get
 
-from .services.authentication import is_reviewer, organisation, user
+from .services.authentication import userdata
 
 def error_page(code: int = 500, errors: list[str] = []) -> tuple[str,int]:
     return render_template("error.html", errors=errors), code
@@ -43,60 +43,42 @@ def is_owner(object_with_owner: dict[str, Any], owner) -> bool:
     return object_with_owner.get('owner') == owner
 
 def can_read(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
+    if is_owner(restricted_object, userdata().username):
         return True
-    if is_reviewer(request):
-        if not organisation(request) == restricted_object.get('organisation'):
-            return False
-        return True
+    if userdata().reviewer:
+        return userdata().organisation_id == restricted_object.get('organisation')
     return False
 
 def can_read_folder(folder: dict[str, Any], request: Request) -> bool:
-    if is_owner(folder, user(request)):
+    if is_owner(folder, userdata().username):
         return True
-    if is_reviewer(request):
+    if userdata().reviewer:
         package = Package.from_db(get(Databases.PACKAGES, folder['package_id']).json())
-        if not organisation(request) == package.organisation:
-            return False
-        return True
+        return userdata().organisation_id == package.organisation
     return False
 
 def can_add_files(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
-        return True
-    return False
+    return bool(is_owner(restricted_object, userdata().username))
 
 def can_delete_files(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
-        return True
-    return False
+    return bool(is_owner(restricted_object, userdata().username))
 
 def can_edit_name(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
-        return True
-    return False
+    return bool(is_owner(restricted_object, userdata().username))
 
 def can_delete_packages(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
-        return True
-    return False
+    return bool(is_owner(restricted_object, userdata().username))
 
 def can_update_metadata(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
-        return True
-    return False
+    return bool(is_owner(restricted_object, userdata().username))
 
 def can_read_metadata(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
+    if is_owner(restricted_object, userdata().username):
         return True
-    if is_reviewer(request):
-        return True
-    return False
+    return bool(userdata().reviewer)
 
 def can_submit_package(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, user(request)):
-        return True
-    return False
+    return bool(is_owner(restricted_object, userdata().username))
 
 def get_database_from_string(database_type: str) -> Databases:
 # Only valid code starting with Python 3.10.

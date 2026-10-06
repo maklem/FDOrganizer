@@ -1,11 +1,11 @@
 import os
 
 import jinja2.exceptions
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, session, url_for
 
 from server import APP
 
-from .services.authentication import is_authorized, is_reviewer
+from .services.authentication import is_authorized, userdata
 
 
 def needs_authentication(route: str) -> bool:
@@ -25,13 +25,12 @@ def needs_authentication(route: str) -> bool:
 def request_logger():
     if "static" not in request.path:
         APP.logger.info('Request')
-    return None
 
 @APP.before_request
 def auth_guard():
     if not needs_authentication(request.path):
         return None
-    if not is_authorized(request):
+    if not is_authorized():
         return redirect(url_for("navlogin"))
     return None
 
@@ -90,18 +89,17 @@ def navarchive():
 
 @APP.route("/review")
 def navreview():
-    if not is_reviewer(request):
+    if not userdata().reviewer:
         return redirect(url_for("navhome"))
     return render_template("review.html")
 
 @APP.route("/login")
 def navlogin():
-    if is_authorized(request):
+    if is_authorized():
         return redirect(url_for("navhome"))
     return render_template("login.html")
 
 @APP.route("/logout", methods=['POST'])
 def navlogout():
-    response = redirect("/login")
-    response.delete_cookie("token")
-    return response
+    session.clear()
+    return redirect("/login")
