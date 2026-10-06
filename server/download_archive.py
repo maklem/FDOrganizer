@@ -7,7 +7,7 @@ import hashlib
 from jinja2.exceptions import UndefinedError
 from zipstream import ZipStream
 
-from .services.authentication import organisation
+from .services.authentication import userdata
 from .entities.errors import XMLValidationError
 from .util import can_read, error_page
 from .entities import Document, Package, Databases
@@ -23,7 +23,7 @@ Hashmap = dict[str,str]
 def stream_exportable_package(package_id: str):
     raw_package = get(Databases.PACKAGES, package_id).json()
     package = Package.from_db(raw_package)
-    organisation_id = organisation(request)
+    organisation_id = userdata().organisation_id
 
     if not can_read(raw_package, request):
         return error_page(403,["Rejected. You do not have permission to read this package."])

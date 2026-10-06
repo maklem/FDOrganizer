@@ -1,4 +1,4 @@
-from typing import Any, TypedDict
+from typing import Any
 
 import requests
 from couchdb.http import HTTPError
@@ -12,17 +12,10 @@ from .entities.databases import Databases
 from .entities.errors import IdentityProviderError
 from .entities.organisation import Organisation
 from .services.authentication import (
-    COOKIE_POLICY,
-    active_plugins,
-    add_payload,
+    UserData,
     authorize,
-    create_token,
     find_organisation_by_tag,
     is_authorized,
-    is_reviewer,
-    organisation_displayname,
-    user,
-    user_displayname,
 )
 from .services.database import get, getall
 from .util import error_page, json_body, web_error, web_response
@@ -38,15 +31,13 @@ def get_organisations():
 @json_body
 def login_local(idp_id: str, username: str, password: str) -> Response:
     try:
-        token = authorize(username, password, idp_id)
+        authorize(username, password, idp_id)
     except HTTPError as e:
         return web_response(403, details = {'success': False, 'reason': e.args[0]})
     except RuntimeError:
         return web_response(403, details = {'success': False, 'reason': "wrong credentials"})
 
-    auth_response =  web_response(200, details = {'success': True})
-    auth_response.set_cookie('token', token, **COOKIE_POLICY)
-    return auth_response
+    return web_response(200, details = {'success': True})
 
 @APP.route("/login-oidc/<idp_id>", methods=["GET"])
 def login_oidc(idp_id: str):
@@ -97,13 +88,13 @@ def callback_oidc(idp_id: str):
     except RuntimeError as e:
         return error_page(e.args[0])
 
-    # create token with info for authenticated user
-    token = create_token(username, user_organisation)
+    session["user"] = UserData(
+        username=username,
+        displayname="",
+        organisation_id=user_organisation,
+    )
 
-    # redirect to start page and set auth cookie
-    redirect_response = redirect(url_for('navhome'))
-    redirect_response.set_cookie('token', token, **COOKIE_POLICY)
-    return redirect_response
+    return redirect(url_for('navhome'))
 
 @APP.route("/login-keycloak/<idp_id>", methods=["GET"])
 def login_keycloak(idp_id: str):
@@ -150,23 +141,19 @@ def callback_keycloak(idp_id: str):
     except RuntimeError as e:
         return error_page(500, e.args[0])
 
-    organisation = get_organisation_from_db(user_organisation)
-
-    user_displayname= None
+    user_displayname = ""
     if identity_provider.displayname_field is not None and identity_provider.displayname_field in userinfo:
         user_displayname = userinfo[identity_provider.displayname_field]
 
     # create token with info for authenticated user
-    token = create_token(username, user_organisation)
-    if user_displayname:
-        token = add_payload(token, "displayname", user_displayname)
-
-    token = add_payload(token, "organisation_displayname", organisation.name)
+    session["user"] = UserData(
+        username=username,
+        displayname=user_displayname,
+        organisation_id=user_organisation,
+    )
 
     # redirect to start page and set auth cookie
-    redirect_response = redirect(url_for('navhome'))
-    redirect_response.set_cookie('token', token, **COOKIE_POLICY)
-    return redirect_response
+    return redirect(url_for('navhome'))
 
 def user_organisation_from_login(identity_provider: IdentityProvider, userinfo: dict[str,Any]) -> str:
     errors = []
@@ -222,14 +209,15 @@ def whoami():
         "plugins": []
     }
 
-    if not is_authorized(request):
+    if not is_authorized():
         return web_response(200, details=data)
 
+    user: UserData = session["user"]
+
     return web_response(200, details={
-        **data,
-        "name": user(request),
-        "displayname": user_displayname(request),
-        "organisation": organisation_displayname(request),
-        "reviewer": is_reviewer(request),
-        "plugins": active_plugins(request)
+        "name": user.username,
+        "displayname": user.displayname,
+        "organisation": user.organisation().name,
+        "reviewer": user.reviewer,
+        "plugins": user.list_plugins()
     })

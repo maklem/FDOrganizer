@@ -13,7 +13,7 @@ from werkzeug.datastructures import FileStorage
 from server import APP
 
 from .entities import Databases, Document, Folder, Package
-from .services.authentication import user
+from .services.authentication import userdata
 from .services.database import delete, find, get, post, update
 from .shared import delete_folder, persist_documents
 from .util import (
@@ -75,7 +75,7 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
     if not can_add_files(package_or_folder, request):
         return web_error(401, "You don't have permission to edit this content", component= "SERVER")
     # Create new folder object
-    username = user(request)
+    username = userdata().username
     if parent_type == 'package':
         package_id =package_or_folder.get('_id')
     else:
@@ -119,7 +119,7 @@ def create_documents() -> Response:
     if int(request.headers['Content-Length']) > int(APP.config['MAX_CONTENT_LENGTH']):
         return web_error(413, "File is too large to be processed", component= "SERVER")
     # Get Infos from request header and body
-    username = user(request)
+    username = userdata().username
     parent = request.form.get('parent')
     parent_type = request.form.get('parentType')
     if parent is None or parent_type is None:

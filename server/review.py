@@ -1,23 +1,32 @@
-from datetime import datetime
 import json
+from datetime import datetime
 from typing import Any, Literal
+
 from flask import Response, request
 from requests import HTTPError
+
 from server import APP
-from .shared import update_package_state
-from .entities import Review, Comment, Package, Databases
+
+from .entities import Comment, Databases, Package, Review
+from .services.authentication import userdata
 from .services.database import find, get, post, update
-from .services.authentication import is_reviewer, organisation, user
-from .util import can_read, json_body, web_error, web_response, web_error_database_connection
+from .shared import update_package_state
+from .util import (
+    can_read,
+    json_body,
+    web_error,
+    web_error_database_connection,
+    web_response,
+)
 
 
 @APP.route("/review/packages", methods=["GET"])
 def get_review_packages():
-    if not is_reviewer(request):
+    if not userdata().reviewer:
         return web_error(401, "You don't have permission to view this content", component= "SERVER")
     query = {
         "selector": {
-            "organisation": organisation(request),
+            "organisation": userdata().organisation_id,
             "status": {"$in": ["rework", "review", "archived"]}
         }
     }
@@ -31,14 +40,14 @@ def get_review_packages():
 @APP.route("/review/<package_id>", methods=["GET"])
 def get_package_reviews(package_id) -> Response:
     package = get(Databases.PACKAGES, package_id).json()
-    if not can_read(package, request) and not is_reviewer(request):
+    if not can_read(package, request) and not userdata().reviewer:
         return web_error(401, "You don't have permission to view this package", component= "SERVER")
 
     try:
         reviews = get_reviews(package.get("reviews"))
     except HTTPError as error:
         return web_error_database_connection(error)
-    if not is_reviewer(request):
+    if not userdata().reviewer:
         reviews = [review for review in reviews if review.status != "open"]
     return web_response(200, details = [x.to_dict() for x in reviews])
 
@@ -46,7 +55,7 @@ def get_package_reviews(package_id) -> Response:
 @json_body
 def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = None) -> Response:
     # Check if user is a reviewer
-    if not is_reviewer(request):
+    if not userdata().reviewer:
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     # Check if package can be reviewed
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
@@ -83,7 +92,7 @@ def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = Non
 @APP.route("/review/<review_id>/comment/", methods=["PUT"])
 @json_body
 def post_new_comment(review_id: str, index: int, content: str) -> Response:
-    if not is_reviewer(request):
+    if not userdata().reviewer:
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     review: Review = Review.from_db(get(Databases.REVIEWS, review_id).json())
     if not review.status == 'open':
@@ -103,7 +112,7 @@ def post_new_comment(review_id: str, index: int, content: str) -> Response:
 
 @APP.route("/review/<review_id>/<comment_index>", methods=["DELETE"])
 def delete_comment(review_id: str, comment_index: int):
-    if not is_reviewer(request):
+    if not userdata().reviewer:
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     review = Review.from_db(get(Databases.REVIEWS, review_id).json())
     if not review.status == 'open':
@@ -129,7 +138,7 @@ def delete_comment(review_id: str, comment_index: int):
 @APP.route("/review/submit/<package_id>", methods=["POST"])
 @json_body
 def submit_review(package_id: str, status: Literal["accepted", "rejected"]) -> Response:
-    if not is_reviewer(request):
+    if not userdata().reviewer:
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
     if not package.status == 'review':

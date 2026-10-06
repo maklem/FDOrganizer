@@ -1,20 +1,32 @@
-from jinja2.exceptions import UndefinedError
 import json
-from flask import Response, request
-from requests import HTTPError
 import traceback
 
-from server.export_utils import create_structmap, create_file_list, build_sip_metadata, check_structmap, create_package_data
+from flask import Response, request
+from jinja2.exceptions import UndefinedError
+from requests import HTTPError
 
-from .shared import update_package_state
-from .entities import Package, Databases
-from .entities.errors import XMLValidationError
-
-from .services.authentication import organisation, user
-from .services.database import find, get, update
-
-from .util import can_submit_package, can_update_metadata, json_body, web_error, web_error_database_connection, web_response
 from server import APP
+from server.export_utils import (
+    build_sip_metadata,
+    check_structmap,
+    create_file_list,
+    create_package_data,
+    create_structmap,
+)
+
+from .entities import Databases, Package
+from .entities.errors import XMLValidationError
+from .services.authentication import userdata
+from .services.database import find, get, update
+from .shared import update_package_state
+from .util import (
+    can_submit_package,
+    can_update_metadata,
+    json_body,
+    web_error,
+    web_error_database_connection,
+    web_response,
+)
 
 
 @APP.route("/archive/packages", methods=["GET"])
@@ -22,8 +34,8 @@ def get_archive_packages():
 
     query = {
         "selector": {
-            "owner": user(request),
-            "organisation": organisation(request)
+            "owner": userdata().username,
+            "organisation": userdata().organisation_id
         }
     }
 

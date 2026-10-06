@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import request
 import os
 
-from .services.authentication import organisation
+from .services.authentication import userdata
 
 from .entities.organisation import Organisation
 
@@ -48,11 +48,11 @@ def build_export_package(package_id: str):
         except XMLValidationError as error:
             return web_error(500, message=error.args[0], stacktrace=error.args[1])
 
-        should_place_files = get_organisation_subdirectory(organisation(request)) is not None
+        should_place_files = get_organisation_subdirectory(userdata().organisation_id) is not None
         if should_place_files:
             # Copy files and METS to correct dir for Rosetta Ingest
             try:
-                create_sip(package, mets, organisation(request))
+                create_sip(package, mets, userdata().organisation_id)
             except PathError as error:
                 return web_error(500, message=error.args[0])
             except ExportUserError as error:
