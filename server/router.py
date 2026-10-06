@@ -1,13 +1,17 @@
 import os
+
 import jinja2.exceptions
-from flask import render_template, request, url_for, redirect
+from flask import redirect, render_template, request, url_for
+
 from server import APP
+
 from .services.authentication import is_authorized, is_reviewer
 
 
 def needs_authentication(route: str) -> bool:
     return not any([
         route.startswith(url_for("navlogin")),
+        route.startswith(url_for("navlogout")),
         route.startswith(url_for('get_organisations')),
         route.startswith("/static"),
         route.startswith("/info/"),
@@ -95,3 +99,9 @@ def navlogin():
     if is_authorized(request):
         return redirect(url_for("navhome"))
     return render_template("login.html")
+
+@APP.route("/logout", methods=['POST'])
+def navlogout():
+    response = redirect("/login")
+    response.delete_cookie("token")
+    return response

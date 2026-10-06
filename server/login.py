@@ -1,20 +1,32 @@
-from couchdb.http import HTTPError
-from server.entities.identityprovider import IdentityProvider
-from flask import Response, request, redirect, session, url_for
-import requests
-from requests_oauth2client import OAuth2Client, ClientSecretJwt
+from typing import Any, TypedDict
 
-from typing import Any
+import requests
+from couchdb.http import HTTPError
+from flask import Response, redirect, request, session, url_for
+from requests_oauth2client import ClientSecretJwt, OAuth2Client
 
 from server import APP
+from server.entities.identityprovider import IdentityProvider
+
+from .entities.databases import Databases
 from .entities.errors import IdentityProviderError
 from .entities.organisation import Organisation
-from .entities.databases import Databases
+from .services.authentication import (
+    COOKIE_POLICY,
+    active_plugins,
+    add_payload,
+    authorize,
+    create_token,
+    find_organisation_by_tag,
+    is_authorized,
+    is_reviewer,
+    organisation_displayname,
+    user,
+    user_displayname,
+)
 from .services.database import get, getall
-from .util import json_body, web_error, web_response, error_page
-from .services.authentication import authorize, create_token, add_payload, is_authorized, user, user_displayname, organisation_displayname, find_organisation_by_tag
+from .util import error_page, json_body, web_error, web_response
 
-COOKIE_SAMESITE_POLICY="Lax"
 
 @APP.route("/organisations", methods=["GET"])
 def get_organisations():
@@ -33,7 +45,7 @@ def login_local(idp_id: str, username: str, password: str) -> Response:
         return web_response(403, details = {'success': False, 'reason': "wrong credentials"})
 
     auth_response =  web_response(200, details = {'success': True})
-    auth_response.set_cookie('token', token, samesite=COOKIE_SAMESITE_POLICY)
+    auth_response.set_cookie('token', token, **COOKIE_POLICY)
     return auth_response
 
 @APP.route("/login-oidc/<idp_id>", methods=["GET"])
@@ -90,7 +102,7 @@ def callback_oidc(idp_id: str):
 
     # redirect to start page and set auth cookie
     redirect_response = redirect(url_for('navhome'))
-    redirect_response.set_cookie('token', token, samesite=COOKIE_SAMESITE_POLICY)
+    redirect_response.set_cookie('token', token, **COOKIE_POLICY)
     return redirect_response
 
 @APP.route("/login-keycloak/<idp_id>", methods=["GET"])
@@ -153,7 +165,7 @@ def callback_keycloak(idp_id: str):
 
     # redirect to start page and set auth cookie
     redirect_response = redirect(url_for('navhome'))
-    redirect_response.set_cookie('token', token, samesite=COOKIE_SAMESITE_POLICY)
+    redirect_response.set_cookie('token', token, **COOKIE_POLICY)
     return redirect_response
 
 def user_organisation_from_login(identity_provider: IdentityProvider, userinfo: dict[str,Any]) -> str:
@@ -202,6 +214,22 @@ def get_idp_from_db(idp_id: str) -> IdentityProvider:
 
 @APP.route("/whoami", methods=["GET"])
 def whoami():
+    data = {
+        "name": "",
+        "displayname": "Not logged in",
+        "organisation": "",
+        "reviewer": False,
+        "plugins": []
+    }
+
     if not is_authorized(request):
-        return web_response(200, details={"name": "", "displayname": "Not logged in", "organisation": ""})
-    return web_response(200, details={"name": user(request), "displayname": user_displayname(request), "organisation": organisation_displayname(request)})
+        return web_response(200, details=data)
+
+    return web_response(200, details={
+        **data,
+        "name": user(request),
+        "displayname": user_displayname(request),
+        "organisation": organisation_displayname(request),
+        "reviewer": is_reviewer(request),
+        "plugins": active_plugins(request)
+    })

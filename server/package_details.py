@@ -1,23 +1,32 @@
-import requests
-from typing import Any
-from hashlib import md5, sha512
 import io
 import json
 import os
 import time
+from hashlib import md5, sha512
+from typing import Any
 
-from werkzeug.datastructures import FileStorage
+import requests
 from flask import Response, request
 from requests import HTTPError
+from werkzeug.datastructures import FileStorage
+
 from server import APP
-from .shared import delete_folder, persist_documents
 
-from .entities import Folder, Databases, Document, Package
-
-from .util import can_add_files, can_delete_files, can_read, can_read_folder, json_body, web_error, web_response, get_database_from_string, web_error_database_connection
+from .entities import Databases, Document, Folder, Package
 from .services.authentication import user
 from .services.database import delete, find, get, post, update
-
+from .shared import delete_folder, persist_documents
+from .util import (
+    can_add_files,
+    can_delete_files,
+    can_read,
+    can_read_folder,
+    get_database_from_string,
+    json_body,
+    web_error,
+    web_error_database_connection,
+    web_response,
+)
 
 
 @APP.route("/package/<package_id>/content", methods=["GET"])

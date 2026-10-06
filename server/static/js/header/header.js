@@ -1,4 +1,5 @@
-import { getSessionToken, logout } from "../authentication.js";
+import { logout } from "../authentication.js";
+import { userStore }  from "../user/userStore.js";
 import NavbarTab from "../navbar-tab/navbar-tab.js";
 import NavbarWhoami from "../navbar-whoami/navbar-whoami.js";
 import { setup } from "../setup.js";
@@ -10,15 +11,16 @@ const template = await setup('header');
 export default {
     components: {
         NavbarTab,
-	NavbarWhoami,
+	    NavbarWhoami,
         TopBanner,
         Button
     },
-    computed: {
-        tabs() {
-           if (!getSessionToken().reviewer) return tabs.filter(tab => tab.url !== "review")
-           return tabs
+    data() {
+        return {
+            userStore
         }
+    },
+    computed: {
     },
     methods: {
         logout() {
@@ -27,23 +29,3 @@ export default {
     },
     template
 }
-
-const tabs = [
-    {
-        title: "Welcome",
-        url: "start"
-    },
-    {
-        title: "Editor",
-        url: "package"
-    },
-    {
-        title: "Archive",
-        url: "archive"
-    },
-    {
-        title: "Review",
-        url: "review"
-    }
-
-]

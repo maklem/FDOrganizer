@@ -3,6 +3,7 @@ from typing import Any
 
 from dataclasses_json import DataClassJsonMixin, config
 
+
 def shouldBeExcluded(x):
     return x is None
 

@@ -1,7 +1,8 @@
 import {reactive} from '../vue.js';
 import { get, post } from "../http.js"
-import { loginSource, getSessionToken, logoutSource } from '../authentication.js';
+import { loginSource, logoutSource } from '../authentication.js';
 import {store as editStore} from '../package-edit/state.js'
+import { userStore } from '../user/userStore.js';
 
 const AUTH_TYPES = {
     password: 'USERNAME_AND_PASSWORD',
@@ -133,8 +134,7 @@ async function getSource(sourceId) {
 async function getSources() {
     store.loading.sources = true
     const sources = await get('/import/sources')
-    const token = getSessionToken()
-    store.sources = sources.map(source => ({...source, authenticated: !!token[source.id]}))
+    store.sources = sources.map(source => ({...source, authenticated: userStore.plugins.includes(source.id)}))
     store.loading.sources = false
     if (!!store.activeSource) await getContent()
 }
@@ -203,6 +203,7 @@ async function importAll(){
     await importDocuments(sourceIds)
     store.loading.content = false
 }
+
 async function importDocuments(sourceIds) {
     const {parent,parentType} = editStore.currentPath()
      try {

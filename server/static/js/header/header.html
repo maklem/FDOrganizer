@@ -1,5 +1,8 @@
 <div class="navbar">
-    <NavbarTab v-for="tab in tabs" :url="tab.url" :title="tab.title"></NavbarTab>
+    <NavbarTab url="start" title="Welcome" />
+    <NavbarTab url="package" title="Editor" />
+    <NavbarTab url="archive" title="Archive" />
+    <NavbarTab url="review" title="Review" v-if="userStore.reviewer"/>
     <div class="right-content">
         <NavbarWhoami></NavbarWhoami>
         <Button class="logout" @button-clicked="logout">Log out</Button>
