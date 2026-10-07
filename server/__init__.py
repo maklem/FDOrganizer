@@ -2,8 +2,8 @@ import logging
 import logging.handlers
 import os
 import re
-from cachelib import FileSystemCache
 
+from cachelib import FileSystemCache
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, request
 from werkzeug.exceptions import HTTPException
@@ -24,6 +24,7 @@ APP.config['SESSION_CACHELIB'] = FileSystemCache(cache_dir='flask_session', thre
 APP.config["SESSION_COOKIE_NAME"] = "fdo_session"
 APP.config["SESSION_COOKIE_HTTPONLY"] = True
 APP.config["SESSION_COOKIE_SECURE"] = os.getenv("TEST_SESSION_NOT_SECURE", "no") != "yes"  # ignore HTTPS in CI
+APP.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 APP.config["PERMANENT_SESSION_LIFETIME"] = 3600 * 10
 
 APP.config["MAX_PACKAGE_SIZE"] = 5*1024*1024*1024
