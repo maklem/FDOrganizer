@@ -23,7 +23,7 @@ APP.config["SESSION_TYPE"] = "cachelib"
 APP.config['SESSION_CACHELIB'] = FileSystemCache(cache_dir='flask_session', threshold=500)
 APP.config["SESSION_COOKIE_NAME"] = "fdo_session"
 APP.config["SESSION_COOKIE_HTTPONLY"] = True
-APP.config["SESSION_COOKIE_SECURE"] = True
+APP.config["SESSION_COOKIE_SECURE"] = os.getenv("TEST_SESSION_NOT_SECURE", "no") != "yes"  # ignore HTTPS in CI
 APP.config["PERMANENT_SESSION_LIFETIME"] = 3600 * 10
 
 APP.config["MAX_PACKAGE_SIZE"] = 5*1024*1024*1024

@@ -1,13 +1,13 @@
 # Conftest
 #
 # PyTest's file for shared fixtures and overrides
-from typing import Iterator
+from collections.abc import Iterator
 from textwrap import dedent
 
 from pytest import fixture
 from testcontainers.core.container import DockerContainer
-from testcontainers.core.network import Network
 from testcontainers.core.image import DockerImage
+from testcontainers.core.network import Network
 from testcontainers.core.wait_strategies import LogMessageWaitStrategy
 
 
@@ -55,7 +55,6 @@ def fdorganizer(fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_ne
         assert False, "FDO image has no TAG"
 
     addr = couchdb.get_docker_client().bridge_ip(container_id=couchdb.get_wrapped_container().id)
-    couchdb.env.get("COUCHDB_USER")
 
     env = {
         "COUCHDB_HOST": addr,
@@ -63,6 +62,7 @@ def fdorganizer(fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_ne
         "COUCHDB_USER": couchdb.env.get("COUCHDB_USER", ""),
         "COUCHDB_PASSWORD": couchdb.env.get("COUCHDB_PASSWORD", ""),
         "TOKEN_SECRET": "this-is-a-test",
+        "TEST_SESSION_NOT_SECURE": "yes",
     }
 
     command = dedent("""
