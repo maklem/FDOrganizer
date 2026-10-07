@@ -3,7 +3,6 @@ import json
 from typing import Any
 
 from flask import session
-from flask.wrappers import Request
 from requests import HTTPError
 
 from server.entities.identityprovider import IdentityProvider
@@ -75,10 +74,12 @@ def authorize(username: str, password: str, idp_id: str):
         raise HTTPError(f"Invalid Configuration for {idp_id=}. Field 'organisation' not set or empty.")
     if not (organisation := find_organisation_by_tag(identity_provider.organisation)):
         raise HTTPError(f"Could not log into {organisation=}. Organisation not found.")
+    if organisation.id is None:
+        raise HTTPError(f"Could not log into {organisation=}. Organisation not found.")
     if not credentials_valid(username, password, idp_id):
         raise HTTPError("Credentials not valid")
 
-    session["user"] = UserData(username, "", organisation.id, {})
+    session["user"] = UserData(username, username, organisation.id, {})
 
 
 def is_authorized():

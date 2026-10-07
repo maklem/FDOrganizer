@@ -88,9 +88,13 @@ def callback_oidc(idp_id: str):
     except RuntimeError as e:
         return error_page(e.args[0])
 
+    user_displayname = username
+    if identity_provider.displayname_field is not None and identity_provider.displayname_field in userinfo:
+        user_displayname = userinfo[identity_provider.displayname_field]
+
     session["user"] = UserData(
         username=username,
-        displayname="",
+        displayname=user_displayname,
         organisation_id=user_organisation,
     )
 
@@ -141,7 +145,7 @@ def callback_keycloak(idp_id: str):
     except RuntimeError as e:
         return error_page(500, e.args[0])
 
-    user_displayname = ""
+    user_displayname = username
     if identity_provider.displayname_field is not None and identity_provider.displayname_field in userinfo:
         user_displayname = userinfo[identity_provider.displayname_field]
 
