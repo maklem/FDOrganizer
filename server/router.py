@@ -75,6 +75,19 @@ def navtos():
         APP.logger.error("Terms of Service not found. Please add your terms as 'server/templates/terms-of-service.html'")
         return render_template("terms-of-service-missing.html")
 
+@APP.route("/info/consent")
+def navconsent():
+    CONSENT_FILE="data-consent.html"
+    try:
+        with open(CONSENT_FILE) as f:
+            data = f.read()
+    except jinja2.exceptions.TemplateNotFound as e:
+        APP.logger.error(f"Consent text not found. Please add your terms as '{CONSENT_FILE}'")
+        data = ""
+    return {"html": data}
+
+
+
 @APP.route("/package")
 def navpackage():
     return render_template("package.html")

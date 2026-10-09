@@ -11,14 +11,21 @@ export const store = reactive({
         button: false,
         organisations: false
     },
+    consent: "",
     setPassword,
     setUsername,
     loginOIDC,
     loginKeycloak,
     loginLocal,
     getOrganisations,
-    selectOrganisation
+    selectOrganisation,
+    loadConsent
 });
+
+async function loadConsent() {
+    let json = await get("/info/consent")
+    store.consent = json.html
+}
 
 async function getOrganisations() {
     store.loading.organisations = true;
