@@ -2,6 +2,7 @@ import io
 import json
 import os
 import pathlib
+import tempfile
 import time
 import zipfile
 from dataclasses import dataclass
@@ -166,25 +167,67 @@ def rename_package(package_id: str, name: str) -> Response:
         return web_error_database_connection(error)
     return web_response(200, 'Success')
 
+
+def validate_zip_file(zip: ZipFile) -> str|None:
+    '''
+    validates zip files for extraction
+    returns
+    * first validation error as `str`
+    * `None` on success
+    '''
+    MAX_PATH_LENGTH = 200
+    MAX_FILE_COUNT = 1000
+    MAX_ENTRY_SIZE = APP.config.get("MAX_CONTENT_LENGTH", 0)
+    MAX_EXTRACTED_SIZE =  APP.config.get("MAX_PACKAGE_SIZE", 0)
+
+    file_list = zip.namelist()
+    if len(file_list) > MAX_FILE_COUNT:
+        return f"Too many files in ZIP. ({len(file_list)} > {MAX_FILE_COUNT})"
+    
+    for name in file_list:
+        if os.path.isabs(name):
+            return f"Archive contains absolute path: {name}"
+        
+        if '..' in name or name.startswith('/'):
+            return f"Archive contains path traversal: {name}"
+                
+        entry_info = zip.getinfo(name)
+        if entry_info.file_size > MAX_ENTRY_SIZE:
+            return f"Entry '{name}' too large ({entry_info.file_size} > {MAX_ENTRY_SIZE})"
+                
+        if len(name) > MAX_PATH_LENGTH:
+            return f"Entry path too long: {name}"
+            
+    total_uncompressed = sum(zip.getinfo(name).file_size for name in file_list)
+    if total_uncompressed > MAX_EXTRACTED_SIZE:
+        return f"Total uncompressed size too large ({total_uncompressed} > {MAX_EXTRACTED_SIZE})"
+
+    return None
+
+
 @APP.route("/package/zip", methods=["PUT"])
 def create_package_from_zip() -> Response:
     vals = request.form.to_dict()
-    zip_temp_path = './TEMP/TEMP.zip'
-    project_zip: FileStorage = next(request.files.values()) # type: ignore
-    project_zip.save(zip_temp_path)
-    with ZipFile(zip_temp_path, 'r') as zip_ref:
-        zip_path = zipfile.Path(zip_ref)
-        # Recursively build directory structure tree
-        directory = build_directory_tree(zip_path, vals['keep_empty']=='true', vals['keep_structure']=='true')
-        # Build new package for zip content
-        username = userdata().username
-        package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, userdata().organisation_id, owner_displayname=user_displayname(request))
-        # Create folders and documents
-        folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in directory.folders]
-        doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
-        # Update package with new folder and document ids
-        update(Databases.PACKAGES, package_id, {'folders': folder_ids, 'documents': doc_ids})
-    os.remove(zip_temp_path)
+    with tempfile.TemporaryDirectory() as dir:
+        zip_temp_path = dir+'upload.zip'
+        project_zip: FileStorage = next(request.files.values()) # type: ignore
+        project_zip.save(zip_temp_path)
+        with ZipFile(zip_temp_path, 'r') as zip_ref:
+            if error := validate_zip_file(zip_ref) is not None:
+                web_response(400, 'Validation failed!', details={"error": error})
+
+            zip_path = zipfile.Path(zip_ref)
+            # Recursively build directory structure tree
+            directory = build_directory_tree(zip_path, vals['keep_empty']=='true', vals['keep_structure']=='true')
+            # Build new package for zip content
+            username = userdata().username
+            package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, userdata().organisation_id, owner_displayname=userdata().displayname)
+            # Create folders and documents
+            folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in directory.folders]
+            doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
+            # Update package with new folder and document ids
+            update(Databases.PACKAGES, package_id, {'folders': folder_ids, 'documents': doc_ids})
+
     return web_response(200, 'Success', details={"id": package_id})
 
 def build_directory_tree(path: zipfile.Path, keep_empty: bool, keep_structure: bool) -> Directory:
