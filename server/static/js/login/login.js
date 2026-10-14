@@ -27,7 +27,9 @@ createApp({
         }
     },
     async mounted() {
-        await store.getOrganisations()
+        let consent = store.loadConsent()
+        let org = store.getOrganisations()
+        await consent, org
     },
     template
 }).mount('#app-container')
