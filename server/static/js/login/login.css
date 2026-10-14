@@ -15,6 +15,11 @@
     color: var(--on-primary-color);
 }
 
+.login .content {
+    overflow: scroll;
+    padding: 0.5rem 1rem;
+}
+
 .login form {
     display: flex;
     flex-direction: column;
