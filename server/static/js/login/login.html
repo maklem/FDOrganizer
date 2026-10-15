@@ -36,10 +36,10 @@
                 <div class="error-text" :class="{visible: store.failedLogin}">
                     Wrong username or password!
                 </div>
-                <Button @button-clicked="store.loginLocal()">Login</Button>
+                <Button @button-clicked="store.loginLocal()">Zustimmen und Einloggen</Button>
             </fieldset>
-            <Button v-if="store.selectedOrganisation.authType === 'OIDC'" @button-clicked="store.loginOIDC()">Go To Login</Button>
-            <Button v-if="store.selectedOrganisation.authType === 'KEYCLOAK'" @button-clicked="store.loginKeycloak()">Go To Login</Button>
+            <Button v-if="store.selectedOrganisation.authType === 'OIDC'" @button-clicked="store.loginOIDC()">Zustimmen und Einloggen</Button>
+            <Button v-if="store.selectedOrganisation.authType === 'KEYCLOAK'" @button-clicked="store.loginKeycloak()">Zustimmen und Einloggen</Button>
         </form>
         <div v-else class="lds-spinner">
             <div></div>
