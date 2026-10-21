@@ -23,5 +23,12 @@
         "Review": "Review",
         "Archive": "Archive",
         "Log out": "Log out"
+    },
+    "footer": {
+        "Source": "Source Code",
+        "Impressum": "Imprint",
+        "Datenschutzerklärung": "Data Protection",
+        "Barrierefreiheit": "Accessibility",
+        "Nutzungsbedingungen": "Terms of Service"
     }
 }

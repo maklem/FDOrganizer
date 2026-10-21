@@ -23,5 +23,12 @@
         "Review": "Prüfen",
         "Archive": "Archiv",
         "Log out": "Abmelden"
+    },
+    "footer": {
+        "Source": "Quellcode",
+        "Impressum": "Impressum",
+        "Datenschutzerklärung": "Datenschutzerklärung",
+        "Barrierefreiheit": "Barrierefreiheit",
+        "Nutzungsbedingungen": "Nutzungsbedingungen"
     }
 }
