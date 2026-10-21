@@ -30,5 +30,28 @@
         "Datenschutzerklärung": "Data Protection",
         "Barrierefreiheit": "Accessibility",
         "Nutzungsbedingungen": "Terms of Service"
+    },
+    "package-edit":{
+        "Add folder": "Add folder",
+        "New Folder": "New Folder",
+        "Create folder": "Create folder",
+        "File Upload": "File Upload",
+        "Import": "Import",
+        "Abort": "Abort"
+    },
+    "package": {
+        "Add project": "Add project",
+        "Create a new project": "Create a new project",
+        "Empty Package": "Empty Package",
+        "Import from zip": "Import from zip",
+        "Select zip file": "Select zip file",
+        "Create project": "Create project",
+        "Import zip": "Import zip",
+        "Edit project": "Edit project",
+        "see options": "see options",
+        "Keep empty files": "Keep empty files",
+        "Keep original folder structure": "Keep original folder structure",
+        "Choose a name:": "Choose a name:",
+        "Abort": "Abort"
     }
 }

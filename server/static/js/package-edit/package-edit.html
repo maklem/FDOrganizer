@@ -8,11 +8,11 @@
             class="side-button"
             @button-clicked="$refs.newFolder.showModal()">
                 <i class="fa-solid fa-folder-plus"></i>
-                <div>Add folder</div>
+                <div>{{ $t('package-edit.Add folder') }}</div>
             </Button>
         </PackageContent>
         <dialog ref="newFolder" class="create-folder" @keyup="enterPressed">
-            <h1>New Folder</h1>
+            <h1>{{ $t('package-edit.New Folder') }}</h1>
             <LabeledInput
                 :id="'new-folder'"
                 :label="'Choose a name:'"
@@ -21,20 +21,20 @@
                 @input="(value) => store.newFolderName = value"
             ></LabeledInput>
             <form method="dialog">
-                <Button class="abort-create" @button-clicked="$refs.newFolder.close()">Abort</Button>
+                <Button class="abort-create" @button-clicked="$refs.newFolder.close()">{{ $t('package-edit.Abort') }}</Button>
                 <Button class="confirm-create" :disabled="store.newFolderName === ''" @button-clicked="createFolder()">
-                    <div>Create folder</div>
+                    <div>{{ $t('package-edit.Create folder') }}</div>
                 </Button>
             </form>
         </dialog>
         <aside class="right-sidebar">
             <div class="tabs">
                 <div class="tab" :class="{active: store.activeTab === 'upload'}">
-                    <button class="text" @click="store.activeTab = 'upload'">File Upload</button>
+                    <button class="text" @click="store.activeTab = 'upload'">{{ $t('package-edit.File Upload') }}</button>
                     <div class="indicator"></div>
                 </div>
                 <div class="tab" :class="{active: store.activeTab === 'import'}">
-                    <button class="text" @click="store.activeTab = 'import'">Import</button>
+                    <button class="text" @click="store.activeTab = 'import'">{{ $t('package-edit.Import') }}</button>
                     <div class="indicator"></div>
                 </div>
             </div>

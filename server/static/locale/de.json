@@ -30,5 +30,28 @@
         "Datenschutzerklärung": "Datenschutzerklärung",
         "Barrierefreiheit": "Barrierefreiheit",
         "Nutzungsbedingungen": "Nutzungsbedingungen"
+    },
+    "package-edit":{
+        "Add folder": "Ordner hinzufügem",
+        "New Folder": "Neuer Ordner",
+        "Create folder": "Ordner Erstellen",
+        "File Upload": "Datei Hochladen",
+        "Import": "Importieren",
+        "Abort": "Abbrechen"
+    },
+    "package": {
+        "Add project": "Neues Projekt",
+        "Create a new project": "Erstelle ein neues Projekt",
+        "Empty Package": "Leeres Paket",
+        "Import from zip": "Aus ZIP importieren",
+        "Select zip file": "Wähle ZIP-Datei",
+        "Create project": "Erstelle Projekt",
+        "Import zip": "Importiere ZIP",
+        "Edit project": "Projekt Bearbeiten",
+        "see options": "Importeinstellungen...",
+        "Keep empty files": "behalte leere Dateien",
+        "Keep original folder structure": "behalte ursprüngliche Ordnerstruktur",
+        "Choose a name:": "Benenne das Paket:",
+        "Abort": "Abbrechen"
     }
 }
