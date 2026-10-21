@@ -1,6 +1,6 @@
 <div class="login" style="overflow: scroll;">
     <TopBanner></TopBanner>
-    <h2>{{ $t('login.title') }}</h2>
+    <h2>{{ $t('login.title') }}<LocaleSwitch></LocaleSwitch></h2>
     <div class="content">
         <div v-html="store.consent"></div>
         <form v-if="store.selectedOrganisation !== undefined && !store.loading.organisations">

@@ -1,0 +1,20 @@
+{
+    "login": {
+        "title": "Login",
+        "organisation": {
+            "label": "Choose your organisation"
+        },
+        "username": {
+            "label": "Username",
+            "placeholder": "Your username for {name}"
+        },
+        "password": {
+            "label": "Password",
+            "placeholder": "Your password for {name}"
+        },
+        "error": {
+            "credentials": "Wrong username or password!"
+        },
+        "submit": "Consent and log in"
+    }
+}

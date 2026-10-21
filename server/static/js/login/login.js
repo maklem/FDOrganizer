@@ -6,8 +6,10 @@ import { store } from "./state.js";
 import TopBanner from "../top-banner/top-banner.js";
 import LabeledInput from "../labeled-input/labeled-input.js";
 import Footer from "../footer/footer.js";
+import LocaleSwitch from "../locale-switch/locale-switch.js";
 
 import de from "/static/locale/de.json" with { type: "json" }
+import en from "/static/locale/en.json" with { type: "json" }
 
 
 const template = await setup('login');
@@ -16,7 +18,7 @@ const i18n = createI18n({
     locale: "de",
     globalInjection: true,
     messages: {
-        de
+        de, en
     }
 });
 
@@ -25,7 +27,8 @@ createApp({
         TopBanner,
         Button,
         LabeledInput,
-        Footer
+        Footer,
+        LocaleSwitch
     },
     data() {
         return {
