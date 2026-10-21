@@ -16,5 +16,12 @@
             "credentials": "Wrong username or password!"
         },
         "submit": "Consent and log in"
+    },
+    "header": {
+        "Welcome": "Welcome",
+        "Editor": "Editor",
+        "Review": "Review",
+        "Archive": "Archive",
+        "Log out": "Log out"
     }
 }

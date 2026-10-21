@@ -16,5 +16,12 @@
             "credentials": "Benutzername oder Passwort falsch!"
         },
         "submit": "Zustimmen und Einloggen"
+    },
+    "header": {
+        "Welcome": "Willkommen",
+        "Editor": "Bearbeiten",
+        "Review": "Prüfen",
+        "Archive": "Archiv",
+        "Log out": "Abmelden"
     }
 }
