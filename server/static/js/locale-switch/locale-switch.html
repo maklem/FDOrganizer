@@ -1,5 +1,5 @@
 <div class="locale-changer">
-  <select v-model="$i18n.locale">
+  <select v-model="$i18n.locale" @change="updateLanguage()">
     <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{ locale }}</option>
   </select>
 </div>
