@@ -1,4 +1,4 @@
-import { createApp } from "../vue.js";
+import { createApp } from "vue";
 import App from "../app/app.js";
 import PackageListItem from "../package-list-item/package-list-item.js";
 import PackageContent from "../package-content/package-content.js";

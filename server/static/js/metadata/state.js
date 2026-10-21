@@ -1,4 +1,4 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import { store as toastStore } from "../toast/state.js"
 import { validate } from '../validation-util.js';
 import { put, get } from "../http.js"

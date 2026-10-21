@@ -1,4 +1,4 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import { get, post } from "../http.js"
 import { loginSource, logoutSource } from '../authentication.js';
 import {store as editStore} from '../package-edit/state.js'

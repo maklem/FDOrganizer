@@ -1,4 +1,5 @@
-import { createApp } from "../vue.js";
+import { createApp } from "vue";
+import { createI18n } from '../vue-i18n.js'
 import Button from "../button/button.js";
 import { setup } from "../setup.js";
 import { store } from "./state.js";
@@ -8,6 +9,8 @@ import Footer from "../footer/footer.js";
 
 
 const template = await setup('login');
+
+const i18n = createI18n({});
 
 createApp({
     components: {
@@ -32,4 +35,4 @@ createApp({
         await consent, org
     },
     template
-}).mount('#app-container')
+}).use(i18n).mount('#app-container')

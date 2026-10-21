@@ -1,4 +1,4 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import {post} from "../http.js"
 import { store as editStore } from '../package-edit/state.js'
 

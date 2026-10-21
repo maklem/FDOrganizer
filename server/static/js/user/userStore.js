@@ -1,4 +1,4 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import {get} from "../http.js"
 
 export const userStore = reactive({

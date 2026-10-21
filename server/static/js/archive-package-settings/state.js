@@ -1,4 +1,4 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import {patch, get, put, dlt} from "../http.js"
 
 const TABS = [

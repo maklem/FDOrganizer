@@ -1,4 +1,4 @@
-import { createApp } from "../vue.js";
+import { createApp } from "vue";
 import { setup } from "../setup.js";
 import TopBanner from "../top-banner/top-banner.js";
 import {store} from "./state.js";

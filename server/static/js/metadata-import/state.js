@@ -1,4 +1,4 @@
-import { reactive } from '../vue.js';
+import { reactive } from 'vue';
 import { store as metadatastore } from "../metadata/state.js";
 import { validate } from '../validation-util.js';
 

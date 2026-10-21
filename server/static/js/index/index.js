@@ -1,4 +1,4 @@
-import { createApp } from "../vue.js";
+import { createApp } from "vue";
 import App from "../app/app.js";
 import { setup } from "../setup.js";
 import VideoDialog from "../video-dialog/video-dialog.js"
