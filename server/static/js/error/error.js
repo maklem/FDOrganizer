@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { setup } from "../setup.js";
 import TopBanner from "../top-banner/top-banner.js";
 import {store} from "./state.js";
+import { vue_i18n } from "../locale-switch/loadLocale.js";
 
 const template = await setup('error');
 
@@ -19,4 +20,4 @@ createApp({
         store.setErrorMessages(errorMessages);
     },
     template
-}).mount('#app-container')
+}).use(vue_i18n).mount('#app-container')

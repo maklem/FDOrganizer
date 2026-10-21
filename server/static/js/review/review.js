@@ -6,7 +6,7 @@ import PackageContent from "../package-content/package-content.js";
 import Metadata from "../metadata/metadata.js"
 import ArchivePackageSettings from "../archive-package-settings/archive-package-settings.js"
 import VideoDialog from "../video-dialog/video-dialog.js"
-
+import { vue_i18n } from "../locale-switch/loadLocale.js";
 
 import {store, STATUS} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"
@@ -40,5 +40,6 @@ const review = createApp({
     },
     template
 })
+review.use(vue_i18n)
 review.provide("pageContext", "review")
 review.mount('#app-container')

@@ -8,19 +8,9 @@ import LabeledInput from "../labeled-input/labeled-input.js";
 import Footer from "../footer/footer.js";
 import LocaleSwitch from "../locale-switch/locale-switch.js";
 
-import de from "/static/locale/de.json" with { type: "json" }
-import en from "/static/locale/en.json" with { type: "json" }
-
+import { vue_i18n } from "../locale-switch/loadLocale.js";
 
 const template = await setup('login');
-
-const i18n = createI18n({
-    locale: "de",
-    globalInjection: true,
-    messages: {
-        de, en
-    }
-});
 
 createApp({
     components: {
@@ -46,4 +36,4 @@ createApp({
         await consent, org
     },
     template
-}).use(i18n).mount('#app-container')
+}).use(vue_i18n).mount('#app-container')
