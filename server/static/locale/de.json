@@ -1,5 +1,20 @@
 {
     "login": {
-        "title": "Anmeldung!?"
+        "title": "Anmeldung",
+        "organisation": {
+            "label": "Organisation auswählen"
+        },
+        "username": {
+            "label": "Benutzername",
+            "placeholder": "Ihr Benutzername für {name}"
+        },
+        "password": {
+            "label": "Passwort",
+            "placeholder": "Ihr Passwort für {name}"
+        },
+        "error": {
+            "credentials": "Benutzername oder Passwort falsch!"
+        },
+        "submit": "Zustimmen und Einloggen"
     }
 }
