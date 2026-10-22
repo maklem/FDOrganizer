@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import App from "../app/app.js";
 import { setup } from "../setup.js";
 import VideoDialog from "../video-dialog/video-dialog.js"
-import { vue_i18n } from "../locale-switch/loadLocale.js";
+import { vue_i18n } from "../i18n.js";
 
 const template = await setup('index');
 

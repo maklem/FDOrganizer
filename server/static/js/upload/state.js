@@ -1,7 +1,7 @@
 import {reactive} from 'vue';
 import {post} from "../http.js"
 import { store as editStore } from '../package-edit/state.js'
-import { vue_i18n } from "../locale-switch/loadLocale.js"
+import { vue_i18n } from "../i18n.js"
 
 export const store = reactive({
     files: [],

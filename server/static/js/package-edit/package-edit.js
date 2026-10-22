@@ -9,7 +9,7 @@ import Metadata from "../metadata/metadata.js";
 import LabeledInput from "../labeled-input/labeled-input.js"
 import {store} from './state.js'
 import { setup } from "../setup.js";
-import { vue_i18n } from "../locale-switch/loadLocale.js";
+import { vue_i18n } from "../i18n.js";
 
 const template = await setup('package-edit');
 

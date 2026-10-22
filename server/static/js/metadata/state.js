@@ -3,7 +3,7 @@ import { store as toastStore } from "../toast/state.js"
 import { validate } from '../validation-util.js';
 import { put, get } from "../http.js"
 import { CONTENT, RELATIONS, SCOPE, ORIGIN_AND_CREATION, USAGE_AND_RIGHTS, STORAGE } from './metadata-sections.js';
-import { vue_i18n } from "../locale-switch/loadLocale.js";
+import { vue_i18n } from "../i18n.js";
 
 
 export const store = reactive({

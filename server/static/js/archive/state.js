@@ -2,7 +2,7 @@ import {reactive} from 'vue';
 import {get, post} from "../http.js"
 import {store as editStore} from '../package-edit/state.js'
 import {store as statusStore} from "../status-dialog/state.js"
-import { vue_i18n } from "../locale-switch/loadLocale.js"
+import { vue_i18n } from "../i18n.js"
 
 export const STATUS = [
     {

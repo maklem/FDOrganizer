@@ -1,7 +1,7 @@
 import { reactive } from 'vue';
 import { store as metadatastore } from "../metadata/state.js";
 import { validate } from '../validation-util.js';
-import { vue_i18n } from "../locale-switch/loadLocale.js";
+import { vue_i18n } from "../i18n.js";
 
 export const store = reactive({
     modalRef: undefined,

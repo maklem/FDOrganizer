@@ -6,7 +6,7 @@ import PackageContent from "../package-content/package-content.js";
 import LabeledInput from "../labeled-input/labeled-input.js"
 import Metadata from "../metadata/metadata.js"
 import VideoDialog from "../video-dialog/video-dialog.js"
-import { vue_i18n } from "../locale-switch/loadLocale.js";
+import { vue_i18n } from "../i18n.js";
 
 import {store} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"

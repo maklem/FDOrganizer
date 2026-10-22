@@ -1,4 +1,4 @@
-import { vue_i18n } from "./locale-switch/loadLocale.js";
+import { vue_i18n } from "./i18n.js";
 
 /**
  * @param  {number} bytes

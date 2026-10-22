@@ -8,7 +8,7 @@ import ArchivePackageSettings from "../archive-package-settings/archive-package-
 import VideoDialog from "../video-dialog/video-dialog.js"
 import StatusDialog from "../status-dialog/status-dialog.js";
 import {store as statusStore} from "../status-dialog/state.js"
-import { vue_i18n } from "../locale-switch/loadLocale.js";
+import { vue_i18n } from "../i18n.js";
 
 import {store, STATUS} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"

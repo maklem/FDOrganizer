@@ -8,7 +8,7 @@ import LabeledInput from "../labeled-input/labeled-input.js";
 import Footer from "../footer/footer.js";
 import LocaleSwitch from "../locale-switch/locale-switch.js";
 
-import { vue_i18n } from "../locale-switch/loadLocale.js";
+import { vue_i18n } from "../i18n.js";
 
 const template = await setup('login');
 
