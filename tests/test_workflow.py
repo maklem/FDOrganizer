@@ -9,7 +9,7 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
     page.locator("#organisation-selector").select_option(label="Login of Example University [Local]")
     page.locator("#auth-username").fill("reviewer")
     page.locator("#auth-password").fill("reviewer")
-    page.get_by_role("button", name="Zustimmen und Einloggen").click()
+    page.get_by_role("button", name="Consent and log in").click()
 
     # Create Package
     page.get_by_role("link", name="Editor").click()
