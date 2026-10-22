@@ -2,26 +2,26 @@
     <div class="content" v-if="!metadatastore.loading.entity">
         <header class="metadata-import-header">
             <i class="fa-solid fa-file-import"></i>
-            <h1 v-if="!!metadatastore.entity">Import into {{metadatastore.entity.name}}</h1>
+            <h1 v-if="!!metadatastore.entity">{{ $t('metadataImport.importInto', { name: metadatastore.entity.name }) }}</h1>
             <div comment="spacer"></div>
             <Button class="back-button" :flat @button-clicked="store.closeImport()">
                 <i class="fa-solid fa-xmark"></i>
             </Button>
         </header>
         <main>
-            <h2>Datacite JSON Data</h2>
+            <h2>{{ $t('metadataImport.title') }}</h2>
             <p>
-            This importer allows you to copy some information from already prepared datacite documents.
-            The data model of FDO has some overlap with Datacite, but there are many incompatibilities.
-            Please carefully check the newly added entries.
+            {{ $t('metadataImport.explanation1') }}
+            {{ $t('metadataImport.explanation2') }}
+            {{ $t('metadataImport.explanation3') }}
             </p>
             <form>
                 <textarea v-model="inputtext" id="import-json-data"></textarea>
             </form>
         </main>
         <div class="button-row">
-            <Button class="close-button" @button-clicked="store.closeImport()">Abort</Button>
-            <Button class="save-metadata" @button-clicked="mergeIntoMetadata()">Import</Button>
+            <Button class="close-button" @button-clicked="store.closeImport()">{{ $t('metadataImport.abort') }}</Button>
+            <Button class="save-metadata" @button-clicked="mergeIntoMetadata()">{{ $t('metadataImport.import') }}</Button>
         </div>
     </div>
 </dialog>
@@ -29,22 +29,22 @@
     <div class="content" v-if="!metadatastore.loading.entity">
         <header class="metadata-import-header">
             <i class="fa-solid fa-file-import"></i>
-            <h1 v-if="!!metadatastore.entity">Import into {{metadatastore.entity.name}}</h1>
+            <h1 v-if="!!metadatastore.entity">{{ $t('metadataImport.importInto', { name: metadatastore.entity.name }) }}</h1>
             <div comment="spacer"></div>
         </header>
         <main>
-            <h2>Import Results</h2>
+            <h2>{{ $t('metadataImport.results') }}</h2>
             <div class="import-results">
                 <ul>
                     <li v-for="r in store.results">{{r}}</li>
                 </ul>
             </div>
-            <div class="import-error" v-if="!!store.error">Something went wrong during import: {{store.error}}</div>
+            <div class="import-error" v-if="!!store.error">{{ $t('metadataImport.error', { error: store.error }) }}</div>
         </main>
         <div class="button-row">
-            <Button class="close-button" @button-clicked="store.closeImport()" v-if="!!store.error">Abort Import</Button>
-            <Button class="close-button" @button-clicked="store.closeResults()" v-if="!!store.error">Revise</Button>
-            <Button class="close-button" @button-clicked="store.closeImport()" v-if="!store.error">OK</Button>
+            <Button class="close-button" @button-clicked="store.closeImport()" v-if="!!store.error">{{ $t('metadataImport.abortImport') }}</Button>
+            <Button class="close-button" @button-clicked="store.closeResults()" v-if="!!store.error">{{ $t('metadataImport.revise') }}</Button>
+            <Button class="close-button" @button-clicked="store.closeImport()" v-if="!store.error">{{ $t('metadataImport.ok') }}</Button>
         </div>
     </div>
 </dialog>

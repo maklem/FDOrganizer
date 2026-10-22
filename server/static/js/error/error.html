@@ -1,13 +1,13 @@
 <div class="error">
   <TopBanner></TopBanner>
-  <h2>Error</h2>
+  <h2>{{ $t('error.title') }}</h2>
   <div class="errorMessage">
-    FDOrganizer could not complete your request.
+    {{ $t('error.message1') }}
     <p>
-    During evaluation the following errors were reported.
+    {{ $t('error.message2') }}
     <ul>
       <li v-for="msg in store.errorMessages">{{ msg }}</li>
     </ul>
-    Please contact the technical administrators, in case you need help.
+    {{ $t('error.message3') }}
   </div>
 </div>

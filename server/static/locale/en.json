@@ -18,40 +18,338 @@
         "submit": "Consent and log in"
     },
     "header": {
-        "Welcome": "Welcome",
-        "Editor": "Editor",
-        "Review": "Review",
-        "Archive": "Archive",
-        "Log out": "Log out"
+        "welcome": "Welcome",
+        "editor": "Editor",
+        "review": "Review",
+        "archive": "Archive",
+        "logout": "Log out"
     },
     "footer": {
-        "Source": "Source Code",
-        "Impressum": "Imprint",
-        "Datenschutzerklärung": "Data Protection",
-        "Barrierefreiheit": "Accessibility",
-        "Nutzungsbedingungen": "Terms of Service"
-    },
-    "package-edit":{
-        "Add folder": "Add folder",
-        "New Folder": "New Folder",
-        "Create folder": "Create folder",
-        "File Upload": "File Upload",
-        "Import": "Import",
-        "Abort": "Abort"
+        "source": "Source Code",
+        "imprint": "Imprint",
+        "privacy": "Data Protection",
+        "accessibility": "Accessibility",
+        "terms": "Terms of Service",
+        "copyright": "© University of Bayreuth 2022, University of Regensburg 2022-2025, Friedrich-Alexander-Universität Erlangen-Nürnberg 2026"
     },
     "package": {
-        "Add project": "Add project",
-        "Create a new project": "Create a new project",
-        "Empty Package": "Empty Package",
-        "Import from zip": "Import from zip",
-        "Select zip file": "Select zip file",
-        "Create project": "Create project",
-        "Import zip": "Import zip",
-        "Edit project": "Edit project",
-        "see options": "see options",
-        "Keep empty files": "Keep empty files",
-        "Keep original folder structure": "Keep original folder structure",
-        "Choose a name:": "Choose a name:",
-        "Abort": "Abort"
+        "addProject": "Add project",
+        "createNewProject": "Create a new project",
+        "emptyPackage": "Empty Package",
+        "importFromZip": "Import from zip",
+        "selectZipFile": "Select zip file",
+        "createProject": "Create project",
+        "importZip": "Import zip",
+        "editProject": "Edit project",
+        "seeOptions": "see options",
+        "keepEmptyFiles": "Keep empty files",
+        "keepFolderStructure": "Keep original folder structure",
+        "chooseName": "Choose a name:",
+        "abort": "Abort",
+        "noData": "No data added yet",
+        "video": {
+            "title": "How to add a project"
+        },
+        "chooseNamePlaceholder": "e.g. Dataset 1"
+    },
+    "archive": {
+        "video": {
+            "archive": {
+                "title": "How to archive data",
+                "trigger": "How to archive?"
+            },
+            "revise": {
+                "title": "How to revise reviewed projects",
+                "trigger": "How to revise?"
+            }
+        },
+        "noPackages": "No packages with status \"{status}\"",
+        "editProject": "Edit project",
+        "submitPackage": "Submit package",
+        "submitPending": "Submitting package for review...",
+        "submitFailed": "Could not submit package for review",
+        "connectionFailed": "Connection to server/database broken.",
+        "tryAgainLater": "Please try again later."
+    },
+    "review": {
+        "video": {
+            "title": "How to review a submitted project",
+            "trigger": "How to review?"
+        },
+        "noPackages": "No packages with status \"{status}\"",
+        "acceptForArchive": "Accept for Archive",
+        "downloadPackage": "Download Package"
+    },
+    "error": {
+        "title": "Error",
+        "message1": "FDOrganizer could not complete your request.",
+        "message2": "During evaluation the following errors were reported:",
+        "message3": "Please contact the technical administrators, in case you need help."
+    },
+    "index": {
+        "title": "The FDOrganizer",
+        "preIngest": "Pre-Ingest Tool",
+        "preIngestText": "The tool can be used for data curation and organization before the data is transferred to a long-term archive",
+        "sources": "Interface to several data sources",
+        "sourcesText": "A variety of data sources, such as databases or electronic lab notebooks, can be connected to the FDOrganizer",
+        "archive": "Interface to long-term archiving system",
+        "archiveText": "The data is automatically transferred to the connected long-term archive without any additional effort",
+        "features": "The Features",
+        "import": "Import research data from different source systems",
+        "importText": "Research data can be imported easily from various connected data sources, such as electronic lab notebooks or databases",
+        "organize": "Organize and store research data",
+        "organizeText": "The data can be organized and arranged in appropriate structures",
+        "metadata": "Add and structure metadata",
+        "metadataText": "Metadata can be added and structured at different levels",
+        "howToUse": "How to use",
+        "edit": "Edit",
+        "edit1": "Create data package and import the data from different sources",
+        "edit2": "Add various metadata",
+        "archiveTab": "Archive",
+        "archive1": "Agreement to the terms of use and definition of further requirements",
+        "archive2": "Submit data package",
+        "review": "Review",
+        "reviewText": "Review of the submitted data package by responsible parties",
+        "videoTutorial": "Video Tutorial",
+        "firstSteps": "First Steps",
+        "fileManagement": "File management",
+        "metadataTutorial": "Metadata",
+        "archival": "Archival",
+        "tutorial": {
+            "manage": {
+                "createProject": {
+                    "header": "Creating projects",
+                    "title": "How to create a project"
+                },
+                "createFolder": {
+                    "header": "Creating folders",
+                    "title": "How to add folders"
+                },
+                "uploadFiles": {
+                    "header": "Uploading files",
+                    "title": "How to add files to a project"
+                },
+                "importFiles": {
+                    "header": "Importing files",
+                    "title": "How to import files from external sources"
+                }
+            },
+            "metadata": {
+                "openMetadata": {
+                    "header": "Opening metadata",
+                    "title": "How to add metadata to a project"
+                },
+                "addMetadata": {
+                    "header": "Adding metadata",
+                    "title": "How to add metadata"
+                }
+            },
+            "archive": {
+                "archiveProject": {
+                    "header": "Archiving projects",
+                    "title": "How to archive a project"
+                },
+                "reviseProject": {
+                    "header": "Revising projects",
+                    "title": "How to rework a reviewed project"
+                }
+            }
+        }
+    },
+    "packageContent": {
+        "noData": "No data added yet",
+        "video": {
+            "title": "How to add files to a project"
+        }
+    },
+    "packageContentDocument": {
+        "deleteTitle": "Delete {name}?",
+        "deleteText1": "If the file was uploaded manually, it will be deleted.",
+        "deleteText2": "With external files only the reference will be lost.",
+        "deleteQuestion": "Do you really want to delete the file?",
+        "cancel": "Do not delete",
+        "confirm": "Delete file"
+    },
+    "packageContentFolder": {
+        "deleteTitle": "Delete {name}?",
+        "deleteText1": "The folder, its metadata and all contained files and metadata will be deleted.",
+        "deleteText2": "With contained external files only the reference and metadata will be lost.",
+        "deleteQuestion": "Do you really want to delete the folder?",
+        "cancel": "Do not delete",
+        "confirm": "Delete folder",
+        "contentOne": "{count} content",
+        "contentMany": "{count} contents"
+    },
+    "packageListItem": {
+        "expires": "Expires:",
+        "deleteTitle": "Delete {name}?",
+        "deleteText1": "The files you have uploaded manually will be deleted.",
+        "deleteText2": "References to external files will be lost.",
+        "deleteQuestion": "Do you really want to delete the project?",
+        "cancel": "Do not delete",
+        "confirm": "Delete project"
+    },
+    "packageEdit": {
+        "addFolder": "Add folder",
+        "newFolder": "New Folder",
+        "createFolder": "Create folder",
+        "fileUpload": "File Upload",
+        "import": "Import",
+        "abort": "Abort",
+        "chooseName": "Choose a name:",
+        "chooseNamePlaceholder": "e.g. Supplements"
+    },
+    "metadata": {
+        "video": {
+            "title": "How to add metadata"
+        },
+        "import": "Import",
+        "abort": "Abort",
+        "close": "Close",
+        "save": "Save",
+        "invalidFields": "Some fields contain invalid entries",
+        "section": {
+            "required": "Required",
+            "content": "Content",
+            "relations": "Related Documents",
+            "scope": "Data Scope",
+            "provenance": "Data Creation & Acquisition",
+            "rights": "Usage & Rights",
+            "storage": "Storage Period"
+        }
+    },
+    "metadataField": {
+        "add": "Add {label}",
+        "noData": "No data"
+    },
+    "metadataImport": {
+        "importInto": "Import into {name}",
+        "title": "Datacite JSON Data",
+        "explanation1": "This importer allows you to copy some information from already prepared datacite documents.",
+        "explanation2": "The data model of FDO has some overlap with Datacite, but there are many incompatibilities.",
+        "explanation3": "Please carefully check the newly added entries.",
+        "abort": "Abort",
+        "import": "Import",
+        "results": "Import Results",
+        "error": "Something went wrong during import: {error}",
+        "abortImport": "Abort Import",
+        "revise": "Revise",
+        "ok": "OK",
+        "noDataError": "Could not find metadata in JSON data. Tried to access property 'data' but it is not present."
+    },
+    "archiveListItem": {
+        "changed": "Changed:",
+        "expires": "Expires:"
+    },
+    "reviewListItem": {
+        "expires": "Expires:"
+    },
+    "import": {
+        "video": {
+            "title": "How to import files",
+            "trigger": "How to import files?"
+        },
+        "importSelected": "Import selected files",
+        "importAll": "Import all"
+    },
+    "importSource": {
+        "logout": "log out",
+        "username": "Username",
+        "usernamePlaceholder": "Your {name} login name",
+        "password": "Password",
+        "passwordPlaceholder": "Your {name} password",
+        "apiKey": "API Key",
+        "apiKeyPlaceholder": "Your API Key for {name}",
+        "invalidCredentials": "Invalid username or password",
+        "invalidApiKey": "Invalid API key",
+        "login": "Login"
+    },
+    "upload": {
+        "file": "file",
+        "files": "files",
+        "currentlyUsed": "Currently used: {size}",
+        "packageLimit": "Limit for Package: {size}",
+        "fileLimit": "Limit per File / Upload Task: {size}",
+        "video": {
+            "title": "How to upload files",
+            "trigger": "How to upload files?"
+        },
+        "startUpload": "Start Upload",
+        "fileTooLarge": "File exceeds file size limit",
+        "packageTooLarge": "File exceeds package limit",
+        "rejectedByServer": "upload rejected by server.",
+        "dialog": {
+            "title": "Upload Files",
+            "abort": "Abort",
+            "yes": "Yes",
+            "tryAgain": "Try Again",
+            "uploadingOne": "Currently uploading {count} file!",
+            "uploadingMany": "Currently uploading {count} files!",
+            "failedOne": "Upload finished! {count} file could not be uploaded!",
+            "failedMany": "Upload finished! {count} files could not be uploaded!",
+            "confirmOne": "Do you really want to upload {count} selected file?",
+            "confirmMany": "Do you really want to upload {count} selected files?"
+        }
+    },
+    "uploadFile": {
+        "warning": "Warning: {error}"
+    },
+    "navbarWhoami": {
+        "copyToClipboard": "copy to clipboard"
+    },
+    "statusDialog": {
+        "ok": "Ok"
+    },
+    "archiveSettings": {
+        "introduction": "Please consider the following legal requirements for archival and check the applicable boxes below.",
+        "terms": {
+            "title": "Terms & Conditions",
+            "agreement1": "I have read and understood the ",
+            "agreementLink": "Data Submission Agreement",
+            "agreement2": " and request the processing of the submitted data in accordance with the options chosen above.",
+            "duration1": "I attest that the cost for the preservation is covered for a minimum preservation period of ",
+            "durationPlaceholder": "yy",
+            "duration2": " years, starting with the successful archival of this package. I am aware that after the expiration of that time decisions about the further preservation of this package will be made by the institution named in the Data Submission Agreement"
+        },
+        "privacy": {
+            "statement1": "I attest that all personal data in this package was processed in accordance following the ",
+            "gdprLink": "EU General Data Protection Regulation",
+            "statement2": ". For this purpose I have taken the following measures:",
+            "removed": "All existing personal data in this package was removed",
+            "anonymised": "All existing personal data in this package was anonymised using standard procedures",
+            "consent1": "All existing personal data in this package was labeled accordingly. The remaining personal data is integral for its research purpose (as stated in ",
+            "article89": "Article 89 of the EU General Data Protection Regulation",
+            "consent2": "). Written consent to processing and archival of the data was obtained. The physical or digital storage location of the consent documents is linked in the metadata of the respective files"
+        },
+        "reviews": {
+            "comingSoon": "Coming soon",
+            "newComment": "New comment",
+            "add": "Add to review",
+            "current": "Current review",
+            "noComments": "No comments",
+            "none": "No reviews yet",
+            "past": "Review from {date}"
+        },
+        "abort": "Abort",
+        "save": "Save",
+        "requestChanges": "Request changes",
+        "close": "Close",
+        "tab": {
+            "legal": "Legal",
+            "reviews": "Reviews"
+        }
+    },
+    "status": {
+        "archive": {
+            "active": "Active",
+            "review": "In Review",
+            "rework": "Needs Rework",
+            "archived": "Archived"
+        },
+        "review": {
+            "review": "Needs review",
+            "rework": "Rejected",
+            "archived": "Accepted"
+        }
     }
 }

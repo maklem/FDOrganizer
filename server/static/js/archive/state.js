@@ -2,6 +2,7 @@ import {reactive} from 'vue';
 import {get, post} from "../http.js"
 import {store as editStore} from '../package-edit/state.js'
 import {store as statusStore} from "../status-dialog/state.js"
+import { vue_i18n } from "../locale-switch/loadLocale.js"
 
 export const STATUS = [
     {
@@ -73,7 +74,7 @@ function climbPackagePath() {
 
 
 async function requestReview() {
-    statusStore.openDialog("Submitting package for review...", 'ok', [])
+    statusStore.openDialog(vue_i18n.global.t('archive.submitPending'), 'ok', [])
 
     const request = post(`/archive/submit/${store.selectedPackage.id}`)
     const response = await request;
@@ -83,9 +84,9 @@ async function requestReview() {
         store.selectedPackage = undefined
     }else
     if(response.status == 'error') {
-        statusStore.openDialog("Could not submit package for review", 'error', response.details)
+        statusStore.openDialog(vue_i18n.global.t('archive.submitFailed'), 'error', response.details)
     }else{
-        statusStore.openDialog("Could not submit package for review", 'error', ["Connection to server/database broken.", "Please try again later."])
+        statusStore.openDialog(vue_i18n.global.t('archive.submitFailed'), 'error', [vue_i18n.global.t('archive.connectionFailed'), vue_i18n.global.t('archive.tryAgainLater')])
     }
     store.getPackages()
 }

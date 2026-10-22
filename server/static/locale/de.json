@@ -18,40 +18,338 @@
         "submit": "Zustimmen und Einloggen"
     },
     "header": {
-        "Welcome": "Willkommen",
-        "Editor": "Bearbeiten",
-        "Review": "Prüfen",
-        "Archive": "Archiv",
-        "Log out": "Abmelden"
+        "welcome": "Willkommen",
+        "editor": "Bearbeiten",
+        "review": "Prüfen",
+        "archive": "Archiv",
+        "logout": "Abmelden"
     },
     "footer": {
-        "Source": "Quellcode",
-        "Impressum": "Impressum",
-        "Datenschutzerklärung": "Datenschutzerklärung",
-        "Barrierefreiheit": "Barrierefreiheit",
-        "Nutzungsbedingungen": "Nutzungsbedingungen"
-    },
-    "package-edit":{
-        "Add folder": "Ordner hinzufügem",
-        "New Folder": "Neuer Ordner",
-        "Create folder": "Ordner Erstellen",
-        "File Upload": "Datei Hochladen",
-        "Import": "Importieren",
-        "Abort": "Abbrechen"
+        "source": "Quellcode",
+        "imprint": "Impressum",
+        "privacy": "Datenschutzerklärung",
+        "accessibility": "Barrierefreiheit",
+        "terms": "Nutzungsbedingungen",
+        "copyright": "© Universität Bayreuth 2022, Universität Regensburg 2022-2025, Friedrich-Alexander-Universität Erlangen-Nürnberg 2026"
     },
     "package": {
-        "Add project": "Neues Projekt",
-        "Create a new project": "Erstelle ein neues Projekt",
-        "Empty Package": "Leeres Paket",
-        "Import from zip": "Aus ZIP importieren",
-        "Select zip file": "Wähle ZIP-Datei",
-        "Create project": "Erstelle Projekt",
-        "Import zip": "Importiere ZIP",
-        "Edit project": "Projekt Bearbeiten",
-        "see options": "Importeinstellungen...",
-        "Keep empty files": "behalte leere Dateien",
-        "Keep original folder structure": "behalte ursprüngliche Ordnerstruktur",
-        "Choose a name:": "Benenne das Paket:",
-        "Abort": "Abbrechen"
+        "addProject": "Neues Projekt",
+        "createNewProject": "Erstelle ein neues Projekt",
+        "emptyPackage": "Leeres Paket",
+        "importFromZip": "Aus ZIP importieren",
+        "selectZipFile": "Wähle ZIP-Datei",
+        "createProject": "Erstelle Projekt",
+        "importZip": "Importiere ZIP",
+        "editProject": "Projekt Bearbeiten",
+        "seeOptions": "Importeinstellungen...",
+        "keepEmptyFiles": "behalte leere Dateien",
+        "keepFolderStructure": "behalte ursprüngliche Ordnerstruktur",
+        "chooseName": "Benenne das Paket:",
+        "abort": "Abbrechen",
+        "noData": "Noch keine Daten hinzugefügt",
+        "video": {
+            "title": "Wie füge ich ein Projekt hinzu"
+        },
+        "chooseNamePlaceholder": "z.B. Datensatz 1"
+    },
+    "archive": {
+        "video": {
+            "archive": {
+                "title": "Wie archiviert man Daten",
+                "trigger": "Wie archiviere ich?"
+            },
+            "revise": {
+                "title": "Wie überarbeite ich begutachtete Projekte",
+                "trigger": "Wie überarbeite ich?"
+            }
+        },
+        "noPackages": "Keine Pakete mit Status \"{status}\"",
+        "editProject": "Projekt bearbeiten",
+        "submitPackage": "Paket einreichen",
+        "submitPending": "Paket wird zur Überprüfung eingereicht...",
+        "submitFailed": "Paket konnte nicht zur Überprüfung eingereicht werden",
+        "connectionFailed": "Verbindung zum Server/der Datenbank unterbrochen.",
+        "tryAgainLater": "Bitte versuchen Sie es später erneut."
+    },
+    "review": {
+        "video": {
+            "title": "Wie prüft man ein eingereichtes Projekt",
+            "trigger": "Wie prüfe ich?"
+        },
+        "noPackages": "Keine Pakete mit Status \"{status}\"",
+        "acceptForArchive": "Für Archivierung akzeptieren",
+        "downloadPackage": "Paket herunterladen"
+    },
+    "error": {
+        "title": "Fehler",
+        "message1": "FDOrganizer konnte Ihre Anfrage nicht bearbeiten.",
+        "message2": "Bei der Auswertung wurden folgende Fehler gemeldet:",
+        "message3": "Bitte kontaktieren Sie die technischen Administratoren, falls Sie Hilfe benötigen."
+    },
+    "index": {
+        "title": "Der FDOrganizer",
+        "preIngest": "Pre-Ingest-Werkzeug",
+        "preIngestText": "Das Werkzeug kann zur Kuratierung und Organisation von Daten vor der Übertragung an ein Langzeitarchiv verwendet werden",
+        "sources": "Schnittstelle zu verschiedenen Datenquellen",
+        "sourcesText": "Eine Vielzahl von Datenquellen, wie Datenbanken oder elektronische Laborbücher, kann mit dem FDOrganizer verbunden werden",
+        "archive": "Schnittstelle zum Langzeitarchivierungssystem",
+        "archiveText": "Die Daten werden automatisch ohne zusätzlichen Aufwand an das verbundene Langzeitarchiv übertragen",
+        "features": "Die Funktionen",
+        "import": "Forschungdaten aus verschiedenen Quellsystemen importieren",
+        "importText": "Forschungsdaten können einfach aus verschiedenen angeschlossenen Datenquellen wie elektronischen Laborbüchern oder Datenbanken importiert werden",
+        "organize": "Forschungsdaten organisieren und speichern",
+        "organizeText": "Die Daten können organisiert und in geeigneten Strukturen angeordnet werden",
+        "metadata": "Metadaten hinzufügen und strukturieren",
+        "metadataText": "Metadaten können auf verschiedenen Ebenen hinzugefügt und strukturiert werden",
+        "howToUse": "Anwendung",
+        "edit": "Bearbeiten",
+        "edit1": "Datenpaket erstellen und Daten aus verschiedenen Quellen importieren",
+        "edit2": "Verschiedene Metadaten hinzufügen",
+        "archiveTab": "Archivieren",
+        "archive1": "Zustimmung zu den Nutzungsbedingungen und Definition weiterer Anforderungen",
+        "archive2": "Datenpaket einreichen",
+        "review": "Überprüfung",
+        "reviewText": "Überprüfung des eingereichten Datenpakets durch zuständige Personen",
+        "videoTutorial": "Video-Tutorial",
+        "firstSteps": "Erste Schritte",
+        "fileManagement": "Dateiverwaltung",
+        "metadataTutorial": "Metadaten",
+        "archival": "Archivierung",
+        "tutorial": {
+            "manage": {
+                "createProject": {
+                    "header": "Projekte anlegen",
+                    "title": "Wie man ein Projekt anlegt"
+                },
+                "createFolder": {
+                    "header": "Ordner anlegen",
+                    "title": "Wie man Ordner hinzufügt"
+                },
+                "uploadFiles": {
+                    "header": "Dateien hochladen",
+                    "title": "Wie man Dateien zu einem Projekt hinzufügt"
+                },
+                "importFiles": {
+                    "header": "Dateien importieren",
+                    "title": "Wie man Dateien aus externen Quellen importiert"
+                }
+            },
+            "metadata": {
+                "openMetadata": {
+                    "header": "Metadaten öffnen",
+                    "title": "Wie man Metadaten zu einem Projekt hinzufügt"
+                },
+                "addMetadata": {
+                    "header": "Metadaten hinzufügen",
+                    "title": "Wie man Metadaten hinzufügt"
+                }
+            },
+            "archive": {
+                "archiveProject": {
+                    "header": "Projekte archivieren",
+                    "title": "Wie man ein Projekt archiviert"
+                },
+                "reviseProject": {
+                    "header": "Projekte überarbeiten",
+                    "title": "Wie man ein geprüftes Projekt überarbeitet"
+                }
+            }
+        }
+    },
+    "packageContent": {
+        "noData": "Noch keine Daten hinzugefügt",
+        "video": {
+            "title": "Wie füge ich Dateien zu einem Projekt hinzu"
+        }
+    },
+    "packageContentDocument": {
+        "deleteTitle": "{name} löschen?",
+        "deleteText1": "Wenn die Datei manuell hochgeladen wurde, wird sie gelöscht.",
+        "deleteText2": "Bei externen Dateien geht nur der Verweis verloren.",
+        "deleteQuestion": "Möchten Sie die Datei wirklich löschen?",
+        "cancel": "Nicht löschen",
+        "confirm": "Datei löschen"
+    },
+    "packageContentFolder": {
+        "deleteTitle": "{name} löschen?",
+        "deleteText1": "Der Ordner, seine Metadaten und alle enthaltenen Dateien und Metadaten werden gelöscht.",
+        "deleteText2": "Bei enthaltenen externen Dateien gehen nur der Verweis und die Metadaten verloren.",
+        "deleteQuestion": "Möchten Sie den Ordner wirklich löschen?",
+        "cancel": "Nicht löschen",
+        "confirm": "Ordner löschen",
+        "contentOne": "{count} Inhalt",
+        "contentMany": "{count} Inhalte"
+    },
+    "packageListItem": {
+        "expires": "Läuft ab:",
+        "deleteTitle": "{name} löschen?",
+        "deleteText1": "Die manuell hochgeladenen Dateien werden gelöscht.",
+        "deleteText2": "Verweise auf externe Dateien gehen verloren.",
+        "deleteQuestion": "Möchten Sie das Projekt wirklich löschen?",
+        "cancel": "Nicht löschen",
+        "confirm": "Projekt löschen"
+    },
+    "packageEdit": {
+        "addFolder": "Ordner hinzufügen",
+        "newFolder": "Neuer Ordner",
+        "createFolder": "Ordner Erstellen",
+        "fileUpload": "Datei Hochladen",
+        "import": "Importieren",
+        "abort": "Abbrechen",
+        "chooseName": "Name wählen:",
+        "chooseNamePlaceholder": "z.B. Ergänzungen"
+    },
+    "metadata": {
+        "video": {
+            "title": "Wie füge ich Metadaten hinzu"
+        },
+        "import": "Importieren",
+        "abort": "Abbrechen",
+        "close": "Schließen",
+        "save": "Speichern",
+        "invalidFields": "Manche Felder enthalten fehlerhafte Angaben",
+        "section": {
+            "required": "Erforderlich",
+            "content": "Inhalt",
+            "relations": "Verwandte Dokumente",
+            "scope": "Datenumfang",
+            "provenance": "Datenerstellung & -erwerb",
+            "rights": "Nutzung & Rechte",
+            "storage": "Speicherdauer"
+        }
+    },
+    "metadataField": {
+        "add": "{label} hinzufügen",
+        "noData": "Keine Daten"
+    },
+    "metadataImport": {
+        "importInto": "Importieren in {name}",
+        "title": "Datacite JSON-Daten",
+        "explanation1": "Dieser Importer ermöglicht es Ihnen, einige Informationen aus bereits vorbereiteten Datacite-Dokumenten zu kopieren.",
+        "explanation2": "Das Datenmodell von FDO hat einige Überschneidungen mit Datacite, aber es gibt viele Unverträglichkeiten.",
+        "explanation3": "Bitte überprüfen Sie die neu hinzugefügten Einträge sorgfältig.",
+        "abort": "Abbrechen",
+        "import": "Importieren",
+        "results": "Import-Ergebnisse",
+        "error": "Beim Import ist etwas schief gelaufen: {error}",
+        "abortImport": "Import abbrechen",
+        "revise": "Überarbeiten",
+        "ok": "OK",
+        "noDataError": "Metadaten konnten in den JSON-Daten nicht gefunden werden. Die Eigenschaft 'data' wurde erwartet, ist aber nicht vorhanden."
+    },
+    "archiveListItem": {
+        "changed": "Geändert:",
+        "expires": "Läuft ab:"
+    },
+    "reviewListItem": {
+        "expires": "Läuft ab:"
+    },
+    "import": {
+        "video": {
+            "title": "Wie importiere ich Dateien",
+            "trigger": "Wie importiere ich Dateien?"
+        },
+        "importSelected": "Ausgewählte Dateien importieren",
+        "importAll": "Alle importieren"
+    },
+    "importSource": {
+        "logout": "Abmelden",
+        "username": "Benutzername",
+        "usernamePlaceholder": "Ihr {name}-Login-Name",
+        "password": "Passwort",
+        "passwordPlaceholder": "Ihr {name}-Passwort",
+        "apiKey": "API-Schlüssel",
+        "apiKeyPlaceholder": "Ihr API-Schlüssel für {name}",
+        "invalidCredentials": "Ungültiger Benutzername oder Passwort",
+        "invalidApiKey": "Ungültiger API-Schlüssel",
+        "login": "Anmelden"
+    },
+    "upload": {
+        "file": "Datei",
+        "files": "Dateien",
+        "currentlyUsed": "Aktuell genutzt: {size}",
+        "packageLimit": "Limit für Paket: {size}",
+        "fileLimit": "Limit pro Datei / Upload-Aufgabe: {size}",
+        "video": {
+            "title": "Wie lade ich Dateien hoch",
+            "trigger": "Wie lade ich Dateien hoch?"
+        },
+        "startUpload": "Hochladen starten",
+        "fileTooLarge": "Datei überschreitet die Dateigrößenbeschränkung",
+        "packageTooLarge": "Datei überschreitet das Paketlimit",
+        "rejectedByServer": "Upload vom Server abgelehnt.",
+        "dialog": {
+            "title": "Dateien hochladen",
+            "abort": "Abbrechen",
+            "yes": "Ja",
+            "tryAgain": "Erneut versuchen",
+            "uploadingOne": "Lade {count} Datei hoch!",
+            "uploadingMany": "Lade {count} Dateien hoch!",
+            "failedOne": "Upload abgeschlossen! {count} Datei konnte nicht hochgeladen werden!",
+            "failedMany": "Upload abgeschlossen! {count} Dateien konnten nicht hochgeladen werden!",
+            "confirmOne": "Möchten Sie wirklich {count} ausgewählte Datei hochladen?",
+            "confirmMany": "Möchten Sie wirklich {count} ausgewählte Dateien hochladen?"
+        }
+    },
+    "uploadFile": {
+        "warning": "Warnung: {error}"
+    },
+    "navbarWhoami": {
+        "copyToClipboard": "In Zwischenablage kopieren"
+    },
+    "statusDialog": {
+        "ok": "OK"
+    },
+    "archiveSettings": {
+        "introduction": "Bitte beachten Sie die folgenden rechtlichen Anforderungen für die Archivierung und kreuzen Sie die zutreffenden Kästchen an.",
+        "terms": {
+            "title": "Allgemeine Geschäftsbedingungen",
+            "agreement1": "Ich habe die ",
+            "agreementLink": "Nutzungsbedingungen",
+            "agreement2": " gelesen und verstanden und beantrage die Bearbeitung der eingereichten Daten gemäß den oben gewählten Optionen.",
+            "duration1": "Ich bestätige, dass die Kosten für die Aufbewahrung für einen Mindestaufbewahrungszeitraum von ",
+            "durationPlaceholder": "JJ",
+            "duration2": " Jahren gedeckt sind, beginnend mit der erfolgreichen Archivierung dieses Pakets. Mir ist bewusst, dass nach Ablauf dieser Zeit über die weitere Aufbewahrung dieses Pakets von der in der Datenübernahmevereinbarung genannten Institution entschieden wird."
+        },
+        "privacy": {
+            "statement1": "Ich bestätige, dass alle personenbezogenen Daten in diesem Paket gemäß der ",
+            "gdprLink": "EU-Datenschutz-Grundverordnung",
+            "statement2": " verarbeitet wurden. Zu diesem Zweck habe ich folgende Maßnahmen ergriffen:",
+            "removed": "Alle vorhandenen personenbezogenen Daten in diesem Paket wurden entfernt",
+            "anonymised": "Alle vorhandenen personenbezogenen Daten in diesem Paket wurden nach standardisierten Verfahren anonymisiert",
+            "consent1": "Alle vorhandenen personenbezogenen Daten in diesem Paket wurden entsprechend gekennzeichnet. Die verbleibenden personenbezogenen Daten sind für ihren Forschungszweck unerlässlich (gemäß ",
+            "article89": "Artikel 89 der EU-Datenschutz-Grundverordnung",
+            "consent2": "). Eine schriftliche Einwilligung zur Verarbeitung und Archivierung der Daten wurde eingeholt. Der physische oder digitale Speicherort der Einverständniserklärungen ist in den Metadaten der jeweiligen Dateien verlinkt"
+        },
+        "reviews": {
+            "comingSoon": "Bald verfügbar",
+            "newComment": "Neuer Kommentar",
+            "add": "Zum Review hinzufügen",
+            "current": "Aktueller Review",
+            "noComments": "Keine Kommentare",
+            "none": "Keine Reviews vorhanden",
+            "past": "Review vom {date}"
+        },
+        "abort": "Abbrechen",
+        "save": "Speichern",
+        "requestChanges": "Änderungen anfordern",
+        "close": "Schließen",
+        "tab": {
+            "legal": "Rechtliches",
+            "reviews": "Prüfungen"
+        }
+    },
+    "status": {
+        "archive": {
+            "active": "Aktiv",
+            "review": "In Prüfung",
+            "rework": "Überarbeitung nötig",
+            "archived": "Archiviert"
+        },
+        "review": {
+            "review": "Zu prüfen",
+            "rework": "Abgelehnt",
+            "archived": "Akzeptiert"
+        }
     }
 }

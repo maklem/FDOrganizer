@@ -3,6 +3,7 @@ import { store as toastStore } from "../toast/state.js"
 import { validate } from '../validation-util.js';
 import { put, get } from "../http.js"
 import { CONTENT, RELATIONS, SCOPE, ORIGIN_AND_CREATION, USAGE_AND_RIGHTS, STORAGE } from './metadata-sections.js';
+import { vue_i18n } from "../locale-switch/loadLocale.js";
 
 
 export const store = reactive({
@@ -24,7 +25,6 @@ export const store = reactive({
     getAllFields,
     makeTemplate,
     reset,
-    sectionLabel,
     openMetadata,
     closeDocument
 });
@@ -61,7 +61,7 @@ async function saveMetadata() {
     const filteredData = filterUnmetConditions(store.metadata, schema);
 
     if(!validateAll(filteredData, schema)) {
-        toastStore.addMessage("error", "Manche Felder enthalten fehlerhafte Angaben")
+        toastStore.addMessage("error", vue_i18n.global.t('metadata.invalidFields'))
         return false
     }
     await put(`/${store.entityType}/${store.entity.id}/metadata`, {
@@ -98,13 +98,6 @@ function splitSchema(schema) {
         storage: createSection(schema, STORAGE, 'Storage'),
     }
 }
-
-function sectionLabel(key) {
-    if (!store.schema.hasOwnProperty(key)) return ''
-    return LABELS[key]
-}
-
-
 
 function makeTemplate(field) {
     if (!!field.fields){
@@ -187,16 +180,6 @@ function reset() {
     store.touched = false
     store.entity = undefined
     store.entityType = undefined
-}
-
-const LABELS = {
-    required: 'Required',
-    content: 'Content',
-    relations: 'Related Documents',
-    scope: 'Data Scope',
-    provenance: 'Data Creation & Acquisition',
-    rights: 'Usage & Rights',
-    storage: 'Storage Period'
 }
 
 function openMetadata(entityType, entityId, readonly = false) {

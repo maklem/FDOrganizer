@@ -1,6 +1,7 @@
 import { reactive } from 'vue';
 import { store as metadatastore } from "../metadata/state.js";
 import { validate } from '../validation-util.js';
+import { vue_i18n } from "../locale-switch/loadLocale.js";
 
 export const store = reactive({
     modalRef: undefined,
@@ -90,7 +91,7 @@ function mergeIntoMetadata(inputtext) {
     }
 
     if(!data.data){
-        store.error = "Could not find metadata in JSON data. Tried to access property 'data' but it is not present."
+        store.error = vue_i18n.global.t('metadataImport.noDataError')
         return false;
     }
 

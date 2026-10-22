@@ -12,18 +12,18 @@
         </header>
         <section class="legal-tab" :class="{hidden: store.activeTab !== 'legal'}">
           <div class="introduction">
-              Please consider the following legal requirements for archival and check the applicable boxes below.
+              {{ $t('archiveSettings.introduction') }}
           </div>
           <form class="package-settings">
               <fieldset class="settings-group terms-and-conditions">
-                <legend>Terms & Conditions</legend>
+                <legend>{{ $t('archiveSettings.terms.title') }}</legend>
                 <div class="radio-option">
                   <input :disabled="store.settingsReadonly"
                   :ref="box => {if(!!box) box.checked = store.checkTerms}"
                   type="checkbox"
                   id="check-terms"
                   @input="event => store.checkTerms = !store.checkTerms">
-                  <label for="check-terms">I have read and understood the <a href="https://lzv-bayern.de/mehr-information/f%C3%BCr-universit%C3%A4ten/daten%C3%BCbernahmevereinbarung" target="_blank" rel="noopener noreferrer">Data Submission Agreement</a> and request the processing of the submitted data in accordance with the options chosen above.</label>
+                  <label for="check-terms">{{ $t('archiveSettings.terms.agreement1') }}<a href="https://lzv-bayern.de/mehr-information/f%C3%BCr-universit%C3%A4ten/daten%C3%BCbernahmevereinbarung" target="_blank" rel="noopener noreferrer">{{ $t('archiveSettings.terms.agreementLink') }}</a>{{ $t('archiveSettings.terms.agreement2') }}</label>
                 </div>
                 <div class="radio-option">
                   <input :disabled="store.settingsReadonly"
@@ -31,16 +31,16 @@
                   type="checkbox"
                   id="check-duration"
                   @input="event => store.checkDuration = !store.checkDuration">
-                  <label for="check-duration">I attest that the cost for the preservation is covered for a minimum preservation period of
+                  <label for="check-duration">{{ $t('archiveSettings.terms.duration1') }}
                     <LabeledInput
                       class="duration-input"
                       :type="'quantity'"
                       :value="store.duration"
                       :disabled="(!store.checkDuration ? true : undefined) || store.settingsReadonly"
-                      :placeholder="'yy'"
+                      :placeholder="$t('archiveSettings.terms.durationPlaceholder')"
                       @input="value => store.duration = value"
                     ></LabeledInput>
-                    years, starting with the successful archival of this package. I am aware that after the expiration of that time decisions about the further preservation of this package will be made by the institution named in the Data Submission Agreement
+                    {{ $t('archiveSettings.terms.duration2') }}
                   </label>
                   </div>
                 <div class="radio-option">
@@ -50,7 +50,7 @@
                   id="check-dsgvo"
                   @input="event => store.checkDSGVO = !store.checkDSGVO">
                   <!-- TODO: Replace dummy link with path to DSGVO-->
-                  <label for="check-dsgvo">I attest that all personal data in this package was processed in accordance following the <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">EU General Data Protection Regulation</a>. For this purpose I have taken the following measures:</label>
+                  <label for="check-dsgvo">{{ $t('archiveSettings.privacy.statement1') }}<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">{{ $t('archiveSettings.privacy.gdprLink') }}</a>{{ $t('archiveSettings.privacy.statement2') }}</label>
                 </div>
                 <div class="dsgvo-options">
                   <div class="radio-option">
@@ -62,7 +62,7 @@
                     value="none"
                     :disabled="!store.checkDSGVO"
                     @input="event => store.personalData = event.currentTarget.value">
-                    <label for="none-personal-data">All existing personal data in this package was removed</label>
+                    <label for="none-personal-data">{{ $t('archiveSettings.privacy.removed') }}</label>
                   </div>
                   <div class="radio-option">
                     <input :disabled="store.settingsReadonly"
@@ -73,7 +73,7 @@
                     value="anonymous"
                     :disabled="!store.checkDSGVO"
                     @input="event => store.personalData = event.currentTarget.value">
-                    <label for="anonymous-personal-data">All existing personal data in this package was anonymised using standard procedures</label>
+                    <label for="anonymous-personal-data">{{ $t('archiveSettings.privacy.anonymised') }}</label>
                   </div>
                   <div class="radio-option">
                     <input :disabled="store.settingsReadonly"
@@ -84,7 +84,7 @@
                     value="consent"
                     :disabled="!store.checkDSGVO"
                     @input="event => store.personalData = event.currentTarget.value">
-                    <label for="consent-personal-data">All existing personal data in this package was labeled accordingly. The remaining personal data is integral for its research purpose (as stated in <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">Article 89 of the EU General Data Protection Regulation</a>). Written consent to processing and archival of the data was obtained. The physical or digital storage location of the consent documents is linked in the metadata of the respective files</label>
+                    <label for="consent-personal-data">{{ $t('archiveSettings.privacy.consent1') }}<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">{{ $t('archiveSettings.privacy.article89') }}</a>{{ $t('archiveSettings.privacy.consent2') }}</label>
                   </div>
                 </div>
               </fieldset>
@@ -92,7 +92,7 @@
         </section>
         <section class="review-tab" :class="{hidden: store.activeTab !== 'reviews'}">
           <div v-if="store.loading.reviews" class="introduction">
-              Here will soon be reviews.
+              {{ $t('archiveSettings.reviews.comingSoon') }}
           </div>
           <template v-if="!store.reviewReadonly">
             <div class="add-comment">
@@ -100,18 +100,18 @@
                 :type="'long-text'"
                 :value="store.currentComment"
                 :id="'write-comment'"
-                :label="'New Comment'"
+                :label="$t('archiveSettings.reviews.newComment')"
                 @input="(value) => store.currentComment = value"
               ></LabeledInput>
               <Button
                 @button-clicked="store.addComment()"
                 :disabled="store.currentComment === ''"
               >
-                Add to review
+                {{ $t('archiveSettings.reviews.add') }}
               </Button>
             </div>
             <div class="current-review">
-              <h2>Current Review</h2>
+              <h2>{{ $t('archiveSettings.reviews.current') }}</h2>
               <ul class="comment-list" v-if="store.currentReview?.comments?.length">
                 <li v-for="comment in store.currentReview.comments"
                 :class="{external: showAuthor(comment)}">
@@ -122,19 +122,19 @@
                   <div class="author" v-if="showAuthor(comment)">{{comment.owner}}</div>
                 </li>
               </ul>
-              <div v-else class="no-review">No comments yet. Please add a comment to start a new review.</div>
+              <div v-else class="no-review">{{ $t('archiveSettings.reviews.noComments') }}</div>
             </div>
           </template>
           <template v-else>
             <div
               v-if="!store.reviews.length"
               class="no-review">
-              There are no reviews for this package yet.
+              {{ $t('archiveSettings.reviews.none') }}
             </div>
           </template>
           <div v-for="review in store.reviews"
           class="past-review">
-            <h2>Review from {{formatRelativeDate(review.creation_date * 1000)}}</h2>
+            <h2>{{ $t('archiveSettings.reviews.past', { date: formatRelativeDate(review.creation_date * 1000) }) }}</h2>
             <ul class="comment-list">
               <li v-for="comment in review.comments"
               :class="{external: showAuthor(comment)}">
@@ -145,8 +145,8 @@
           </div>
         </section>
         <div v-if="pageContext === 'archive'" class="button-row">
-            <Button class="close-button" @button-clicked="store.closeSettings()">Abort</Button>
-            <Button class="save-metadata" :disabled="!store.readyToSaveSettings()" @button-clicked="save">Save</Button>
+            <Button class="close-button" @button-clicked="store.closeSettings()">{{ $t('archiveSettings.abort') }}</Button>
+            <Button class="save-metadata" :disabled="!store.readyToSaveSettings()" @button-clicked="save">{{ $t('archiveSettings.save') }}</Button>
         </div>
         <div v-else class="button-row">
             <Button v-if="store.activeTab === 'reviews'"
@@ -154,9 +154,9 @@
             class="reject-button"
             @button-clicked="requestChanges()">
                 <i class="fa-solid fa-xmark"></i>
-                <div>Request changes</div>
+                <div>{{ $t('archiveSettings.requestChanges') }}</div>
             </Button>
-            <Button class="close-button" @button-clicked="store.closeSettings()">Close</Button>
+            <Button class="close-button" @button-clicked="store.closeSettings()">{{ $t('archiveSettings.close') }}</Button>
         </div>
     </div>
 </dialog>

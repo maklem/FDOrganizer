@@ -14,16 +14,16 @@
     </div>
 </div>
 <dialog ref="documentDelete" class="delete-document">
-    <h1>Delete {{name}}?</h1>
+    <h1>{{ $t('packageContentDocument.deleteTitle', { name }) }}</h1>
 
-    <div class="text">If the file was uploaded manually, it will be deleted.</div>
-    <div class="text">With external files only the reference will be lost.</div>
-    <div class="text">Do you really want to delete the file?</div>
+    <div class="text">{{ $t('packageContentDocument.deleteText1') }}</div>
+    <div class="text">{{ $t('packageContentDocument.deleteText2') }}</div>
+    <div class="text">{{ $t('packageContentDocument.deleteQuestion') }}</div>
     <form method="dialog">
-        <Button class="abort-delete" @button-clicked="$refs.documentDelete.close()">Do not delete</Button>
+        <Button class="abort-delete" @button-clicked="$refs.documentDelete.close()">{{ $t('packageContentDocument.cancel') }}</Button>
         <Button class="confirm-delete" @button-clicked="deleteDocument(id)">
             <i class="fa-solid fa-trash"></i>
-            <div>Delete file</div>
+            <div>{{ $t('packageContentDocument.confirm') }}</div>
         </Button>
     </form>
 </dialog>

@@ -23,9 +23,15 @@ export default {
     },
     computed: {
         dialogText() {
-            if (this.store.loading.upload) return `Currently uploading ${this.store.files.length} files!`
-            if (this.store.failedUploads.length) return `Upload finished! ${this.store.failedUploads.length} files could not be uploaded!`
-            return `Do you really want to upload ${this.store.files.length} selected files?`
+            const count = this.store.files.length
+            if (this.store.loading.upload) {
+                return this.$t(count === 1 ? 'upload.dialog.uploadingOne' : 'upload.dialog.uploadingMany', { count })
+            }
+            if (this.store.failedUploads.length) {
+                const failed = this.store.failedUploads.length
+                return this.$t(failed === 1 ? 'upload.dialog.failedOne' : 'upload.dialog.failedMany', { count: failed })
+            }
+            return this.$t(count === 1 ? 'upload.dialog.confirmOne' : 'upload.dialog.confirmMany', { count })
         }
     },
     methods: {

@@ -5,9 +5,9 @@
                 <template v-for="status in STATUS">
                     <header class="package-status-header">
                         <i class="icon fa-solid" :class="status.icon"></i>
-                        <h2 class="text">{{status.name}}</h2>
-                        <VideoDialog v-if="status.id === 'review'" title="How to review a submitted project" video="HowToReview">
-                            <span class="tutorial-trigger">How to review?</span>
+                        <h2 class="text">{{ $t('status.review.' + status.id) }}</h2>
+                        <VideoDialog v-if="status.id === 'review'" :title="$t('review.video.title')" video="HowToReview">
+                            <span class="tutorial-trigger">{{ $t('review.video.trigger') }}</span>
                         </VideoDialog>
                     </header>
                     <ReviewListItem v-if="!!store.packagesWithStatus(status.id).length"
@@ -16,7 +16,7 @@
                        @open-metadata="metadataStore.openMetadata('package', pkg.id, true)"
                        @open-settings="settingsStore.openSettings(pkg, 'reviews', true, store.reviewReadonly(pkg))"
                     ></ReviewListItem>
-                    <div v-else class="no-data-placeholder">No packages with status "{{status.name}}"</div>
+                    <div v-else class="no-data-placeholder">{{ $t('review.noPackages', { status: $t('status.review.' + status.id) }) }}</div>
                 </template>
             </template>
             <div class="loading" v-else></div>
@@ -30,14 +30,14 @@
                 class="accept-button side-button"
                 @button-clicked="store.acceptReview()">
                     <i class="fa-solid fa-check"></i>
-                    <div>Accept for Archive</div>
+                    <div>{{ $t('review.acceptForArchive') }}</div>
                 </Button>
                 <Button
                 v-if="store.selectedPackage.status === 'archived'"
                 class="accept-button side-button"
                 @button-clicked="store.download()">
                     <i class="fa-solid fa-download"></i>
-                    <div>Download Package</div>
+                    <div>{{ $t('review.downloadPackage') }}</div>
                 </Button>
         </PackageContent>
         <Metadata></Metadata>

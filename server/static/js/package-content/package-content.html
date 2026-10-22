@@ -15,8 +15,8 @@
             @metadata="$emit('metadata', $event)"
         ></PackageContentDocument>
         <div class="no-data-placeholder" v-if="!store.content.documents.length && !store.content.folders.length">
-            <span>No data added yet</span>
-            <VideoDialog title="How to add files to a project" video="HowToEdit_FileUpload">
+            <span>{{ $t('packageContent.noData') }}</span>
+            <VideoDialog :title="$t('packageContent.video.title')" video="HowToEdit_FileUpload">
                 <i class="fa-solid fa-circle-question question-button"></i>
             </VideoDialog>
         </div>
