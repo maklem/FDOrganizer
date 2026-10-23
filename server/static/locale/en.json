@@ -24,6 +24,9 @@
         "archive": "Archive",
         "logout": "Log out"
     },
+    "localeSwitch": {
+        "label": "Language"
+    },
     "footer": {
         "source": "Source Code",
         "imprint": "Imprint",

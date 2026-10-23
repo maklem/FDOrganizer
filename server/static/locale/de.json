@@ -24,6 +24,9 @@
         "archive": "Archiv",
         "logout": "Abmelden"
     },
+    "localeSwitch": {
+        "label": "Sprache"
+    },
     "footer": {
         "source": "Quellcode",
         "imprint": "Impressum",
