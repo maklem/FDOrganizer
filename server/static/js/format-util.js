@@ -5,7 +5,7 @@ import { vue_i18n } from "./i18n.js";
  */
 export function formatFilesize(bytes) {
     if (bytes === undefined) return ''
-    return new Intl.NumberFormat('de-DE', {
+    return new Intl.NumberFormat(currentLocale(), {
         style: 'unit',
         maximumFractionDigits: 1,
         unit: getUnit(bytes)
