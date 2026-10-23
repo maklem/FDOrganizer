@@ -173,8 +173,7 @@
         "deleteQuestion": "Do you really want to delete the folder?",
         "cancel": "Do not delete",
         "confirm": "Delete folder",
-        "contentOne": "{count} content",
-        "contentMany": "{count} contents"
+        "content": "{count} content | {count} contents"
     },
     "packageListItem": {
         "expires": "Expires:",
@@ -258,8 +257,7 @@
         "login": "Login"
     },
     "upload": {
-        "file": "file",
-        "files": "files",
+        "file": "{count} file | {count} files",
         "currentlyUsed": "Currently used: {size}",
         "packageLimit": "Limit for Package: {size}",
         "fileLimit": "Limit per File / Upload Task: {size}",
@@ -276,12 +274,9 @@
             "abort": "Abort",
             "yes": "Yes",
             "tryAgain": "Try Again",
-            "uploadingOne": "Currently uploading {count} file!",
-            "uploadingMany": "Currently uploading {count} files!",
-            "failedOne": "Upload finished! {count} file could not be uploaded!",
-            "failedMany": "Upload finished! {count} files could not be uploaded!",
-            "confirmOne": "Do you really want to upload {count} selected file?",
-            "confirmMany": "Do you really want to upload {count} selected files?"
+            "uploading": "Currently uploading {count} file! | Currently uploading {count} files!",
+            "failed": "Upload finished! {count} file could not be uploaded! | Upload finished! {count} files could not be uploaded!",
+            "confirm": "Do you really want to upload {count} selected file? | Do you really want to upload {count} selected files?"
         }
     },
     "uploadFile": {

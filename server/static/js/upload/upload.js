@@ -25,13 +25,13 @@ export default {
         dialogText() {
             const count = this.store.files.length
             if (this.store.loading.upload) {
-                return this.$t(count === 1 ? 'upload.dialog.uploadingOne' : 'upload.dialog.uploadingMany', { count })
+                return this.$t('upload.dialog.uploading', { count })
             }
             if (this.store.failedUploads.length) {
                 const failed = this.store.failedUploads.length
-                return this.$t(failed === 1 ? 'upload.dialog.failedOne' : 'upload.dialog.failedMany', { count: failed })
+                return this.$t('upload.dialog.failed', { count: failed })
             }
-            return this.$t(count === 1 ? 'upload.dialog.confirmOne' : 'upload.dialog.confirmMany', { count })
+            return this.$t('upload.dialog.confirm', { count })
         }
     },
     methods: {

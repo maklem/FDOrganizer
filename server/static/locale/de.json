@@ -173,8 +173,7 @@
         "deleteQuestion": "Möchten Sie den Ordner wirklich löschen?",
         "cancel": "Nicht löschen",
         "confirm": "Ordner löschen",
-        "contentOne": "{count} Inhalt",
-        "contentMany": "{count} Inhalte"
+        "content": "{count} Inhalt | {count} Inhalte"
     },
     "packageListItem": {
         "expires": "Läuft ab:",
@@ -258,8 +257,7 @@
         "login": "Anmelden"
     },
     "upload": {
-        "file": "Datei",
-        "files": "Dateien",
+        "file": "{count} Datei | {count} Dateien",
         "currentlyUsed": "Aktuell genutzt: {size}",
         "packageLimit": "Limit für Paket: {size}",
         "fileLimit": "Limit pro Datei / Upload-Aufgabe: {size}",
@@ -276,12 +274,9 @@
             "abort": "Abbrechen",
             "yes": "Ja",
             "tryAgain": "Erneut versuchen",
-            "uploadingOne": "Lade {count} Datei hoch!",
-            "uploadingMany": "Lade {count} Dateien hoch!",
-            "failedOne": "Upload abgeschlossen! {count} Datei konnte nicht hochgeladen werden!",
-            "failedMany": "Upload abgeschlossen! {count} Dateien konnten nicht hochgeladen werden!",
-            "confirmOne": "Möchten Sie wirklich {count} ausgewählte Datei hochladen?",
-            "confirmMany": "Möchten Sie wirklich {count} ausgewählte Dateien hochladen?"
+            "uploading": "Lade {count} Datei hoch! | Lade {count} Dateien hoch!",
+            "failed": "Upload abgeschlossen! {count} Datei konnte nicht hochgeladen werden! | Upload abgeschlossen! {count} Dateien konnten nicht hochgeladen werden!",
+            "confirm": "Möchten Sie wirklich {count} ausgewählte Datei hochladen? | Möchten Sie wirklich {count} ausgewählte Dateien hochladen?"
         }
     },
     "uploadFile": {

@@ -4,7 +4,7 @@
         <i class="fa-regular fa-folder hover-hidden"></i>
     </a>
     <div class="name">{{name}}</div>
-     <div class="count">{{ $t(count === 1 ? 'packageContentFolder.contentOne' : 'packageContentFolder.contentMany', { count }) }}</div>
+     <div class="count">{{ $t('packageContentFolder.content', { count }) }}</div>
     <div v-if=editable class="action">
         <Button class="delete" :flat @button-clicked="$refs.folderDelete.showModal()">
             <i class="fa-solid fa-trash"></i>
