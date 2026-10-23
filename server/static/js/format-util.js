@@ -135,7 +135,7 @@ export function formatRelativeDate(timestamp) {
     const outputUnit = unit(relativeTimeDiff)
     if (outputUnit === 'exact') return formatDate(timestamp)
 
-    const format = new Intl.RelativeTimeFormat(navigator.language, {style: 'long', numeric: 'auto'})
+    const format = new Intl.RelativeTimeFormat(currentLocale(), {style: 'long', numeric: 'auto'})
     return format.format(Math.ceil(timeIn(outputUnit, relativeTimeDiff)), outputUnit)
 }
 
