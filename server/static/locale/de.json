@@ -82,9 +82,7 @@
     },
     "error": {
         "title": "Fehler",
-        "message1": "FDOrganizer konnte Ihre Anfrage nicht bearbeiten.",
-        "message2": "Bei der Auswertung wurden folgende Fehler gemeldet:",
-        "message3": "Bitte kontaktieren Sie die technischen Administratoren, falls Sie Hilfe benötigen."
+        "message": "FDOrganizer konnte Ihre Anfrage nicht bearbeiten. Bei der Auswertung wurden folgende Fehler gemeldet: {errors} Bitte kontaktieren Sie die technischen Administratoren, falls Sie Hilfe benötigen."
     },
     "index": {
         "title": "Der FDOrganizer",
@@ -164,16 +162,14 @@
     },
     "packageContentDocument": {
         "deleteTitle": "{name} löschen?",
-        "deleteText1": "Wenn die Datei manuell hochgeladen wurde, wird sie gelöscht.",
-        "deleteText2": "Bei externen Dateien geht nur der Verweis verloren.",
+        "deleteText": "Wenn die Datei manuell hochgeladen wurde, wird sie gelöscht.\n\nBei externen Dateien geht nur der Verweis verloren.",
         "deleteQuestion": "Möchten Sie die Datei wirklich löschen?",
         "cancel": "Nicht löschen",
         "confirm": "Datei löschen"
     },
     "packageContentFolder": {
         "deleteTitle": "{name} löschen?",
-        "deleteText1": "Der Ordner, seine Metadaten und alle enthaltenen Dateien und Metadaten werden gelöscht.",
-        "deleteText2": "Bei enthaltenen externen Dateien gehen nur der Verweis und die Metadaten verloren.",
+        "deleteText": "Der Ordner, seine Metadaten und alle enthaltenen Dateien und Metadaten werden gelöscht.\n\nBei enthaltenen externen Dateien gehen nur der Verweis und die Metadaten verloren.",
         "deleteQuestion": "Möchten Sie den Ordner wirklich löschen?",
         "cancel": "Nicht löschen",
         "confirm": "Ordner löschen",
@@ -183,8 +179,7 @@
     "packageListItem": {
         "expires": "Läuft ab:",
         "deleteTitle": "{name} löschen?",
-        "deleteText1": "Die manuell hochgeladenen Dateien werden gelöscht.",
-        "deleteText2": "Verweise auf externe Dateien gehen verloren.",
+        "deleteText": "Die manuell hochgeladenen Dateien werden gelöscht.\n\nVerweise auf externe Dateien gehen verloren.",
         "deleteQuestion": "Möchten Sie das Projekt wirklich löschen?",
         "cancel": "Nicht löschen",
         "confirm": "Projekt löschen"
@@ -225,9 +220,7 @@
     "metadataImport": {
         "importInto": "Importieren in {name}",
         "title": "Datacite JSON-Daten",
-        "explanation1": "Dieser Importer ermöglicht es Ihnen, einige Informationen aus bereits vorbereiteten Datacite-Dokumenten zu kopieren.",
-        "explanation2": "Das Datenmodell von FDO hat einige Überschneidungen mit Datacite, aber es gibt viele Unverträglichkeiten.",
-        "explanation3": "Bitte überprüfen Sie die neu hinzugefügten Einträge sorgfältig.",
+        "explanation": "Dieser Importer ermöglicht es Ihnen, einige Informationen aus bereits vorbereiteten Datacite-Dokumenten zu kopieren. Das Datenmodell von FDO hat einige Überschneidungen mit Datacite, aber es gibt viele Unverträglichkeiten. Bitte überprüfen Sie die neu hinzugefügten Einträge sorgfältig.",
         "abort": "Abbrechen",
         "import": "Importieren",
         "results": "Import-Ergebnisse",
@@ -304,22 +297,15 @@
         "introduction": "Bitte beachten Sie die folgenden rechtlichen Anforderungen für die Archivierung und kreuzen Sie die zutreffenden Kästchen an.",
         "terms": {
             "title": "Allgemeine Geschäftsbedingungen",
-            "agreement1": "Ich habe die ",
-            "agreementLink": "Nutzungsbedingungen",
-            "agreement2": " gelesen und verstanden und beantrage die Bearbeitung der eingereichten Daten gemäß den oben gewählten Optionen.",
-            "duration1": "Ich bestätige, dass die Kosten für die Aufbewahrung für einen Mindestaufbewahrungszeitraum von ",
-            "durationPlaceholder": "JJ",
-            "duration2": " Jahren gedeckt sind, beginnend mit der erfolgreichen Archivierung dieses Pakets. Mir ist bewusst, dass nach Ablauf dieser Zeit über die weitere Aufbewahrung dieses Pakets von der in der Datenübernahmevereinbarung genannten Institution entschieden wird."
+            "agreement": "Ich habe die <a href=\"https://lzv-bayern.de/mehr-information/f%C3%BCr-universit%C3%A4ten/daten%C3%BCbernahmevereinbarung\" target=\"_blank\" rel=\"noopener noreferrer\">Nutzungsbedingungen</a> gelesen und verstanden und beantrage die Bearbeitung der eingereichten Daten gemäß den oben gewählten Optionen.",
+            "duration": "Ich bestätige, dass die Kosten für die Aufbewahrung für einen Mindestaufbewahrungszeitraum von {duration} Jahren gedeckt sind, beginnend mit der erfolgreichen Archivierung dieses Pakets. Mir ist bewusst, dass nach Ablauf dieser Zeit über die weitere Aufbewahrung dieses Pakets von der in der Datenübernahmevereinbarung genannten Institution entschieden wird.",
+            "durationPlaceholder": "JJ"
         },
         "privacy": {
-            "statement1": "Ich bestätige, dass alle personenbezogenen Daten in diesem Paket gemäß der ",
-            "gdprLink": "EU-Datenschutz-Grundverordnung",
-            "statement2": " verarbeitet wurden. Zu diesem Zweck habe ich folgende Maßnahmen ergriffen:",
+            "statement": "Ich bestätige, dass alle personenbezogenen Daten in diesem Paket gemäß der <a href=\"https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679\" target=\"_blank\" rel=\"noopener noreferrer\">EU-Datenschutz-Grundverordnung</a> verarbeitet wurden. Zu diesem Zweck habe ich folgende Maßnahmen ergriffen:",
             "removed": "Alle vorhandenen personenbezogenen Daten in diesem Paket wurden entfernt",
             "anonymised": "Alle vorhandenen personenbezogenen Daten in diesem Paket wurden nach standardisierten Verfahren anonymisiert",
-            "consent1": "Alle vorhandenen personenbezogenen Daten in diesem Paket wurden entsprechend gekennzeichnet. Die verbleibenden personenbezogenen Daten sind für ihren Forschungszweck unerlässlich (gemäß ",
-            "article89": "Artikel 89 der EU-Datenschutz-Grundverordnung",
-            "consent2": "). Eine schriftliche Einwilligung zur Verarbeitung und Archivierung der Daten wurde eingeholt. Der physische oder digitale Speicherort der Einverständniserklärungen ist in den Metadaten der jeweiligen Dateien verlinkt"
+            "consent": "Alle vorhandenen personenbezogenen Daten in diesem Paket wurden entsprechend gekennzeichnet. Die verbleibenden personenbezogenen Daten sind für ihren Forschungszweck unerlässlich (gemäß <a href=\"https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679\" target=\"_blank\" rel=\"noopener noreferrer\">Artikel 89 der EU-Datenschutz-Grundverordnung</a>). Eine schriftliche Einwilligung zur Verarbeitung und Archivierung der Daten wurde eingeholt. Der physische oder digitale Speicherort der Einverständniserklärungen ist in den Metadaten der jeweiligen Dateien verlinkt"
         },
         "reviews": {
             "comingSoon": "Bald verfügbar",

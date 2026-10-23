@@ -108,6 +108,7 @@
 .delete-package .text {
     font-size: 1.1rem;
     padding: 0.1rem 1rem;
+    white-space: pre-line;
 }
 
 .delete-package form {

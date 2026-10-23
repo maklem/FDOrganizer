@@ -16,8 +16,7 @@
 <dialog ref="documentDelete" class="delete-document">
     <h1>{{ $t('packageContentDocument.deleteTitle', { name }) }}</h1>
 
-    <div class="text">{{ $t('packageContentDocument.deleteText1') }}</div>
-    <div class="text">{{ $t('packageContentDocument.deleteText2') }}</div>
+    <div class="text">{{ $t('packageContentDocument.deleteText') }}</div>
     <div class="text">{{ $t('packageContentDocument.deleteQuestion') }}</div>
     <form method="dialog">
         <Button class="abort-delete" @button-clicked="$refs.documentDelete.close()">{{ $t('packageContentDocument.cancel') }}</Button>

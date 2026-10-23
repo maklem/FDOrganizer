@@ -1,13 +1,11 @@
 <div class="error">
   <TopBanner></TopBanner>
   <h2>{{ $t('error.title') }}</h2>
-  <div class="errorMessage">
-    {{ $t('error.message1') }}
-    <p>
-    {{ $t('error.message2') }}
-    <ul>
-      <li v-for="msg in store.errorMessages">{{ msg }}</li>
-    </ul>
-    {{ $t('error.message3') }}
-  </div>
+  <i18n-t keypath="error.message" tag="div" class="errorMessage">
+    <template v-slot:errors>
+      <ul>
+        <li v-for="msg in store.errorMessages">{{ msg }}</li>
+      </ul>
+    </template>
+  </i18n-t>
 </div>

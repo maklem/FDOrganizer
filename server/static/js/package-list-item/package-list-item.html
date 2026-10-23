@@ -51,8 +51,7 @@
 <dialog ref="confirmDelete" class="delete-package">
     <h1>{{ $t('packageListItem.deleteTitle', { name }) }}</h1>
 
-    <div class="text">{{ $t('packageListItem.deleteText1') }}</div>
-    <div class="text">{{ $t('packageListItem.deleteText2') }}</div>
+    <div class="text">{{ $t('packageListItem.deleteText') }}</div>
     <div class="text">{{ $t('packageListItem.deleteQuestion') }}</div>
     <form method="dialog">
         <Button class="abort-delete" @button-clicked="closeDialog">{{ $t('packageListItem.cancel') }}</Button>

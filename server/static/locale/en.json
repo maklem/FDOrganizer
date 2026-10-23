@@ -82,9 +82,7 @@
     },
     "error": {
         "title": "Error",
-        "message1": "FDOrganizer could not complete your request.",
-        "message2": "During evaluation the following errors were reported:",
-        "message3": "Please contact the technical administrators, in case you need help."
+        "message": "FDOrganizer could not complete your request. During evaluation the following errors were reported: {errors} Please contact the technical administrators, in case you need help."
     },
     "index": {
         "title": "The FDOrganizer",
@@ -164,16 +162,14 @@
     },
     "packageContentDocument": {
         "deleteTitle": "Delete {name}?",
-        "deleteText1": "If the file was uploaded manually, it will be deleted.",
-        "deleteText2": "With external files only the reference will be lost.",
+        "deleteText": "If the file was uploaded manually, it will be deleted.\n\nWith external files only the reference will be lost.",
         "deleteQuestion": "Do you really want to delete the file?",
         "cancel": "Do not delete",
         "confirm": "Delete file"
     },
     "packageContentFolder": {
         "deleteTitle": "Delete {name}?",
-        "deleteText1": "The folder, its metadata and all contained files and metadata will be deleted.",
-        "deleteText2": "With contained external files only the reference and metadata will be lost.",
+        "deleteText": "The folder, its metadata and all contained files and metadata will be deleted.\n\nWith contained external files only the reference and metadata will be lost.",
         "deleteQuestion": "Do you really want to delete the folder?",
         "cancel": "Do not delete",
         "confirm": "Delete folder",
@@ -183,8 +179,7 @@
     "packageListItem": {
         "expires": "Expires:",
         "deleteTitle": "Delete {name}?",
-        "deleteText1": "The files you have uploaded manually will be deleted.",
-        "deleteText2": "References to external files will be lost.",
+        "deleteText": "The files you have uploaded manually will be deleted.\n\nReferences to external files will be lost.",
         "deleteQuestion": "Do you really want to delete the project?",
         "cancel": "Do not delete",
         "confirm": "Delete project"
@@ -225,9 +220,7 @@
     "metadataImport": {
         "importInto": "Import into {name}",
         "title": "Datacite JSON Data",
-        "explanation1": "This importer allows you to copy some information from already prepared datacite documents.",
-        "explanation2": "The data model of FDO has some overlap with Datacite, but there are many incompatibilities.",
-        "explanation3": "Please carefully check the newly added entries.",
+        "explanation": "This importer allows you to copy some information from already prepared datacite documents. The data model of FDO has some overlap with Datacite, but there are many incompatibilities. Please carefully check the newly added entries.",
         "abort": "Abort",
         "import": "Import",
         "results": "Import Results",
@@ -304,22 +297,15 @@
         "introduction": "Please consider the following legal requirements for archival and check the applicable boxes below.",
         "terms": {
             "title": "Terms & Conditions",
-            "agreement1": "I have read and understood the ",
-            "agreementLink": "Data Submission Agreement",
-            "agreement2": " and request the processing of the submitted data in accordance with the options chosen above.",
-            "duration1": "I attest that the cost for the preservation is covered for a minimum preservation period of ",
-            "durationPlaceholder": "yy",
-            "duration2": " years, starting with the successful archival of this package. I am aware that after the expiration of that time decisions about the further preservation of this package will be made by the institution named in the Data Submission Agreement"
+            "agreement": "I have read and understood the <a href=\"https://lzv-bayern.de/mehr-information/f%C3%BCr-universit%C3%A4ten/daten%C3%BCbernahmevereinbarung\" target=\"_blank\" rel=\"noopener noreferrer\">Data Submission Agreement</a> and request the processing of the submitted data in accordance with the options chosen above.",
+            "duration": "I attest that the cost for the preservation is covered for a minimum preservation period of {duration} years, starting with the successful archival of this package. I am aware that after the expiration of that time decisions about the further preservation of this package will be made by the institution named in the Data Submission Agreement",
+            "durationPlaceholder": "yy"
         },
         "privacy": {
-            "statement1": "I attest that all personal data in this package was processed in accordance following the ",
-            "gdprLink": "EU General Data Protection Regulation",
-            "statement2": ". For this purpose I have taken the following measures:",
+            "statement": "I attest that all personal data in this package was processed in accordance following the <a href=\"https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679\" target=\"_blank\" rel=\"noopener noreferrer\">EU General Data Protection Regulation</a>. For this purpose I have taken the following measures:",
             "removed": "All existing personal data in this package was removed",
             "anonymised": "All existing personal data in this package was anonymised using standard procedures",
-            "consent1": "All existing personal data in this package was labeled accordingly. The remaining personal data is integral for its research purpose (as stated in ",
-            "article89": "Article 89 of the EU General Data Protection Regulation",
-            "consent2": "). Written consent to processing and archival of the data was obtained. The physical or digital storage location of the consent documents is linked in the metadata of the respective files"
+            "consent": "All existing personal data in this package was labeled accordingly. The remaining personal data is integral for its research purpose (as stated in <a href=\"https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679\" target=\"_blank\" rel=\"noopener noreferrer\">Article 89 of the EU General Data Protection Regulation</a>). Written consent to processing and archival of the data was obtained. The physical or digital storage location of the consent documents is linked in the metadata of the respective files"
         },
         "reviews": {
             "comingSoon": "Coming soon",

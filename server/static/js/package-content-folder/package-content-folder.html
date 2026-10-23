@@ -19,8 +19,7 @@
 <dialog ref="folderDelete" class="delete-folder">
     <h1>{{ $t('packageContentFolder.deleteTitle', { name }) }}</h1>
 
-    <div class="text">{{ $t('packageContentFolder.deleteText1') }}</div>
-    <div class="text">{{ $t('packageContentFolder.deleteText2') }}</div>
+    <div class="text">{{ $t('packageContentFolder.deleteText') }}</div>
     <div class="text">{{ $t('packageContentFolder.deleteQuestion') }}</div>
     <form method="dialog">
         <Button class="abort-delete" @button-clicked="$refs.folderDelete.close()">{{ $t('packageContentFolder.cancel') }}</Button>

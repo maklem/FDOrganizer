@@ -23,7 +23,7 @@
                   type="checkbox"
                   id="check-terms"
                   @input="event => store.checkTerms = !store.checkTerms">
-                  <label for="check-terms">{{ $t('archiveSettings.terms.agreement1') }}<a href="https://lzv-bayern.de/mehr-information/f%C3%BCr-universit%C3%A4ten/daten%C3%BCbernahmevereinbarung" target="_blank" rel="noopener noreferrer">{{ $t('archiveSettings.terms.agreementLink') }}</a>{{ $t('archiveSettings.terms.agreement2') }}</label>
+                  <label for="check-terms" v-html="$t('archiveSettings.terms.agreement')"></label>
                 </div>
                 <div class="radio-option">
                   <input :disabled="store.settingsReadonly"
@@ -31,16 +31,19 @@
                   type="checkbox"
                   id="check-duration"
                   @input="event => store.checkDuration = !store.checkDuration">
-                  <label for="check-duration">{{ $t('archiveSettings.terms.duration1') }}
-                    <LabeledInput
-                      class="duration-input"
-                      :type="'quantity'"
-                      :value="store.duration"
-                      :disabled="(!store.checkDuration ? true : undefined) || store.settingsReadonly"
-                      :placeholder="$t('archiveSettings.terms.durationPlaceholder')"
-                      @input="value => store.duration = value"
-                    ></LabeledInput>
-                    {{ $t('archiveSettings.terms.duration2') }}
+                  <label for="check-duration">
+                    <i18n-t keypath="archiveSettings.terms.duration">
+                      <template v-slot:duration>
+                        <LabeledInput
+                          class="duration-input"
+                          :type="'quantity'"
+                          :value="store.duration"
+                          :disabled="(!store.checkDuration ? true : undefined) || store.settingsReadonly"
+                          :placeholder="$t('archiveSettings.terms.durationPlaceholder')"
+                          @input="value => store.duration = value"
+                        ></LabeledInput>
+                      </template>
+                    </i18n-t>
                   </label>
                   </div>
                 <div class="radio-option">
@@ -50,7 +53,7 @@
                   id="check-dsgvo"
                   @input="event => store.checkDSGVO = !store.checkDSGVO">
                   <!-- TODO: Replace dummy link with path to DSGVO-->
-                  <label for="check-dsgvo">{{ $t('archiveSettings.privacy.statement1') }}<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">{{ $t('archiveSettings.privacy.gdprLink') }}</a>{{ $t('archiveSettings.privacy.statement2') }}</label>
+                  <label for="check-dsgvo" v-html="$t('archiveSettings.privacy.statement')"></label>
                 </div>
                 <div class="dsgvo-options">
                   <div class="radio-option">
@@ -84,7 +87,7 @@
                     value="consent"
                     :disabled="!store.checkDSGVO"
                     @input="event => store.personalData = event.currentTarget.value">
-                    <label for="consent-personal-data">{{ $t('archiveSettings.privacy.consent1') }}<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">{{ $t('archiveSettings.privacy.article89') }}</a>{{ $t('archiveSettings.privacy.consent2') }}</label>
+                    <label for="consent-personal-data" v-html="$t('archiveSettings.privacy.consent')"></label>
                   </div>
                 </div>
               </fieldset>
