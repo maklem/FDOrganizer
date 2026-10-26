@@ -1,6 +1,7 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import {post} from "../http.js"
 import { store as editStore } from '../package-edit/state.js'
+import { vue_i18n } from "../i18n.js"
 
 export const store = reactive({
     files: [],
@@ -21,11 +22,11 @@ function displayFiles() {
     return store.files.map(file => {
         let error = ""
         if(file.size > editStore.limits.file){
-             error="File exceeds file size limit"
+             error=vue_i18n.global.t('upload.fileTooLarge')
         }else{
             total_size += file.size
             if(total_size > editStore.limits.package){
-                error="File exceeds package limit"
+                error=vue_i18n.global.t('upload.packageTooLarge')
             }
         }
         return {
@@ -71,7 +72,7 @@ async function uploadFiles() {
             reply.failed.forEach(filename => {
                 response.failed.push({
                     "file": filename,
-                    "error": "upload rejected by server.",
+                    "error": vue_i18n.global.t('upload.rejectedByServer'),
                 })
             })
         }

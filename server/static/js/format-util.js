@@ -1,9 +1,11 @@
+import { vue_i18n } from "./i18n.js";
+
 /**
  * @param  {number} bytes
  */
 export function formatFilesize(bytes) {
     if (bytes === undefined) return ''
-    return new Intl.NumberFormat('de-DE', {
+    return new Intl.NumberFormat(currentLocale(), {
         style: 'unit',
         maximumFractionDigits: 1,
         unit: getUnit(bytes)
@@ -112,8 +114,20 @@ export function filetypeIcon(type) {
 }
 
 export function localized(text) {
-    if (text instanceof Object) return text['en']
+    if (text instanceof Object) {
+        const locale = currentLocale()
+        return text[locale] ?? text['en']
+    }
     return text
+}
+
+/**
+ * @returns {string} the currently selected locale, e.g. "de" or "en"
+ */
+export function currentLocale() {
+    const locale = vue_i18n.global.locale
+    // in composition mode the locale is a ref, in legacy mode it is a plain string
+    return (locale && typeof locale === 'object' && 'value' in locale) ? locale.value : locale
 }
 
 export function formatRelativeDate(timestamp) {
@@ -121,7 +135,7 @@ export function formatRelativeDate(timestamp) {
     const outputUnit = unit(relativeTimeDiff)
     if (outputUnit === 'exact') return formatDate(timestamp)
 
-    const format = new Intl.RelativeTimeFormat(navigator.language, {style: 'long', numeric: 'auto'})
+    const format = new Intl.RelativeTimeFormat(currentLocale(), {style: 'long', numeric: 'auto'})
     return format.format(Math.ceil(timeIn(outputUnit, relativeTimeDiff)), outputUnit)
 }
 

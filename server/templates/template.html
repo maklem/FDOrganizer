@@ -10,6 +10,12 @@
 	<link href="{{ url_for('static',     filename='fontawesome/css/fontawesome.min.css') }}" rel="stylesheet">
 	<link href="{{ url_for('static',     filename='fontawesome/css/all.min.css') }}" rel="stylesheet">
 	<link href="{{ url_for('static',     filename='css/template.css') }}" rel="stylesheet">
+	<script type="importmap">
+	{ "imports": {
+		"vue":               "/static/js/vue.esm-browser.prod.js",
+		"vue-i18n":          "/static/js/vue-i18n.esm-browser.prod.js"
+	} }
+	</script>
 	{% block js %}
 	{% endblock %}
 </head>

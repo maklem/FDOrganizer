@@ -1,0 +1,59 @@
+.locale-changer {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.locale-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background-color: transparent;
+    color: var(--on-primary-color);
+    cursor: pointer;
+    font-size: 2rem;
+}
+
+.locale-toggle:hover,
+.locale-toggle:focus-visible,
+.locale-toggle.active {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.locale-menu {
+    position: absolute;
+    top: calc(100%);
+    right: 0;
+    z-index: 10000001;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 0.25rem;
+    background-color: #fff;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
+}
+
+.locale-option {
+    padding: 0.4rem 0.75rem;
+    border: none;
+    font-weight: normal;
+    background-color: transparent;
+    color: var(--font-color);
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.locale-option:hover,
+.locale-option:focus-visible {
+    background-color: rgba(var(--rgb-primary-color), 0.1);
+    outline: none;
+}
+
+.locale-option.selected {
+    color: var(--primary-color);
+    font-weight: bold;
+}

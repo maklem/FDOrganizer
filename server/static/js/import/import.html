@@ -5,13 +5,13 @@
     :class="{active: store.activeSource === source.id}"
     ></ImportSource>
     <div class="button-row" v-if="store.showImportButtons()">
-        <VideoDialog title="How to import files" video="HowToEdit_FileImport">
-            <span class="import-tutorial-trigger">How to import files?</span>
+        <VideoDialog :title="$t('import.video.title')" video="HowToEdit_FileImport">
+            <span class="import-tutorial-trigger">{{ $t('import.video.trigger') }}</span>
         </VideoDialog>
-        <Button :disabled="!store.selectedDocuments.length" @button-clicked="store.importSelected()">Import selected files</Button>
-        <Button :disabled="!store.documents.length" @button-clicked="store.importAll()">Import all</Button>
+        <Button :disabled="!store.selectedDocuments.length" @button-clicked="store.importSelected()">{{ $t('import.importSelected') }}</Button>
+        <Button :disabled="!store.documents.length" @button-clicked="store.importAll()">{{ $t('import.importAll') }}</Button>
     </div>
 </div>
-<VideoDialog v-if="!store.showImportButtons()" title="How to import files" video="HowToEdit_FileImport">
-    <span class="import-tutorial-trigger">How to import files?</span>
+<VideoDialog v-if="!store.showImportButtons()" :title="$t('import.video.title')" video="HowToEdit_FileImport">
+    <span class="import-tutorial-trigger">{{ $t('import.video.trigger') }}</span>
 </VideoDialog>

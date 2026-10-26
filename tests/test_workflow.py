@@ -7,9 +7,9 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
 
     # Log in
     page.locator("#organisation-selector").select_option(label="Login of Example University [Local]")
-    page.get_by_role("textbox", name="Username").fill("reviewer")
-    page.get_by_role("textbox", name="Password").fill("reviewer")
-    page.get_by_role("button", name="Zustimmen und Einloggen").click()
+    page.locator("#auth-username").fill("reviewer")
+    page.locator("#auth-password").fill("reviewer")
+    page.get_by_role("button", name="Consent and log in").click()
 
     # Create Package
     page.get_by_role("link", name="Editor").click()
@@ -27,7 +27,8 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
 
     # Set mandatory metadata
     page.get_by_role("link", name="Archive").click()
-    page.get_by_role("button").nth(2).click() # "The Book"
+    archive_item = page.locator(".archive-list-item").filter(has_text="Testproject")
+    archive_item.locator(".open-metadata").click()
     page.get_by_role("heading", name="Required").click()
     page.get_by_label("Type of identifier").select_option("resourceIdentifierNotApplicable")
     page.get_by_label("Creator").select_option("personal")
@@ -44,7 +45,7 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
     page.get_by_role("button", name="Save").click()
 
     # set legal fields
-    page.get_by_role("button").nth(4).click() # "The Wheel"
+    archive_item.locator(".open-settings").click()
     page.get_by_role("button", name="Legal").click()
     page.get_by_role("checkbox", name="I have read and understood").check()
     page.get_by_role("checkbox", name="I attest that the cost for").check()

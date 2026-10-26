@@ -17,7 +17,7 @@
             </template>
         </header>
         <Button v-if="authenticated" class="logout-button" @button-clicked="store.logout(id)">
-            <div>log out</div>
+            <div>{{ $t('importSource.logout') }}</div>
         </Button>
     </div>
     <div v-if="store.activeSource === id" class="source-content">
@@ -27,32 +27,32 @@
                 <template v-if="authenticationType === store.AUTH_TYPES.password">
                     <LabeledInput
                         :id="id + '-username'"
-                        :label="'Username'"
-                        :placeholder="'Your ' + name + ' login name'"
+                        :label="$t('importSource.username')"
+                        :placeholder="$t('importSource.usernamePlaceholder', { name })"
                         :value="store.username"
                         :invalid="store.failedLogin"
                         @input="(value) => store.setUsername(value)"></LabeledInput>
                     <LabeledInput
                     :id="id + '-password'"
-                    :label="'Password'"
+                    :label="$t('importSource.password')"
                     :type="'password'"
-                    :placeholder="'Your ' + name + ' password'"
+                    :placeholder="$t('importSource.passwordPlaceholder', { name })"
                     :value="store.password"
                     :invalid="store.failedLogin"
                     @input="(value) => store.setPassword(value)"></LabeledInput>
-                    <div v-if="store.failedLogin" class="error-text">Invalid username or password</div>
+                    <div v-if="store.failedLogin" class="error-text">{{ $t('importSource.invalidCredentials') }}</div>
                 </template>
                 <template v-else-if="authenticationType === store.AUTH_TYPES.APIKey">
                     <LabeledInput
                         :id="id + 'APIKey'"
-                        :label="'API Key'"
-                        :placeholder="'Your API Key for ' + name"
+                        :label="$t('importSource.apiKey')"
+                        :placeholder="$t('importSource.apiKeyPlaceholder', { name })"
                         :value="store.APIKey"
                         :invalid="store.failedLogin"
                         @input="(value) => store.setAPIKey(value)"></LabeledInput>
-                    <div v-if="store.failedLogin" class="error-text">Invalid API key</div>
+                    <div v-if="store.failedLogin" class="error-text">{{ $t('importSource.invalidApiKey') }}</div>
                 </template>
-                <Button @button-clicked="authenticate">Login</Button>
+                <Button @button-clicked="authenticate">{{ $t('importSource.login') }}</Button>
             </form>
             <template v-else>
                 <div v-for="folder in store.getFolders()" class="import-folder" @click="store.openFolder(folder.id)">

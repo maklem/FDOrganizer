@@ -2,7 +2,7 @@
     <legend>{{localized(field.label)}}</legend> 
     <div v-if="field.tooltip" class="tooltip-container">
         <i class="fa-solid fa-circle-info" @click="toggle = !toggle"></i>
-        <div v-show="toggle" class="tooltip-text">{{field.tooltip["en"]}}</div>
+        <div v-show="toggle" class="tooltip-text">{{localized(field.tooltip)}}</div>
     </div>
     <div v-if="!!metadata?.length" class="field-instance" v-for="(instance, index) in metadata">
         <Button v-if="!store.readonly"
@@ -28,10 +28,10 @@
         @button-clicked="addField()"
     >
         <i class="fa-solid fa-plus"></i>
-        <span>Add {{localized(field.label)}}</span>
+        <span>{{ $t('metadataField.add', { label: localized(field.label) }) }}</span>
     </Button>
     <div class="no-data" v-else-if="!metadata?.length && store.readonly">
-        No data
+        {{ $t('metadataField.noData') }}
     </div>
 </fieldset>
 <template v-else >
@@ -74,6 +74,6 @@
         @button-clicked="addField()"
     >
         <i class="fa-solid fa-plus"></i>
-        <span v-if="!metadata?.length">Add {{localized(field.label)}}</span>
+        <span v-if="!metadata?.length">{{ $t('metadataField.add', { label: localized(field.label) }) }}</span>
     </Button>
 </template>

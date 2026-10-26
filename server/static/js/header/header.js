@@ -5,6 +5,7 @@ import NavbarWhoami from "../navbar-whoami/navbar-whoami.js";
 import { setup } from "../setup.js";
 import TopBanner from "../top-banner/top-banner.js";
 import Button from "../button/button.js"
+import LocaleSwitch from "../locale-switch/locale-switch.js";
 
 const template = await setup('header');
 
@@ -13,7 +14,8 @@ export default {
         NavbarTab,
 	    NavbarWhoami,
         TopBanner,
-        Button
+        Button,
+        LocaleSwitch
     },
     data() {
         return {

@@ -1,4 +1,4 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import {put, get, dlt} from "../http.js"
 
 

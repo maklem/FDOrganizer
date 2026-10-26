@@ -1,4 +1,4 @@
-import { createApp } from "../vue.js";
+import { createApp } from "vue";
 import App from "../app/app.js";
 import PackageListItem from "../package-list-item/package-list-item.js";
 import Button from "../button/button.js";
@@ -6,6 +6,7 @@ import PackageContent from "../package-content/package-content.js";
 import LabeledInput from "../labeled-input/labeled-input.js"
 import Metadata from "../metadata/metadata.js"
 import VideoDialog from "../video-dialog/video-dialog.js"
+import { vue_i18n } from "../i18n.js";
 
 import {store} from './state.js'
 import {store as metadataStore} from "../metadata/state.js"
@@ -55,4 +56,5 @@ async mounted() {
     template
 })
 pkg.provide("editable", false)
+pkg.use(vue_i18n)
 pkg.mount('#app-container')

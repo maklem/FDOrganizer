@@ -1,55 +1,56 @@
-import { createApp } from "../vue.js";
+import { createApp } from "vue";
 import App from "../app/app.js";
 import { setup } from "../setup.js";
 import VideoDialog from "../video-dialog/video-dialog.js"
+import { vue_i18n } from "../i18n.js";
 
 const template = await setup('index');
 
 const TUTORIALS = {
     manage: [
         {
-            header: "Creating projects",
-            title: "How to create a project",
+            header: "index.tutorial.manage.createProject.header",
+            title: "index.tutorial.manage.createProject.title",
             video: "HowToAddAProject"
         },
         {
-            header: "Creating folders",
-            title: "How to add folders",
+            header: "index.tutorial.manage.createFolder.header",
+            title: "index.tutorial.manage.createFolder.title",
             video: "HowToEdit_CreateFolder"
         },
         {
-            header: "Uploading files",
-            title: "How to add files to a project",
+            header: "index.tutorial.manage.uploadFiles.header",
+            title: "index.tutorial.manage.uploadFiles.title",
             video: "HowToEdit_FileUpload"
         },
         {
-            header: "Importing files",
-            title: "How to import files from external sources",
+            header: "index.tutorial.manage.importFiles.header",
+            title: "index.tutorial.manage.importFiles.title",
             video: "HowToEdit_FileImport",
 
         },
     ],
     metadata: [
         {
-            header: "Opening metadata",
-            title: "How to add metadata to a project",
+            header: "index.tutorial.metadata.openMetadata.header",
+            title: "index.tutorial.metadata.openMetadata.title",
             video: "HowToAddMetadata",
         },
         {
-            header: "Adding metadata",
-            title: "How to add metadata",
+            header: "index.tutorial.metadata.addMetadata.header",
+            title: "index.tutorial.metadata.addMetadata.title",
             video: "HowToAddMetadata_Form",
         }
     ],
     archive: [
         {
-            header: "Archiving projects",
-            title: "How to archive a project",
+            header: "index.tutorial.archive.archiveProject.header",
+            title: "index.tutorial.archive.archiveProject.title",
             video: "HowToArchive_Active"
         },
         {
-            header: "Revising projects",
-            title: "How to rework a reviewed project",
+            header: "index.tutorial.archive.reviseProject.header",
+            title: "index.tutorial.archive.reviseProject.title",
             video: "HowToArchive_Rework"
         }
     ]
@@ -66,4 +67,4 @@ createApp({
         }
     },
     template
-}).mount('#app-container')
+}).use(vue_i18n).mount('#app-container')

@@ -1,4 +1,4 @@
-import { createApp } from "../vue.js";
+import { createApp } from "vue";
 import App from "../app/app.js";
 import PackageListItem from "../package-list-item/package-list-item.js";
 import PackageContent from "../package-content/package-content.js";
@@ -9,6 +9,7 @@ import Metadata from "../metadata/metadata.js";
 import LabeledInput from "../labeled-input/labeled-input.js"
 import {store} from './state.js'
 import { setup } from "../setup.js";
+import { vue_i18n } from "../i18n.js";
 
 const template = await setup('package-edit');
 
@@ -47,4 +48,5 @@ const packageEdit = createApp({
 })
 
 packageEdit.provide("editable", true)
+packageEdit.use(vue_i18n)
 packageEdit.mount('#app-container')

@@ -3,8 +3,8 @@
         <aside class="left-sidebar">
             <template v-if="!store.loading.packageList">
                 <div class="no-data-placeholder" v-if="!store.packages.length">
-                    <span>No data added yet</span>
-                    <VideoDialog title="How to add a project" video="HowToAddAProject">
+                    <span>{{ $t('package.noData') }}</span>
+                    <VideoDialog :title="$t('package.video.title')" video="HowToAddAProject">
                         <i class="fa-solid fa-circle-question question-button"></i>
                     </VideoDialog>
                 </div>
@@ -16,13 +16,13 @@
                 <div class="add-package">
                     <Button @button-clicked="$refs.newPackage.showModal()">
                         <i class="fa-solid fa-plus"></i>
-                        <div>Add project</div>
+                        <div>{{ $t('package.addProject')}}</div>
                     </Button>
                 </div>
             </template>
             <div class="loading" v-else></div>
             <dialog ref="newPackage" class="create-package" @keyup="enterPressed">
-                <h1>Create a new project</h1>
+                <h1>{{ $t('package.createNewProject')}}</h1>
                 <div class="source-options">
                     <div class="radio-option">
                         <input
@@ -32,7 +32,7 @@
                             name="empty"
                             value="empty"
                             @input="event => source = event.currentTarget.value">
-                        <label for="source-empty">Empty Package</label>
+                        <label for="source-empty">{{ $t('package.emptyPackage') }}</label>
                     </div>
                     <div class="radio-option">
                         <input
@@ -42,13 +42,13 @@
                             name="zip"
                             value="zip"
                             @input="event => source = event.currentTarget.value">
-                        <label for="source-zip">Import from zip</label>
+                        <label for="source-zip">{{ $t('package.importFromZip') }}</label>
                     </div>
                 </div>
                 <LabeledInput v-if="source === 'empty'"
                     :value="store.newPackage.name"
-                    :label="'Choose a name:'"
-                    :placeholder="'e.g. Dataset 1'"
+                    :label="$t('package.chooseName')"
+                    :placeholder="$t('package.chooseNamePlaceholder')"
                     @input="value => store.setNewPackageName(value)"
                 ></LabeledInput>
                 <template v-if="source === 'zip'">
@@ -60,40 +60,40 @@
                     <label for="file-upload">
                         <template v-if="!store.zipfile">
                             <i class="fa-solid fa-plus"></i>
-                            <div class="labeltext">Select zip file</div>
+                            <div class="labeltext">{{ $t('package.selectZipFile') }}</div>
                         </template>
                         <div v-else class="filename">{{store.zipfile.name}}</div>
                     </label>
                     <details>
-                        <summary>see options</summary>
+                        <summary>{{ $t('package.seeOptions') }}</summary>
                         <ul class="option-list">
                             <li>
                                 <label for="keep-empty">
                                     <input type="checkbox" name="keep-empty" :id="'keep-empty'" class="select" @input="event => store.newPackage.keepEmpty = event.target.checked"/>
-                                    <div>Keep empty files</div>
+                                    <div>{{ $t('package.keepEmptyFiles') }}</div>
                                 </label>
                             </li>
                             <li>
                                 <label for="keep-structure">
                                     <input type="checkbox" name="keep-structure" :id="'keep-structure'" class="select" @input="event => store.newPackage.keepStructure = event.target.checked"/>
-                                    <div>Keep original folder structure</div>
+                                    <div>{{ $t('package.keepFolderStructure') }}</div>
                                 </label>
                             </li>
                         </ul>
                     </details>
                 </template>
                 <form method="dialog">
-                    <Button class="abort-create" @button-clicked="$refs.newPackage.close()">Abort</Button>
+                    <Button class="abort-create" @button-clicked="$refs.newPackage.close()">{{ $t('package.abort') }}</Button>
                     <Button v-if="source === 'empty'" 
                         :disabled="store.newPackage.name === ''"
                         class="confirm-create"
                         @button-clicked="createPackage()"
                     >
-                        <div>Create project</div>
+                        <div>{{ $t('package.createProject') }}</div>
                     </Button>
                     <Button v-if="source === 'zip'" class="confirm-create" @button-clicked="uploadZip()" :disabled="!store.zipfile">
                         <i class="fa-regular fa-file-zipper"></i>
-                        <div>Import zip</div>
+                        <div>{{ $t('package.importZip') }}</div>
                     </Button>
                 </form>
             </dialog>
@@ -105,7 +105,7 @@
             class="side-button"
             @button-clicked="store.openDetails()">
                 <i class="fa-solid fa-pen-to-square"></i>
-                <div>Edit project</div>
+                <div>{{ $t('package.editProject') }}</div>
             </Button>
         </PackageContent>
         <Metadata></Metadata>

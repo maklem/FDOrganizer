@@ -3,7 +3,7 @@
         <header class="metadata-header">
             <i class="fa-solid" :class="iconClass"></i>
             <h1 v-if="!!store.entity">{{store.entity.name}}</h1>
-            <VideoDialog title="How to add metadata" video="HowToAddMetadata_Form">
+            <VideoDialog :title="$t('metadata.video.title')" video="HowToAddMetadata_Form">
                 <i class="fa-solid fa-circle-question question-button"></i>
             </VideoDialog>
             <Button class="back-button" :flat @button-clicked="store.closeDocument()">
@@ -11,13 +11,13 @@
             </Button>
         </header>
         <main class="metadata-sections">
-            <MetadataSection v-for="key in Object.keys(store.schema)" :id="key" :label="store.sectionLabel(key)" :selectedSection="selectedSection" @select-section=selectSection(key)></MetadataSection>
+            <MetadataSection v-for="key in Object.keys(store.schema)" :id="key" :label="$t('metadata.section.' + key)" :selectedSection="selectedSection" @select-section=selectSection(key)></MetadataSection>
         </main>
         <div class="button-row">
-            <Button class="close-button" @button-clicked="importstore.openImport()" v-if="!store.readonly">Import</Button>
-            <Button class="close-button" @button-clicked="store.closeDocument()" v-if="!store.readonly">Abort</Button>
-            <Button class="close-button" @button-clicked="store.closeDocument()" v-if="store.readonly">Close</Button>
-            <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched" v-if="!store.readonly">Save</Button>
+            <Button class="close-button" @button-clicked="importstore.openImport()" v-if="!store.readonly">{{ $t('metadata.import') }}</Button>
+            <Button class="close-button" @button-clicked="store.closeDocument()" v-if="!store.readonly">{{ $t('metadata.abort') }}</Button>
+            <Button class="close-button" @button-clicked="store.closeDocument()" v-if="store.readonly">{{ $t('metadata.close') }}</Button>
+            <Button class="save-metadata" @button-clicked="save" :disabled="!store.touched" v-if="!store.readonly">{{ $t('metadata.save') }}</Button>
         </div>
     </div>
     <Toast></Toast>

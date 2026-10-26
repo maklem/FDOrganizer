@@ -8,33 +8,33 @@
             class="side-button"
             @button-clicked="$refs.newFolder.showModal()">
                 <i class="fa-solid fa-folder-plus"></i>
-                <div>Add folder</div>
+                <div>{{ $t('packageEdit.addFolder') }}</div>
             </Button>
         </PackageContent>
         <dialog ref="newFolder" class="create-folder" @keyup="enterPressed">
-            <h1>New Folder</h1>
+            <h1>{{ $t('packageEdit.newFolder') }}</h1>
             <LabeledInput
                 :id="'new-folder'"
-                :label="'Choose a name:'"
-                :placeholder="'e.g. Supplements'"
+                :label="$t('packageEdit.chooseName')"
+                :placeholder="$t('packageEdit.chooseNamePlaceholder')"
                 :value="store.newFolderName"
                 @input="(value) => store.newFolderName = value"
             ></LabeledInput>
             <form method="dialog">
-                <Button class="abort-create" @button-clicked="$refs.newFolder.close()">Abort</Button>
+                <Button class="abort-create" @button-clicked="$refs.newFolder.close()">{{ $t('packageEdit.abort') }}</Button>
                 <Button class="confirm-create" :disabled="store.newFolderName === ''" @button-clicked="createFolder()">
-                    <div>Create folder</div>
+                    <div>{{ $t('packageEdit.createFolder') }}</div>
                 </Button>
             </form>
         </dialog>
         <aside class="right-sidebar">
             <div class="tabs">
                 <div class="tab" :class="{active: store.activeTab === 'upload'}">
-                    <button class="text" @click="store.activeTab = 'upload'">File Upload</button>
+                    <button class="text" @click="store.activeTab = 'upload'">{{ $t('packageEdit.fileUpload') }}</button>
                     <div class="indicator"></div>
                 </div>
                 <div class="tab" :class="{active: store.activeTab === 'import'}">
-                    <button class="text" @click="store.activeTab = 'import'">Import</button>
+                    <button class="text" @click="store.activeTab = 'import'">{{ $t('packageEdit.import') }}</button>
                     <div class="indicator"></div>
                 </div>
             </div>

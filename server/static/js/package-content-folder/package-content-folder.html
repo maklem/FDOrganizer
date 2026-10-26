@@ -4,7 +4,7 @@
         <i class="fa-regular fa-folder hover-hidden"></i>
     </a>
     <div class="name">{{name}}</div>
-     <div class="count">{{count}} {{count === 1 ? "content" : "contents"}}</div>
+     <div class="count">{{ $t('packageContentFolder.content', { count }) }}</div>
     <div v-if=editable class="action">
         <Button class="delete" :flat @button-clicked="$refs.folderDelete.showModal()">
             <i class="fa-solid fa-trash"></i>
@@ -17,16 +17,15 @@
     </div>
 </div>
 <dialog ref="folderDelete" class="delete-folder">
-    <h1>Delete {{name}}?</h1>
+    <h1>{{ $t('packageContentFolder.deleteTitle', { name }) }}</h1>
 
-    <div class="text">The folder, its metadata and all contained files and metadata will be deleted.</div>
-    <div class="text">With contained external files only the reference and metadata will be lost.</div>
-    <div class="text">Do you really want to delete the folder?</div>
+    <div class="text">{{ $t('packageContentFolder.deleteText') }}</div>
+    <div class="text">{{ $t('packageContentFolder.deleteQuestion') }}</div>
     <form method="dialog">
-        <Button class="abort-delete" @button-clicked="$refs.folderDelete.close()">Do not delete</Button>
+        <Button class="abort-delete" @button-clicked="$refs.folderDelete.close()">{{ $t('packageContentFolder.cancel') }}</Button>
         <Button class="confirm-delete" @button-clicked="deleteFolder(id)">
             <i class="fa-solid fa-trash"></i>
-            <div>Delete folder</div>
+            <div>{{ $t('packageContentFolder.confirm') }}</div>
         </Button>
     </form>
 </dialog>

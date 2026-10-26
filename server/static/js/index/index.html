@@ -2,107 +2,107 @@
     <main class="index-page">
         <div class="grid-container">
             <div class="column">
-                <h2>The FDOrganizer</h2>
+                <h2>{{ $t('index.title') }}</h2>
                 <div class="intro-item">
                     <i class="fa-solid fa-dolly"></i>
                     <div>
-                        <h4>Pre-Ingest Tool</h4>
-                        <p>The tool can be used for data curation and organization before the data is transferred to a long-term archive</p>
+                        <h4>{{ $t('index.preIngest') }}</h4>
+                        <p>{{ $t('index.preIngestText') }}</p>
                     </div>
                 </div>
                 <div class="intro-item">
                     <i class="fa-solid fa-server"></i>
                     <div>
-                        <h4>Interface to several data sources</h4>
-                        <p>A variety of data sources, such as databases or electronic lab notebooks, can be connected to the FDOrganizer</p>
+                        <h4>{{ $t('index.sources') }}</h4>
+                        <p>{{ $t('index.sourcesText') }}</p>
                     </div>
                 </div>
                 <div class="intro-item">
                     <i class="fa-solid fa-box-archive"></i>
                     <div>
-                        <h4>Interface to long-term archiving system</h4>
-                        <p>The data is automatically transferred to the connected long-term archive without any additional effort</p>
+                        <h4>{{ $t('index.archive') }}</h4>
+                        <p>{{ $t('index.archiveText') }}</p>
                     </div>
                 </div>
             </div>
             <div class="column">
-                <h2>The Features</h2>
+                <h2>{{ $t('index.features') }}</h2>
                 <div class="intro-item">
                     <i class="fa-solid fa-file-import"></i>
                     <div>
-                        <h4>Import research data from different source systems</h4>
-                        <p>Research data can be imported easily from various connected data sources, such as electronic lab notebooks or databases</p>
+                        <h4>{{ $t('index.import') }}</h4>
+                        <p>{{ $t('index.importText') }}</p>
                     </div>
                 </div>
                 <div class="intro-item">
                     <i class="fa-regular fa-folder-open"></i>
                     <div>
-                        <h4>Organize and store research data</h4>
-                        <p>The data can be organized and arranged in appropriate structures</p>
+                        <h4>{{ $t('index.organize') }}</h4>
+                        <p>{{ $t('index.organizeText') }}</p>
                     </div>
                 </div>
                 <div class="intro-item">
                     <i class="fa-solid fa-sitemap"></i>
                     <div>
-                        <h4>Add and structure metadata</h4>
-                        <p>Metadata can be added and structured at different levels</p>
+                        <h4>{{ $t('index.metadata') }}</h4>
+                        <p>{{ $t('index.metadataText') }}</p>
                     </div>
                 </div>
             </div>
             <div class="column">
-                <h2>How to use</h2>
+                <h2>{{ $t('index.howToUse') }}</h2>
                 <div class="intro-item">
                     <i class="fa-solid fa-pen-to-square"></i>
                     <div>
-                        <h4>Edit</h4>
+                        <h4>{{ $t('index.edit') }}</h4>
                         <ul>
-                            <li>Create data package and import the data from different sources</li>
-                            <li>Add various metadata</li>
+                            <li>{{ $t('index.edit1') }}</li>
+                            <li>{{ $t('index.edit2') }}</li>
                         </ul>
                     </div>
                 </div>
                 <div class="intro-item">
                     <i class="fa-solid fa-box-archive"></i>
                     <div>
-                        <h4>Archive</h4>
+                        <h4>{{ $t('index.archiveTab') }}</h4>
                         <ul>
-                            <li>Agreement to the terms of use and definition of further requirements</li>
-                            <li>Submit data package</li>
+                            <li>{{ $t('index.archive1') }}</li>
+                            <li>{{ $t('index.archive2') }}</li>
                         </ul>
                     </div>
                 </div>
                 <div class="intro-item">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <div>
-                        <h4>Review</h4>
-                        <p>Review of the submitted data package by responsible parties</p>
+                        <h4>{{ $t('index.review') }}</h4>
+                        <p>{{ $t('index.reviewText') }}</p>
                     </div>
                 </div>
             </div>
             <div class="column">
-                <h2>Video Tutorial</h2>
-                <h4>First Steps</h4>
-                <VideoDialog title="First Steps" video="FirstSteps_Overview">
+                <h2>{{ $t('index.videoTutorial') }}</h2>
+                <h4>{{ $t('index.firstSteps') }}</h4>
+                <VideoDialog :title="$t('index.firstSteps')" video="FirstSteps_Overview">
                     <video disablePictureInPicture class="tutorial-video" src="/static/videos/FirstSteps_Overview.mp4"></video>
                 </VideoDialog>
-                <h4>File management</h4>
+                <h4>{{ $t('index.fileManagement') }}</h4>
                 <template v-for="tutorial in tutorials.manage">
-                    <h5>{{tutorial.header}}</h5>
-                    <VideoDialog :title=tutorial.title :video=tutorial.video>
+                    <h5>{{ $t(tutorial.header) }}</h5>
+                    <VideoDialog :title="$t(tutorial.title)" :video=tutorial.video>
                         <video disablePictureInPicture class="tutorial-video" :src="'/static/videos/'+tutorial.video+'.mp4'"></video>
                     </VideoDialog>
                 </template>
-                <h4>Metadata</h4>
+                <h4>{{ $t('index.metadataTutorial') }}</h4>
                 <template v-for="tutorial in tutorials.metadata">
-                    <h5>{{tutorial.header}}</h5>
-                    <VideoDialog :title=tutorial.title :video=tutorial.video>
+                    <h5>{{ $t(tutorial.header) }}</h5>
+                    <VideoDialog :title="$t(tutorial.title)" :video=tutorial.video>
                         <video disablePictureInPicture class="tutorial-video" :src="'/static/videos/'+tutorial.video+'.mp4'"></video>
                     </VideoDialog>
                 </template>
-                <h4>Archival</h4>
+                <h4>{{ $t('index.archival') }}</h4>
                 <template v-for="tutorial in tutorials.archive">
-                    <h5>{{tutorial.header}}</h5>
-                    <VideoDialog :title=tutorial.title :video=tutorial.video>
+                    <h5>{{ $t(tutorial.header) }}</h5>
+                    <VideoDialog :title="$t(tutorial.title)" :video=tutorial.video>
                         <video disablePictureInPicture class="tutorial-video" :src="'/static/videos/'+tutorial.video+'.mp4'"></video>
                     </VideoDialog>
                 </template>

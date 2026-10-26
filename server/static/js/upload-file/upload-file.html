@@ -2,7 +2,7 @@
     <i class="icon fa-solid" :class="`fa-${filetypeIcon(type)}`"></i>
     <span class="name">{{name}}</span>
     <span class="size">{{formatFilesize(size)}}</span>
-    <span class="error" v-if="!!error">Warning: {{error}}</span>
+    <span class="error" v-if="!!error">{{ $t('uploadFile.warning', { error }) }}</span>
     <div class="overlay">
         <Button class="delete-file" @button-clicked="store.removeFile(name)">
             <i class="fa-solid fa-trash"></i>

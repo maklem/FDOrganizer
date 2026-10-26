@@ -5,8 +5,8 @@
 >
     <i class="fa-solid fa-box icon"></i>
     <div class="name">{{name}}</div>
-    <div class="date">Changed: {{formatRelativeDate(last_changed)}}</div>
-    <div class="expiry">Expires: {{formatRelativeDate(keep_until)}}</div>
+    <div class="date">{{ $t('archiveListItem.changed') }} {{formatRelativeDate(last_changed)}}</div>
+    <div class="expiry">{{ $t('archiveListItem.expires') }} {{formatRelativeDate(keep_until)}}</div>
     <div class="action">
         <Button
         :flat
@@ -17,7 +17,7 @@
         <Button class="settings" :flat @button-clicked="$emit('download')">
             <i class="fa-solid fa-download"></i>
         </Button>
-        <Button class="settings" :flat @button-clicked="$emit('open-settings')">
+        <Button class="settings open-settings" :flat @button-clicked="$emit('open-settings')">
             <i class="fa-solid fa-cog"></i>
         </Button>
     </div>

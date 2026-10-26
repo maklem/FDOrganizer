@@ -1,5 +1,4 @@
-import {reactive} from '../vue.js';
-import {patch, get, put, dlt} from "../http.js"
+import {reactive} from 'vue';
 
 export const store = reactive({
     title: String,

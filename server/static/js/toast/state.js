@@ -1,4 +1,4 @@
-import {reactive, nextTick} from '../vue.js';
+import {reactive, nextTick} from 'vue';
 
 export const store = reactive({
     messages: [],

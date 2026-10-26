@@ -1,12 +1,12 @@
 <div class="login" style="overflow: scroll;">
     <TopBanner></TopBanner>
-    <h2>Anmeldung</h2>
+    <h2>{{ $t('login.title') }}<LocaleSwitch></LocaleSwitch></h2>
     <div class="content">
         <div v-html="store.consent"></div>
         <form v-if="store.selectedOrganisation !== undefined && !store.loading.organisations">
             <LabeledInput
                 id="organisation-selector"
-                :label="'Choose your organisation'"
+                :label="$t('login.organisation.label')"
                 :type="'monoselect'"
                 :options="organisations"
                 :value="store.selectedOrganisation.id"
@@ -16,8 +16,8 @@
             <fieldset v-if="store.selectedOrganisation.authType === 'LOCAL'">
                 <LabeledInput
                     id="auth-username"
-                    :label="'Username'"
-                    :placeholder="'Your username for ' + store.selectedOrganisation.name"
+                    :label="$t('login.username.label')"
+                    :placeholder="$t('login.username.placeholder', { name: store.selectedOrganisation.name })"
                     :value="store.username"
                     :invalid="store.failedLogin"
                     @input="(value) => store.username = value"
@@ -25,8 +25,8 @@
                 ></LabeledInput>
                 <LabeledInput
                     id="auth-password"
-                    :label="'Password'"
-                    :placeholder="'The password for ' + store.selectedOrganisation.name"
+                    :label="$t('login.password.label')"
+                    :placeholder="$t('login.password.placeholder', { name: store.selectedOrganisation.name })"
                     :type="'password'"
                     :value="store.password"
                     :invalid="store.failedLogin"
@@ -34,12 +34,12 @@
                     :required="true"
                 ></LabeledInput>
                 <div class="error-text" :class="{visible: store.failedLogin}">
-                    Wrong username or password!
+                    {{ $t('login.error.credentials') }}
                 </div>
-                <Button @button-clicked="store.loginLocal()">Zustimmen und Einloggen</Button>
+                <Button @button-clicked="store.loginLocal()">{{ $t('login.submit') }}</Button>
             </fieldset>
-            <Button v-if="store.selectedOrganisation.authType === 'OIDC'" @button-clicked="store.loginOIDC()">Zustimmen und Einloggen</Button>
-            <Button v-if="store.selectedOrganisation.authType === 'KEYCLOAK'" @button-clicked="store.loginKeycloak()">Zustimmen und Einloggen</Button>
+            <Button v-if="store.selectedOrganisation.authType === 'OIDC'" @button-clicked="store.loginOIDC()">{{ $t('login.submit') }}</Button>
+            <Button v-if="store.selectedOrganisation.authType === 'KEYCLOAK'" @button-clicked="store.loginKeycloak()">{{ $t('login.submit') }}</Button>
         </form>
         <div v-else class="lds-spinner">
             <div></div>

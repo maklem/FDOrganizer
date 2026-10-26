@@ -1,11 +1,12 @@
 <div class="navbar">
-    <NavbarTab url="start" title="Welcome" />
-    <NavbarTab url="package" title="Editor" />
-    <NavbarTab url="archive" title="Archive" />
-    <NavbarTab url="review" title="Review" v-if="userStore.reviewer"/>
+    <NavbarTab url="start" :title="$t('header.welcome')" />
+    <NavbarTab url="package" :title="$t('header.editor')" />
+    <NavbarTab url="archive" :title="$t('header.archive')" />
+    <NavbarTab url="review" :title="$t('header.review')" v-if="userStore.reviewer"/>
     <div class="right-content">
         <NavbarWhoami></NavbarWhoami>
-        <Button class="logout" @button-clicked="logout">Log out</Button>
+        <Button class="logout" @button-clicked="logout">{{$t('header.logout')}}</Button>
+        <LocaleSwitch></LocaleSwitch>
         <div class="shard"></div>
         <div class="logo">
             <img src="/static/images/favicon.svg">

@@ -1,18 +1,18 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 import {patch, get, put, dlt} from "../http.js"
 
 const TABS = [
     // {
     //     id: 'access',
-    //     title: 'Access'
+    //     title: 'archiveSettings.tab.access'
     // },
     {
         id: 'legal',
-        title: 'Legal'
+        title: 'archiveSettings.tab.legal'
     },
     {
         id: 'reviews',
-        title: 'Reviews'
+        title: 'archiveSettings.tab.reviews'
     }
 ]
 

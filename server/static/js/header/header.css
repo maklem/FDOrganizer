@@ -55,4 +55,8 @@
         border: none;
         margin-right: 2rem;
     }
+
+    .locale-changer {
+        margin-right: 0.75rem;
+    }
 }

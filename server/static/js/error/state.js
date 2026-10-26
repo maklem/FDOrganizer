@@ -1,4 +1,4 @@
-import {reactive} from '../vue.js';
+import {reactive} from 'vue';
 
 export const store = reactive({
     errorMessages: [],

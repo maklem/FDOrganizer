@@ -4,11 +4,18 @@
 from collections.abc import Iterator
 from textwrap import dedent
 
+from playwright.sync_api import Page
 from pytest import fixture
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.image import DockerImage
 from testcontainers.core.network import Network
 from testcontainers.core.wait_strategies import LogMessageWaitStrategy
+
+
+@fixture(autouse=True)
+def language(page: Page) -> None:
+    """Run the tests with a fixed language, independently of the browser default."""
+    page.add_init_script(script="window.localStorage.setItem('language', 'en')")
 
 
 @fixture(scope="session")
