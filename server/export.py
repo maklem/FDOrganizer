@@ -1,29 +1,39 @@
-from datetime import datetime
-import shutil
-from pathlib import Path
-from flask import request
 import os
+import shutil
+from datetime import datetime
+from pathlib import Path
 
-from .services.authentication import userdata
+from flask import request
 
-from .entities.organisation import Organisation
-
-from .entities.errors import ExportUserError, PathError, XMLValidationError
-from .util import web_error, web_response
-from .entities import Document, Package, Databases
-from .services.database import get, get_attachment
-from .export_utils import create_structmap, create_package_data, build_sip_metadata, create_file_list
 from . import APP
+from .entities import Databases, Document, Package
+from .entities.errors import ExportUserError, PathError, XMLValidationError
+from .entities.organisation import Organisation
+from .export_utils import (
+    build_sip_metadata,
+    create_file_list,
+    create_package_data,
+    create_structmap,
+)
+from .services.authentication import userdata
+from .services.database import get, get_attachment
+from .util import web_error, web_response
 
 TEMP_DIR = os.path.join('server','tmp')
 
 @APP.route("/export/<package_id>", methods=["POST"])
 def build_export_package(package_id: str):
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
+    user = userdata()
 
-    # Refuse packages that are already archived
+    if package.organisation != user.organisation_id or not user.reviewer:
+        return web_error(403, message="Operation not permitted.")
+
     if package.status == 'archived':
         return web_error(400, message="Package is already archived")
+
+    if package.status != 'review':
+        return web_error(400, message="Package is not in review")
 
     try:    
         # Get all documents and folders in hierarchical structure
