@@ -209,12 +209,12 @@ def validate_zip_file(zip: ZipFile) -> str|None:
 def create_package_from_zip() -> Response:
     vals = request.form.to_dict()
     with tempfile.TemporaryDirectory() as dir:
-        zip_temp_path = dir+'upload.zip'
+        zip_temp_path = pathlib.Path(dir) / 'upload.zip'
         project_zip: FileStorage = next(request.files.values()) # type: ignore
         project_zip.save(zip_temp_path)
         with ZipFile(zip_temp_path, 'r') as zip_ref:
-            if error := validate_zip_file(zip_ref) is not None:
-                web_response(400, 'Validation failed!', details={"error": error})
+            if (error := validate_zip_file(zip_ref)) is not None:
+                return web_response(400, 'Validation failed!', details={"error": error})
 
             zip_path = zipfile.Path(zip_ref)
             # Recursively build directory structure tree
