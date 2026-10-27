@@ -1,43 +1,45 @@
-from functools import wraps
-import json
 import re
-from typing import Any, Optional, Union
-from flask import Request, make_response, request, render_template, Response
+from functools import wraps
+from typing import Any
+
+from flask import Request, Response, jsonify, make_response, render_template, request
 from requests import HTTPError
 
-from .entities import Package, Databases
-
+from .entities import Databases, Package
+from .services.authentication import userdata
 from .services.database import get
 
-from .services.authentication import userdata
 
 def error_page(code: int = 500, errors: list[str] = []) -> tuple[str,int]:
     return render_template("error.html", errors=errors), code
 
-def web_error(code: int, message:str, stacktrace: Optional[Union[str, list[str]]] = None, component = "SERVER") -> Response:
-    error_data: dict[str, Union[str, list[str]]] = {
+def web_error(code: int, message:str, stacktrace: str | list[str] | None = None, component = "SERVER") -> Response:
+    error_data: dict[str, str | list[str]] = {
         'message': message,
         'component': component
     }
     if stacktrace is not None:
         error_data['stacktrace'] = stacktrace
-    return make_response(json.dumps(error_data), code)
+
+    response = jsonify(error_data)
+    response.status_code = code
+    return response
 
 def web_error_database_connection(error: HTTPError) -> Response:
     if error.response is None:
         return web_error(500, "connection to database failed.", component= "DATABASE")
     return web_error(error.response.status_code, error.response.reason, component= "DATABASE")
 
-def web_response(code: int, message:Optional[str] = None, details: dict[str, Any] | list[Any] | None = None) -> Response:
+def web_response(code: int, message:str | None = None, details: dict[str, Any] | list[Any] | None = None) -> Response:
     if message is None and details is None:
         return make_response(code)
     if details is None:
-        return make_response(json.dumps(
-            {
-                'message': message,
-            }
-        ), code)
-    return make_response(json.dumps(details), code)
+        response = jsonify({'message': message})
+        response.status_code = code
+        return response
+    response = jsonify(details)
+    response.status_code = code
+    return response
     
 def is_owner(object_with_owner: dict[str, Any], owner) -> bool:
     return object_with_owner.get('owner') == owner
