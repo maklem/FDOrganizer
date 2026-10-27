@@ -29,6 +29,7 @@ from .util import (
     can_edit_name,
     can_read,
     is_owner,
+    is_valid_filename,
     json_body,
     web_error,
     web_error_database_connection,
@@ -85,6 +86,8 @@ def get_package_limits(id: str):
 @APP.route("/package", methods=["PUT"])
 @json_body
 def create_package(name: str) -> Response:
+    if not is_valid_filename(name):
+        return web_error(400, "Name of package is invalid.", component= "SERVER")
     user = userdata()
     username = user.username
     displayname = user.displayname
@@ -154,6 +157,10 @@ def rename_package(package_id: str, name: str) -> Response:
     package = get(Databases.PACKAGES, package_id).json()
     if not can_edit_name(package, request):
         return web_error(401, "You don't have permission to change the name of this package", component= "SERVER")
+
+    if not is_valid_filename(name):
+        return web_error(400, "Name of package is invalid.", component= "SERVER")
+
     changes = {
         "name": name,
     }
@@ -221,7 +228,10 @@ def create_package_from_zip() -> Response:
             directory = build_directory_tree(zip_path, vals['keep_empty']=='true', vals['keep_structure']=='true')
             # Build new package for zip content
             username = userdata().username
-            package_id = create_package_in_db(pathlib.Path(str(project_zip.filename)).stem, username, userdata().organisation_id, owner_displayname=userdata().displayname)
+            package_name = pathlib.Path(str(project_zip.filename)).stem
+            if not is_valid_filename(package_name):
+                return web_error(400, "Name of package is invalid.", component= "SERVER")
+            package_id = create_package_in_db(package_name, username, userdata().organisation_id, owner_displayname=userdata().displayname)
             # Create folders and documents
             folder_ids = [create_folder_from_zip(folder_entry, zip_ref, username, package_id) for folder_entry in directory.folders]
             doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
@@ -248,7 +258,8 @@ def build_directory_tree(path: zipfile.Path, keep_empty: bool, keep_structure: b
     return recurse_directory(path, keep_empty)
 
 def create_folder_from_zip(directory: Directory, zipfile: ZipFile, username: str, package_id: str):
-    
+    if not is_valid_filename(directory.name):
+        raise ValueError("Name of folder is invalid.")
     folder_ids = [create_folder_from_zip(folder_entry, zipfile, username, package_id) for folder_entry in directory.folders]
     doc_ids = [create_document_from_zip(file_entry, username) for file_entry in directory.files]
     
@@ -259,6 +270,8 @@ def create_folder_from_zip(directory: Directory, zipfile: ZipFile, username: str
     return persisted_entity['id']
 
 def create_document_from_zip(file_info: zipfile.Path, username):
+    if not is_valid_filename(file_info.name):
+        raise ValueError("Name of file is invalid.")
     file = io.BytesIO(file_info.read_bytes())
     storage = FileStorage(file)
     storage.filename = file_info.name
@@ -266,6 +279,8 @@ def create_document_from_zip(file_info: zipfile.Path, username):
     return create_document_with_attachement(file_doc_pair['file'], file_doc_pair['document'])
 
 def create_package_in_db(name:str, owner: str, organisation: str, owner_displayname: str) -> str:
+    if not is_valid_filename(name):
+        raise ValueError("Name of package is invalid.")
     now = round(time.time()*1000)
     status='active'
     keep_until = determine_package_expiration_timestamp_ms(status)

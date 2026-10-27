@@ -22,6 +22,7 @@ from .util import (
     can_read,
     can_read_folder,
     get_database_from_string,
+    is_valid_filename,
     json_body,
     web_error,
     web_error_database_connection,
@@ -74,6 +75,10 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not can_add_files(package_or_folder, request):
         return web_error(401, "You don't have permission to edit this content", component= "SERVER")
+
+    if not is_valid_filename(name):
+        return web_error(400, "Name of folder is invalid.", component= "SERVER")
+
     # Create new folder object
     username = userdata().username
     if parent_type == 'package':
@@ -134,6 +139,9 @@ def create_documents() -> Response:
     file_document_pairs = []
     failed_files= []
     for file in request.files.values():
+        if not is_valid_filename(file.filename):
+            failed_files.append({'file': file.filename, 'error': f"Name of file '{file.filename}' is invalid."})
+            continue
         try:
             file_document_pairs.append(create_file_document_pair(file, username))
         except HTTPError as error:
@@ -240,6 +248,8 @@ def create_file_document_pair(file: FileStorage, username: str) -> dict[str,Any]
         raise HTTPError('No file provided')
     if not file.filename:
         raise HTTPError('No filename available')
+    if not is_valid_filename(file.filename):
+        raise HTTPError('Name of file is invalid')
     
     file_data = file.read()
     hash_md5 = md5(file_data).hexdigest()

@@ -1,5 +1,6 @@
 import re
 from functools import wraps
+from pathlib import Path
 from typing import Any
 
 from flask import Request, Response, jsonify, make_response, render_template, request
@@ -10,7 +11,9 @@ from .services.authentication import userdata
 from .services.database import get
 
 
-def error_page(code: int = 500, errors: list[str] = []) -> tuple[str,int]:
+def error_page(code: int = 500, errors: list[str]|None = None) -> tuple[str,int]:
+    if errors is None:
+        errors = []
     return render_template("error.html", errors=errors), code
 
 def web_error(code: int, message:str, stacktrace: str | list[str] | None = None, component = "SERVER") -> Response:
@@ -108,3 +111,20 @@ def json_body(api_method):
         kwargs[snake_case_key] = value
     return api_method(*args, **kwargs)
   return unpack_json_body
+
+ALLOWED_FILE_EXPRESSION = re.compile(r'^[A-Za-z0-9._ \-\+\=\[\]\(\)\@]+$')
+def is_valid_filename(name: str|None) -> bool:
+    if name is None:
+        return False
+    if '\x00' in name or any(ord(c) < 32 for c in name):
+        return False
+    if '/' in name or '\\' in name:
+        return False
+    if name.startswith('-'):
+        return False
+    if name in ('', '.', '..'):
+        return False
+    if Path(name).name != name:
+        return False
+
+    return bool(ALLOWED_FILE_EXPRESSION.match(name))
