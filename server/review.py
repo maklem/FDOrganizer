@@ -59,7 +59,7 @@ def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = Non
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     # Check if package can be reviewed
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
-    if not package.status == 'review':
+    if package.status != 'review':
         return web_error(400, f'Review cannot be submitted for package in status {package.status}', component="SERVER")
     # Check if there is an open review
     if package.reviews:
@@ -95,7 +95,7 @@ def post_new_comment(review_id: str, index: int, content: str) -> Response:
     if not userdata().reviewer:
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     review: Review = Review.from_db(get(Databases.REVIEWS, review_id).json())
-    if not review.status == 'open':
+    if review.status != 'open':
         return web_error(400, "Cannot add comment to review with status {review.status}", component= "SERVER")
     new_comment = Comment(index = index, content=content, owner=user(request))
     changes = {
@@ -115,9 +115,9 @@ def delete_comment(review_id: str, comment_index: int):
     if not userdata().reviewer:
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     review = Review.from_db(get(Databases.REVIEWS, review_id).json())
-    if not review.status == 'open':
+    if review.status != 'open':
         return web_error(400, "Cannot delete comment from review with status {review.status}", component= "SERVER")
-    comment_to_delete = [comment for comment in review.comments if comment.index == int(comment_index)][0]
+    comment_to_delete = next(comment for comment in review.comments if comment.index == int(comment_index))
     if not comment_to_delete:
         return web_error(400, "No comment with index {comment_index} found in review {review_id}", component= "SERVER")
     # if not is_owner(comment_to_delete.to_dict(), user(request)):
@@ -141,7 +141,7 @@ def submit_review(package_id: str, status: Literal["accepted", "rejected"]) -> R
     if not userdata().reviewer:
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
-    if not package.status == 'review':
+    if package.status != 'review':
         return web_error(400, f"Review cannot be submitted for package in status {package.status}", component= "SERVER")
     query = {
         "selector": {

@@ -28,7 +28,7 @@ def authentication_token(username: str, password: str):
     url = f'{base_url()}/_session'
     response = authenticate(url, username, password)
     print(url)
-    if not response.status_code == 200:
+    if response.status_code != 200:
         print('User Authentication not sucessful! Check configured username and password')
         return False
     cookie = response.headers["Set-Cookie"]

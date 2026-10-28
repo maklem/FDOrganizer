@@ -100,7 +100,7 @@ def get_collection(source: str, collection: str):
 
 @APP.route('/import/<source>/login', methods=['POST'])
 def login_source(source: str):
-    auth_token = request.cookies['token']
+    request.cookies['token']
     plugin = importlib.import_module(f'.plugins.{source}.import', 'server')
 
     # Get plugin authentication

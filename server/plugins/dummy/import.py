@@ -17,7 +17,7 @@ from ...util import web_response
 
 def login(request: Request) -> Response:
     """Authenticates with remote APIs. Tokens/usernames/passwords/API keys should be returned in the web response in place of None."""
-    request_data = json.loads(request.get_data())
+    json.loads(request.get_data())
     try:
         # setup required APIs here
         pass
