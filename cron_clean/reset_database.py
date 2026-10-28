@@ -2,10 +2,12 @@
     Script for purging the storageFile couchDB for testing purposes
 '''
 import sys
-import requests
+
 import create_database
+import requests
 from dotenv import load_dotenv
 from requests import HTTPError
+
 
 def getDatabaseName():
     if len(sys.argv) == 2:

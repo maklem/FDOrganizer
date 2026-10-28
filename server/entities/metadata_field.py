@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
+
 from dataclasses_json import DataClassJsonMixin
 
 

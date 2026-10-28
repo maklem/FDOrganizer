@@ -4,7 +4,7 @@
 import io
 import json
 from hashlib import md5, sha512
-from typing import Literal, Union
+from typing import Literal
 
 from flask.wrappers import Request, Response
 
@@ -25,7 +25,7 @@ def login(request: Request) -> Response:
         raise PluginError(500, 'Example plugin error')
     return web_response(200, "Authentication successful", None)
 
-def get_toplevel(request: Request, auth) -> Union[Response, dict[Literal['folders', 'documents'], list]]:
+def get_toplevel(request: Request, auth) -> Response | dict[Literal['folders', 'documents'], list]:
     """Queries the remote server for package contents."""
     # Setup API again, then query toplevel contents.
     # Example contents:

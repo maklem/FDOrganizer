@@ -62,7 +62,7 @@ def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = Non
     if not package.status == 'review':
         return web_error(400, f'Review cannot be submitted for package in status {package.status}', component="SERVER")
     # Check if there is an open review
-    if not not package.reviews:
+    if package.reviews:
         reviews = get_reviews(package.reviews)
         if any(review.status == 'open' for review in reviews):
             return web_error(400, "Cannot create new review for package with open review", component= "SERVER")
@@ -142,7 +142,7 @@ def submit_review(package_id: str, status: Literal["accepted", "rejected"]) -> R
         return web_error(401, "You don't have permission to review packages", component= "SERVER")
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
     if not package.status == 'review':
-        return web_error(400, "Review cannot be submitted for package in status {}".format(package.status), component= "SERVER")
+        return web_error(400, f"Review cannot be submitted for package in status {package.status}", component= "SERVER")
     query = {
         "selector": {
             "_id": {

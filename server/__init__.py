@@ -84,4 +84,15 @@ logfile_handler.addFilter(credentialfilter)
 logfile_handler.setFormatter(formatter)
 APP.logger.addHandler(logfile_handler)
 
-from . import router,login,metadata,package_details,package,source_import,archive,export, review, download_archive  # noqa: E402, F401
+from . import (  # noqa: F401
+    archive,
+    download_archive,
+    export,
+    login,
+    metadata,
+    package,
+    package_details,
+    review,
+    router,
+    source_import,
+)

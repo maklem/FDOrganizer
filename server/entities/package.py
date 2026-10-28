@@ -6,6 +6,7 @@ from dataclasses_json import DataClassJsonMixin, config
 
 from .archive_settings import ArchiveSettings
 
+
 def shouldBeExcluded(x):
     return x is None
 

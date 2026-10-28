@@ -106,7 +106,7 @@ def check_package_validity(package: Package) -> list[str]:
     except TypeError:
         errors.append(f"*Something* is wrong...\n\n{traceback.format_exc()}")
     except XMLValidationError as error:
-        errors.append(f"The generated metadata does not satisfy the schema requirements. ({str(error)})")
+        errors.append(f"The generated metadata does not satisfy the schema requirements. ({error!s})")
     return errors
 
 

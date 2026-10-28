@@ -3,8 +3,10 @@
 '''
 import os
 import sys
-from dotenv import load_dotenv
+
 import requests
+from dotenv import load_dotenv
+
 
 def credentials():
     return {
@@ -27,7 +29,7 @@ def authentication_token(username: str, password: str):
     response = authenticate(url, username, password)
     print(url)
     if not response.status_code == 200:
-        print(f'User Authentication not sucessful! Check configured username and password')
+        print('User Authentication not sucessful! Check configured username and password')
         return False
     cookie = response.headers["Set-Cookie"]
     return cookie[:cookie.find(";")]

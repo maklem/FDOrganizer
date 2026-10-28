@@ -3,8 +3,6 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from flask import request
-
 from . import APP
 from .entities import Databases, Document, Package
 from .entities.errors import ExportUserError, PathError, XMLValidationError

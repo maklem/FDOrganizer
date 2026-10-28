@@ -1,15 +1,14 @@
 import json
 import os
-from typing import Any, Literal, Optional
 import urllib.parse
 from base64 import b64encode
+from typing import Any, Literal
 
 import requests
 
-from ..entities.errors import PatchError
-
-from ..entities.databases import Databases
 from ..entities.couch_document import CouchDocument
+from ..entities.databases import Databases
+from ..entities.errors import PatchError
 
 
 def auth_header() -> dict[str, str]:
@@ -29,27 +28,27 @@ def query_params(parameters: dict[str, str]) -> str:
     return params
 
 
-def db_url(database: Databases, parameters: Optional[dict[str, str]] = None) -> str:
+def db_url(database: Databases, parameters: dict[str, str] | None = None) -> str:
     if not parameters:
         return f'{base_url()}/{database.value}'
     return f'{db_url(database)}?{query_params(parameters)}'
 
 
-def doc_url(database: Databases, document: str, parameters: Optional[dict[str, str]] = None) -> str:
+def doc_url(database: Databases, document: str, parameters: dict[str, str] | None = None) -> str:
     if not parameters:
         return f'{base_url()}/{database.value}/{document}'
     return f'{doc_url(database, document)}?{query_params(parameters)}'
 
 
 def encode_credentials(username, password) -> str:
-    string = (f'{username}:{password}').encode('utf-8')
+    string = (f'{username}:{password}').encode()
     return str(b64encode(string), 'utf-8')
 
 
 
 
 
-def attach(database: Databases, document: CouchDocument, file_content, filename, mimetype: Optional[str] = None, parameters: Optional[dict[str, str]] = None):
+def attach(database: Databases, document: CouchDocument, file_content, filename, mimetype: str | None = None, parameters: dict[str, str] | None = None):
     headers = auth_header() | {'If-Match': document.rev}
     if mimetype is not None:
         headers = headers | {'Content-Type': mimetype}
@@ -60,7 +59,7 @@ def get_attachment(document_id: str, document_name: str):
     headers = auth_header()
     return requests.get(f'{doc_url(Databases.DOCUMENTS, document=document_id)}/{document_name}', headers=headers)
 
-def post(database: Databases, payload: str, parameters: Optional[dict[str, str]] = None) -> requests.Response:
+def post(database: Databases, payload: str, parameters: dict[str, str] | None = None) -> requests.Response:
     headers = auth_header() | {
         "Content-Type": "application/json",
         "Accept": "application/json"
@@ -68,7 +67,7 @@ def post(database: Databases, payload: str, parameters: Optional[dict[str, str]]
     return requests.post(db_url(database, parameters), headers=headers, data=payload, timeout=20)
 
 
-def find(database: Databases, query: str, parameters: Optional[dict[str, str]] = None) -> requests.Response:
+def find(database: Databases, query: str, parameters: dict[str, str] | None = None) -> requests.Response:
     url = f'{db_url(database)}/_find'
     
     headers = auth_header() | {

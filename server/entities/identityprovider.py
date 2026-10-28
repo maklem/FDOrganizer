@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Literal, Any
+from typing import Any, Literal
+
 from dataclasses_json import DataClassJsonMixin, config
+
 
 def isNone(x) -> bool:
     return x is None
@@ -13,7 +15,7 @@ class IdentityProvider(DataClassJsonMixin):
     type: Literal["LOCAL", "OIDC", "KEYCLOAK"]
     name: str
     url: str | None = field(default=None, metadata=config(exclude=isNone))
-    scope: list[str] = field(default_factory=lambda: [], metadata=config(exclude=isEmpty))
+    scope: list[str] = field(default_factory=list, metadata=config(exclude=isEmpty))
     client_id: str | None = field(default=None, metadata=config(exclude=isNone))
     client_secret: str | None = field(default=None, metadata=config(exclude=isNone))
     username_field: str | None = field(default=None, metadata=config(exclude=isNone))

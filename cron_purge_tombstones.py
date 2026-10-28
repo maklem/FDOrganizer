@@ -1,7 +1,9 @@
 import os
-from dotenv import load_dotenv
-from couchdb import Server, Database
+
 import couchdb
+from couchdb import Database, Server
+from dotenv import load_dotenv
+
 
 def purge_thombstones(database: Database):
     try:

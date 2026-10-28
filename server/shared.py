@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-from typing import List, Literal
+from typing import Literal
+
 from requests import HTTPError
 
-from .entities import Document, Databases, CouchDocument
-
+from .entities import CouchDocument, Databases, Document
+from .services.database import attach, delete, get, post, update
 from .util import get_database_from_string
-from .services.database import attach, delete, get, update, post
 
 PackageState = Literal['active', 'archived', 'review', 'rework']
 
@@ -72,7 +72,7 @@ def delete_document(id: str) -> bool:
 
     return True
 
-def persist_documents(doc_file_pairs: List, parent, parent_type):    
+def persist_documents(doc_file_pairs: list, parent, parent_type):    
     documents: dict[str, list[dict[str, str]]] = {
         'failed': [],
         'success': []

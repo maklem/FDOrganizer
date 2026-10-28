@@ -1,15 +1,20 @@
 import json
 from typing import Any
-from requests import HTTPError
+
 from flask import request
+from requests import HTTPError
 
 from . import APP
-
-from .entities import Databases, Document, Folder, Package, Metadata
-
+from .entities import Databases, Document, Folder, Metadata, Package
 from .services.database import get, post, update
-
-from .util import can_read_metadata, can_update_metadata, get_database_from_string, web_error, web_error_database_connection, web_response
+from .util import (
+    can_read_metadata,
+    can_update_metadata,
+    get_database_from_string,
+    web_error,
+    web_error_database_connection,
+    web_response,
+)
 
 
 @APP.route("/<entity_type>/<entity_id>/metadata", methods=["GET"])

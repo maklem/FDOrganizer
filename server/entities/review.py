@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Any, Literal
+
 from dataclasses_json import DataClassJsonMixin, config
 
 from .comment import Comment
-
 
 shouldBeExcluded = lambda x: x is None
 

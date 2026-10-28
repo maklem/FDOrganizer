@@ -1,12 +1,15 @@
 '''
     Script for creating a new couchDB Database
 '''
+import json
 import os
 import sys
-from dotenv import load_dotenv
-import json
+
 import couchdb
+from dotenv import load_dotenv
+
 from server.entities.databases import Databases
+
 
 def getenv(key: str) -> str:
     val = os.getenv(key)

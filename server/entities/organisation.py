@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any
+
 from dataclasses_json import DataClassJsonMixin, config
+
 
 def shouldBeExcluded(x) -> bool:
     return x is None

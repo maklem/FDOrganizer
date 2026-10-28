@@ -1,16 +1,17 @@
-from typing import Any, Literal, TypedDict, Optional
 import os
 from datetime import datetime
-from xmlschema import XMLSchema11
-import jinja2
+from typing import Any, Literal, TypedDict
 
-from .services.database import get
-from .entities import Folder, Document, Package, Databases, Metadata
+import jinja2
+from xmlschema import XMLSchema11
+
+from .entities import Databases, Document, Folder, Metadata, Package
 from .entities.errors import XMLValidationError
+from .services.database import get
 
 StructMap = TypedDict('StructMap', {
     'name': str,
-    'metadata': Optional[str],
+    'metadata': str | None,
     'folders': list['StructMap'],
     'files': list[Document],
 })
@@ -158,7 +159,7 @@ def build_sip_metadata(package_data, file_list, structmap: StructMap) -> str:
     try:
         schema.validate(rendered_xml)
     except Exception as error:
-        raise XMLValidationError(f'Validation of METS-File failed: {str(error)}', rendered_xml)
+        raise XMLValidationError(f'Validation of METS-File failed: {error!s}', rendered_xml)
     return rendered_xml
 
 def add_label(metadata: Metadata):

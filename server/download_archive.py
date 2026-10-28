@@ -1,19 +1,25 @@
+import hashlib
 import logging
 import os
-from typing import Generator
+from collections.abc import Generator
 
 from flask import request
-import hashlib
 from jinja2.exceptions import UndefinedError
 from zipstream import ZipStream
 
-from .services.authentication import userdata
-from .entities.errors import XMLValidationError
-from .util import can_read, error_page
-from .entities import Document, Package, Databases
-from .services.database import get, get_attachment
-from .export_utils import create_structmap, create_package_data, build_sip_metadata, check_structmap, create_file_list
 from . import APP
+from .entities import Databases, Document, Package
+from .entities.errors import XMLValidationError
+from .export_utils import (
+    build_sip_metadata,
+    check_structmap,
+    create_file_list,
+    create_package_data,
+    create_structmap,
+)
+from .services.authentication import userdata
+from .services.database import get, get_attachment
+from .util import can_read, error_page
 
 TEMP_DIR = os.path.join('server','tmp')
 

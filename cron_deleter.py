@@ -1,10 +1,11 @@
 from datetime import datetime
+
 from dotenv import load_dotenv
 from requests.models import HTTPError
 
-from server.package import delete_folder, delete_document
 from server.entities import Databases, Package
-from server.services.database import get, getall, delete
+from server.package import delete_document, delete_folder
+from server.services.database import delete, get, getall
 
 load_dotenv(dotenv_path=".env")
 
@@ -89,5 +90,5 @@ for package in packages:
     else:
         print(" -> keep")
 
-    print("")
+    print()
 

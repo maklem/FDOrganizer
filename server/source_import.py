@@ -16,8 +16,8 @@ from .entities.errors import PluginError
 from .entities.organisation import Organisation
 from .services.authentication import (
     add_plugin,
-    userdata,
     remove_plugin,
+    userdata,
 )
 from .services.database import get
 from .shared import persist_documents

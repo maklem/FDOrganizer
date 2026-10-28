@@ -71,7 +71,7 @@ def navtos():
     TOS_FILE="terms-of-service.html"
     try:
         return render_template(TOS_FILE)
-    except jinja2.exceptions.TemplateNotFound as e:
+    except jinja2.exceptions.TemplateNotFound:
         APP.logger.error("Terms of Service not found. Please add your terms as 'server/templates/terms-of-service.html'")
         return render_template("terms-of-service-missing.html")
 
@@ -81,7 +81,7 @@ def navconsent():
     try:
         with open(CONSENT_FILE) as f:
             data = f.read()
-    except jinja2.exceptions.TemplateNotFound as e:
+    except jinja2.exceptions.TemplateNotFound:
         APP.logger.error(f"Consent text not found. Please add your terms as '{CONSENT_FILE}'")
         data = ""
     return {"html": data}
