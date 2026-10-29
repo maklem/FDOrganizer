@@ -22,6 +22,7 @@ from .util import (
     can_read,
     can_read_folder,
     get_database_from_string,
+    is_valid_filename,
     json_body,
     web_error,
     web_error_database_connection,
@@ -38,15 +39,18 @@ def get_package(package_id) -> Response:
         return web_error_database_connection(error)
     # Check if user has rights to view the package
     if not can_read(package, request):
-        return web_error(401, "You don't have permission to view this content", component= "SERVER")
+        return web_error(
+            401, "You don't have permission to view this content", component="SERVER"
+        )
     # Get package content from DB
     try:
-        content = get_content(package.get('folders'), package.get('documents'))
+        content = get_content(package.get("folders"), package.get("documents"))
     except HTTPError as error:
         return web_error_database_connection(error)
     # Return package and its content
-    result = {'package': Package.convert(package)} | content
-    return web_response(200, details = result)
+    result = {"package": Package.convert(package)} | content
+    return web_response(200, details=result)
+
 
 @APP.route("/folder/<folder_id>/content", methods=["GET"])
 def get_folder_content(folder_id) -> Response:
@@ -57,14 +61,17 @@ def get_folder_content(folder_id) -> Response:
         return web_error_database_connection(error)
     # Check if user has rights to view the folder contents
     if not can_read_folder(folder, request):
-        return web_error(401, "You don't have permission to view this content", component= "SERVER")
+        return web_error(
+            401, "You don't have permission to view this content", component="SERVER"
+        )
     # Get folder content from DB
     try:
-        content = get_content(folder.get('folders'), folder.get('documents'))
+        content = get_content(folder.get("folders"), folder.get("documents"))
     except HTTPError as error:
         return web_error_database_connection(error)
     # Return folder contents
-    return web_response(200, details = content)
+    return web_response(200, details=content)
+
 
 @APP.route("/package/folder", methods=["PUT"])
 @json_body
@@ -73,38 +80,44 @@ def create_folder(name: str, parent: str, parent_type: str) -> Response:
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not can_add_files(package_or_folder, request):
-        return web_error(401, "You don't have permission to edit this content", component= "SERVER")
+        return web_error(
+            401, "You don't have permission to edit this content", component="SERVER"
+        )
+
+    if not is_valid_filename(name):
+        return web_error(400, "Name of folder is invalid.", component="SERVER")
+
     # Create new folder object
     username = userdata().username
-    if parent_type == 'package':
-        package_id =package_or_folder.get('_id')
+    if parent_type == "package":
+        package_id = package_or_folder.get("_id")
     else:
-        package_id = package_or_folder.get('package_id')
+        package_id = package_or_folder.get("package_id")
     if package_id is None:
-        return web_error(500, "Package ID for creating the folder not found", component= "SERVER")
-    folder = Folder(name=name, documents=[], folders=[], owner=username, package_id=package_id)
-    #Persist folder
+        return web_error(
+            500, "Package ID for creating the folder not found", component="SERVER"
+        )
+    folder = Folder(
+        name=name, documents=[], folders=[], owner=username, package_id=package_id
+    )
+    # Persist folder
     try:
         folder_created = post(Databases.FOLDERS, folder.to_json()).json()
     except HTTPError as error:
         return web_error_database_connection(error)
     except KeyError as error:
-        return web_error(400, error.args[0], component= "DATABASE")
-    #Update parent to include folder
-    changes = {
-        'folders': {
-            "method": "append",
-            "value": folder_created.get('id')
-        }
-    }
+        return web_error(400, error.args[0], component="DATABASE")
+    # Update parent to include folder
+    changes = {"folders": {"method": "append", "value": folder_created.get("id")}}
     try:
         update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
     except HTTPError as error:
         # Delete new folder on error
-        delete_folder(folder_created.get('id'))
+        delete_folder(folder_created.get("id"))
         return web_error_database_connection(error)
-    return web_response(200, 'Success', folder_created)
+    return web_response(200, "Success", folder_created)
+
 
 def file_size_of(entry: Package | Folder) -> int:
     size = 0
@@ -114,76 +127,89 @@ def file_size_of(entry: Package | Folder) -> int:
         size += file_size_of(Folder.from_dict(get(Databases.FOLDERS, folder).json()))
     return size
 
+
 @APP.route("/package/documents", methods=["POST"])
 def create_documents() -> Response:
-    if int(request.headers['Content-Length']) > int(APP.config['MAX_CONTENT_LENGTH']):
-        return web_error(413, "File is too large to be processed", component= "SERVER")
+    if int(request.headers["Content-Length"]) > int(APP.config["MAX_CONTENT_LENGTH"]):
+        return web_error(413, "File is too large to be processed", component="SERVER")
     # Get Infos from request header and body
     username = userdata().username
-    parent = request.form.get('parent')
-    parent_type = request.form.get('parentType')
+    parent = request.form.get("parent")
+    parent_type = request.form.get("parentType")
     if parent is None or parent_type is None:
-        return web_error(400, "Request is missing information", component= "SERVER")
+        return web_error(400, "Request is missing information", component="SERVER")
 
     # Check ownership of parent, to determine if creation of subelement is valid
     package_or_folder = get(get_database_from_string(parent_type), parent).json()
     if not can_add_files(package_or_folder, request):
-        return web_error(401, "You don't have permission to edit this content", component="SERVER")
+        return web_error(
+            401, "You don't have permission to edit this content", component="SERVER"
+        )
 
-    #Create documents for uploaded files
+    # Create documents for uploaded files
     file_document_pairs = []
-    failed_files= []
+    failed_files = []
     for file in request.files.values():
+        if not is_valid_filename(file.filename):
+            failed_files.append(
+                {
+                    "file": file.filename,
+                    "error": f"Name of file '{file.filename}' is invalid.",
+                }
+            )
+            continue
         try:
             file_document_pairs.append(create_file_document_pair(file, username))
         except HTTPError as error:
-            failed_files.append({'file': file.filename, 'error': error.args[0]})
+            failed_files.append({"file": file.filename, "error": error.args[0]})
 
-    new_size = sum(entry['document'].size for entry in file_document_pairs)
+    new_size = sum(entry["document"].size for entry in file_document_pairs)
 
-    if parent_type == 'package':
+    if parent_type == "package":
         package_id = parent
     else:
-        package_id: str = package_or_folder['package_id']
+        package_id: str = package_or_folder["package_id"]
 
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
     stored_size = file_size_of(package)
 
-    package_size_limit = APP.config.get('MAX_PACKAGE_SIZE', 1000)
+    package_size_limit = APP.config.get("MAX_PACKAGE_SIZE", 1000)
     if stored_size + new_size > package_size_limit:
-        return web_error(413, f"Upload denied. Package would exceed configured limit of MAX_PACKAGE_SIZE={package_size_limit} bytes.")
+        return web_error(
+            413,
+            f"Upload denied. Package would exceed configured limit of MAX_PACKAGE_SIZE={package_size_limit} bytes.",
+        )
 
-
-    #Persist documents and files in DB
+    # Persist documents and files in DB
     persisted_documents = persist_documents(file_document_pairs, parent, parent_type)
-    
-    persisted_documents['failed'] = failed_files
-    return web_response(200, 'Success', persisted_documents)
+
+    persisted_documents["failed"] = failed_files
+    return web_response(200, "Success", persisted_documents)
+
 
 @APP.route("/package/document/<document_id>", methods=["DELETE"])
 def delete_document_from_package(document_id) -> Response:
     # Check incoming request for errors
     if not request.json:
-        return web_error(400, "Request is missing information", component= "SERVER")
-    
-    #Check ownership
+        return web_error(400, "Request is missing information", component="SERVER")
+
+    # Check ownership
     document = get(Databases.DOCUMENTS, document_id).json()
     if document is None:
-        return web_error(400, f'Document with id {document_id} does not exist', component= "SERVER")
+        return web_error(
+            400, f"Document with id {document_id} does not exist", component="SERVER"
+        )
     if not can_delete_files(document, request):
-        return web_error(401, "You don't have permission to delete this content", component= "SERVER")
-    
+        return web_error(
+            401, "You don't have permission to delete this content", component="SERVER"
+        )
+
     # Get Infos from request header and body
-    parent = request.json.get('parent')
-    parent_type = request.json.get('parentType')
+    parent = request.json.get("parent")
+    parent_type = request.json.get("parentType")
 
     # Delete document reference from parent object first
-    changes = {
-        'documents': {
-            'method': 'remove',
-            'value': document_id
-        }
-    }
+    changes = {"documents": {"method": "remove", "value": document_id}}
     try:
         update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
@@ -195,33 +221,32 @@ def delete_document_from_package(document_id) -> Response:
         delete(Databases.DOCUMENTS, document_id)
     except HTTPError as error:
         return web_error_database_connection(error)
-    return web_response(200, 'Document deleted')
+    return web_response(200, "Document deleted")
 
 
 @APP.route("/package/folder/<folder_id>", methods=["DELETE"])
 def delete_folder_from_package(folder_id) -> Response:
     # Check incoming request for errors
     if not request.json:
-        return web_error(400, "Request is missing information", component= "SERVER")
+        return web_error(400, "Request is missing information", component="SERVER")
     # Get Infos from request header and body
     folder = get(Databases.FOLDERS, folder_id).json()
 
-    if folder is None: 
-        return web_error(400, f'Folder with id {folder_id} does not exist', component= "SERVER")
+    if folder is None:
+        return web_error(
+            400, f"Folder with id {folder_id} does not exist", component="SERVER"
+        )
     if not can_delete_files(folder, request):
-        return web_error(401, "You don't have permission to delete this content", component= "SERVER")
-    
+        return web_error(
+            401, "You don't have permission to delete this content", component="SERVER"
+        )
+
     # Get Infos from request header and body
-    parent = request.json.get('parent')
-    parent_type = request.json.get('parentType')
+    parent = request.json.get("parent")
+    parent_type = request.json.get("parentType")
 
     # Delete document reference from parent object first
-    changes = {
-        'folders': {
-            'method': 'remove',
-            'value': folder_id
-        }
-    }
+    changes = {"folders": {"method": "remove", "value": folder_id}}
     try:
         update(get_database_from_string(parent_type), parent, changes)
         # TODO: Get package id for modify_package()
@@ -230,17 +255,21 @@ def delete_folder_from_package(folder_id) -> Response:
 
     # After the reference is sucessfully deleted, delete document itself
     if not delete_folder(folder_id):
-        return web_error(500, "Folder could not be deleted successfully", component= "DATABASE")
-    return web_response(200, 'Folder deleted')
+        return web_error(
+            500, "Folder could not be deleted successfully", component="DATABASE"
+        )
+    return web_response(200, "Folder deleted")
 
 
-def create_file_document_pair(file: FileStorage, username: str) -> dict[str,Any]:
+def create_file_document_pair(file: FileStorage, username: str) -> dict[str, Any]:
     # Check uploaded file integrity
     if file is None:
-        raise HTTPError('No file provided')
+        raise HTTPError("No file provided")
     if not file.filename:
-        raise HTTPError('No filename available')
-    
+        raise HTTPError("No filename available")
+    if not is_valid_filename(file.filename):
+        raise HTTPError("Name of file is invalid")
+
     file_data = file.read()
     hash_md5 = md5(file_data).hexdigest()
     hash_sha512 = sha512(file_data).hexdigest()
@@ -255,35 +284,32 @@ def create_file_document_pair(file: FileStorage, username: str) -> dict[str,Any]
         hash_md5=hash_md5,
         hash_sha512=hash_sha512,
         source="manual upload",
-        owner=username)
-    return {'document': document, 'file': outfile }
+        owner=username,
+    )
+    return {"document": document, "file": outfile}
 
-            
-def content_query(id_array) -> dict[str,Any]:
-    return {
-        "selector": {
-            "_id": {
-                "$in": id_array
-            }
-        },
-        "limit": 1000
-    }
+
+def content_query(id_array) -> dict[str, Any]:
+    return {"selector": {"_id": {"$in": id_array}}, "limit": 1000}
+
 
 def modify_package(package_id: str) -> requests.models.Response:
-    now = round(time.time()*1000)
-    changes = {
-        "last_changed": now
-    }
+    now = round(time.time() * 1000)
+    changes = {"last_changed": now}
     return update(Databases.PACKAGES, package_id, changes)
 
-def get_content(folders: list[str], documents: list[str]) -> dict[str,Any]:
-    found_folders =find(
-        Databases.FOLDERS,
-        json.dumps(content_query(folders))
-    ).json().get('docs')
-    found_documents = find(
-        Databases.DOCUMENTS,
-        json.dumps(content_query(documents))
-    ).json().get('docs')
 
-    return {"folders": [Folder.convert(x) for x in found_folders], "documents": [Document.convert(x) for x in found_documents] }
+def get_content(folders: list[str], documents: list[str]) -> dict[str, Any]:
+    found_folders = (
+        find(Databases.FOLDERS, json.dumps(content_query(folders))).json().get("docs")
+    )
+    found_documents = (
+        find(Databases.DOCUMENTS, json.dumps(content_query(documents)))
+        .json()
+        .get("docs")
+    )
+
+    return {
+        "folders": [Folder.convert(x) for x in found_folders],
+        "documents": [Document.convert(x) for x in found_documents],
+    }

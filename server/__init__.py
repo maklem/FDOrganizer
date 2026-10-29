@@ -6,28 +6,29 @@ import re
 from cachelib import FileSystemCache
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, request
-from werkzeug.exceptions import HTTPException
-
 from flask_session import Session
+from werkzeug.exceptions import HTTPException
 
 from .services.authentication import is_authorized, userdata
 from .util import web_error
 
 APP = Flask(__name__)
-APP.config["UPLOAD_FOLDER"] = './uploads'
+APP.config["UPLOAD_FOLDER"] = "./uploads"
 APP.config["MAX_CONTENT_LENGTH"] = 1_000_000_000
 APP.config["APPLICATION_ROOT"] = "/"
 
 APP.config["SESSION_PERMANENT"] = False
 APP.config["SESSION_TYPE"] = "cachelib"
-APP.config['SESSION_CACHELIB'] = FileSystemCache(cache_dir='flask_session', threshold=500)
+APP.config["SESSION_CACHELIB"] = FileSystemCache(cache_dir="fdo_session", threshold=500)
 APP.config["SESSION_COOKIE_NAME"] = "fdo_session"
 APP.config["SESSION_COOKIE_HTTPONLY"] = True
-APP.config["SESSION_COOKIE_SECURE"] = os.getenv("TEST_SESSION_NOT_SECURE", "no") != "yes"  # ignore HTTPS in CI
+APP.config["SESSION_COOKIE_SECURE"] = (
+    os.getenv("TEST_SESSION_NOT_SECURE", "no") != "yes"
+)  # ignore HTTPS in CI
 APP.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 APP.config["PERMANENT_SESSION_LIFETIME"] = 3600 * 10
 
-APP.config["MAX_PACKAGE_SIZE"] = 5*1024*1024*1024
+APP.config["MAX_PACKAGE_SIZE"] = 5 * 1024 * 1024 * 1024
 
 APP.config["KEEP_ACTIVE_PACKAGES_DAYS"] = 60
 APP.config["KEEP_ARCHIVED_PACKAGES_DAYS"] = 15
@@ -38,9 +39,16 @@ load_dotenv(dotenv_path="../.env")
 
 APP.config.from_prefixed_env(prefix="FDO")
 
+
 @APP.errorhandler(HTTPException)
 def handle_exception(error):
-    return web_error(error.code, f'{error.name}: {error.description}', stacktrace=error.description, component="SERVER")
+    return web_error(
+        error.code,
+        f"{error.name}: {error.description}",
+        stacktrace=error.description,
+        component="SERVER",
+    )
+
 
 class CredentialFilter(logging.Filter):
     def filter(self, record):
@@ -50,9 +58,10 @@ class CredentialFilter(logging.Filter):
         route = request.path
         if "/login-oidc" in route or "/login-local" in route:
             record.contains_credentials = True
-        if re.search("/import/.+/login",route):
+        if re.search("/import/.+/login", route):
             record.contains_credentials = True
         return True
+
 
 class RequestFormatter(logging.Formatter):
     def format(self, record):
@@ -62,10 +71,10 @@ class RequestFormatter(logging.Formatter):
             record.username = request.remote_addr
             if is_authorized():
                 record.username = userdata().username
-            record.params = '---'
+            record.params = "---"
             if not record.contains_credentials and request.is_json:
                 jsondata = request.get_json(silent=True)
-                if jsondata is not None: 
+                if jsondata is not None:
                     record.params = request.json
         else:
             record.url = None
@@ -73,15 +82,29 @@ class RequestFormatter(logging.Formatter):
 
         return super().format(record)
 
+
 formatter = RequestFormatter(
-    '[%(asctime)s] %(username)s %(type)s to %(url)s\n%(params)s',
-    datefmt='%d.%m.%y %H:%M:%S'
+    "[%(asctime)s] %(username)s %(type)s to %(url)s\n%(params)s",
+    datefmt="%d.%m.%y %H:%M:%S",
 )
 credentialfilter = CredentialFilter()
 logfilename = os.getenv("FDO_SERVERLOG")
-logfile_handler = logging.handlers.WatchedFileHandler(logfilename if logfilename is not None else 'server.log')
+logfile_handler = logging.handlers.WatchedFileHandler(
+    logfilename if logfilename is not None else "server.log"
+)
 logfile_handler.addFilter(credentialfilter)
 logfile_handler.setFormatter(formatter)
 APP.logger.addHandler(logfile_handler)
 
-from . import router,login,metadata,package_details,package,source_import,archive,export, review, download_archive  # noqa: E402, F401
+from . import (  # noqa: F401
+    archive,
+    download_archive,
+    export,
+    login,
+    metadata,
+    package,
+    package_details,
+    review,
+    router,
+    source_import,
+)

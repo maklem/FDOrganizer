@@ -1,4 +1,3 @@
-import re
 from playwright.sync_api import Page, expect
 
 
@@ -6,7 +5,9 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
     page.goto(f"{fdorganizer_url}/login")
 
     # Log in
-    page.locator("#organisation-selector").select_option(label="Login of Example University [Local]")
+    page.locator("#organisation-selector").select_option(
+        label="Login of Example University [Local]"
+    )
     page.locator("#auth-username").fill("reviewer")
     page.locator("#auth-password").fill("reviewer")
     page.get_by_role("button", name="Consent and log in").click()
@@ -30,7 +31,9 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
     archive_item = page.locator(".archive-list-item").filter(has_text="Testproject")
     archive_item.locator(".open-metadata").click()
     page.get_by_role("heading", name="Required").click()
-    page.get_by_label("Type of identifier").select_option("resourceIdentifierNotApplicable")
+    page.get_by_label("Type of identifier").select_option(
+        "resourceIdentifierNotApplicable"
+    )
     page.get_by_label("Creator").select_option("personal")
     page.get_by_label("NamenameORCiD---").select_option("name")
     page.get_by_role("textbox", name="Last Name").fill("Test")
@@ -51,7 +54,9 @@ def test_solo_reviewer_happy_path(page: Page, fdorganizer_url: str) -> None:
     page.get_by_role("checkbox", name="I attest that the cost for").check()
     page.get_by_placeholder("yy").fill("5")
     page.get_by_role("checkbox", name="I attest that all personal").check()
-    page.get_by_role("radio", name="All existing personal data in this package was removed").check()
+    page.get_by_role(
+        "radio", name="All existing personal data in this package was removed"
+    ).check()
     page.get_by_role("button", name="Save").click()
 
     # hand in for review

@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal
 
-from dataclasses_json import DataClassJsonMixin, config
+from dataclasses_json import DataClassJsonMixin
 
 shouldBeExcluded = lambda x: x is None
 
@@ -12,4 +12,4 @@ class ArchiveSettings(DataClassJsonMixin):
     duration: int
     checkTerms: bool
     checkDSGVO: bool
-    personalData: Literal['none', 'anonymous', 'consent']
+    personalData: Literal["none", "anonymous", "consent"]

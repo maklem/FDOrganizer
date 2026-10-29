@@ -1,18 +1,25 @@
-'''
-    Script for creating a new couchDB Database
-'''
+"""
+Script for creating a new couchDB Database
+"""
+
+import json
 import os
 import sys
-from dotenv import load_dotenv
-import json
+
 import couchdb
+from dotenv import load_dotenv
+
 from server.entities.databases import Databases
+
 
 def getenv(key: str) -> str:
     val = os.getenv(key)
     if not val:
-        raise ValueError(f"Could not find {key} in environment. Is not defined or empty.")
+        raise ValueError(
+            f"Could not find {key} in environment. Is not defined or empty."
+        )
     return val
+
 
 def connect_couchdb() -> couchdb.Server:
     user = getenv("COUCHDB_USER")
@@ -20,12 +27,15 @@ def connect_couchdb() -> couchdb.Server:
     host = getenv("COUCHDB_HOST")
     port = getenv("COUCHDB_PORT")
 
-    COUCHDB_SERVER = f'http://{user}:{password}@{host}:{port}/'
+    COUCHDB_SERVER = f"http://{user}:{password}@{host}:{port}/"
     return couchdb.Server(COUCHDB_SERVER)
+
 
 def print_help():
     import textwrap
-    print(textwrap.dedent("""
+
+    print(
+        textwrap.dedent("""
     ---- FDOrganizer Maintenance Tool ----
 
     Usage: python3 maintenance.py [command] [Options...]
@@ -41,8 +51,9 @@ def print_help():
                 uv run maintenance.py populate organisations dummy_organisation.json
                 uv run maintenance.py populate identityproviders dummy_local_idp.json
                 uv run maintenance.py populate users dummy_local_users.json
-    """
-))
+    """)
+    )
+
 
 def populate(server: couchdb.Server, args: list[str]) -> bool:
     if len(args) != 2:
@@ -54,7 +65,7 @@ def populate(server: couchdb.Server, args: list[str]) -> bool:
 
     with open(filename) as f:
         contents = json.load(f)
-    
+
     if isinstance(contents, list):
         for entry in contents:
             server[database].save(entry)
@@ -87,7 +98,8 @@ def create_databases(server: couchdb.Server) -> None:
     for db in Databases:
         _ensure_database(server, db.value)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if len(sys.argv) == 1 or "--help" in sys.argv:
         print_help()
         sys.exit()

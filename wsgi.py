@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+
 from server import APP
 
 if load_dotenv(dotenv_path=".env"):

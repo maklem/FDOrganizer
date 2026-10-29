@@ -5,7 +5,7 @@
 
 # Server config and caches
 __pycache__
-flask_session
+fdo_session
 /server/tmp
 /server/templates/terms-of-service.html
 /data-consent.html
@@ -17,6 +17,7 @@ flask_session
 /.vscode
 /.mypy_cache
 /.idea
+/.ruff_cache
 
 # Environment variables
 .env

@@ -1,79 +1,98 @@
-from typing import Any, Literal, TypedDict, Optional
 import os
 from datetime import datetime
-from xmlschema import XMLSchema11
+from typing import Any, Literal, TypedDict
+
 import jinja2
+from xmlschema import XMLSchema11
 
-from .services.database import get
-from .entities import Folder, Document, Package, Databases, Metadata
+from .entities import Databases, Document, Folder, Metadata, Package
 from .entities.errors import XMLValidationError
+from .services.database import get
 
-StructMap = TypedDict('StructMap', {
-    'name': str,
-    'metadata': Optional[str],
-    'folders': list['StructMap'],
-    'files': list[Document],
-})
+StructMap = TypedDict(
+    "StructMap",
+    {
+        "name": str,
+        "metadata": str | None,
+        "folders": list["StructMap"],
+        "files": list[Document],
+    },
+)
+
 
 def timestamp_to_date(value, format="%Y-%m-%d"):
     return datetime.fromtimestamp(value / 1000).strftime(format)
 
-def create_package_data(package: Package) -> dict[Literal['metadata','id'],Any]:
-    if package.metadata is None:
-        raise ValueError('Package has no metadata')
-    metadata = Metadata.from_dict(get(Databases.METADATA, package.metadata).json())
-    return {
-        'metadata': metadata.metadata,
-        'id': package.id
-    }
 
-def _check_languages(languages: list[dict[str,Any]], filename) -> list[str]:
+def create_package_data(package: Package) -> dict[Literal["metadata", "id"], Any]:
+    if package.metadata is None:
+        raise ValueError("Package has no metadata")
+    metadata = Metadata.from_dict(get(Databases.METADATA, package.metadata).json())
+    return {"metadata": metadata.metadata, "id": package.id}
+
+
+def _check_languages(languages: list[dict[str, Any]], filename) -> list[str]:
     errors: list[str] = []
 
     for i in range(len(languages)):
-        error_prefix = f"In metadata for \"{filename}\": language[{i}]"
+        error_prefix = f'In metadata for "{filename}": language[{i}]'
         if "languageType" not in languages[i]:
             errors.append(f"{error_prefix} has no type.")
             continue
         if languages[i]["languageType"][0] == "naturalLanguage":
             if "languageCode" not in languages[i]:
-                errors.append(f"{error_prefix} of type 'naturalLanguage' has no languageCode.")
+                errors.append(
+                    f"{error_prefix} of type 'naturalLanguage' has no languageCode."
+                )
                 continue
-            if languages[i]["languageCode"][0] == "custom":
+            if languages[i]["languageCode"][0] == "custom":  # noqa: SIM102
                 if "customLanguage" not in languages[i]:
-                    errors.append(f"{error_prefix} of type 'naturalLanguage' with code 'custom' has no custom value.")
+                    errors.append(
+                        f"{error_prefix} of type 'naturalLanguage' with code 'custom' has no custom value."
+                    )
                     continue
         elif languages[i]["languageType"][0] == "programmingLanguage":
             if "customProgrammingLanguage" not in languages[i]:
-                errors.append(f"{error_prefix} of type 'programmingLanguage' has no value.")
+                errors.append(
+                    f"{error_prefix} of type 'programmingLanguage' has no value."
+                )
                 continue
         else:
             errors.append(f"{error_prefix} has unknown type.")
             continue
     return errors
 
+
 def _check_document(prefix: str, document: Document) -> list[str]:
     errors = []
     if document.metadata is not None:
         metadata = Metadata.from_dict(get(Databases.METADATA, document.metadata).json())
         if "language" in metadata.metadata:
-            errors = _check_languages(metadata.metadata["language"], os.path.join(prefix, document.name))
+            errors = _check_languages(
+                metadata.metadata["language"], os.path.join(prefix, document.name)
+            )
     return errors
+
 
 def _check_folder(prefix: str, folder: StructMap) -> list[str]:
     errors = []
     if "metadata" in folder and folder["metadata"] is not None:
-        metadata = Metadata.from_dict(get(Databases.METADATA, folder["metadata"]).json())
+        metadata = Metadata.from_dict(
+            get(Databases.METADATA, folder["metadata"]).json()
+        )
         if "language" in metadata.metadata:
-            errors = _check_languages(metadata.metadata["language"], os.path.join(prefix, folder["name"]))
+            errors = _check_languages(
+                metadata.metadata["language"], os.path.join(prefix, folder["name"])
+            )
     return errors
+
 
 def _check_filecount(structmap: StructMap) -> list[str]:
     errors = []
 
     def count_files(structmap) -> int:
-        here = len(structmap['files'])
-        there = sum(count_files(folder) for folder in structmap['folders'])
+        here = len(structmap["files"])
+        there = sum(count_files(folder) for folder in structmap["folders"])
         return here + there
 
     if 0 == count_files(structmap):
@@ -81,43 +100,58 @@ def _check_filecount(structmap: StructMap) -> list[str]:
     return errors
 
 
-def check_structmap(prefix, structmap:StructMap) -> list[str]:
+def check_structmap(prefix, structmap: StructMap) -> list[str]:
     errors = []
-    if prefix=="":
-        if structmap['metadata'] is None:
+    if prefix == "":
+        if structmap["metadata"] is None:
             errors.append("Package requires metadata, but none were found.")
         errors = errors + _check_filecount(structmap)
 
     errors = errors + _check_folder(prefix, structmap)
 
     current_prefix = os.path.join(prefix, structmap["name"])
-    for file in structmap['files']:
+    for file in structmap["files"]:
         for e in _check_document(current_prefix, file):
             errors.append(e)
-    for folder in structmap['folders']:
+    for folder in structmap["folders"]:
         for e in check_structmap(current_prefix, folder):
             errors.append(e)
     return errors
 
+
 def create_structmap(entity: Package | Folder) -> StructMap:
-    documents = [Document.from_db(get(Databases.DOCUMENTS, document_id).json()) for document_id in entity.documents]
-    folders = [Folder.from_dict(get(Databases.FOLDERS, folder_id).json()) for folder_id in entity.folders]
+    documents = [
+        Document.from_db(get(Databases.DOCUMENTS, document_id).json())
+        for document_id in entity.documents
+    ]
+    folders = [
+        Folder.from_dict(get(Databases.FOLDERS, folder_id).json())
+        for folder_id in entity.folders
+    ]
     return {
-        'name': entity.name,
-        'metadata': entity.metadata,
-        'files': documents,
-        'folders': [create_structmap(folder) for folder in folders]
+        "name": entity.name,
+        "metadata": entity.metadata,
+        "files": documents,
+        "folders": [create_structmap(folder) for folder in folders],
     }
 
-def create_file_list(structmap, structpath = "") -> list[dict[str,Any]]:
-    doc_data = [create_document_data(document, structpath) for document in structmap.get('files')]
 
-    nested_data = [create_file_list(folder, os.path.join(structpath, folder.get('name'))) for folder in structmap.get('folders')]
+def create_file_list(structmap, structpath="") -> list[dict[str, Any]]:
+    doc_data = [
+        create_document_data(document, structpath)
+        for document in structmap.get("files")
+    ]
+
+    nested_data = [
+        create_file_list(folder, os.path.join(structpath, folder.get("name")))
+        for folder in structmap.get("folders")
+    ]
     flat_nested_data = [file_info for sublist in nested_data for file_info in sublist]
 
     return [*doc_data, *flat_nested_data]
 
-def create_document_data(document: Document, structpath: str) -> dict[str,Any]:
+
+def create_document_data(document: Document, structpath: str) -> dict[str, Any]:
     label = ""
     note = ""
     metadata: Metadata | None = None
@@ -126,50 +160,66 @@ def create_document_data(document: Document, structpath: str) -> dict[str,Any]:
         label = add_label(metadata)
         note = add_note(metadata)
     else:
-        print(f'No metadata found for document {document.name} with ID {document.id}')
-    
+        print(f"No metadata found for document {document.name} with ID {document.id}")
+
     return {
-        'id': document.id,
-        'fileOriginalName': document.name,
-        'fileOriginalPath': os.path.join(structpath, document.name),
-        'fileSizeBytes': str(document.size),
-        'fileCreationDate': datetime.now().strftime('%Y-%m-%d'),
-        'fileModificationDate': datetime.now().strftime('%Y-%m-%d'),
-        'MD5': document.hash_md5,
-        'label': label,
-        'note':  note,
-        'metadata': metadata if metadata is not None else None
+        "id": document.id,
+        "fileOriginalName": document.name,
+        "fileOriginalPath": os.path.join(structpath, document.name),
+        "fileSizeBytes": str(document.size),
+        "fileCreationDate": datetime.now().strftime("%Y-%m-%d"),
+        "fileModificationDate": datetime.now().strftime("%Y-%m-%d"),
+        "MD5": document.hash_md5,
+        "label": label,
+        "note": note,
+        "metadata": metadata if metadata is not None else None,
     }
 
+
 def build_sip_metadata(package_data, file_list, structmap: StructMap) -> str:
-    templateLoader = jinja2.FileSystemLoader(searchpath=[os.path.join('server', 'metadata_templates', 'rosetta-mets'), os.path.join('server', 'metadata_templates', 'dublincore')])
+    templateLoader = jinja2.FileSystemLoader(
+        searchpath=[
+            os.path.join("server", "metadata_templates", "rosetta-mets"),
+            os.path.join("server", "metadata_templates", "dublincore"),
+        ]
+    )
     templateEnv = jinja2.Environment(
         loader=templateLoader,
         autoescape=jinja2.select_autoescape(),
         trim_blocks=True,
-        lstrip_blocks=True
+        lstrip_blocks=True,
     )
     templateEnv.filters["timestamp_to_date"] = timestamp_to_date
-    template = templateEnv.get_template('rosetta-mets.xml.jinja')
-    rendered_xml = template.render(files = file_list, package = package_data, structmap = structmap)
-    schema_path = os.path.join('server', 'metadata_templates', 'rosetta-mets', 'schema')
-    schema_file = open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd'))
-    schema = XMLSchema11(schema_file, base_url=schema_path)
-    try:
-        schema.validate(rendered_xml)
-    except Exception as error:
-        raise XMLValidationError(f'Validation of METS-File failed: {str(error)}', rendered_xml)
+    template = templateEnv.get_template("rosetta-mets.xml.jinja")
+    rendered_xml = template.render(
+        files=file_list, package=package_data, structmap=structmap
+    )
+    schema_path = os.path.join("server", "metadata_templates", "rosetta-mets", "schema")
+    with open(os.path.join(schema_path, "rosetta-mets_7.3.xsd")) as schema_file:
+        schema = XMLSchema11(schema_file, base_url=schema_path)
+        try:
+            schema.validate(rendered_xml)
+        except XMLValidationError as error:
+            raise XMLValidationError(
+                f"Validation of METS-File failed: {error!s}", rendered_xml
+            )
     return rendered_xml
+
 
 def add_label(metadata: Metadata):
     try:
-        return metadata.metadata['title'][0]['titleText'][0]
+        return metadata.metadata["title"][0]["titleText"][0]
     except KeyError:
         return ""
-    
+
+
 def add_note(metadata: Metadata):
     try:
-        notes = [description['textAbstract'] for description in metadata.metadata['description'] if description['descriptionType'][0] == "descriptionAbstract"]
+        notes = [
+            description["textAbstract"]
+            for description in metadata.metadata["description"]
+            if description["descriptionType"][0] == "descriptionAbstract"
+        ]
         if notes:
             return notes[0]
         else:

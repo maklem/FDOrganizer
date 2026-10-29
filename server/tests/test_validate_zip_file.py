@@ -28,21 +28,28 @@ def zip_limits():
 
 
 def test_validate_zip_file_accepts_valid_zip(zip_limits):
-    with build_zip([
-        ("first.txt", b"hello"),
-        ("folder/second.txt", b"world"),
-    ]) as zip_file:
+    with build_zip(
+        [
+            ("first.txt", b"hello"),
+            ("folder/second.txt", b"world"),
+        ]
+    ) as zip_file:
         assert validate_zip_file(zip_file) is None
 
 
 def test_validate_zip_file_rejects_absolute_paths(zip_limits):
     with build_zip([("/etc/passwd", b"nope")]) as zip_file:
-        assert validate_zip_file(zip_file) == "Archive contains absolute path: /etc/passwd"
+        assert (
+            validate_zip_file(zip_file) == "Archive contains absolute path: /etc/passwd"
+        )
 
 
 def test_validate_zip_file_rejects_path_traversal(zip_limits):
     with build_zip([("../evil.txt", b"nope")]) as zip_file:
-        assert validate_zip_file(zip_file) == "Archive contains path traversal: ../evil.txt"
+        assert (
+            validate_zip_file(zip_file)
+            == "Archive contains path traversal: ../evil.txt"
+        )
 
 
 def test_validate_zip_file_rejects_too_many_files(zip_limits):
@@ -66,4 +73,6 @@ def test_validate_zip_file_rejects_long_entry_paths(zip_limits):
 def test_validate_zip_file_rejects_total_uncompressed_size_too_large(zip_limits):
     APP.config["MAX_PACKAGE_SIZE"] = 10
     with build_zip([("small-1.txt", b"x" * 6), ("small-2.txt", b"x" * 6)]) as zip_file:
-        assert validate_zip_file(zip_file) == "Total uncompressed size too large (12 > 10)"
+        assert (
+            validate_zip_file(zip_file) == "Total uncompressed size too large (12 > 10)"
+        )

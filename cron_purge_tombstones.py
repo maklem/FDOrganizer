@@ -1,31 +1,34 @@
 import os
-from dotenv import load_dotenv
-from couchdb import Server, Database
+
 import couchdb
+from couchdb import Database, Server
+from dotenv import load_dotenv
+
 
 def purge_thombstones(database: Database):
     try:
-        deletions = database.changes(since='0', include_docs='true')
+        deletions = database.changes(since="0", include_docs="true")
     except couchdb.http.ResourceNotFound as e:
         print(e)
         return
-    
+
     for d in deletions["results"]:
         if not d.get("deleted"):
             print(f"keeping {d['id']}")
             continue
-        doc = d['doc']
+        doc = d["doc"]
         print(f"purging {doc=}")
         database.purge([doc])
 
+
 load_dotenv(dotenv_path=".env")
 
-user = f'{os.getenv("COUCHDB_USER")}'
-password = f'{os.getenv("COUCHDB_PASSWORD")}'
-host = f'{os.getenv("COUCHDB_HOST")}'
-port = f'{os.getenv("COUCHDB_PORT")}'
+user = f"{os.getenv('COUCHDB_USER')}"
+password = f"{os.getenv('COUCHDB_PASSWORD')}"
+host = f"{os.getenv('COUCHDB_HOST')}"
+port = f"{os.getenv('COUCHDB_PORT')}"
 
-COUCHDB_SERVER = f'http://{user}:{password}@{host}:{port}/'
+COUCHDB_SERVER = f"http://{user}:{password}@{host}:{port}/"
 DATABASE_NAMES = [
     "documents",
     "folders",
@@ -41,5 +44,3 @@ for db in server:
 for db in DATABASE_NAMES:
     print(f"For {db} purge ...")
     purge_thombstones(server[db])
-
-

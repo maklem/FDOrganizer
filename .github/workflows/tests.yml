@@ -7,6 +7,7 @@ jobs:
   playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    needs: [pytest, ruff, ty]
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python
@@ -29,6 +30,7 @@ jobs:
   pytest:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    needs: [ruff, ty]
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python
@@ -41,3 +43,31 @@ jobs:
         pip install -r requirements.txt -r requirements.dev.txt
     - name: Run your tests
       run: pytest server/
+  ruff:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: install ruff
+      uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
+      with:
+        version: '0.17.1'
+        args: "--version"
+    - run: ruff check --verbose --output-format=github
+    - run: ruff format --check --output-format=github
+  ty:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Install dependencies
+      run: |
+        python -m venv .venv
+        .venv/bin/python -m pip install --upgrade pip
+        .venv/bin/pip install -r requirements.txt -r requirements.dev.txt ty==0.0.94
+    - name: Run ty
+      run: .venv/bin/ty check
