@@ -156,7 +156,7 @@ def get_plugins() -> list[Path]:
 
 
 def get_plugin_auth(source: str):
-    auth_token = payload(request.cookies['token']).get('plugins', {})
+    auth_token = userdata().plugins
     return auth_token.get(source)
 
 def get_plugin(source: str):

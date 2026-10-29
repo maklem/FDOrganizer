@@ -3,6 +3,8 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
+from requests import RequestException
+
 from . import APP
 from .entities import Databases, Document, Package
 from .entities.errors import ExportUserError, PathError, XMLValidationError
@@ -106,7 +108,7 @@ def create_ie_directory(structmap, structpath = ""):
 def download_file(document: Document, structpath:str):
     try:
         file_data = get_attachment(document.id, document.name).content # type: ignore
-    except Exception:
+    except RequestException:
         print(f'No attachment found for document {document.name} with ID {document.id}')
     doc_file = Path(os.path.join(TEMP_DIR, structpath, document.name))
     doc_file.parent.mkdir(exist_ok=True, parents=True)

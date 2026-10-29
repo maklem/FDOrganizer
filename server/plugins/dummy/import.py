@@ -21,7 +21,7 @@ def login(request: Request) -> Response:
     try:
         # setup required APIs here
         pass
-    except:
+    except:  # noqa: E722
         raise PluginError(500, 'Example plugin error')
     return web_response(200, "Authentication successful", None)
 

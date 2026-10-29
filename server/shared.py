@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Literal
 
-from requests import HTTPError
+from requests import HTTPError, RequestException
 
 from .entities import CouchDocument, Databases, Document
 from .services.database import attach, delete, get, post, update
@@ -19,7 +19,7 @@ def delete_folder(id: str) -> bool:
         try:
             if not delete_folder(subfolder):
                 failed_subfolders.append(subfolder)
-        except BaseException:
+        except RequestException:
             failed_subfolders.append(subfolder)
     if len(failed_subfolders) > 0:
         # TODO: Rollback for deletion 
@@ -30,7 +30,7 @@ def delete_folder(id: str) -> bool:
         try:
             if not delete_document(document):
                 failed_documents.append(document)
-        except BaseException:
+        except RequestException:
             failed_documents.append(document)
     if len(failed_documents) > 0:
         # TODO: Rollback for deletion 
@@ -40,14 +40,14 @@ def delete_folder(id: str) -> bool:
     if folder.get('metadata') is not None:
         try:
             delete(Databases.METADATA, folder.get('metadata'))
-        except BaseException:
+        except RequestException:
             # TODO: Rollback for deletion 
             return False
         
     # Delete the folder itself
     try:
         delete(Databases.FOLDERS, id)
-    except BaseException:
+    except RequestException:
         # TODO: Rollback for deletion 
         return False
 
@@ -60,13 +60,13 @@ def delete_document(id: str) -> bool:
     if document.get('metadata') is not None:
         try:
             delete(Databases.METADATA, document.get('metadata'))
-        except BaseException:
+        except RequestException:
             return False
         
     # Delete the document itself
     try:
         delete(Databases.DOCUMENTS, id)
-    except BaseException:
+    except RequestException:
         # TODO: Rollback for deletion 
         return False
 
@@ -81,7 +81,7 @@ def persist_documents(doc_file_pairs: list, parent, parent_type):
         try:
             document_id = create_document_with_attachement(pair['file'], pair['document'])
             documents['success'].append({'file': pair['document'].name, 'document_id': document_id})
-        except BaseException as error:
+        except RequestException as error:
             documents['failed'].append({'file': pair['document'].name, 'error': error.args[0]})
 
     #Update parent to include documents

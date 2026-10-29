@@ -70,7 +70,7 @@ def post_new_review(package_id: str, comments: list[dict[str, Any]] | None = Non
     review = Review(status="open", comments=[])
     # Add comments
     if comments is not None:
-        review.comments = [Comment(index = comment['index'], content=comment['content'], owner=user(request)) for comment in comments]
+        review.comments = [Comment(index = comment['index'], content=comment['content'], owner=userdata().username) for comment in comments]
     try:
         post_response = post(Databases.REVIEWS, review.to_json()).json()
         created_review = get(Databases.REVIEWS, post_response.get('id')).json()
@@ -97,7 +97,7 @@ def post_new_comment(review_id: str, index: int, content: str) -> Response:
     review: Review = Review.from_db(get(Databases.REVIEWS, review_id).json())
     if review.status != 'open':
         return web_error(400, "Cannot add comment to review with status {review.status}", component= "SERVER")
-    new_comment = Comment(index = index, content=content, owner=user(request))
+    new_comment = Comment(index = index, content=content, owner=userdata().username)
     changes = {
         "comments": {
             "method": 'append',

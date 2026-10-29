@@ -40,7 +40,7 @@ def _check_languages(languages: list[dict[str,Any]], filename) -> list[str]:
             if "languageCode" not in languages[i]:
                 errors.append(f"{error_prefix} of type 'naturalLanguage' has no languageCode.")
                 continue
-            if languages[i]["languageCode"][0] == "custom":
+            if languages[i]["languageCode"][0] == "custom":  # noqa: SIM102
                 if "customLanguage" not in languages[i]:
                     errors.append(f"{error_prefix} of type 'naturalLanguage' with code 'custom' has no custom value.")
                     continue
@@ -154,12 +154,12 @@ def build_sip_metadata(package_data, file_list, structmap: StructMap) -> str:
     template = templateEnv.get_template('rosetta-mets.xml.jinja')
     rendered_xml = template.render(files = file_list, package = package_data, structmap = structmap)
     schema_path = os.path.join('server', 'metadata_templates', 'rosetta-mets', 'schema')
-    schema_file = open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd'))
-    schema = XMLSchema11(schema_file, base_url=schema_path)
-    try:
-        schema.validate(rendered_xml)
-    except Exception as error:
-        raise XMLValidationError(f'Validation of METS-File failed: {error!s}', rendered_xml)
+    with open(os.path.join(schema_path, 'rosetta-mets_7.3.xsd')) as schema_file:
+        schema = XMLSchema11(schema_file, base_url=schema_path)
+        try:
+            schema.validate(rendered_xml)
+        except XMLValidationError as error:
+            raise XMLValidationError(f'Validation of METS-File failed: {error!s}', rendered_xml)
     return rendered_xml
 
 def add_label(metadata: Metadata):

@@ -5,6 +5,7 @@ from collections.abc import Generator
 
 from flask import request
 from jinja2.exceptions import UndefinedError
+from requests import RequestException
 from zipstream import ZipStream
 
 from . import APP
@@ -25,6 +26,8 @@ TEMP_DIR = os.path.join('server','tmp')
 
 Hashmap = dict[str,str]
 
+logger = logging.getLogger("fdo.download_archive")
+
 @APP.route("/download/<package_id>", methods=["GET"])
 def stream_exportable_package(package_id: str):
     raw_package = get(Databases.PACKAGES, package_id).json()
@@ -37,16 +40,16 @@ def stream_exportable_package(package_id: str):
     try:
         package_data = create_package_data(package)
     except ValueError as error:
-        logging.error(error.args[0])
+        logger.error(error.args[0])
         return error_page(500, [error.args[0]])
 
     structmap = create_structmap(package)
 
     errors = check_structmap("", structmap)
     if errors:
-        logging.error("Failed to generate download. Errors:")
+        logger.error("Failed to generate download. Errors:")
         for e in errors:
-            logging.error(f" - {e}")
+            logger.error(f" - {e}")
         return error_page(500, errors)
 
 
@@ -67,10 +70,10 @@ def stream_exportable_package(package_id: str):
             yield from stream_mets(zs, package, mets, organisation_id)
         except UndefinedError as error:
             errors.append(error.args[0])
-            logging.error(error.args[0])
+            logger.error(error.args[0])
         except XMLValidationError as error:
             errors.append(error.args[0])
-            logging.error(error.args[0])
+            logger.error(error.args[0])
 
         if errors:
             zs.add("\n\n".join(errors), "generator-errors.log")
@@ -99,7 +102,7 @@ def stream_zipped_file(zs: ZipStream, hashmap: Hashmap, document: Document, stru
     file_name = os.path.join(structpath, document.name)
     try:
         file_data = get_attachment(document.id, document.name).content
-    except Exception:
+    except RequestException:
         print(f'No attachment found for document {document.name} with ID {document.id}')
     hashmap[document.id] = hashlib.md5(file_data).hexdigest()
     zs.add(file_data, file_name)

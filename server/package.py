@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from zipfile import ZipFile
 
 from flask import Response, request
-from requests import HTTPError
+from requests import HTTPError, RequestException
 from werkzeug.datastructures import FileStorage
 
 from server import APP
@@ -77,7 +77,7 @@ def get_package_limits(id: str):
 
     try:
         package_limits["current_size"] = file_size_of(Package.from_db(package_data))
-    except Exception:
+    except RequestException:
         pass
 
     return web_response(200, details = package_limits)
