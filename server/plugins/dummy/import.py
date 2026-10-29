@@ -8,11 +8,10 @@ from typing import Literal
 
 from flask.wrappers import Request, Response
 
+from server.entities.document import Document
 from server.entities.errors import PluginError
-
-from ...entities.document import Document
-from ...entities.folder import Folder
-from ...util import web_response
+from server.entities.folder import Folder
+from server.util import web_response
 
 
 def login(request: Request) -> Response:

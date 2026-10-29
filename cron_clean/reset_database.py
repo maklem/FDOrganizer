@@ -24,7 +24,7 @@ def delete(url: str, token: str):
 
 def print_reset_error(name: str, error: HTTPError):
     print(f'Error resetting Database "{name}": ')
-    print(f'{error.response.reason}')
+    print(f'{error.response.reason if error.response else "--- unknown error !! ---"}')
 
 def reset_database(name: str, token: str):
     print(f'Resetting Database "{name}"')
