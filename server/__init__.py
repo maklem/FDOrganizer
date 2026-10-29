@@ -6,9 +6,8 @@ import re
 from cachelib import FileSystemCache
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, request
-from werkzeug.exceptions import HTTPException
-
 from flask_session import Session
+from werkzeug.exceptions import HTTPException
 
 from .services.authentication import is_authorized, userdata
 from .util import web_error
