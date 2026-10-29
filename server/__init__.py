@@ -19,9 +19,7 @@ APP.config["APPLICATION_ROOT"] = "/"
 
 APP.config["SESSION_PERMANENT"] = False
 APP.config["SESSION_TYPE"] = "cachelib"
-APP.config["SESSION_CACHELIB"] = FileSystemCache(
-    cache_dir="fdo_session", threshold=500
-)
+APP.config["SESSION_CACHELIB"] = FileSystemCache(cache_dir="fdo_session", threshold=500)
 APP.config["SESSION_COOKIE_NAME"] = "fdo_session"
 APP.config["SESSION_COOKIE_HTTPONLY"] = True
 APP.config["SESSION_COOKIE_SECURE"] = (
