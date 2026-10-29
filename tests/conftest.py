@@ -26,7 +26,7 @@ def fdorganizer_image() -> Iterator[DockerImage]:
         print(image.get_logs())
 
 
-FDORGANIZER_SCOPE="module"
+FDORGANIZER_SCOPE = "module"
 
 
 @fixture(scope=FDORGANIZER_SCOPE)
@@ -55,13 +55,16 @@ def couchdb(request, fdo_network: Network) -> Iterator[DockerContainer]:
         print(container.get_logs())
 
 
-
 @fixture(scope=FDORGANIZER_SCOPE)
-def fdorganizer(fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_network: Network) -> Iterator[DockerContainer]:
+def fdorganizer(
+    fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_network: Network
+) -> Iterator[DockerContainer]:
     if fdorganizer_image.tag is None:
         assert False, "FDO image has no TAG"
 
-    addr = couchdb.get_docker_client().bridge_ip(container_id=couchdb.get_wrapped_container().id)
+    addr = couchdb.get_docker_client().bridge_ip(
+        container_id=couchdb.get_wrapped_container().id
+    )
 
     env = {
         "COUCHDB_HOST": addr,
@@ -91,5 +94,7 @@ def fdorganizer(fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_ne
 
 @fixture(scope=FDORGANIZER_SCOPE)
 def fdorganizer_url(fdorganizer: DockerContainer) -> str:
-    addr = fdorganizer.get_docker_client().bridge_ip(container_id=fdorganizer.get_wrapped_container().id)
+    addr = fdorganizer.get_docker_client().bridge_ip(
+        container_id=fdorganizer.get_wrapped_container().id
+    )
     return f"http://{addr}:8000/"

@@ -5,6 +5,7 @@ from dataclasses_json import DataClassJsonMixin, config
 
 shouldBeExcluded = lambda x: x is None
 
+
 @dataclass
 class Metadata(DataClassJsonMixin):
     schema_version: str
@@ -14,6 +15,6 @@ class Metadata(DataClassJsonMixin):
 
     @staticmethod
     def convert(metadata_in: dict[str, Any]) -> dict[str, Any]:
-        metadata_out: Metadata = Metadata.from_dict(metadata_in) 
-        metadata_out.id = metadata_in.get('_id')
+        metadata_out: Metadata = Metadata.from_dict(metadata_in)
+        metadata_out.id = metadata_in.get("_id")
         return metadata_out.to_dict()

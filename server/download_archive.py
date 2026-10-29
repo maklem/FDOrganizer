@@ -22,11 +22,12 @@ from .services.authentication import userdata
 from .services.database import get, get_attachment
 from .util import can_read, error_page
 
-TEMP_DIR = os.path.join('server','tmp')
+TEMP_DIR = os.path.join("server", "tmp")
 
-Hashmap = dict[str,str]
+Hashmap = dict[str, str]
 
 logger = logging.getLogger("fdo.download_archive")
+
 
 @APP.route("/download/<package_id>", methods=["GET"])
 def stream_exportable_package(package_id: str):
@@ -35,7 +36,9 @@ def stream_exportable_package(package_id: str):
     organisation_id = userdata().organisation_id
 
     if not can_read(raw_package, request):
-        return error_page(403,["Rejected. You do not have permission to read this package."])
+        return error_page(
+            403, ["Rejected. You do not have permission to read this package."]
+        )
 
     try:
         package_data = create_package_data(package)
@@ -52,8 +55,7 @@ def stream_exportable_package(package_id: str):
             logger.error(f" - {e}")
         return error_page(500, errors)
 
-
-    def generate() -> Generator[bytes,None,None]:
+    def generate() -> Generator[bytes, None, None]:
         # Get all documents and folders in hierarchical structure
         hashmap: Hashmap = {}
         zs = ZipStream()
@@ -78,24 +80,34 @@ def stream_exportable_package(package_id: str):
         if errors:
             zs.add("\n\n".join(errors), "generator-errors.log")
             yield from zs.all_files()
-            
+
         yield from zs.finalize()
 
     # return web_response(200, details = {'success': True})
     return generate(), {"Content-Type": "application/zip"}
 
 
-def stream_mets(zs: ZipStream, package: Package, mets, organisation_id: str) -> Generator[bytes,None,None]:
-    zs.add(mets, 'mets.xml')
+def stream_mets(
+    zs: ZipStream, package: Package, mets, organisation_id: str
+) -> Generator[bytes, None, None]:
+    zs.add(mets, "mets.xml")
     yield from zs.all_files()
 
-def stream_zipped_directory(zs: ZipStream, hashmap: Hashmap, structmap, structpath = "") -> Generator[bytes,None,None]:
-    for document in structmap.get('files'):
-        yield from stream_zipped_file(zs, hashmap, document, structpath)
-    for folder in structmap.get('folders'):
-        yield from stream_zipped_directory(zs, hashmap, folder, structpath=os.path.join(structpath, folder['name']))
 
-def stream_zipped_file(zs: ZipStream, hashmap: Hashmap, document: Document, structpath:str) -> Generator[bytes,None,None]:
+def stream_zipped_directory(
+    zs: ZipStream, hashmap: Hashmap, structmap, structpath=""
+) -> Generator[bytes, None, None]:
+    for document in structmap.get("files"):
+        yield from stream_zipped_file(zs, hashmap, document, structpath)
+    for folder in structmap.get("folders"):
+        yield from stream_zipped_directory(
+            zs, hashmap, folder, structpath=os.path.join(structpath, folder["name"])
+        )
+
+
+def stream_zipped_file(
+    zs: ZipStream, hashmap: Hashmap, document: Document, structpath: str
+) -> Generator[bytes, None, None]:
     if not document.id:
         return
 
@@ -103,7 +115,7 @@ def stream_zipped_file(zs: ZipStream, hashmap: Hashmap, document: Document, stru
     try:
         file_data = get_attachment(document.id, document.name).content
     except RequestException:
-        print(f'No attachment found for document {document.name} with ID {document.id}')
+        print(f"No attachment found for document {document.name} with ID {document.id}")
     hashmap[document.id] = hashlib.md5(file_data).hexdigest()
     zs.add(file_data, file_name)
     yield from zs.all_files()

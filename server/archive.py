@@ -35,15 +35,16 @@ def get_archive_packages():
     query = {
         "selector": {
             "owner": userdata().username,
-            "organisation": userdata().organisation_id
+            "organisation": userdata().organisation_id,
         }
     }
 
     try:
-        packages = find(Databases.PACKAGES, json.dumps(query)).json().get('docs')
+        packages = find(Databases.PACKAGES, json.dumps(query)).json().get("docs")
     except HTTPError as error:
         return web_error_database_connection(error)
-    return web_response(200, details = [Package.convert(x) for x in packages])
+    return web_response(200, details=[Package.convert(x) for x in packages])
+
 
 @APP.route("/archive/<package_id>/settings", methods=["PATCH"])
 @json_body
@@ -51,25 +52,30 @@ def change_package_settings(package_id, settings: dict) -> Response:
 
     package = get(Databases.PACKAGES, package_id).json()
     if not can_update_metadata(package, request):
-        return web_error(401, "You don't have permission to delete this content", component= "SERVER")
+        return web_error(
+            401, "You don't have permission to delete this content", component="SERVER"
+        )
     try:
-        updated_package = update(Databases.PACKAGES, package_id, {'archive_settings': settings}).json()
+        updated_package = update(
+            Databases.PACKAGES, package_id, {"archive_settings": settings}
+        ).json()
     except HTTPError as error:
         return web_error_database_connection(error)
-    return web_response(200, message="Update successful", details = updated_package)
+    return web_response(200, message="Update successful", details=updated_package)
+
 
 @APP.route("/archive/check-requirements", methods=["GET"])
 def check_export_requirements(package_id: str):
     package: Package = Package.from_dict(get(Databases.PACKAGES, package_id).json())
     requirements = {
-        'contains_files': True,
-        'has_metadata': True,
+        "contains_files": True,
+        "has_metadata": True,
     }
     if package.metadata is None:
-        requirements['has_metadata'] = False
+        requirements["has_metadata"] = False
     if not package.documents and not package.folders:
-        requirements['contains_files'] = False
-    return web_response(200, details = requirements)
+        requirements["contains_files"] = False
+    return web_response(200, details=requirements)
 
 
 def check_package_validity(package: Package) -> list[str]:
@@ -83,12 +89,24 @@ def check_package_validity(package: Package) -> list[str]:
             errors.append("Legal questions for archiving have not been answered.")
         else:
             prefix = "Legal questions for archiving: "
-            if not package.archive_settings.checkDSGVO or package.archive_settings.personalData not in ['none', "anonymous", "consent"]:
-                errors.append(prefix+"data is not DSGVO compliant")
-            if not package.archive_settings.checkDuration or package.archive_settings.duration < 1:
-                errors.append(prefix+"data can not be stored without funding for at least a year.")
+            if (
+                not package.archive_settings.checkDSGVO
+                or package.archive_settings.personalData
+                not in ["none", "anonymous", "consent"]
+            ):
+                errors.append(prefix + "data is not DSGVO compliant")
+            if (
+                not package.archive_settings.checkDuration
+                or package.archive_settings.duration < 1
+            ):
+                errors.append(
+                    prefix
+                    + "data can not be stored without funding for at least a year."
+                )
             if not package.archive_settings.checkTerms:
-                errors.append(prefix+"data can not be stored without agreement to terms.")
+                errors.append(
+                    prefix + "data can not be stored without agreement to terms."
+                )
 
         if errors:
             return errors
@@ -106,7 +124,9 @@ def check_package_validity(package: Package) -> list[str]:
     except TypeError:
         errors.append(f"*Something* is wrong...\n\n{traceback.format_exc()}")
     except XMLValidationError as error:
-        errors.append(f"The generated metadata does not satisfy the schema requirements. ({error!s})")
+        errors.append(
+            f"The generated metadata does not satisfy the schema requirements. ({error!s})"
+        )
     return errors
 
 
@@ -117,12 +137,30 @@ def submit_for_review(package_id: str) -> Response:
     except HTTPError as error:
         return web_error_database_connection(error)
     if not can_submit_package(package, request):
-        return web_response(200, details={'status': 'error', 'details': ["You don\'t have permission to submit this package"]})
-    if package.get('status') not in ['active', 'rework']:
-        return web_response(200, details={'status': 'error', 'details': [ "Package cannot be submitted for review in status {} ".format(package.get('status'))]})
+        return web_response(
+            200,
+            details={
+                "status": "error",
+                "details": ["You don't have permission to submit this package"],
+            },
+        )
+    if package.get("status") not in ["active", "rework"]:
+        return web_response(
+            200,
+            details={
+                "status": "error",
+                "details": [
+                    "Package cannot be submitted for review in status {} ".format(
+                        package.get("status")
+                    )
+                ],
+            },
+        )
 
     if errors := check_package_validity(Package.from_db(package)):
-        return web_response(200, details={'status': 'error', 'details': errors})
-    
+        return web_response(200, details={"status": "error", "details": errors})
+
     update_package_state(package_id, "review")
-    return web_response(200, details={'status': 'ok', 'details': ["Package submitted for review"]})
+    return web_response(
+        200, details={"status": "ok", "details": ["Package submitted for review"]}
+    )

@@ -8,4 +8,14 @@ from .organisation import Organisation
 from .package import Package
 from .review import Review
 
-__all__ = [ 'Comment', 'CouchDocument', 'Databases', 'Document', 'Folder', 'Metadata', 'Organisation', 'Package', 'Review']
+__all__ = [
+    "Comment",
+    "CouchDocument",
+    "Databases",
+    "Document",
+    "Folder",
+    "Metadata",
+    "Organisation",
+    "Package",
+    "Review",
+]

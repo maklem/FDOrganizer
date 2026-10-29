@@ -23,9 +23,20 @@ from .util import error_page, json_body, web_error, web_response
 
 @APP.route("/organisations", methods=["GET"])
 def get_organisations():
-    identity_providers = [IdentityProvider.from_db(identityprovider) for identityprovider in getall(Databases.IDENTITYPROVIDERS)]
-    identity_provider_stubs = [{'id': identity_provider.id, 'name': identity_provider.name, 'authType': identity_provider.type} for identity_provider in identity_providers]
+    identity_providers = [
+        IdentityProvider.from_db(identityprovider)
+        for identityprovider in getall(Databases.IDENTITYPROVIDERS)
+    ]
+    identity_provider_stubs = [
+        {
+            "id": identity_provider.id,
+            "name": identity_provider.name,
+            "authType": identity_provider.type,
+        }
+        for identity_provider in identity_providers
+    ]
     return web_response(200, details=identity_provider_stubs)
+
 
 @APP.route("/login-local/<idp_id>", methods=["POST"])
 @json_body
@@ -33,11 +44,14 @@ def login_local(idp_id: str, username: str, password: str) -> Response:
     try:
         authorize(username, password, idp_id)
     except HTTPError as e:
-        return web_response(403, details = {'success': False, 'reason': e.args[0]})
+        return web_response(403, details={"success": False, "reason": e.args[0]})
     except RuntimeError:
-        return web_response(403, details = {'success': False, 'reason': "wrong credentials"})
+        return web_response(
+            403, details={"success": False, "reason": "wrong credentials"}
+        )
 
-    return web_response(200, details = {'success': True})
+    return web_response(200, details={"success": True})
+
 
 @APP.route("/login-oidc/<idp_id>", methods=["GET"])
 def login_oidc(idp_id: str):
@@ -45,43 +59,45 @@ def login_oidc(idp_id: str):
     try:
         client = oidc_client(identity_provider)
     except IdentityProviderError as error:
-        return web_error(500, error.args[0], component = "SERVER")
+        return web_error(500, error.args[0], component="SERVER")
     # create auth request for OIDC-IDP
     az_request = client.authorization_request(scope=identity_provider.scope)
     # save current login attempt data
-    session['code_verifier'] = az_request.code_verifier
-    session['state'] = az_request.state
-    session['nonce'] = az_request.nonce
+    session["code_verifier"] = az_request.code_verifier
+    session["state"] = az_request.state
+    session["nonce"] = az_request.nonce
     # redirect to OIDC login window
     return web_response(200, details={"auth_url": az_request.uri})
+
 
 @APP.route("/login-oidc-callback/<organisation_id>", methods=["GET"])
 def callback_oidc(idp_id: str):
     identity_provider = get_idp_from_db(idp_id)
     client = oidc_client(identity_provider)
-    
+
     # create auth request from callback URL
-    url= request.url
-    az_request = client.authorization_request(scope=identity_provider.scope,
-                                              state=session['state'],
-                                              code_verifier=session['code_verifier'],
-                                              nonce=session['nonce']
-                                              )
-    
+    url = request.url
+    az_request = client.authorization_request(
+        scope=identity_provider.scope,
+        state=session["state"],
+        code_verifier=session["code_verifier"],
+        nonce=session["nonce"],
+    )
+
     # get info of authenticated user after successful authorization
     az_response = az_request.validate_callback(url)
-    idp_token = client.authorization_code(az_response)                                  
+    idp_token = client.authorization_code(az_response)
     userinfo = client.userinfo(idp_token)
     # email = userinfo['email']
     # given_name = userinfo['given_name']
     # family_name = userinfo['family_name']
     # sub = userinfo['sub']
-    username = userinfo['username']
+    username = userinfo["username"]
 
     # remove login attempt ID after successful login
-    session.pop('code_verifier')
-    session.pop('state')
-    session.pop('nonce')
+    session.pop("code_verifier")
+    session.pop("state")
+    session.pop("nonce")
 
     try:
         user_organisation = user_organisation_from_login(identity_provider, userinfo)
@@ -89,7 +105,10 @@ def callback_oidc(idp_id: str):
         return error_page(e.args[0])
 
     user_displayname = username
-    if identity_provider.displayname_field is not None and identity_provider.displayname_field in userinfo:
+    if (
+        identity_provider.displayname_field is not None
+        and identity_provider.displayname_field in userinfo
+    ):
         user_displayname = userinfo[identity_provider.displayname_field]
 
     session["user"] = UserData(
@@ -98,45 +117,59 @@ def callback_oidc(idp_id: str):
         organisation_id=user_organisation,
     )
 
-    return redirect(url_for('navhome'))
+    return redirect(url_for("navhome"))
+
 
 @APP.route("/login-keycloak/<idp_id>", methods=["GET"])
 def login_keycloak(idp_id: str):
     identity_provider = get_idp_from_db(idp_id)
 
-    scopes = '+'.join(identity_provider.scope)
-    auth_url = f'{identity_provider.url}auth?scope={scopes}&response_type=code&client_id={identity_provider.client_id}&redirect_uri={request.url_root}login-keycloak-callback/{identity_provider.id}'
+    scopes = "+".join(identity_provider.scope)
+    auth_url = f"{identity_provider.url}auth?scope={scopes}&response_type=code&client_id={identity_provider.client_id}&redirect_uri={request.url_root}login-keycloak-callback/{identity_provider.id}"
     # redirect to OIDC login window
     return web_response(200, details={"auth_url": auth_url})
+
 
 @APP.route("/login-keycloak-callback/<idp_id>", methods=["GET"])
 def callback_keycloak(idp_id: str):
     identity_provider = get_idp_from_db(idp_id)
 
-    token_url = f'{identity_provider.url}token'
-    token_request_body= {
-        'grant_type': 'authorization_code',
-        'client_id': identity_provider.client_id,
-        'redirect_uri': f'{request.url_root}login-keycloak-callback/{identity_provider.id}',
-        'code': request.args.get('code')
+    token_url = f"{identity_provider.url}token"
+    token_request_body = {
+        "grant_type": "authorization_code",
+        "client_id": identity_provider.client_id,
+        "redirect_uri": f"{request.url_root}login-keycloak-callback/{identity_provider.id}",
+        "code": request.args.get("code"),
     }
     if identity_provider.client_secret is not None:
-        token_request_body['client_secret'] = identity_provider.client_secret
+        token_request_body["client_secret"] = identity_provider.client_secret
     token_response = requests.post(token_url, data=token_request_body)
     try:
-        access_token = token_response.json()['access_token']
+        access_token = token_response.json()["access_token"]
     except KeyError:
-        return error_page(400, ["Could not accquire access token for fetching user info. Organisation IDP-data might be wrong."])
+        return error_page(
+            400,
+            [
+                "Could not accquire access token for fetching user info. Organisation IDP-data might be wrong."
+            ],
+        )
 
-    userinfo_url = f'{identity_provider.url}userinfo'
-    userinfo_response = requests.get(userinfo_url, headers={'Authorization': f'Bearer {access_token}'})
+    userinfo_url = f"{identity_provider.url}userinfo"
+    userinfo_response = requests.get(
+        userinfo_url, headers={"Authorization": f"Bearer {access_token}"}
+    )
     userinfo = userinfo_response.json()
 
     if identity_provider.username_field is None:
         try:
-            username = userinfo['username']
+            username = userinfo["username"]
         except KeyError:
-            return error_page(400, [f"No 'username' field or custom field for the organisation found in {userinfo=}"])
+            return error_page(
+                400,
+                [
+                    f"No 'username' field or custom field for the organisation found in {userinfo=}"
+                ],
+            )
     else:
         username = userinfo[identity_provider.username_field]
 
@@ -146,7 +179,10 @@ def callback_keycloak(idp_id: str):
         return error_page(500, e.args[0])
 
     user_displayname = username
-    if identity_provider.displayname_field is not None and identity_provider.displayname_field in userinfo:
+    if (
+        identity_provider.displayname_field is not None
+        and identity_provider.displayname_field in userinfo
+    ):
         user_displayname = userinfo[identity_provider.displayname_field]
 
     # create token with info for authenticated user
@@ -157,9 +193,12 @@ def callback_keycloak(idp_id: str):
     )
 
     # redirect to start page and set auth cookie
-    return redirect(url_for('navhome'))
+    return redirect(url_for("navhome"))
 
-def user_organisation_from_login(identity_provider: IdentityProvider, userinfo: dict[str,Any]) -> str:
+
+def user_organisation_from_login(
+    identity_provider: IdentityProvider, userinfo: dict[str, Any]
+) -> str:
     errors = []
     user_organisation_tag = ""
     if identity_provider.organisation:
@@ -168,18 +207,22 @@ def user_organisation_from_login(identity_provider: IdentityProvider, userinfo: 
         if identity_provider.organisation_field in userinfo:
             user_organisation_tag = userinfo[identity_provider.organisation_field]
         else:
-            errors.append(f"Could not log in. Expected '{identity_provider.organisation_field}' in userinfo. Received {userinfo=}")
+            errors.append(
+                f"Could not log in. Expected '{identity_provider.organisation_field}' in userinfo. Received {userinfo=}"
+            )
     else:
-        errors.append("Invalid Configuration for IdentityProvider. 'organisation' and 'organisation_field' are not set.")
+        errors.append(
+            "Invalid Configuration for IdentityProvider. 'organisation' and 'organisation_field' are not set."
+        )
 
     if user_organisation_tag == "":
         errors.append("User could not be assigned to an organisation.")
         raise RuntimeError(errors)
 
     user_organisation = find_organisation_by_tag(user_organisation_tag)
-    
+
     if not user_organisation.id:
-        errors.append("Invalid Configuration."),
+        (errors.append("Invalid Configuration."),)
         errors.append(f"Found {user_organisation=}")
         raise RuntimeError(errors)
 
@@ -192,16 +235,19 @@ def oidc_client(provider: IdentityProvider):
     return OAuth2Client.from_discovery_endpoint(
         issuer=provider.url,
         auth=ClientSecretJwt(provider.client_id, provider.client_secret),
-        redirect_uri=f'{request.url_root}/login-oidc-callback/{provider.id}'
+        redirect_uri=f"{request.url_root}/login-oidc-callback/{provider.id}",
     )
+
 
 def get_organisation_from_db(organisation_id: str) -> Organisation:
     org_response = get(Databases.ORGANISATIONS, organisation_id).json()
     return Organisation.from_db(org_response)
 
+
 def get_idp_from_db(idp_id: str) -> IdentityProvider:
     org_response = get(Databases.IDENTITYPROVIDERS, idp_id).json()
     return IdentityProvider.from_db(org_response)
+
 
 @APP.route("/whoami", methods=["GET"])
 def whoami():
@@ -210,7 +256,7 @@ def whoami():
         "displayname": "Not logged in",
         "organisation": "",
         "reviewer": False,
-        "plugins": []
+        "plugins": [],
     }
 
     if not is_authorized():
@@ -218,10 +264,13 @@ def whoami():
 
     user: UserData = session["user"]
 
-    return web_response(200, details={
-        "name": user.username,
-        "displayname": user.displayname,
-        "organisation": user.organisation().name,
-        "reviewer": user.reviewer,
-        "plugins": user.list_plugins()
-    })
+    return web_response(
+        200,
+        details={
+            "name": user.username,
+            "displayname": user.displayname,
+            "organisation": user.organisation().name,
+            "reviewer": user.reviewer,
+            "plugins": user.list_plugins(),
+        },
+    )

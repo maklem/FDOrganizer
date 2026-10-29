@@ -12,4 +12,4 @@ class ArchiveSettings(DataClassJsonMixin):
     duration: int
     checkTerms: bool
     checkDSGVO: bool
-    personalData: Literal['none', 'anonymous', 'consent']
+    personalData: Literal["none", "anonymous", "consent"]

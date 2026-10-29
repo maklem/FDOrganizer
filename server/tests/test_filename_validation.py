@@ -70,7 +70,7 @@ class TestFilenameValidation:
         assert is_valid_filename("file|name.txt") is False
         assert is_valid_filename("file;name.txt") is False
         assert is_valid_filename("file:name.txt") is False
-        assert is_valid_filename("file\"name.txt") is False
+        assert is_valid_filename('file"name.txt') is False
         assert is_valid_filename("file<name>.txt") is False
         assert is_valid_filename("file>name.txt") is False
         assert is_valid_filename("file?name.txt") is False
