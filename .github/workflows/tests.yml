@@ -7,6 +7,7 @@ jobs:
   playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    needs: [pytest, ruff, ty]
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python
@@ -29,6 +30,7 @@ jobs:
   pytest:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    needs: [ruff, ty]
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python
@@ -47,7 +49,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Run ruff
-      uses: astral-sh/ruff-action@v4
+      uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
       with:
         version: '0.17.1'
         args: check --output-format=github
