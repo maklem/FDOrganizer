@@ -276,7 +276,7 @@ Der FDOrganizer (kurz für Forschungsdatenorganizer) ist eine Webapplikation, di
 1. Installation der Abhängigkeiten
 
     ```bash
-    pip install -r requirements.txt
+    pip install -e .
     ```
 
 1. Erstellen von Datenbanken

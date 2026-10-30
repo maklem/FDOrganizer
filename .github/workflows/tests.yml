@@ -17,7 +17,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt -r requirements.dev.txt
+        pip install -e ".[dev]"
     - name: Ensure browsers are installed
       run: python -m playwright install --with-deps
     - name: Run your tests
@@ -40,7 +40,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt -r requirements.dev.txt
+        pip install -e ".[dev]"
     - name: Run your tests
       run: pytest server/
   ruff:
@@ -51,7 +51,7 @@ jobs:
     - name: install ruff
       uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
       with:
-        version: '0.17.1'
+        version: '0.17.3'
         args: "--version"
     - run: ruff check --verbose --output-format=github
     - run: ruff format --check --output-format=github
@@ -68,6 +68,6 @@ jobs:
       run: |
         python -m venv .venv
         .venv/bin/python -m pip install --upgrade pip
-        .venv/bin/pip install -r requirements.txt -r requirements.dev.txt ty==0.0.94
+        .venv/bin/pip install -e ".[dev]"
     - name: Run ty
       run: .venv/bin/ty check

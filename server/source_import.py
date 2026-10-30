@@ -2,11 +2,11 @@ import importlib
 import json
 import os.path
 from functools import wraps
+from importlib.resources import files
 from pathlib import Path
 from typing import Literal
 
 from flask import Response, request, session
-from importlib_resources import files
 
 from server import APP
 
