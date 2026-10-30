@@ -6,6 +6,8 @@ from typing import Any
 from flask import Request, Response, jsonify, make_response, render_template, request
 from requests import HTTPError
 
+from server.entities.errors import PathError
+
 from .entities import Databases, Package
 from .services.authentication import userdata
 from .services.database import get
@@ -101,9 +103,7 @@ def can_update_metadata(restricted_object: dict[str, Any], request: Request) -> 
 
 
 def can_read_metadata(restricted_object: dict[str, Any], request: Request) -> bool:
-    if is_owner(restricted_object, userdata().username):
-        return True
-    return bool(userdata().reviewer)
+    return can_read(restricted_object, request)
 
 
 def can_submit_package(restricted_object: dict[str, Any], request: Request) -> bool:
@@ -160,3 +160,19 @@ def is_valid_filename(name: str | None) -> bool:
         return False
 
     return bool(ALLOWED_FILE_EXPRESSION.match(name))
+
+
+def safe_join(base_path: str | Path, *segments: str) -> Path:
+    base = Path(base_path)
+
+    for segment in segments:
+        if not is_valid_filename(segment):
+            raise PathError(f"could not safely join paths: '{base}' and '{segment}'")
+
+        new = base / segment
+        if not new.resolve().is_relative_to(base.resolve()):
+            raise PathError(f"could not safely join paths: '{base}' and '{segment}'")
+
+        base = new
+
+    return base
