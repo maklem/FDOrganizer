@@ -43,7 +43,7 @@ def get_review_packages():
 @APP.route("/review/<package_id>", methods=["GET"])
 def get_package_reviews(package_id) -> Response:
     package = get(Databases.PACKAGES, package_id).json()
-    if not can_read(package, request) and not userdata().reviewer:
+    if not can_read(package, request):
         return web_error(
             401, "You don't have permission to view this package", component="SERVER"
         )
@@ -69,6 +69,11 @@ def post_new_review(
         )
     # Check if package can be reviewed
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
+    if not can_read(package.to_dict(), request):
+        return web_error(
+            401, "You don't have permission to review packages", component="SERVER"
+        )
+
     if package.status != "review":
         return web_error(
             400,
@@ -185,6 +190,11 @@ def submit_review(package_id: str, status: Literal["accepted", "rejected"]) -> R
             401, "You don't have permission to review packages", component="SERVER"
         )
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
+    if not can_read(package.to_dict(), request):
+        return web_error(
+            401, "You don't have permission to review packages", component="SERVER"
+        )
+
     if package.status != "review":
         return web_error(
             400,
