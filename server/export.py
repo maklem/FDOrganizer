@@ -17,7 +17,7 @@ from .export_utils import (
 )
 from .services.authentication import userdata
 from .services.database import get, get_attachment
-from .util import web_error, web_response
+from .util import safe_join, web_error, web_response
 
 TEMP_DIR = os.path.join("server", "tmp")
 
@@ -41,7 +41,7 @@ def build_export_package(package_id: str):
         structmap = create_structmap(package)
 
         # Download files
-        create_ie_directory(structmap, package.name)
+        create_ie_directory(structmap, (package.name,))
 
         # Create data for mets generation (depends on downloaded files)
         file_list = create_file_list(structmap, package.name)
@@ -78,7 +78,7 @@ def build_export_package(package_id: str):
 
 def create_sip(package: Package, mets, organisation_id: str):
     sipname = f"{package.id}-{round(datetime.now().timestamp())}"
-    source = Path(TEMP_DIR, package.name)
+    source = safe_join(TEMP_DIR, package.name)
     if not os.path.exists(source):
         raise PathError(f"Configured source path {source} does not exist")
 
@@ -94,7 +94,7 @@ def create_sip(package: Package, mets, organisation_id: str):
     target = Path(export_dir, sipname, "content")
     linuxuser = int(export_user)
     shutil.chown(source, linuxuser)
-    shutil.copytree(source, os.path.join(target, "streams", package.name))
+    shutil.copytree(source, safe_join(target, "streams", package.name))
     Path(os.path.join(target, "mets.xml")).write_text(mets, encoding="utf-8")
 
 
@@ -105,21 +105,21 @@ def get_organisation_subdirectory(organisation_id: str) -> str | None:
 
 
 def delete_temp_package(package_name: str):
-    shutil.rmtree(os.path.join(TEMP_DIR, package_name))
+    shutil.rmtree(safe_join(TEMP_DIR, package_name))
 
 
-def create_ie_directory(structmap, structpath=""):
+def create_ie_directory(structmap, structpath: tuple[str, ...] = ()):
     for document in structmap.get("files"):
         download_file(document, structpath)
     for folder in structmap.get("folders"):
-        create_ie_directory(folder, structpath=os.path.join(structpath, folder["name"]))
+        create_ie_directory(folder, structpath=(*structpath, folder["name"]))
 
 
-def download_file(document: Document, structpath: str):
+def download_file(document: Document, structpath: tuple[str, ...]):
     try:
         file_data = get_attachment(document.id, document.name).content  # type: ignore
     except RequestException:
         print(f"No attachment found for document {document.name} with ID {document.id}")
-    doc_file = Path(os.path.join(TEMP_DIR, structpath, document.name))
+    doc_file = safe_join(TEMP_DIR, *structpath, document.name)
     doc_file.parent.mkdir(exist_ok=True, parents=True)
     doc_file.write_bytes(file_data)
