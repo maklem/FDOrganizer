@@ -1,9 +1,18 @@
+import secrets
 from typing import Any
 
 import requests
 from couchdb.http import HTTPError
 from flask import Response, redirect, request, session, url_for
-from requests_oauth2client import ClientSecretJwt, OAuth2Client
+from requests_oauth2client import (
+    AuthorizationRequest,
+    BearerToken,
+    ClientSecretJwt,
+    IdToken,
+    InvalidIdToken,
+    OAuth2Client,
+    OAuth2Error,
+)
 
 from server import APP
 from server.entities.identityprovider import IdentityProvider
@@ -123,36 +132,73 @@ def callback_oidc(idp_id: str):
 @APP.route("/login-keycloak/<idp_id>", methods=["GET"])
 def login_keycloak(idp_id: str):
     identity_provider = get_idp_from_db(idp_id)
+    if identity_provider.type != "KEYCLOAK" or identity_provider.client_id is None:
+        return error_page(400, ["Invalid login flow."])
 
-    scopes = "+".join(identity_provider.scope)
-    auth_url = f"{identity_provider.url}auth?scope={scopes}&response_type=code&client_id={identity_provider.client_id}&redirect_uri={request.url_root}login-keycloak-callback/{identity_provider.id}"
+    az_request = AuthorizationRequest(
+        authorization_endpoint=f"{identity_provider.url}auth",
+        client_id=identity_provider.client_id,
+        redirect_uri=f"{request.url_root}login-keycloak-callback/{identity_provider.id}",
+        scope=identity_provider.scope,
+    )
+    session["keycloak_state"] = az_request.state
+    session["keycloak_nonce"] = az_request.nonce
+    session["keycloak_code_verifier"] = az_request.code_verifier
+
     # redirect to OIDC login window
-    return web_response(200, details={"auth_url": auth_url})
+    return web_response(200, details={"auth_url": az_request.uri})
 
 
 @APP.route("/login-keycloak-callback/<idp_id>", methods=["GET"])
 def callback_keycloak(idp_id: str):
     identity_provider = get_idp_from_db(idp_id)
+    if identity_provider.type != "KEYCLOAK" or identity_provider.client_id is None:
+        return error_page(400, ["Invalid login attempt."])
+
+    expected_state = session.pop("keycloak_state", None)
+    expected_nonce = session.pop("keycloak_nonce", None)
+    code_verifier = session.pop("keycloak_code_verifier", None)
+    if expected_state is None or expected_nonce is None or code_verifier is None:
+        return error_page(400, ["Missing or expired login attempt."])
+
+    az_request = AuthorizationRequest(
+        authorization_endpoint=f"{identity_provider.url}auth",
+        client_id=identity_provider.client_id,
+        redirect_uri=f"{request.url_root}login-keycloak-callback/{identity_provider.id}",
+        scope=identity_provider.scope,
+        state=expected_state,
+        nonce=expected_nonce,
+        code_verifier=code_verifier,
+    )
+    try:
+        az_response = az_request.validate_callback(request.url)
+    except OAuth2Error as error:
+        return error_page(400, [str(error)])
 
     token_url = f"{identity_provider.url}token"
     token_request_body = {
         "grant_type": "authorization_code",
         "client_id": identity_provider.client_id,
         "redirect_uri": f"{request.url_root}login-keycloak-callback/{identity_provider.id}",
-        "code": request.args.get("code"),
+        "code": az_response.code,
+        "code_verifier": code_verifier,
     }
     if identity_provider.client_secret is not None:
         token_request_body["client_secret"] = identity_provider.client_secret
     token_response = requests.post(token_url, data=token_request_body)
     try:
-        access_token = token_response.json()["access_token"]
-    except KeyError:
+        token_data = token_response.json()
+        access_token = token_data["access_token"]
+    except (KeyError, ValueError):
         return error_page(
             400,
             [
                 "Could not accquire access token for fetching user info. Organisation IDP-data might be wrong."
             ],
         )
+
+    if not nonce_matches(token_data.get("id_token"), expected_nonce):
+        return error_page(400, ["ID token nonce validation failed."])
 
     userinfo_url = f"{identity_provider.url}userinfo"
     userinfo_response = requests.get(
@@ -247,6 +293,21 @@ def get_organisation_from_db(organisation_id: str) -> Organisation:
 def get_idp_from_db(idp_id: str) -> IdentityProvider:
     org_response = get(Databases.IDENTITYPROVIDERS, idp_id).json()
     return IdentityProvider.from_db(org_response)
+
+
+def nonce_matches(id_token_str: Any, expected_nonce: str) -> bool:
+    if not isinstance(id_token_str, str):
+        return False
+    try:
+        token = BearerToken(access_token="", id_token=id_token_str)
+    except InvalidIdToken:
+        return False
+    if not isinstance(token.id_token, IdToken):
+        return False
+    token_nonce = token.id_token.get_claim("nonce")
+    return isinstance(token_nonce, str) and secrets.compare_digest(
+        token_nonce, expected_nonce
+    )
 
 
 @APP.route("/whoami", methods=["GET"])
