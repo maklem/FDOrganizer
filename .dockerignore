@@ -1,1 +1,13 @@
 server/static/videos/*
+.git
+.venv
+env
+**/__pycache__
+**/*.pyc
+**/.ruff_cache
+**/.pytest_cache
+**/.mypy_cache
+test-results
+**/*.egg-info
+build
+dist

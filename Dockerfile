@@ -15,8 +15,10 @@ apt-get clean \
 && \
 rm -rf /var/lib/apt/lists/*
 
+COPY pyproject.toml README.md LICENSE ./
+COPY server ./server
+RUN pip install --no-cache-dir ".[production]"
 COPY . .
-RUN pip install --no-cache-dir -r requirements.txt
 
 RUN chmod +x /server/docker_init.sh
 RUN chmod +x /server/start.sh

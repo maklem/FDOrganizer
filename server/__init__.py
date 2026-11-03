@@ -56,7 +56,11 @@ class CredentialFilter(logging.Filter):
         if not has_request_context():
             return True
         route = request.path
-        if "/login-oidc" in route or "/login-local" in route:
+        if (
+            "/login-oidc" in route
+            or "/login-local" in route
+            or "/login-keycloak" in route
+        ):
             record.contains_credentials = True
         if re.search("/import/.+/login", route):
             record.contains_credentials = True
@@ -66,7 +70,7 @@ class CredentialFilter(logging.Filter):
 class RequestFormatter(logging.Formatter):
     def format(self, record):
         if has_request_context():
-            record.url = request.url
+            record.url = request.path
             record.type = request.method
             record.username = request.remote_addr
             if is_authorized():

@@ -12,6 +12,8 @@ fdo_session
 
 # Package files
 *.egg-info
+/build
+/dist
 
 # IDE settings
 /.vscode
