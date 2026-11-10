@@ -18,6 +18,14 @@ class PatchError(Exception):
     """Patch failed"""
 
 
+class InvalidDocumentIdError(Exception):
+    """Database document id contains invalid characters"""
+
+    def __init__(self, document_id):
+        self.document_id = document_id
+        super().__init__(f"Invalid database document id: {document_id!r}")
+
+
 class XMLValidationError(Exception):
     """XML is invalid according to schema"""
 
