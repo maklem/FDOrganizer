@@ -6,6 +6,8 @@ from flask import redirect, render_template, request, session, url_for
 from server import APP
 
 from .services.authentication import is_authorized, userdata
+from .services.database import is_valid_database_id
+from .util import web_error
 
 
 def needs_authentication(route: str) -> bool:
@@ -36,6 +38,17 @@ def auth_guard():
         return None
     if not is_authorized():
         return redirect(url_for("navlogin"))
+    return None
+
+
+@APP.before_request
+def validate_database_ids():
+    """Reject requests whose database ids contain other than alphanumeric symbols."""
+    for key, value in (request.view_args or {}).items():
+        if (key == "id" or key.endswith("_id")) and not is_valid_database_id(value):
+            return web_error(
+                400, f"Invalid database id for '{key}'.", component="SERVER"
+            )
     return None
 
 

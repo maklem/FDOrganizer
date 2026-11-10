@@ -1,7 +1,6 @@
 import logging
 import logging.handlers
 import os
-import re
 
 from cachelib import FileSystemCache
 from dotenv import load_dotenv
@@ -9,6 +8,7 @@ from flask import Flask, has_request_context, request
 from flask_session import Session
 from werkzeug.exceptions import HTTPException
 
+from .entities.errors import InvalidDocumentIdError
 from .services.authentication import is_authorized, userdata
 from .util import web_error
 
@@ -50,6 +50,14 @@ def handle_exception(error):
     )
 
 
+@APP.errorhandler(InvalidDocumentIdError)
+def handle_invalid_document_id(error: InvalidDocumentIdError):
+    APP.logger.warning(
+        f"Rejected request with invalid database id: {error.document_id!r}"
+    )
+    return web_error(400, "Invalid database id.", component="DATABASE")
+
+
 class CredentialFilter(logging.Filter):
     def filter(self, record):
         record.contains_credentials = False
@@ -62,7 +70,11 @@ class CredentialFilter(logging.Filter):
             or "/login-keycloak" in route
         ):
             record.contains_credentials = True
-        if re.search("/import/.+/login", route):
+        if (
+            route.startswith("/import/")
+            and route.endswith("/login")
+            and len(route) > 14  # have at least one character between start/end check
+        ):
             record.contains_credentials = True
         return True
 
