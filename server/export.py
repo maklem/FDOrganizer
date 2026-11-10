@@ -1,7 +1,6 @@
 import os
 import shutil
 from datetime import datetime
-from pathlib import Path
 
 from requests import RequestException
 
@@ -85,17 +84,18 @@ def create_sip(package: Package, mets, organisation_id: str):
     if (export_sub_dir := get_organisation_subdirectory(organisation_id)) is None:
         raise PathError("Configured export_subdirectory is None")
 
-    export_dir = Path.joinpath(Path(str(os.getenv("EXPORT_DIR"))), export_sub_dir)
+    export_base_dir = os.getenv("EXPORT_DIR") or "file_exports"
+    export_dir = safe_join(export_base_dir, export_sub_dir)
     export_user = os.getenv("EXPORT_USER")
     if export_dir is None or export_user is None:
         raise ExportUserError(
             "No export user for SIP transfer configured. Check server environment variables"
         )
-    target = Path(export_dir, sipname, "content")
+    target = safe_join(export_dir, sipname, "content")
     linuxuser = int(export_user)
     shutil.chown(source, linuxuser)
     shutil.copytree(source, safe_join(target, "streams", package.name))
-    Path(os.path.join(target, "mets.xml")).write_text(mets, encoding="utf-8")
+    safe_join(target, "mets.xml").write_text(mets, encoding="utf-8")
 
 
 def get_organisation_subdirectory(organisation_id: str) -> str | None:
