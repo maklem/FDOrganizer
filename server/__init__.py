@@ -1,7 +1,6 @@
 import logging
 import logging.handlers
 import os
-import re
 
 from cachelib import FileSystemCache
 from dotenv import load_dotenv
@@ -62,7 +61,11 @@ class CredentialFilter(logging.Filter):
             or "/login-keycloak" in route
         ):
             record.contains_credentials = True
-        if re.search("/import/.+/login", route):
+        if (
+            route.startswith("/import/")
+            and route.endswith("/login")
+            and len(route) > 14  # have at least one character between start/end check
+        ):
             record.contains_credentials = True
         return True
 
