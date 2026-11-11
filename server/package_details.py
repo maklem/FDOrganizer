@@ -271,7 +271,7 @@ def create_file_document_pair(file: FileStorage, username: str) -> dict[str, Any
         raise HTTPError("Name of file is invalid")
 
     file_data = file.read()
-    hash_md5 = md5(file_data).hexdigest()
+    hash_md5 = md5(file_data, usedforsecurity=False).hexdigest()
     hash_sha512 = sha512(file_data).hexdigest()
     outfile = io.BytesIO(file_data)
     outfile.seek(0)
