@@ -113,20 +113,25 @@ def check_package_validity(package: Package) -> list[str]:
 
         try:
             package_data = create_package_data(package)
-        except ValueError as e:
-            errors.append(str(e))
+        except ValueError:
+            errors.append("Metadata missing or invalid.")
 
         if errors:
             return errors
         build_sip_metadata(package_data, file_list, structmap)
     except UndefinedError:
-        errors.append(f"*Something* is wrong...\n\n{traceback.format_exc()}")
-    except TypeError:
-        errors.append(f"*Something* is wrong...\n\n{traceback.format_exc()}")
-    except XMLValidationError as error:
-        errors.append(
-            f"The generated metadata does not satisfy the schema requirements. ({error!s})"
+        APP.logger.warning(
+            f"Could not generate valid metadata file for {package.id}\n\n{traceback.format_exc()}"
         )
+        errors.append(f"Could not generate valid metadata file for {package.id}.")
+    except TypeError:
+        APP.logger.warning(
+            f"Could not generate valid metadata file for {package.id}\n\n{traceback.format_exc()}"
+        )
+        errors.append(f"Could not generate valid metadata file for {package.id}.")
+    except XMLValidationError as e:
+        APP.logger.warning(f"Failed to validate {package.id} for export. ({e!s})")
+        errors.append(f"Could not generate valid metadata file for {package.id}.")
     return errors
 
 
