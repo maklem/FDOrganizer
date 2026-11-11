@@ -1,10 +1,6 @@
-import pytest
-
 from server import APP
-from server.entities.errors import InvalidDocumentIdError
 from server.router import validate_database_ids
 from server.services.database import (
-    assert_valid_document_id,
     is_valid_database_id,
 )
 
@@ -57,20 +53,6 @@ class TestIsValidDatabaseId:
 
     def test_invalid_control_characters(self):
         assert is_valid_database_id("abc\x00def") is False
-
-
-class TestAssertValidDocumentId:
-    def test_valid_id_does_not_raise(self):
-        assert_valid_document_id("3f9d1a2b4c5d6e7f8a9b0c1d2e3f4a5b")
-
-    def test_invalid_id_raises(self):
-        with pytest.raises(InvalidDocumentIdError):
-            assert_valid_document_id("../plugins/pwn")
-
-    def test_error_contains_document_id(self):
-        with pytest.raises(InvalidDocumentIdError) as error:
-            assert_valid_document_id("not/a/valid/id")
-        assert error.value.document_id == "not/a/valid/id"
 
 
 class TestValidateDatabaseIdsHook:

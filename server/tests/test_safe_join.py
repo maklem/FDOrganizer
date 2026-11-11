@@ -98,7 +98,7 @@ def test_safe_join_rejects_symlink_to_outside_file(tmp_path, tmp_path_factory):
         safe_join(tmp_path, "link.txt")
 
 
-def test_safe_join_allows_symlink_inside_base(tmp_path):
+def test_safe_join_rejects_symlink_inside_base(tmp_path):
     inside = tmp_path / "inside"
     inside.mkdir()
     link = tmp_path / "link"
@@ -107,4 +107,5 @@ def test_safe_join_allows_symlink_inside_base(tmp_path):
     except OSError:
         pytest.skip("symlinks are not supported")
 
-    assert safe_join(tmp_path, "link", "file.txt") == link / "file.txt"
+    with pytest.raises(PathError):
+        safe_join(tmp_path, "link", "file.txt")
