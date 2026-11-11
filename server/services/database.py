@@ -12,6 +12,7 @@ from ..entities.databases import Databases
 from ..entities.errors import InvalidDocumentIdError, PatchError
 
 DATABASE_ID_EXPRESSION = re.compile(r"^[A-Za-z0-9]{1,64}$")
+DATABASE_TIMEOUT = 5.0
 
 
 def sanitize_database_id(id: str) -> str:
@@ -94,6 +95,7 @@ def get_attachment(document_id: str, document_name: str):
     return requests.get(
         f"{doc_url(Databases.DOCUMENTS, document=document_id)}/{document_name}",
         headers=headers,
+        timeout=DATABASE_TIMEOUT,
     )
 
 

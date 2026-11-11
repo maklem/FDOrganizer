@@ -100,7 +100,7 @@ def get_files_with_metadata(ids, request, auth):
             owner="",
             source_id=id_,
             source="Dummy",
-            hash_md5=md5(data_).hexdigest(),
+            hash_md5=md5(data_, usedforsecurity=False).hexdigest(),
             hash_sha512=sha512(data_).hexdigest(),
         )
         for data_, id_ in zip(data, ids)

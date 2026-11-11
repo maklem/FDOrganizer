@@ -1,4 +1,3 @@
-import hashlib
 import logging
 import os
 from collections.abc import Generator
@@ -57,11 +56,10 @@ def stream_exportable_package(package_id: str):
 
     def generate() -> Generator[bytes, None, None]:
         # Get all documents and folders in hierarchical structure
-        hashmap: Hashmap = {}
         zs = ZipStream()
         errors: list[str] = []
         # Download files
-        yield from stream_zipped_directory(zs, hashmap, structmap, package.name)
+        yield from stream_zipped_directory(zs, structmap, package.name)
 
         # Create data for mets generation (depends on downloaded files)
         file_list = create_file_list(structmap, package.name)
@@ -95,18 +93,18 @@ def stream_mets(
 
 
 def stream_zipped_directory(
-    zs: ZipStream, hashmap: Hashmap, structmap, structpath=""
+    zs: ZipStream, structmap, structpath=""
 ) -> Generator[bytes, None, None]:
     for document in structmap.get("files"):
-        yield from stream_zipped_file(zs, hashmap, document, structpath)
+        yield from stream_zipped_file(zs, document, structpath)
     for folder in structmap.get("folders"):
         yield from stream_zipped_directory(
-            zs, hashmap, folder, structpath=os.path.join(structpath, folder["name"])
+            zs, folder, structpath=os.path.join(structpath, folder["name"])
         )
 
 
 def stream_zipped_file(
-    zs: ZipStream, hashmap: Hashmap, document: Document, structpath: str
+    zs: ZipStream, document: Document, structpath: str
 ) -> Generator[bytes, None, None]:
     if not document.id:
         return
@@ -116,6 +114,5 @@ def stream_zipped_file(
         file_data = get_attachment(document.id, document.name).content
     except RequestException:
         print(f"No attachment found for document {document.name} with ID {document.id}")
-    hashmap[document.id] = hashlib.md5(file_data).hexdigest()
     zs.add(file_data, file_name)
     yield from zs.all_files()

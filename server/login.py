@@ -29,6 +29,8 @@ from .services.authentication import (
 from .services.database import get, getall
 from .util import error_page, json_body, web_error, web_response
 
+REMOTE_AUTHENTICATION_TIMEOUT = 5.0
+
 
 @APP.route("/organisations", methods=["GET"])
 def get_organisations():
@@ -185,7 +187,9 @@ def callback_keycloak(idp_id: str):
     }
     if identity_provider.client_secret is not None:
         token_request_body["client_secret"] = identity_provider.client_secret
-    token_response = requests.post(token_url, data=token_request_body)
+    token_response = requests.post(
+        token_url, data=token_request_body, timeout=REMOTE_AUTHENTICATION_TIMEOUT
+    )
     try:
         token_data = token_response.json()
         access_token = token_data["access_token"]
@@ -202,7 +206,9 @@ def callback_keycloak(idp_id: str):
 
     userinfo_url = f"{identity_provider.url}userinfo"
     userinfo_response = requests.get(
-        userinfo_url, headers={"Authorization": f"Bearer {access_token}"}
+        userinfo_url,
+        headers={"Authorization": f"Bearer {access_token}"},
+        timeout=REMOTE_AUTHENTICATION_TIMEOUT,
     )
     userinfo = userinfo_response.json()
 
@@ -299,7 +305,7 @@ def nonce_matches(id_token_str: Any, expected_nonce: str) -> bool:
     if not isinstance(id_token_str, str):
         return False
     try:
-        token = BearerToken(access_token="", id_token=id_token_str)
+        token = BearerToken(id_token=id_token_str)
     except InvalidIdToken:
         return False
     if not isinstance(token.id_token, IdToken):
