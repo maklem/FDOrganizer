@@ -163,16 +163,19 @@ def is_valid_filename(name: str | None) -> bool:
 
 
 def safe_join(base_path: str | Path, *segments: str) -> Path:
-    base = Path(base_path)
+    base = Path(base_path).resolve()
 
     for segment in segments:
         if not is_valid_filename(segment):
             raise PathError(f"could not safely join paths: '{base}' and '{segment}'")
 
-        new = base / segment
-        if not new.resolve().is_relative_to(base.resolve()):
+        new = base.joinpath(segment).resolve()
+
+        if not new.as_posix().startswith(base.as_posix()):
+            raise PathError(f"could not safely join paths: '{base}' and '{segment}'")
+
+        if not new.is_relative_to(base):
             raise PathError(f"could not safely join paths: '{base}' and '{segment}'")
 
         base = new
-
     return base
