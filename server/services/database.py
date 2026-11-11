@@ -14,17 +14,20 @@ from ..entities.errors import InvalidDocumentIdError, PatchError
 DATABASE_ID_EXPRESSION = re.compile(r"^[A-Za-z0-9]{1,64}$")
 
 
+def sanitize_database_id(id: str) -> str:
+    if (match := DATABASE_ID_EXPRESSION.fullmatch(id)) is not None:
+        return match.group()
+    raise InvalidDocumentIdError(id)
+
+
 def is_valid_database_id(database_id: str | None) -> bool:
     """A database document id may only contain alphanumeric symbols."""
     if not isinstance(database_id, str):
         return False
-    return DATABASE_ID_EXPRESSION.fullmatch(database_id) is not None
-
-
-def assert_valid_document_id(document_id: str) -> None:
-    """Reject document ids from untrusted sources before they reach the database."""
-    if not is_valid_database_id(document_id):
-        raise InvalidDocumentIdError(document_id)
+    try:
+        return sanitize_database_id(database_id) == database_id
+    except InvalidDocumentIdError:
+        return False
 
 
 def auth_header() -> dict[str, str]:
@@ -53,7 +56,7 @@ def db_url(database: Databases, parameters: dict[str, str] | None = None) -> str
 def doc_url(
     database: Databases, document: str, parameters: dict[str, str] | None = None
 ) -> str:
-    assert_valid_document_id(document)
+    document = sanitize_database_id(document)
     if not parameters:
         return f"{base_url()}/{database.value}/{document}"
     return f"{doc_url(database, document)}?{query_params(parameters)}"
@@ -76,9 +79,9 @@ def attach(
     if mimetype is not None:
         headers = headers | {"Content-Type": mimetype}
 
-    assert_valid_document_id(document.id)
+    document_id = sanitize_database_id(document.id)
     return requests.put(
-        f"{doc_url(database, document.id, parameters)}/{urllib.parse.quote(filename)}",
+        f"{doc_url(database, document_id, parameters)}/{urllib.parse.quote(filename)}",
         headers=headers,
         data=file_content,
         timeout=20,
@@ -87,7 +90,7 @@ def attach(
 
 def get_attachment(document_id: str, document_name: str):
     headers = auth_header()
-    assert_valid_document_id(document_id)
+    document_id = sanitize_database_id(document_id)
     return requests.get(
         f"{doc_url(Databases.DOCUMENTS, document=document_id)}/{document_name}",
         headers=headers,
@@ -130,7 +133,7 @@ def getall(database: Databases) -> list[dict[str, Any]]:
 
 
 def get(database: Databases, id: str) -> requests.Response:
-    assert_valid_document_id(id)
+    id = sanitize_database_id(id)
     url = f"{db_url(database)}/{id}"
 
     headers = auth_header() | {
@@ -143,7 +146,7 @@ def get(database: Databases, id: str) -> requests.Response:
 def update(
     database: Databases, doc_id, changes: dict[str, Any], replace: bool = False
 ) -> requests.Response:
-    assert_valid_document_id(doc_id)
+    doc_id = sanitize_database_id(doc_id)
     current_document = get(database, doc_id).json()
 
     new_document = changes if replace else patch(current_document, changes)
@@ -162,7 +165,7 @@ def update(
 
 
 def delete(database: Databases, doc_id: str) -> requests.Response:
-    assert_valid_document_id(doc_id)
+    doc_id = sanitize_database_id(doc_id)
     revision = (
         requests.head(
             doc_url(database, doc_id), headers=auth_header(), timeout=10

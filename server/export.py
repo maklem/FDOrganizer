@@ -15,7 +15,7 @@ from .export_utils import (
     create_structmap,
 )
 from .services.authentication import userdata
-from .services.database import assert_valid_document_id, get, get_attachment
+from .services.database import get, get_attachment, sanitize_database_id
 from .util import safe_join, web_error, web_response
 
 TEMP_DIR = os.path.join("server", "tmp")
@@ -23,7 +23,7 @@ TEMP_DIR = os.path.join("server", "tmp")
 
 @APP.route("/export/<package_id>", methods=["POST"])
 def build_export_package(package_id: str):
-    assert_valid_document_id(package_id)
+    package_id = sanitize_database_id(package_id)
 
     package = Package.from_db(get(Databases.PACKAGES, package_id).json())
     user = userdata()

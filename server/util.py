@@ -171,7 +171,7 @@ def safe_join(base_path: str | Path, *segments: str) -> Path:
 
         new = base.joinpath(segment).resolve()
 
-        if not new.as_posix().startswith(base.as_posix()):
+        if new != base.joinpath(segment):
             raise PathError(f"could not safely join paths: '{base}' and '{segment}'")
 
         if not new.is_relative_to(base):
