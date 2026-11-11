@@ -63,3 +63,11 @@ server = [
     "static/locale/**/*",
     "metadata_templates/**/*",
 ]
+
+[tool.bandit]
+targets = [ "server" ]
+exclude_dirs = [
+    ".*",
+    "tests",
+    "server/tests"
+    ]
