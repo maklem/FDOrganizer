@@ -45,6 +45,7 @@ dev = [
     "ruff==0.17.3",
     "testcontainers==4.14.2",
     "ty==0.0.95",
+    "bandit==1.9.4",
 ]
 
 [tool.setuptools.packages.find]
