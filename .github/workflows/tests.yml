@@ -9,7 +9,7 @@ jobs:
   playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    needs: [pytest, ruff, ty]
+    needs: [pytest, ruff, ty, bandit]
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python
