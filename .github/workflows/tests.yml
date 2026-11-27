@@ -13,8 +13,8 @@ jobs:
     steps:
     - name: install os dependencies
       run: |
-        apt install redis
-        systemctl start redis
+        sudo apt install redis
+        sudo systemctl start redis
     - uses: actions/checkout@v5
     - name: Set up Python
       uses: actions/setup-python@v6
