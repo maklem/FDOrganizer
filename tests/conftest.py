@@ -60,7 +60,7 @@ def redis(fdo_network: Network) -> Iterator[DockerContainer]:
     container = (
         DockerContainer("redis")
         .with_network(fdo_network)
-        .waiting_for(LogMessageWaitStrategy("Apache CouchDB has started on"))
+        .waiting_for(LogMessageWaitStrategy("Ready to accept connections tcp"))
     )
     with container:
         yield container
