@@ -21,8 +21,8 @@ from .entities.databases import Databases
 from .entities.errors import IdentityProviderError
 from .entities.organisation import Organisation
 from .services.authentication import (
-    userdata,
     UserData,
+    userdata,
     authorize,
     find_organisation_by_tag,
     is_authorized,
