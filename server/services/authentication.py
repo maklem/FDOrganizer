@@ -34,21 +34,24 @@ class UserData:
     def list_plugins(self) -> list[str]:
         return list(self.plugins.keys())
 
+    def as_dict(self):
+        return dataclasses.asdict(self)
+
 
 def add_plugin(key: str, value: str):
-    session["user"].plugins.update({key: value})
+    session["user"]["plugins"].update({key: value})
     session.modified = True
 
 
 def remove_plugin(key: str):
-    session["user"].plugins.pop(key, None)
+    session["user"]["plugins"].pop(key, None)
     session.modified = True
 
 
 def userdata() -> UserData:
     if "user" not in session:
         raise RuntimeError("Reading UserData without authenticated user.")
-    return session["user"]
+    return UserData(**session["user"])
 
 
 def find_organisation_by_tag(idp_tag: str) -> Organisation:
@@ -86,7 +89,7 @@ def authorize(username: str, password: str, idp_id: str):
     if not credentials_valid(username, password, idp_id):
         raise HTTPError("Credentials not valid")
 
-    session["user"] = UserData(username, username, organisation.id, {})
+    session["user"] = UserData(username, username, organisation.id, {}).as_dict()
 
 
 def is_authorized():

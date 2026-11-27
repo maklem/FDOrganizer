@@ -25,6 +25,7 @@ from .services.authentication import (
     authorize,
     find_organisation_by_tag,
     is_authorized,
+    userdata,
 )
 from .services.database import get, getall
 from .util import error_page, json_body, web_error, web_response
@@ -126,7 +127,7 @@ def callback_oidc(idp_id: str):
         username=username,
         displayname=user_displayname,
         organisation_id=user_organisation,
-    )
+    ).as_dict()
 
     return redirect(url_for("navhome"))
 
@@ -329,7 +330,7 @@ def whoami():
     if not is_authorized():
         return web_response(200, details=data)
 
-    user: UserData = session["user"]
+    user = userdata()
 
     return web_response(
         200,
