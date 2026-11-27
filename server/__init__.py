@@ -1,8 +1,9 @@
 import logging
 import logging.handlers
 import os
+from datetime import timedelta
 
-from cachelib import FileSystemCache
+import redis
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, request
 from flask_session import Session
@@ -17,16 +18,16 @@ APP.config["UPLOAD_FOLDER"] = "./uploads"
 APP.config["MAX_CONTENT_LENGTH"] = 1_000_000_000
 APP.config["APPLICATION_ROOT"] = "/"
 
-APP.config["SESSION_PERMANENT"] = False
-APP.config["SESSION_TYPE"] = "cachelib"
-APP.config["SESSION_CACHELIB"] = FileSystemCache(cache_dir="fdo_session", threshold=500)
+APP.config["SESSION_PERMANENT"] = True
+APP.config["SESSION_TYPE"] = "redis"
+APP.config["SESSION_REDIS"] = redis.Redis()
 APP.config["SESSION_COOKIE_NAME"] = "fdo_session"
 APP.config["SESSION_COOKIE_HTTPONLY"] = True
 APP.config["SESSION_COOKIE_SECURE"] = (
     os.getenv("TEST_SESSION_NOT_SECURE", "no") != "yes"
 )  # ignore HTTPS in CI
 APP.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-APP.config["PERMANENT_SESSION_LIFETIME"] = 3600 * 10
+APP.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=10)
 
 APP.config["MAX_PACKAGE_SIZE"] = 5 * 1024 * 1024 * 1024
 
