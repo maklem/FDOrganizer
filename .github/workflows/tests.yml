@@ -11,10 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [pytest, ruff, ty, bandit]
     steps:
-    - name: install os dependencies
-      run: |
-        sudo apt install redis
-        sudo systemctl start redis
     - uses: actions/checkout@v5
     - name: Set up Python
       uses: actions/setup-python@v6

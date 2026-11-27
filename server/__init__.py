@@ -20,7 +20,6 @@ APP.config["APPLICATION_ROOT"] = "/"
 
 APP.config["SESSION_PERMANENT"] = True
 APP.config["SESSION_TYPE"] = "redis"
-APP.config["SESSION_REDIS"] = redis.Redis()
 APP.config["SESSION_COOKIE_NAME"] = "fdo_session"
 APP.config["SESSION_COOKIE_HTTPONLY"] = True
 APP.config["SESSION_COOKIE_SECURE"] = (
@@ -39,6 +38,9 @@ Session(APP)
 load_dotenv(dotenv_path="../.env")
 
 APP.config.from_prefixed_env(prefix="FDO")
+
+# Init redis **after** loading environment
+APP.config["SESSION_REDIS"] = redis.Redis(host=os.getenv("REDIS_HOST", "localhost"))
 
 
 @APP.errorhandler(HTTPException)

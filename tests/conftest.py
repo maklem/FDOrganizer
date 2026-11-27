@@ -38,7 +38,7 @@ def fdo_network() -> Iterator[Network]:
 
 
 @fixture(scope=FDORGANIZER_SCOPE)
-def couchdb(request, fdo_network: Network) -> Iterator[DockerContainer]:
+def couchdb(fdo_network: Network) -> Iterator[DockerContainer]:
     env = {
         "COUCHDB_USER": "fdo",
         "COUCHDB_PASSWORD": "fdo",
@@ -56,23 +56,43 @@ def couchdb(request, fdo_network: Network) -> Iterator[DockerContainer]:
 
 
 @fixture(scope=FDORGANIZER_SCOPE)
+def redis(fdo_network: Network) -> Iterator[DockerContainer]:
+    container = (
+        DockerContainer("redis")
+        .with_network(fdo_network)
+        .waiting_for(LogMessageWaitStrategy("Apache CouchDB has started on"))
+    )
+    with container:
+        yield container
+        print("=== Logs: redis ===")
+        print(container.get_logs())
+
+
+@fixture(scope=FDORGANIZER_SCOPE)
 def fdorganizer(
-    fdorganizer_image: DockerImage, couchdb: DockerContainer, fdo_network: Network
+    fdorganizer_image: DockerImage,
+    couchdb: DockerContainer,
+    redis: DockerContainer,
+    fdo_network: Network,
 ) -> Iterator[DockerContainer]:
     if fdorganizer_image.tag is None:
         assert False, "FDO image has no TAG"
 
-    addr = couchdb.get_docker_client().bridge_ip(
+    couchdb_addr = couchdb.get_docker_client().bridge_ip(
         container_id=couchdb.get_wrapped_container().id
+    )
+    redis_addr = redis.get_docker_client().bridge_ip(
+        container_id=redis.get_wrapped_container().id
     )
 
     env = {
-        "COUCHDB_HOST": addr,
+        "COUCHDB_HOST": couchdb_addr,
         "COUCHDB_PORT": "5984",
         "COUCHDB_USER": couchdb.env.get("COUCHDB_USER", ""),
         "COUCHDB_PASSWORD": couchdb.env.get("COUCHDB_PASSWORD", ""),
         "TOKEN_SECRET": "this-is-a-test",
         "TEST_SESSION_NOT_SECURE": "yes",
+        "REDIS_HOST": redis_addr,
     }
 
     command = dedent("""
