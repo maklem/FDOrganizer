@@ -22,10 +22,10 @@ from .entities.errors import IdentityProviderError
 from .entities.organisation import Organisation
 from .services.authentication import (
     UserData,
-    userdata,
     authorize,
     find_organisation_by_tag,
     is_authorized,
+    userdata,
 )
 from .services.database import get, getall
 from .util import error_page, json_body, web_error, web_response
