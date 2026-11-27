@@ -33,14 +33,14 @@ APP.config["MAX_PACKAGE_SIZE"] = 5 * 1024 * 1024 * 1024
 APP.config["KEEP_ACTIVE_PACKAGES_DAYS"] = 60
 APP.config["KEEP_ARCHIVED_PACKAGES_DAYS"] = 15
 
-Session(APP)
-
 load_dotenv(dotenv_path="../.env")
 
 APP.config.from_prefixed_env(prefix="FDO")
 
 # Init redis **after** loading environment
 APP.config["SESSION_REDIS"] = redis.Redis(host=os.getenv("REDIS_HOST", "localhost"))
+
+Session(APP)
 
 
 @APP.errorhandler(HTTPException)
