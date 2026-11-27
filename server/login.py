@@ -21,6 +21,7 @@ from .entities.databases import Databases
 from .entities.errors import IdentityProviderError
 from .entities.organisation import Organisation
 from .services.authentication import (
+    userdata,
     UserData,
     authorize,
     find_organisation_by_tag,
@@ -126,7 +127,7 @@ def callback_oidc(idp_id: str):
         username=username,
         displayname=user_displayname,
         organisation_id=user_organisation,
-    )
+    ).as_dict()
 
     return redirect(url_for("navhome"))
 
@@ -329,7 +330,7 @@ def whoami():
     if not is_authorized():
         return web_response(200, details=data)
 
-    user: UserData = session["user"]
+    user = userdata()
 
     return web_response(
         200,
