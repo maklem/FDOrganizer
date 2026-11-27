@@ -9,11 +9,13 @@ services:
       - "8080"
     depends_on:
       - db
+      - cache
     environment:
       - COUCHDB_USER=${COUCHDB_USER}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
       - COUCHDB_HOST=db
       - COUCHDB_PORT=5984
+      - REDIS_HOST=cache
       - EXPORT_DIR=/server/export
       - IMPRESSUM_LINK=${IMPRESSUM_LINK}
       - TOKEN_SECRET=${TOKEN_SECRET}
@@ -27,6 +29,11 @@ services:
       - /server/docker_init.sh && /server/start.sh
     restart: always
     user: ${EXPORT_USER}
+
+  cache:
+    image: redis:latest
+    container_name: cache
+    restart: always
 
   db:
     image: couchdb:latest
